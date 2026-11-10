@@ -25,7 +25,7 @@ Step-by-step manual checklists and beginner guides for practicing **CyberPatriot
 
 - [Forensics questions](forensics-questions.md): hashes, decoding, finding files, reading logs
 - [Linux critical service hardening](../../Linux/debian.md#16-critical-services-complete-manual-procedures): Apache, Nginx, PHP, MySQL, FTP, Samba, DNS, Postfix
-- [Cisco networking and Packet Tracer](../../Cisco/cisco-networking.md): IOS commands, subnetting, ports
+- [Cisco networking and Packet Tracer](../../Cisco/packet-tracer.md): IOS commands, subnetting, ports
 - [Glossary](glossary.md): every acronym explained
 - [For mentors and teachers](for-mentors-and-teachers.md): running practice sessions with this toolkit
 
@@ -41,7 +41,7 @@ These original, documentation-only supplements add targeted material found by co
 
 - [Windows: effective Group Policy, services, events, persistence, SMB and firewall](../../Windows/windows-10-11.md#21-advanced-windows-investigations--included-in-this-checklist)
 - [Linux: sudo, SSH socket activation, PAM, cron/systemd, firewall and file investigations](../../Linux/debian.md#18-advanced-manual-verification-and-recovery)
-- [Cisco: VLAN/trunk troubleshooting, router-on-a-stick, port security, STP, ACLs and DHCP](../../Cisco/cisco-switch-routing-troubleshooting.md)
+- [Cisco: VLAN/trunk troubleshooting, router-on-a-stick, port security, STP, ACLs and DHCP](../../Cisco/packet-tracer.md#22-consolidated-troubleshooting-reference)
 
 ## Detailed procedures and recovery
 
@@ -49,7 +49,7 @@ These original, documentation-only supplements add targeted material found by co
 - [Windows Server role-aware procedures](../../Windows/windows-server.md#12-role-aware-manual-procedures-and-recovery)
 - [Linux authentication, firewall, package and persistence recovery](../../Linux/linux-mint.md#17-detailed-manual-safety-and-verification-procedures)
 - [FreeBSD-native recovery and service workflow](../../Linux/freebsd.md#13-freebsd-specific-recovery-and-service-workflow)
-- [Cisco complete manual lab procedures](../../Cisco/cisco-networking.md#complete-manual-lab-procedures)
+- [Cisco complete manual lab procedures](../../Cisco/packet-tracer.md#21-expanded-original-configuration-reference)
 - [Forensic investigation procedures](forensics-questions.md#repeatable-investigation-procedures)
 - [Sources, attribution and maintenance](sources-and-attribution.md)
 

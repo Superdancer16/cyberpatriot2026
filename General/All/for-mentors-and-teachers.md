@@ -30,7 +30,7 @@ How to run practice sessions with this toolkit in a class or club, even if your 
 | 5 | Windows | Lesson 6 ([PowerShell basics](../../Windows/windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist)), [Windows 10 / 11 checklist](../../Windows/windows-10-11.md) |
 | 6 | A full practice round | [Round game plan](round-game-plan.md), a permitted clock, manual inventories and checkpoint notes |
 
-After that, rotate students through Windows Server and Debian, using their checklists. For the Cisco part of a round, use the [Cisco & Packet Tracer guide](../../Cisco/cisco-networking.md) and the worked subnetting examples in that guide.
+After that, rotate students through Windows Server and Debian, using their checklists. For the Cisco part of a round, use the [Cisco & Packet Tracer guide](../../Cisco/packet-tracer.md) and the worked subnetting examples in that guide.
 
 ## Running a session
 

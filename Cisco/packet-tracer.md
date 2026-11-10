@@ -1995,7 +1995,7 @@ show startup-config
 show logging
 ~~~
 
-See [main Cisco guide: configure SSH](cisco-networking.md#configure-ssh) for complete hostname, RSA key, VTY/local authentication and SSH transport steps. Use the actual authorized credentials and device capabilities.
+See [main Cisco guide: configure SSH](packet-tracer.md#17-secure-device-management) for complete hostname, RSA key, VTY/local authentication and SSH transport steps. Use the actual authorized credentials and device capabilities.
 
 After successful verification, save:
 
