@@ -1,16 +1,12 @@
-# Cisco
+# Cisco — Two comprehensive study guides
 
-## Networking quiz — vocabulary and common questions
+Choose one of the two complete guides:
 
-- **[Cisco networking quiz: 254 common questions and short answers](networking-quiz-questions-and-answers.md)** — original, free-response-style answers based on typical MCQ concepts: networking terms, OSI, protocols, ports, addressing/subnetting, VLANs, routing, security, Cisco commands, standards organizations and scenarios. Includes Ctrl+F-friendly question numbering and a CyberPatriot XIX module-scope reference.
+1. **[Cisco Packet Tracer — Step-by-Step Handbook](packet-tracer.md)** — practical configurations, worked CLI examples, interface/VLAN/trunk setup, routing, OSPF/EIGRP/RIP, DHCP/DNS, ACLs, NAT/PAT, Wi-Fi, IPv6, SSH, device validation, troubleshooting, and recovery. Includes all useful material from the two former practical Cisco files.
+2. **[Cisco Quiz — 361 Common Questions and Answers](cisco-quiz.md)** — vocabulary, protocol explanations, OSI/TCP-IP, addressing and subnetting, port numbers, switching, wireless, security, routing, Cisco IOS concepts, comparison tables, tips, and quiz-style scenarios. Uses original **free-response questions with answers immediately below**, not four-option practice tests.
 
-## Cisco concepts and practical guides
+**Study priority:** Follow the assigned Cisco NetAcad **Content Course** for the current CyberPatriot round and actual competition rules. The two guides are original reference material, **not live competition answer keys**.
 
-- [Cisco networking and Packet Tracer: concepts, configurations and verification](cisco-networking.md)
-- [Cisco switching, routing, VLANs, ACLs and troubleshooting](cisco-switch-routing-troubleshooting.md)
-
-**Study priority:** Use the current round's official NetAcad *Content Course* modules first; the Q&A guide is independent practice, not an official question bank or a promise about live quiz questions. Follow current competition rules on permitted references and collaboration.
-
-Start with the actual Packet Tracer activity instructions and topology for practical exercises. Keep backups when allowed, inspect the present configuration, and verify required connectivity before saving changes.
+For Packet Tracer, follow the activity's instructions and permitted features. Preserve working settings and back up the activity only when allowed. Keep required network connectivity while changing configurations.
 
 [Back to all categories](../README.md).

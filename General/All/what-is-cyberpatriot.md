@@ -47,7 +47,7 @@ Older practice images may also be Windows 10, Windows Server 2019, or Ubuntu. Th
 
 - Each team gets **one 4-hour block**. The clock starts when the first image is powered on.
 - Up to 5 people work at once. Usually each person takes one image or one task.
-- There is also a **Cisco networking** part (a quiz and a Packet Tracer activity). Study it with the [Cisco & Packet Tracer guide](../../Cisco/cisco-networking.md) and the worked subnetting examples in that guide.
+- There is also a **Cisco networking** part (a quiz and a Packet Tracer activity). Study it with the [Cisco & Packet Tracer guide](../../Cisco/packet-tracer.md) and the worked subnetting examples in that guide.
 
 ## Where to go next
 
