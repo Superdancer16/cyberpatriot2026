@@ -1,6 +1,6 @@
 # Windows deeper investigations: effective policy, persistence, shares and event evidence
 
-> **Use after:** [Windows workstation checklist](../checklists/windows-10-11.md) or [Windows Server checklist](../checklists/windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
+> **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
 
 This supplement draws topic ideas from public CyberPatriot checklists and verifies key methods with Microsoft documentation. A generic checklist cannot tell you which accounts, shares, or services are authorized on *your* image.
 
