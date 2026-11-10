@@ -24,10 +24,10 @@ How to run practice sessions with this toolkit in a class or club, even if your 
 | Session | Goal | Use |
 |---|---|---|
 | 1 | Understand the game | Lessons 1–2 ([What is CyberPatriot?](what-is-cyberpatriot.md), [Things that lose points](things-that-lose-points.md)), then a verbal glossary exercise |
-| 2 | Read a README, use a terminal | Lessons 3 and 5 ([Reading the README](reading-the-readme.md), [Linux terminal basics](../../Linux/linux-terminal-basics.md)), a written requirement/verification sheet |
+| 2 | Read a README, use a terminal | Lessons 3 and 5 ([Reading the README](reading-the-readme.md), [Linux terminal basics](../../Linux/linux-mint.md#22-complete-linux-terminal-basics-embedded)), a written requirement/verification sheet |
 | 3 | First Linux image: users, passwords, firewall | [Linux Mint checklist](../../Linux/linux-mint.md) sections 0–4 |
 | 4 | Linux, continued: services, software, files, backdoors, forensics | Mint checklist sections 5–17, [Forensics questions](forensics-questions.md) |
-| 5 | Windows | Lesson 6 ([PowerShell basics](../../Windows/powershell-basics.md)), [Windows 10 / 11 checklist](../../Windows/windows-10-11.md) |
+| 5 | Windows | Lesson 6 ([PowerShell basics](../../Windows/windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist)), [Windows 10 / 11 checklist](../../Windows/windows-10-11.md) |
 | 6 | A full practice round | [Round game plan](round-game-plan.md), a permitted clock, manual inventories and checkpoint notes |
 
 After that, rotate students through Windows Server and Debian, using their checklists. For the Cisco part of a round, use the [Cisco & Packet Tracer guide](../../Cisco/cisco-networking.md) and the worked subnetting examples in that guide.

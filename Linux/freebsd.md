@@ -654,7 +654,7 @@ After no errors:
 service sshd reload
 ```
 
-For another installed server, use the table to identify its file, copy it privately with `cp -p`, open it with `ee`, apply the compatible defensive directives described in [service hardening](linux-service-hardening.md), then use its actual validation command. Read `service NAME` usage to confirm reload support; use a scheduled restart only when needed. Never assume a Linux package/unit/path applies.
+For another installed server, use the table to identify its file, copy it privately with `cp -p`, open it with `ee`, review defensively relevant concepts in [the Debian service hardening appendix] (and adapt **only** those actually supported by FreeBSD), rather than directly applying Linux directives described in [service hardening](debian.md#16-critical-services-complete-manual-procedures), then use its actual validation command. Read `service NAME` usage to confirm reload support; use a scheduled restart only when needed. Never assume a Linux package/unit/path applies.
 
 **Check it worked:** `service sshd status`, `/usr/sbin/sshd -T` and `sockstat -4 -6 -l`; test a fresh authorized SSH session. For each other service test its actual authorized client operation, not merely its rc status. Inspect `/var/log/messages`, `/var/log/auth.log` and the daemon's configured log.
 

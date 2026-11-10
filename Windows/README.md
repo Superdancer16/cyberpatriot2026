@@ -1,12 +1,10 @@
 # Windows
 
-Detailed Windows-specific CyberPatriot procedures:
+Complete, **self-contained** Markdown handbooks:
 
-- [Windows 10 and Windows 11 checklist](windows-10-11.md)
-- [Windows Server checklist](windows-server.md)
-- [PowerShell basics](powershell-basics.md)
-- [Effective Group Policy, event logs, persistence, shares, and firewall investigations](windows-effective-policy-and-investigation.md)
+- [Windows 10 and Windows 11 — complete workstation checklist](windows-10-11.md) — account policies, Defender, firewall, services, updates, forensics, malware investigation, **PowerShell basics**, effective Group Policy, auditing, troubleshooting and recovery all in one file.
+- [Windows Server 2016/2019/2022 — complete standalone server handbook](windows-server.md) — server roles, Active Directory, DNS/DHCP, IIS/FTP, file shares, domain policy, remote administration, and embedded Windows workstation security/PowerShell procedures.
 
-Before modifying settings, [read the image README](../General/All/reading-the-readme.md) and preserve [forensics evidence](../General/All/forensics-questions.md). Follow the actual system's required-service list.
+All commands and explanations are written directly in these main guides; no separate Windows command or investigation files are necessary. **The README and server role requirements always take precedence** over generic hardening steps.
 
-[Back to all categories](../README.md).
+Start with [reading the image README](../General/All/reading-the-readme.md) and [answering forensics questions](../General/All/forensics-questions.md). [Back to all categories](../README.md).
