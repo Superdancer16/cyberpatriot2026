@@ -36,7 +36,7 @@ Disable-LocalUser -Name "Guest"
 | `Remove-LocalGroupMember -Group Administrators -Member bob` | Take away admin rights |
 | `net accounts` | Show the password and lockout policy |
 | `Get-Service \| Where-Object Status -eq Running` | Running services |
-| `Stop-Service -Name Spooler -Force` | Stop a service |
+| `Stop-Service -Name Spooler` | Stop a service |
 | `Set-Service -Name Spooler -StartupType Disabled` | Stop it from starting again |
 | `Get-NetFirewallProfile` | Is the firewall on? |
 | `Get-MpComputerStatus` | Is Defender on? |
@@ -77,3 +77,64 @@ Press **Windows key + R**, type one of these, press Enter:
 - PowerShell does what you ask **immediately**. There's no undo for `Remove-` commands.
 - Before changing the registry, export the key: in regedit, right-click the key → **Export**.
 - If you're not sure what a command does, add `-WhatIf` to see what *would* happen: `Remove-LocalUser -Name bob -WhatIf`
+
+## Practice objects, paths and reversible changes
+
+- [ ] Done
+
+**What:** Learn how to inspect PowerShell output and edit a harmless file before modifying security settings.
+
+**Why it matters:** PowerShell pipelines pass objects, not just printed text. Formatting is for display; it should normally come last in a pipeline.
+
+**Before changing anything:** Use ordinary Windows PowerShell for this exercise; administrator rights are not needed. Most handbook examples target Windows PowerShell 5.1 on Windows. A module absent from PowerShell 7 is not proof the Windows role is missing.
+
+**Clicking (GUI):** **Start → Windows PowerShell**. Use File Explorer to view your personal profile folder. Run as administrator only for procedures that require it; do not approve an unknown script merely because it requests elevation.
+
+**Typing (check):**
+
+```powershell
+$PSVersionTable.PSVersion
+Get-Location
+Get-Service | Get-Member
+Get-Service | Select-Object -First 5 Name,Status,StartType
+```
+
+`Get-Member` describes available properties/methods. `Select-Object` keeps properties; `Format-Table` displays them. For CSV export, select properties then `Export-Csv`, without `Format-Table` in between.
+
+**Typing (practice edit):**
+
+```powershell
+$practiceFolder = Join-Path $env:USERPROFILE 'CP PowerShell Practice'
+New-Item -ItemType Directory -Path $practiceFolder -ErrorAction Stop
+```
+
+If it exists, inspect it and choose a new folder rather than overwriting work.
+
+```powershell
+$practiceFile = Join-Path $practiceFolder 'example notes.txt'
+'original value' | Set-Content -LiteralPath $practiceFile
+Copy-Item -LiteralPath $practiceFile -Destination "$practiceFile.before"
+notepad.exe $practiceFile
+```
+
+Edit and save the file. `-LiteralPath` treats wildcard characters literally; quote paths containing spaces. A backtick is PowerShell's escape/continuation character; copying a broken continuation can change a command.
+
+**Check it worked:**
+
+```powershell
+Get-Content -LiteralPath $practiceFile
+Test-Path -LiteralPath "$practiceFile.before"
+```
+
+Expected: your changed text and `True`. For cmdlets inspect the full red error and `$Error[0]`; for native programs inspect `$LASTEXITCODE` immediately after that program. ErrorAction SilentlyContinue hides errors and can make incomplete searches look empty.
+
+**Undo:**
+
+```powershell
+Copy-Item -LiteralPath "$practiceFile.before" -Destination $practiceFile
+Get-Content -LiteralPath $practiceFile
+```
+
+Expected: `original value`. This file restore does not model account/password recovery; those have different limits.
+
+**Warnings:** `-WhatIf` exists only on commands that support it, and its preview does not test downstream dependencies. Use `Get-Help COMMAND -Full` to check support. Use `sc.exe` for Service Control; `sc` in Windows PowerShell is an alias for Set-Content. Never use `Invoke-Expression` to inspect a suspicious string.

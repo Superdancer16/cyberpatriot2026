@@ -50,6 +50,28 @@ The scoring engine gives **penalties** (negative points) when you make things wo
 
 ## If your score goes down
 1. **Stop.** What was the last thing you changed?
-2. Undo it (the script's backups are in `/root/cyberpatriot/backups/` or `C:\harden-toolkit\backups\`).
+2. Undo that specific change using the backup/value you actually recorded. No external script backup is assumed.
 3. Refresh the Scoring Report.
-4. Still down? Revert to your last VMware snapshot. Points already earned **stay earned**.
+4. Still down? Revert to your last VMware snapshot. A rollback discards changes made after the snapshot; scoring may fall. Follow the round rules and recheck the report.
+
+## A concrete penalty-recovery procedure
+
+- [ ] Done
+
+**What:** Diagnose the most recent change instead of resetting the entire image.
+
+**Why it matters:** Reinstalling roles, deleting firewall rules or rolling back a VM can discard correct work and introduce new faults.
+
+**Before changing anything:** Stop new edits. Record the report timestamp, penalty wording and last configuration change. Check the README and whether the application itself failed.
+
+**Clicking (GUI):** Reopen the last setting, compare it with your recorded value, and restore that one value if it contradicted the requirement. Check Event Viewer/system logs for an actual error. Do not clear the logs or reset the scoring system.
+
+**Typing (check):** Repeat the procedure's inspection command and its syntax/client test. For example, an SSH config file needs `sshd -t` and a new client login, while an SMB permission change needs both share and NTFS checks; a generic ping cannot prove either works.
+
+**Typing (fix, only when appropriate):** Use that procedure's explicit rollback, including restoring any new-file absence or old runtime value. Restore before trying another theory.
+
+**Check it worked:** Required function returns, the queried setting matches the intended state and the report refreshes. Record what failed and why so another teammate does not reapply it.
+
+**Undo:** If the attempted recovery itself was mistaken, return it to its recorded starting value. Escalate with the exact error and requirement, not a guess that every security setting should be disabled.
+
+**Warnings:** Account deletion, password reset and database migrations may not have a simple undo. Snapshot rules vary; no general claim that points survive reverting is reliable. Do not assume an account not listed among human users is unauthorized if a required service owns it.

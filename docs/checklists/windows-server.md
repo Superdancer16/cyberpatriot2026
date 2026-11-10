@@ -4,7 +4,7 @@ Windows Server 2022 is in **Round 2, the State round and the Semifinals** this s
 
 Most of the [Windows 10/11 checklist](windows-10-11.md) also applies to servers. This page covers **what's different** and the **server roles** (Active Directory, DNS, IIS, FTP, file shares) that make servers harder.
 
-**How to use this page:** work top to bottom. When a step says "same as Windows 10/11", follow that section of the other checklist. The script `scripts/windows/Harden.ps1` detects servers and Domain Controllers automatically.
+**How to use this page:** work top to bottom. When a step says "same as Windows 10/11", follow that section of the other checklist. Identify the server role manually before applying settings; automation is not included here.
 
 ---
 
@@ -23,8 +23,6 @@ Most of the [Windows 10/11 checklist](windows-10-11.md) also applies to servers.
 ### 1.1 Find out what kind of server it is
 - [ ] Done
 
-**Script:** 🔎 The script detects a Domain Controller by itself (it prints the Role at the top); still list the installed roles so you know what's there.
-
 **Why it matters:** On a **Domain Controller** (DC), users and password rules live in **Active Directory** and **Group Policy**, not on the local computer. If you change the local settings on a DC, nothing happens.
 
 **Clicking:** **Server Manager → Dashboard**. If **AD DS** appears in the left list, it's a Domain Controller. **Server Manager → Local Server** also shows **Domain:** if the computer is in a domain.
@@ -38,25 +36,30 @@ Get-WindowsFeature | Where-Object Installed | Select-Object Name, DisplayName   
 | ProductType | Users are in | Password policy is in |
 |---|---|---|
 | **2 (Domain Controller)** | Active Directory Users and Computers (`dsa.msc`) | **Default Domain Policy** (Group Policy, `gpmc.msc`) |
-| **3 (member or standalone server)** | Local Users and Groups (`lusrmgr.msc`) | Local Security Policy (`secpol.msc`) |
+| **3 (member or standalone server)** | Local accounts in `lusrmgr.msc`; domain accounts remain in AD | Local policy for local accounts; domain policy for domain accounts |
 
 The `*-AD*`, `*-GPO` and `*-DnsServer*` commands on this page come with the AD DS and DNS roles, so they work on a Domain Controller. On other servers they fail unless those tools are installed; use the "Standalone / member server" steps there.
 
 ### 1.2 Fast path: run the hardening script
 - [ ] Done
 
-**What:** After the forensics questions are answered, run `Harden.ps1`: Audit mode first, then Apply mode. The commands are in [Windows 10/11 step 1.2](windows-10-11.md#12-fast-path-run-the-hardening-script). Put every critical service from the README into the config (keywords like `ad`, `dns`, `iis`, `ftp`, `smb`, `rdp`).
+**What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
-**Why it matters:** The script detects servers and Domain Controllers by itself. On a DC it works on the **domain** users, the Default Domain Policy and the DNS zones, and it **never** disables Active Directory, DNS, Netlogon, Kerberos or the other services in 6.2.
+**Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
-**Check it worked:** The top of the output says `Role: Domain Controller` or `Role: Server`. The Scoring Report went up. Every line in `C:\harden-toolkit\findings-*.txt` is a job for you.
+**Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
-Now skip every step marked **Script: ✅** below (on the website, press **Tick the script's ✅ steps** at the top of the page). Do the 🔎 and ✋ steps.
+**Clicking (GUI):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
 
-> [!WARNING]
-> - Any `FAILED` line in the summary: do that step by hand.
-> - If the score **drops**, undo the change from `C:\harden-toolkit\backups\` (see [Using the scripts](../start-here/using-the-scripts.md)).
-> - The Windows script **hasn't been tested on a real Windows image yet**. Always run Audit first.
+**Typing (check):** Use the read-only inventory commands in the next section of this checklist. Save their output in a private working folder; do not publish passwords or password hashes.
+
+**Typing (fix, only when appropriate):** Work through one manual item at a time below. Read every command before entering it. There is no script to download from this repository.
+
+**Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
+
+**Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
+
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -65,14 +68,10 @@ Now skip every step marked **Script: ✅** below (on the website, press **Tick t
 ### 2.1 Standalone / member server
 - [ ] Done
 
-**Script:** 🔎 The script does part of Windows 10/11 section 2; follow the Script lines there for what's left.
-
 Same as [Windows 10/11 section 2](windows-10-11.md#2-users-and-groups).
 
 ### 2.2 Domain Controller: domain users
 - [ ] Done
-
-**Script:** ✅ Done by the script (`users` section).
 
 **Clicking:** **Win + R** → `dsa.msc` (**Active Directory Users and Computers**). Users are usually in the **Users** folder, but check **every OU** (folder). Turn on **View → Advanced Features** to see everything.
 - Delete a user: right-click → **Delete**.
@@ -92,8 +91,6 @@ Disable-ADAccount -Identity Guest
 
 ### 2.3 Domain Controller: powerful groups
 - [ ] Done
-
-**Script:** 🔎 The script removes users who aren't README admins from these groups and adds README admins to Domain Admins (asks first); check for nested groups and anyone the README puts there on purpose.
 
 Check the members of each group. Remove anyone the README doesn't say should be an admin.
 
@@ -125,8 +122,6 @@ Get-ADGroupMember 'Domain Admins' -Recursive | Select-Object SamAccountName   # 
 ### 2.4 Domain Controller: risky account settings
 - [ ] Done
 
-**Script:** ✅ Done by the script (`users` section).
-
 **Clicking:** in `dsa.msc`, double-click a user → **Account** tab → **Account options**. These should all be **unticked**:
 - Password never expires
 - Store password using reversible encryption
@@ -145,8 +140,6 @@ Set-ADAccountControl bob -DoesNotRequirePreAuth $false
 ### 2.5 Strong passwords
 - [ ] Done
 
-**Script:** 🔎 The script resets every README user's password except yours only if you put NewPassword in the config or type one when asked; otherwise do it by hand.
-
 ```powershell
 Set-ADAccountPassword -Identity bob -Reset -NewPassword (Read-Host -AsSecureString "New password")
 ```
@@ -158,14 +151,10 @@ Set-ADAccountPassword -Identity bob -Reset -NewPassword (Read-Host -AsSecureStri
 ### 3.1 Standalone / member server
 - [ ] Done
 
-**Script:** 🔎 The script does Windows 10/11 3.1 and most of 3.2; set "Allow Administrator account lockout" yourself.
-
 Same as [Windows 10/11 section 3](windows-10-11.md#3-account-policies-passwords-and-lockout).
 
 ### 3.2 Domain Controller: edit the Default Domain Policy
 - [ ] Done
-
-**Script:** ✅ Done by the script (`passwords` section).
 
 **Clicking:**
 1. **Win + R** → `gpmc.msc` (**Group Policy Management**).
@@ -191,14 +180,10 @@ net accounts /domain
 ### 4.1 Standalone / member server
 - [ ] Done
 
-**Script:** 🔎 The script does Windows 10/11 4.1 and 4.3; still check User Rights Assignment (4.2) by hand.
-
 Same as [Windows 10/11 section 4](windows-10-11.md#4-local-policies).
 
 ### 4.2 Domain Controller: Default Domain Controllers Policy
 - [ ] Done
-
-**Script:** 🔎 The script sets many of these on the DC's own registry and local policy but doesn't edit the Default Domain Controllers Policy; set them in gpmc.msc so Group Policy can't undo them.
 
 On a DC, these come from the **Default Domain Controllers Policy** GPO. In `gpmc.msc`, right-click it → **Edit** → **Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies** (Audit Policy, User Rights Assignment, Security Options). Use the tables in the Windows 10/11 checklist, plus these DC settings:
 
@@ -211,7 +196,7 @@ Backup-GPO -All -Path C:\gpo-backup
 | Security Option | Set to |
 |---|---|
 | Domain controller: LDAP server signing requirements | **Require signing** |
-| Domain controller: LDAP server channel binding token requirements | **Always** |
+| Domain controller: LDAP server channel binding token requirements | Inspect client compatibility and current Microsoft guidance before requiring **Always**; see 12.3 |
 | Domain controller: Allow server operators to schedule tasks | **Disabled** |
 | Domain controller: Refuse machine account password changes | **Disabled** |
 | Domain member: Digitally encrypt or sign secure channel data (always) | **Enabled** |
@@ -234,8 +219,6 @@ Detailed audit settings are under **Security Settings → Advanced Audit Policy 
 ### 4.3 Look for planted bad Group Policies
 - [ ] Done
 
-**Script:** 🔎 On a DC the script lists every GPO, newest first (10 on screen, all of them in the findings file); open each one and look for planted settings.
-
 **Why:** An attacker can create or change a GPO to turn off the firewall, add an admin, or run a script on every computer.
 
 **Clicking:** In `gpmc.msc`, click each GPO → **Settings** tab (it shows a report). Look for anything that weakens security. Check the **Scope** tab to see where it's linked.
@@ -248,8 +231,6 @@ Get-GPOReport -All -ReportType Html -Path C:\gpo-report.html; Start-Process C:\g
 
 ### 4.4 Domain Controller: Zerologon protection
 - [ ] Done
-
-**Script:** 🔎 On a Domain Controller the script sets `FullSecureChannelProtection` to 1 (`security` section); check the "Allow vulnerable Netlogon secure channel connections" policy yourself.
 
 **Why it matters:** Zerologon (CVE-2020-1472) lets anyone on the network take over a Domain Controller without a password. Windows updates since February 2021 always block it, but a planted policy can let chosen accounts use the weak connection again, and an un-updated image is wide open.
 
@@ -269,14 +250,10 @@ Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters' |
 ### 5.1 Microsoft Defender
 - [ ] Done
 
-**Script:** 🔎 The script does part of Windows 10/11 section 5 and offers to install Defender if it's missing; turn on Tamper Protection (Server 2022) and run a scan yourself.
-
 Same as [Windows 10/11 section 5](windows-10-11.md#5-microsoft-defender-antivirus). If Defender isn't installed: **Server Manager → Add Roles and Features → Features → Microsoft Defender Antivirus** (called **Windows Defender Features** on Server 2016), or `Install-WindowsFeature Windows-Defender`, then restart. Server 2016 and 2019 don't show **Tamper Protection** in the Defender settings; skip that part there.
 
 ### 5.2 Firewall
 - [ ] Done
-
-**Script:** 🔎 The script turns the firewall on for every profile and never disables the built-in DC rule groups; still review the custom inbound rules (Windows 10/11 6.2).
 
 Same as [Windows 10/11 section 6](windows-10-11.md#6-firewall).
 
@@ -286,14 +263,10 @@ Same as [Windows 10/11 section 6](windows-10-11.md#6-firewall).
 ### 5.3 Windows Update
 - [ ] Done
 
-**Script:** 🔎 The script installs updates only if InstallUpdates is 'yes' (or you answer yes); otherwise install them here by hand.
-
 **Server Manager → Local Server → Windows Update** (or **Settings → Update & Security**). On Server Core: run `sconfig` and choose **Install updates**.
 
 ### 5.4 IE Enhanced Security Configuration
 - [ ] Done
-
-**Script:** ✋ Not done by the script. Do this by hand.
 
 **Server Manager → Local Server → IE Enhanced Security Configuration** must be **On** for Administrators and Users.
 
@@ -304,8 +277,6 @@ Same as [Windows 10/11 section 6](windows-10-11.md#6-firewall).
 ### 6.1 Turn off what the README doesn't need
 - [ ] Done
 
-**Script:** 🔎 The script disables the risky services the README doesn't list (asks first; WinRM and Remote Desktop default to No); decide those yourself.
-
 Same list as [Windows 10/11 section 8](windows-10-11.md#8-services), plus:
 - **Print Spooler**: disable on Domain Controllers unless this is the print server (PrintNightmare).
 - **Windows Remote Management (WinRM)**: Server Manager uses it, so keep it on servers unless the README says otherwise, and lock it down (section 8).
@@ -314,8 +285,6 @@ Windows Server has no **Security Center** (`wscsvc`) service, so skip that name 
 
 ### 6.2 Never touch these on a Domain Controller
 - [ ] Done
-
-**Script:** 🔎 The script never changes these services on a Domain Controller, but doesn't check they're running; run the check command.
 
 | Service | Name |
 |---|---|
@@ -335,8 +304,6 @@ All should be **Running** and **Automatic**.
 
 ### 6.3 Print Spooler: PrintNightmare fixes
 - [ ] Done
-
-**Script:** ✅ Done by the script (`security` section sets the three registry values below; the `services` section offers to turn off the Print Spooler when the README doesn't need printing).
 
 **Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM. If the spooler must keep running, make sure only admins can install drivers.
 
@@ -362,8 +329,6 @@ Get-Service Spooler | Format-Table Name, Status, StartType     # Disabled on a D
 ### 7.1 Remove roles and features that aren't needed
 - [ ] Done
 
-**Script:** 🔎 The script removes SMBv1, Telnet, TFTP, PowerShell 2.0, SNMP, Simple TCP/IP and (if your config doesn't list ftp) the IIS FTP server (asks first), and asks about IIS with default No; decide other roles yourself.
-
 **Clicking:** **Server Manager → Manage → Remove Roles and Features**. Untick unneeded **features**: Telnet Client, TFTP Client, SMB 1.0/CIFS File Sharing Support, Windows PowerShell 2.0 Engine, SNMP Service, Simple TCP/IP Services. Remove **roles** only if the README clearly doesn't need them (e.g. Web Server (IIS) on a plain DC).
 
 **Typing:**
@@ -384,14 +349,10 @@ Restart once when it says a restart is needed (SMBv1 removal needs one).
 ### 8.1 Remote Desktop and Remote Assistance
 - [ ] Done
 
-**Script:** 🔎 The script does part of Windows 10/11 section 10 (Remote Assistance off, RDP off or NLA on); still check who is in Remote Desktop Users.
-
 Same as [Windows 10/11 section 10](windows-10-11.md#10-remote-access). Servers often **need** RDP; if so, keep it on with Network Level Authentication, and control who's in **Remote Desktop Users**.
 
 ### 8.2 Lock down WinRM
 - [ ] Done
-
-**Script:** 🔎 The script sets the WinRM policies (no Basic authentication, no unencrypted traffic); run the winrm command to confirm.
 
 ```powershell
 winrm get winrm/config/service       # AllowUnencrypted = false, Basic = false
@@ -404,8 +365,6 @@ Or with `gpedit.msc` → **Administrative Templates → Windows Components → W
 
 ### 9.1 IIS web server
 - [ ] Done
-
-**Script:** 🔎 If your config lists iis, the script turns off directory browsing, hides version headers, turns on logging and fixes LocalSystem app pools; you still check authentication, request filtering and web shells.
 
 **Clicking:** **Win + R** → `inetmgr` (IIS Manager). For the server **and each site**:
 - **Directory Browsing** → **Disable** (Actions pane).
@@ -429,8 +388,6 @@ If the X-Powered-By header is already gone, that line may print an error; that's
 ### 9.2 IIS FTP server
 - [ ] Done
 
-**Script:** 🔎 If your config lists ftp, the script turns off anonymous FTP (asks first) and warns if SSL isn't required; you still do authorization rules, user isolation and logging.
-
 In `inetmgr`, click the FTP site:
 - **FTP Authentication** → **Anonymous Authentication: Disabled** (unless the README needs anonymous FTP).
 - **FTP Authorization Rules** → no "Allow All Users / Anonymous Read, Write" unless needed.
@@ -446,8 +403,6 @@ Set-ItemProperty 'IIS:\Sites\Default FTP Site' -Name ftpServer.security.authenti
 
 ### 9.3 DNS server
 - [ ] Done
-
-**Script:** 🔎 The script blocks zone transfers (asks first) and sets secure-only updates on AD-integrated zones; you still check the records and non-AD zones.
 
 **Clicking:** **Win + R** → `dnsmgmt.msc`. For each **Forward Lookup Zone**, right-click → **Properties**:
 - **General → Dynamic updates:** **Secure only** (for AD-integrated zones).
@@ -466,8 +421,6 @@ Get-DnsServerResourceRecord -ZoneName corp.local | Format-Table HostName, Record
 ### 9.4 Active Directory
 - [ ] Done
 
-**Script:** 🔎 The script offers to turn on the AD Recycle Bin and lists unconstrained delegation; you still do Protected Users, SYSVOL scripts and the machine account quota.
-
 - **AD Recycle Bin:** **Active Directory Administrative Center (`dsac.exe`)** → click the domain → **Enable Recycle Bin…** (it can't be turned off later, which is fine).
 - **Protected Users group:** admins in it get extra protection. Add only if the README doesn't forbid it.
 - **Logon scripts in SYSVOL:** look in `C:\Windows\SYSVOL\domain\scripts` and `C:\Windows\SYSVOL\domain\Policies\*\Machine\Scripts` / `User\Scripts` for scripts you don't recognise.
@@ -476,8 +429,6 @@ Get-DnsServerResourceRecord -ZoneName corp.local | Format-Table HostName, Record
 
 ### 9.5 DHCP server
 - [ ] Done
-
-**Script:** ✋ Not done by the script. Do this by hand.
 
 `dhcpmgmt.msc`: check the scopes and reservations against the README, and make sure **Enable DHCP audit logging** is ticked (server → **Properties**). Look at **Scope Options** too: a planted **006 DNS Servers** or **003 Router** pointing at a strange IP sends every client to the attacker.
 
@@ -493,8 +444,6 @@ Get-DhcpServerAuditLog
 ### 9.6 File server shares
 - [ ] Done
 
-**Script:** 🔎 If your config lists smb, the script removes Everyone's write access from shares (asks first); if it doesn't, it offers to stop sharing every non-built-in share. You still check the other share and NTFS permissions.
-
 **Clicking:** `fsmgmt.msc` → **Shares**. For each share the README needs: **Properties → Share Permissions** shouldn't give **Everyone: Full Control**, and on the **Security** tab (NTFS), only the right groups should have **Modify / Full control**.
 
 ```powershell
@@ -506,9 +455,9 @@ Get-SmbServerConfiguration | Format-List EnableSMB1Protocol, RequireSecuritySign
 On a Domain Controller, leave **NETLOGON** and **SYSVOL** alone.
 
 ### 9.7 Turn off SSL 3.0, TLS 1.0 and TLS 1.1
-- [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
+**Compatibility preflight:** Record protocol settings and export the exact SCHANNEL key before editing. Check required clients, application/.NET versions, certificates and patches support modern TLS. Apply changes at a recoverable checkpoint; some need service/system restart. Use [12.5](#125-iis-ftp-and-file-and-storage-services-recovery) for backup/client tests. If a legacy required client fails, restore the recorded per-protocol values, including absence of values that did not previously exist, and investigate a supported compatibility path rather than applying a blanket protocol template.
+- [ ] Done
 
 **Why it matters:** These old encryption versions have known breaks. Websites (IIS), FTP over SSL, Remote Desktop and LDAPS should all use TLS 1.2 or newer. Server 2016-2022 still allow TLS 1.0 and 1.1 unless you turn them off.
 
@@ -547,3 +496,261 @@ Use the [Windows 10/11 checklist](windows-10-11.md) for:
 - [ ] Scoring Report shows **no penalties**
 - [ ] Forensics answers saved
 - [ ] Final snapshot
+
+## 12. Role-aware manual procedures and recovery
+
+Use **Windows PowerShell as Administrator on the server**, not a workstation, for these commands. Substitute the actual domain, scope, site and share names. A missing role cmdlet normally means its role/module is absent; do not install a server role just to satisfy a checklist. The [Windows manual verification section](windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps) supplies shared backup, account, firewall, audit, malware and recovery procedures.
+
+### 12.1 Identify version, roles and management dependencies
+
+- [ ] Done
+
+**What:** Determine whether this is a Domain Controller, member server or standalone server, and identify installed roles.
+
+**Why it matters:** A DC stores domain identities and requires DNS, Kerberos, replication and time services. Removing a role is much more disruptive than stopping a workstation application.
+
+**Before changing anything:** Record required services and client tests from the README. Keep VM console access and an authorized administrator. A practice VM snapshot is not an AD-aware production backup; follow round rules and do not casually revert a replicated DC.
+
+**Clicking (GUI):** **Start → Server Manager → Local Server** shows domain membership, remote management and version. **Manage → Remove Roles and Features** can display installed roles; cancel after inspection. Do not click Remove merely because a role was not named explicitly in a short README.
+
+**Typing (check):**
+
+```powershell
+Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,ProductType
+Get-CimInstance Win32_ComputerSystem | Select-Object Name,Domain,PartOfDomain
+Get-WindowsFeature | Where-Object Installed | Format-Table Name,DisplayName
+```
+
+ProductType 2 means DC; 3 means another server. A **member server has local accounts plus domain accounts**: local policy governs local accounts, while domain account passwords are governed by domain policy even when logging on to that member server.
+
+| Version | Important distinction |
+|---|---|
+| Server 2016 | Older IIS/Defender capabilities and policy templates; do not assume newer cmdlet parameters or `removeServerHeader` support |
+| Server 2019 | Newer role/security capabilities, but patch level still determines which policies exist |
+| Server 2022 | Newer defaults/features; client compatibility and installed role remain more important than copying a 2016 baseline |
+| Server Core | No full desktop; use PowerShell, `sconfig` where available, and authorized remote management |
+
+**Typing (fix, only when appropriate):** Update and harden the installed required role using its procedure below. If a role is confirmed prohibited, first record its dependencies and data. Preview removal with `Uninstall-WindowsFeature -Name ROLE -WhatIf`, replacing ROLE with the actual installed feature name. Prefer the Server Manager wizard's dependency review before carrying out approved removal.
+
+**Check it worked:** Compare the role list and test each required client function after each change. Keep AD DS, DNS, Netlogon, KDC, time and replication functions operational where required.
+
+**Undo:** Restore a mistakenly removed role only with its recorded configuration, data and supported recovery method; installing binaries alone does not restore a deleted directory/database. Use a pre-change role-specific backup.
+
+**Warnings:** Server Manager itself relies on remote management features. Disabling WinRM on a server because it is often disabled on workstations can break management.
+
+### 12.2 AD users, nested groups and service identities
+
+- [ ] Done
+
+**What:** Reconcile domain users and privileged group membership with the README.
+
+**Why it matters:** A nested group can confer Domain Admin access even when a user is not a direct member. Service accounts may run databases, scheduled tasks and IIS pools.
+
+**Before changing anything:** Preserve forensics and record distinguished names, SIDs, group memberships and service dependencies. Never use local-user cmdlets as an AD substitute.
+
+**Clicking (GUI):** **Server Manager → Tools → Active Directory Users and Computers** (`dsa.msc`). Enable **View → Advanced Features**. Find the exact account/OU, open **Properties → Member Of / Account** and inspect privileges, expiration, delegation and password options. Open each group from the earlier powerful-group table and inspect **Members**; nested groups require inspection too. Prefer **Disable Account** before irreversible deletion of a confirmed unauthorized user.
+
+**Typing (check):**
+
+```powershell
+Import-Module ActiveDirectory
+Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires,PasswordNotRequired,ServicePrincipalName | Select-Object SamAccountName,Enabled,PasswordNeverExpires,PasswordNotRequired,ServicePrincipalName
+Get-ADGroupMember -Identity 'Domain Admins'
+Get-ADGroupMember -Identity 'Domain Admins' -Recursive
+```
+
+A recursive query finds effective nested members but hides the membership path; inspect direct group members to locate the offending link. Record an individual user:
+
+```powershell
+Get-ADUser bob -Properties MemberOf,AccountExpirationDate,ServicePrincipalName,TrustedForDelegation | Format-List
+Get-CimInstance Win32_Service | Select-Object Name,StartName,State
+Get-ScheduledTask | Select-Object TaskName,TaskPath,Principal
+```
+
+**Typing (fix, only when appropriate):** Remove the specific unauthorized direct member, preserving legitimate nested structure:
+
+```powershell
+Remove-ADGroupMember -Identity 'Domain Admins' -Members bob -Confirm
+```
+
+Reversible account containment:
+
+```powershell
+Disable-ADAccount -Identity mallory
+```
+
+Do not rotate a required service account password without coordinating each dependent service/application. Managed service accounts have separate lifecycle and password management.
+
+**Check it worked:** Repeat direct/recursive queries, test a new permitted login and verify dependent services. Existing tokens can retain privileges until a new logon; disabling an account does not terminate every existing session automatically.
+
+**Undo:** `Add-ADGroupMember -Identity 'Domain Admins' -Members bob` or `Enable-ADAccount -Identity mallory` restores only a mistakenly changed original state. Deleted AD objects need a supported AD recovery method, not name recreation.
+
+**Warnings:** Do not remove all operator/service identities from a DC using a workstation rights table. Do not change your only working administrator or krbtgt credentials as a routine checklist step.
+
+### 12.3 Domain password policy and Group Policy precedence
+
+- [ ] Done
+
+**What:** Apply account policy at the scope that actually governs the account, and inspect the winning GPO.
+
+**Why it matters:** A local policy does not control domain user passwords. Fine-grained password policies can override the default for selected users/groups. A deny user right can block logon despite an allow grant.
+
+**Before changing anything:** Record the current default/resultant policy and back up the specific GPO before editing it. Keep the Default Domain Policy and Default Domain Controllers Policy roles distinct.
+
+**Clicking (GUI):** `gpmc.msc` → **Forest → Domains → actual domain**. Select the GPO, inspect **Scope**, links, security filtering and **Settings**; right-click **Back Up** to a private folder. Edit domain account policy in the domain-root-linked account-policy GPO, commonly **Default Domain Policy → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies**. For DC-specific audit/rights/options inspect the GPO linked to the **Domain Controllers OU**, not the workstation baseline. Use **Group Policy Results** for a specific machine/user.
+
+**Typing (check):**
+
+```powershell
+Get-ADDefaultDomainPasswordPolicy | Format-List
+Get-ADUserResultantPasswordPolicy -Identity bob
+Get-GPO -All | Select-Object DisplayName,Id,GpoStatus
+```
+
+A null resultant fine-grained policy can mean the domain default applies. Save a report:
+
+```powershell
+gpresult /h C:\CP-Backups\server-gpresult.html
+```
+
+Create and restrict that backup folder using Windows 19.1 first. A GPO report can contain sensitive infrastructure details.
+
+**Typing (fix, only when appropriate):** Use the policy GUI row-by-row, or, for a confirmed domain and README values:
+
+```powershell
+Set-ADDefaultDomainPasswordPolicy -Identity 'example.test' -MinPasswordLength 12 -PasswordHistoryCount 24 -ComplexityEnabled $true -ReversibleEncryptionEnabled $false -LockoutThreshold 5 -LockoutDuration (New-TimeSpan -Minutes 30) -LockoutObservationWindow (New-TimeSpan -Minutes 30)
+```
+
+Replace the domain and all policy values. Length/complexity affect future password changes; lockout threshold counts invalid attempts within the observation window. Do not infer that updating a policy fixed all existing passwords.
+
+**Check it worked:** Re-query default and resultant policies; inspect Group Policy Results for the affected computer. If appropriate, run `gpupdate /target:computer /force` and read its errors; some settings require logoff/restart. Test ordinary authorized access without deliberately locking the active admin.
+
+**Undo:** Restore the individual recorded setting or specific GPO backup via GPMC **Manage Backups → Restore** after reviewing scope. GPO deletion is not a normal way to undo one planted setting. Changing a domain policy does not undo a password reset.
+
+**Warnings:** Requiring LDAP signing/channel binding, restricting NTLM, or removing network-logon principals can break older required clients. Stage compatibility inspection and consult the applicable Microsoft policy documentation; do not apply `Always` blindly to every environment.
+
+### 12.4 DNS, DHCP and DC health
+
+- [ ] Done
+
+**What:** Validate required name resolution, leases, replication and time after hardening.
+
+**Why it matters:** AD relies on internal DNS SRV records and reasonably synchronized time. Using a public resolver as the DC's primary DNS can break domain discovery.
+
+**Before changing anything:** Record DNS zones/forwarders, DHCP scopes/options/reservations, authorized servers and expected DC topology. Back up the affected role, not just a screenshot.
+
+**Clicking (GUI):** **Server Manager → Tools → DNS**; open the server and each zone **Properties → Zone Transfers**. Permit transfers only to required secondary servers rather than blindly disallowing required replication. For AD-integrated zones inspect the appropriate secure dynamic-update setting. **Tools → DHCP → IPv4 → scope** shows range, exclusions, reservations, leases and **Scope Options** (003 Router, 006 DNS Servers, 015 DNS Domain Name). Record each before editing.
+
+**Typing (check):**
+
+```powershell
+Get-DnsServerZone
+Get-DnsServerForwarder
+Resolve-DnsName -Type SRV _ldap._tcp.dc._msdcs.example.test
+Get-DhcpServerv4Scope
+Get-DhcpServerv4OptionValue -ScopeId 192.168.10.0
+```
+
+Use actual domain/scope. Required DNS SRV answers should identify the expected DC. DHCP range must exclude static server addresses. Role cmdlets are available only with the relevant modules.
+
+**Typing (backup/fix, only when appropriate):** Before DHCP edits:
+
+```powershell
+Backup-DhcpServer -Path C:\CP-Backups\DHCP
+```
+
+Use the GUI to correct the exact wrong scope option, unauthorized transfer destination or dynamic-update setting. Do not delete a working zone/scope to rebuild it from memory. Do not change NIC DNS to a public resolver to bypass internal-DNS errors.
+
+**Check it worked:**
+
+```powershell
+dcdiag /test:dns
+repadmin /replsummary
+w32tm /query /status
+```
+
+Use these on the appropriate DC; no replication partners can be normal for a single-DC lab. Investigate errors rather than assuming they are all scoring issues. Renew a noncritical authorized client's DHCP lease and test internal hostname lookup and domain login.
+
+**Undo:** Restore the recorded specific zone/scope option or use the role's reviewed backup procedure. Restore AD-integrated data with AD-aware recovery; arbitrary file copying into DNS/NTDS directories is unsafe.
+
+**Warnings:** Never disable DNS, Kdc, NTDS, Netlogon, DFSR or W32Time on a required DC. DHCP failover and approved secondary DNS servers may be implicit dependencies even if the README does not enumerate every service name.
+
+### 12.5 IIS, FTP and File and Storage Services recovery
+
+- [ ] Done
+
+**What:** Secure required published content and file access while preserving application identities.
+
+**Why it matters:** Server-wide IIS edits affect all sites. Share and NTFS ACLs jointly control network access. TLS without a usable certificate/client can stop a required service.
+
+**Before changing anything:** Record site bindings, certificates, application pool identities, content paths, FTP users/data ports and share ACLs. Back up IIS configuration:
+
+```powershell
+& "$env:windir\system32\inetsrv\appcmd.exe" add backup BeforeCP
+```
+
+Choose a unique name on subsequent runs. Separately back up content and databases; IIS config backup does not preserve them.
+
+**Clicking (GUI):** `inetmgr` → site → **Bindings**, **Authentication**, **Directory Browsing**, **Logging** and **Application Pools → Advanced Settings → Identity**. Apply the earlier section's settings at the intended site, considering inheritance. For FTP inspect **FTP Authentication**, **Authorization Rules**, **SSL Settings**, **User Isolation** and **Firewall Support**. In **Server Manager → File and Storage Services → Shares**, inspect required shares; then inspect each folder's NTFS Security tab as in Windows 19.7.
+
+**Typing (check):**
+
+```powershell
+Import-Module WebAdministration
+Get-Website | Format-Table Name,State,PhysicalPath
+Get-WebBinding | Format-Table protocol,bindingInformation
+Get-ChildItem IIS:\AppPools | Select-Object Name,State,processModel
+Get-SmbShare | Format-Table Name,Path,Description
+```
+
+**Typing (fix, only when appropriate):** Prefer a scoped site change; for an actual site named `Company`:
+
+```powershell
+Set-WebConfigurationProperty -PSPath 'IIS:\Sites\Company' -Filter system.webServer/directoryBrowse -Name enabled -Value $false
+```
+
+Only disable browsing if directory listing is not required. Preserve the intended site authentication; public anonymous access is normal for many websites. Apply least privilege to an app pool without breaking access to its content/database/certificates. Do not deny all unlisted extensions without an application inventory.
+
+**Check it worked:** Test the actual hostname/port from an authorized client, including required login, static/dynamic pages, upload and database-backed behavior. For FTP, test both authentication and a data transfer; passive data ports must match firewall/server configuration. For shares, test read/write under an ordinary authorized user, not only an admin.
+
+**Undo:** Restore the exact site setting or, if needed and after reviewing other sites' changes:
+
+```powershell
+& "$env:windir\system32\inetsrv\appcmd.exe" restore backup BeforeCP
+```
+
+This affects the saved IIS server configuration. Restore content/database/ACL changes separately from their specific backups.
+
+**Warnings:** Do not disable TLS protocols until required clients have been checked and patches/certificates are ready. Hide-version settings do not substitute for updates. A web shell investigation must preserve evidence and compare files with trusted application sources before deletion.
+
+### 12.6 Remote management, firewall, updates and audit completion
+
+- [ ] Done
+
+**What:** Preserve secure remote administration, installed roles and useful logs through updates.
+
+**Why it matters:** Broad firewall blocks can break RPC-dependent AD/management even when obvious ports are open. A workstation port list is insufficient for a DC.
+
+**Before changing anything:** Export firewall/audit policy using Windows 19.1. Record required management source networks and installed antivirus/WSUS configuration. Keep console access.
+
+**Clicking (GUI):** **Server Manager → Local Server → Remote management / Remote Desktop**. Use NLA and authorized RDP membership. `wf.msc` → inspect built-in **role-specific** rules and their scopes; keep required AD/DNS/DHCP/SMB/RPC traffic. **Settings → Update & Security / Windows Update** varies by version; on Core use supported `sconfig` update options. In Event Viewer inspect **Security**, **System**, **Directory Service**, **DNS Server** and **DFS Replication** as applicable.
+
+**Typing (check):**
+
+```powershell
+winrm get winrm/config/service
+winrm enumerate winrm/config/listener
+Get-NetFirewallProfile
+Get-Service WinRM,EventLog,mpssvc,wuauserv | Format-Table Name,Status,StartType
+Get-MpComputerStatus | Select-Object AMRunningMode,AntivirusEnabled,RealTimeProtectionEnabled
+```
+
+WinRM should normally reject Basic authentication and unencrypted traffic. HTTP transport with Kerberos can still encrypt messages; do not equate every port-5985 session with plaintext. Do not expand TrustedHosts to `*` to bypass name/authentication problems.
+
+**Typing (fix, only when appropriate):** In the WinRM policy GUI disable Basic and unencrypted traffic at the correct scope. Restrict the corresponding built-in firewall rules to authorized management sources after confirming the management connection will remain allowed. Apply approved security/role updates, preserving a legitimate organizational WSUS configuration.
+
+**Check it worked:** From an authorized management host test `Test-WSMan server-name`, an authorized RDP login if required, role-specific client transactions, then DC health commands from 12.4. Confirm new audit events and no relevant new service errors. Use selective advanced audit subcategories as described in Windows 19.4.
+
+**Undo:** Restore the exact changed listener/authentication/rule scope from its record, using the console. For an update regression use the supported recovery method for that exact update; do not disable all updates or the firewall.
+
+**Warnings:** Never remove role-required ports based solely on a short generic list. Do not clear server logs, forcibly stop package installation, or automatically reboot while database/AD recovery is unresolved.

@@ -5,7 +5,7 @@ Short explanations of words you'll see in the checklists and scripts.
 | Word | Meaning |
 |---|---|
 | **Active Directory (AD)** | Microsoft's system for managing all the users and computers of a company from one server (the Domain Controller). |
-| **Admin / Administrator** | A user who can change anything on the computer. On Linux: members of the `sudo` group. On Windows: the `Administrators` group. |
+| **Admin / Administrator** | A user who can change anything on the computer. On Linux: identities granted elevation through the actual sudo or other privilege policy. On Windows: the `Administrators` group. |
 | **AppArmor** | A Linux feature that limits what each program may do, so a hacked program can't touch everything. |
 | **Audit policy** | Rules for what Windows writes to the Security log (logins, account changes…). |
 | **Authorized user** | A user the README says should have an account. |
@@ -16,7 +16,7 @@ Short explanations of words you'll see in the checklists and scripts.
 | **Daemon** | Linux word for a background service (`sshd`, `auditd`…). |
 | **Defender** | Microsoft Defender Antivirus, built into Windows. |
 | **Domain Controller (DC)** | The Windows Server that runs Active Directory. |
-| **Firewall** | Blocks network connections that aren't allowed. Linux: UFW / pf. Windows: Windows Defender Firewall. |
+| **Firewall** | Blocks network connections that aren't allowed. Linux: UFW / nftables. FreeBSD: pf / ipfw. Windows: Windows Defender Firewall. |
 | **Forensics question** | A question file on the desktop asking you to investigate something on the image. |
 | **GPO (Group Policy Object)** | A bundle of Windows settings pushed from a Domain Controller to computers. |
 | **Hash** | A fingerprint of a file (e.g. SHA-256). Change one byte and the hash completely changes. |
@@ -49,8 +49,34 @@ Short explanations of words you'll see in the checklists and scripts.
 | **UAC** | User Account Control: the Windows "Do you want to allow this app to make changes?" prompt. |
 | **UFW** | Uncomplicated Firewall: the easy firewall tool on Ubuntu, Mint and Debian. |
 | **UID** | User ID number. 0 = root. 1000+ = normal people on Linux. |
-| **Unauthorized user** | An account the README doesn't list. Usually should be deleted. |
+| **Unauthorized user** | A human account not authorized by the scenario, after excluding required service/built-in identities. Preserve evidence and prefer reversible containment before deletion. |
 | **Updates** | Fixes for security holes. Install them, and turn on automatic updates. |
 | **VM (virtual machine)** | A whole computer running inside a program like VMware. |
 | **Web shell** | A malicious web page that lets an attacker run commands on the server. |
 | **World-writable** | A file anyone on the system can change. Almost always a mistake. |
+
+## Terms used in verification and recovery
+
+| Word | Meaning and practical implication |
+|---|---|
+| **ACL (access control list)** | Ordered permissions/rules. File ACLs and router packet ACLs are different systems; inspect the relevant effective permissions or rule binding. |
+| **Authentication / authorization** | Authentication proves an identity; authorization decides what it may do. Successful login does not prove the user should be an administrator. |
+| **Effective policy** | The configuration that actually applies after defaults, includes, GPOs and scope rules. Verify it instead of trusting one edited file. |
+| **GPO / OU** | Group Policy Object / organizational unit in AD. Links, inheritance and filtering determine which computers/users receive settings. |
+| **Fine-grained password policy** | AD password/lockout policy for selected users/groups that may differ from the domain default. Check a user's resultant policy. |
+| **PAM** | Pluggable Authentication Modules. Module order and control flags determine login/password behavior; a valid-looking line in the wrong position can fail dangerously. |
+| **Socket activation** | A service manager listens and starts a daemon on demand. Stopping the daemon alone may not close the listening socket permanently. |
+| **Reload / restart / daemon-reload** | Reload asks an application to reread supported config; restart stops/starts it; systemd daemon-reload rereads unit definitions and does not itself restart applications. |
+| **nftables / pf** | nftables is a Linux packet-filter framework; pf is used on FreeBSD and other BSD systems. Neither is interchangeable with UFW commands. |
+| **SUID / SGID / capability** | Mechanisms granting special execution privileges. Some are required; investigate ownership/package baselines before removing them. |
+| **Sticky bit** | On directories such as `/tmp`, limits who may remove another user's files. Mode 1777 can be intentional for a shared temporary directory. |
+| **First match / implicit deny** | Many ACL/authentication systems use the first matching rule. Router ACLs deny unmatched traffic; ordering and application point matter. |
+| **VLAN / trunk / SVI** | VLAN separates Layer 2 broadcast domains; trunk carries multiple VLANs; SVI gives a switch a VLAN interface for management/routing where supported. |
+| **STP / BPDU Guard** | Spanning Tree prevents switching loops; BPDU Guard protects true edge ports by reacting to unexpected switch control frames. |
+| **OSPF** | A link-state routing protocol. Neighbor relationships and learned routes must be checked on both ends; return paths still matter. |
+| **Hash / encoding / encryption** | Hash summarizes bytes, encoding changes representation, encryption requires a key to recover plaintext. Base64 is not encryption; a hash is not automatically a trust guarantee. |
+| **Rollback / backup** | Rollback returns a change to a prior state; backups contain particular data/settings. A config backup does not recover deleted users, old passwords or a database migration. |
+| **Read-only investigation** | Intended not to change the target directly, but live access can still create events/history or update access times. Record limitations. |
+| **Least privilege** | Give identities only the access needed for required work. It requires understanding the role, not removing every unfamiliar permission. |
+
+For an unfamiliar command, read its installed help before executing it: Linux/FreeBSD `man COMMAND`, PowerShell `Get-Help COMMAND -Full`, Cisco context-sensitive `?`. Example values are placeholders, never competition requirements.

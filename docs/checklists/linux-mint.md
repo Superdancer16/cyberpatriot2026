@@ -7,7 +7,7 @@ Linux Mint is in **Round 1, the State round, and the Semifinals** this season. I
 - Each item has: **What** · **Why it matters** · **Clicking** (the GUI way) · **Typing** (terminal commands) · **Check it worked** · and sometimes a ⚠️ warning about when *not* to do it.
 - `alice`, `bob` etc. are example names. **Use the names from your README.**
 - New to the terminal? Read [Linux terminal basics](../start-here/linux-terminal-basics.md) first (10 minutes).
-- The script `scripts/linux/harden.sh` can do a lot of this for you. Run it at [step 1.2](#12-fast-path-run-the-hardening-script), then skip the steps marked **Script: ✅**. See [Using the scripts](../start-here/using-the-scripts.md). This checklist teaches you what it's doing, and covers what it can't decide.
+- Follow the manual procedures and verify every item; automation is not included in this repository.
 
 ---
 
@@ -16,14 +16,10 @@ Linux Mint is in **Round 1, the State round, and the Semifinals** this season. I
 ### 0.1 Read the README
 - [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
-
 Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../start-here/reading-the-readme.md).
 
 ### 0.2 Take a snapshot
 - [ ] Done
-
-**Script:** ✋ Not done by the script. Do this by hand.
 
 **What:** Save the current state of the VM so you can go back if you break it.
 
@@ -35,8 +31,6 @@ Write down the admins, users, critical services, required software and prohibite
 ### 0.3 Open a terminal and check you have admin rights
 - [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
-
 **Typing:** press **Ctrl + Alt + T**, then:
 ```bash
 sudo -v        # asks for YOUR password; no error = you are an admin
@@ -46,8 +40,6 @@ whoami         # shows which user you are logged in as
 ### 0.4 Open the Scoring Report
 - [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
-
 Double-click **Scoring Report** on the desktop. Keep it open in a browser tab and refresh it as you work.
 
 ---
@@ -56,8 +48,6 @@ Double-click **Scoring Report** on the desktop. Keep it open in a browser tab an
 
 ### 1.1 Answer every forensics question before changing anything
 - [ ] Done
-
-**Script:** ✋ Not done by the script. Do this by hand.
 
 **What:** Open each `Forensics Question N.txt` on the desktop, find the answer, and type it after `ANSWER:` in the file, then save.
 
@@ -79,32 +69,23 @@ More techniques: [Forensics questions guide](../guides/forensics-questions.md).
 ### 1.2 Fast path: run the hardening script
 - [ ] Done
 
-**What:** Once **every forensics question is answered**, run the toolkit's script `scripts/linux/harden.sh`. It fixes many of the steps below for you and gives you a to-do list for the rest.
+**What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
-**Why it matters:** The script does in a few minutes what takes an hour by hand, and it backs up every file before changing it. That leaves you more time for the steps that need a human.
+**Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
-**Typing:**
-1. Get the script onto the image: open [Download the scripts](/downloads/) on this website and run the **Linux** download commands there. They save `harden.sh` and an example config in the `cp` folder inside your home folder (`~/cp`). No internet on the image? See [Using the scripts](../start-here/using-the-scripts.md).
-2. Optional: make a config file with the [README config builder](/tools/config-builder/) and save it as `my.conf` in `~/cp`, next to `harden.sh`. No config? Leave out `--config my.conf` and the script asks you for the README names instead.
-3. Run it in **audit** mode first (it changes nothing) and read every `REVIEW` line. Then run it in **apply** mode:
-```bash
-cd ~/cp
-sudo bash harden.sh --audit --config my.conf        # report only: read the REVIEW lines
-sudo bash harden.sh --apply --config my.conf        # make the changes (it asks before risky ones)
-sudo cat /root/cyberpatriot/findings-*.txt          # your to-do list: every REVIEW item
-```
+**Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
-**Check it worked:** The summary at the end shows mostly `OK` and `CHANGED`. Refresh the **Scoring Report**: your score should have gone up.
+**Clicking (GUI):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
 
-Every step below has a **Script:** line:
-- **✅** the script does the whole step.
-- **🔎** the script does part of it or only reports it. Finish it yourself.
-- **✋** the script doesn't do it. Do it by hand.
+**Typing (check):** Use the read-only inventory commands in the next section of this checklist. Save their output in a private working folder; do not publish passwords or password hashes.
 
-Now skip every step marked **Script: ✅** below (on the website, press **Tick the script's ✅ steps** at the top of the page). Do the 🔎 and ✋ steps.
+**Typing (fix, only when appropriate):** Work through one manual item at a time below. Read every command before entering it. There is no script to download from this repository.
 
-> [!WARNING]
-> If any line says `FAILED`, do that step by hand. If your score goes **down**, find the change that caused it and undo it from the backups in `/root/cyberpatriot/backups/` (see [Using the scripts](../start-here/using-the-scripts.md#undoing-a-change)).
+**Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
+
+**Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
+
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -112,8 +93,6 @@ Now skip every step marked **Script: ✅** below (on the website, press **Tick t
 
 ### 2.1 See every user on the computer
 - [ ] Done
-
-**Script:** 🔎 The script shows the users on this machine and flags every one that isn't in the README; you still type the README names in correctly.
 
 **What:** Get the list of real (human) users and compare it with the README.
 
@@ -127,8 +106,6 @@ This prints every user with a user ID (UID) of 1000 or more, which means the rea
 
 ### 2.2 Delete users who are not in the README
 - [ ] Done
-
-**Script:** ✅ Done by the script (`users` section).
 
 **What:** Remove each account that isn't listed as an authorized admin or user.
 
@@ -149,8 +126,6 @@ sudo userdel mallory          # delete the account (keeps /home/mallory for now)
 ### 2.3 Create users the README says should exist
 - [ ] Done
 
-**Script:** 🔎 The script creates missing README users (and makes README admins administrators), but they only get a password if you give it one (NEW_PASSWORD or when asked).
-
 **Clicking:** **Users and Groups → Add** (the "+" button), choose Standard or Administrator, enter the name, then set a password.
 
 **Typing:**
@@ -160,8 +135,6 @@ sudo adduser erin             # asks for a password and details
 
 ### 2.4 Fix who is an administrator
 - [ ] Done
-
-**Script:** ✅ Done by the script (`users` section).
 
 **What:** Only the README's admins should be in the `sudo` group (that's what "Administrator" means on Mint).
 
@@ -180,8 +153,6 @@ getent group adm                        # 'adm' can read logs - normally admins 
 ### 2.5 Look for hidden root accounts and hidden users
 - [ ] Done
 
-**Script:** 🔎 The script finds UID-0 and hidden login accounts and offers to delete them or block their logins; you decide for each hidden user (say no if it belongs to a program).
-
 **What:** Find accounts with UID 0 (secret root copies), and accounts with a low UID that can still log in.
 
 **Why it matters:** `useradd -o -u 0 toor` makes a second root that doesn't show up in Users and Groups.
@@ -195,14 +166,12 @@ The second command lists low-UID accounts that have a real shell. Normally that'
 
 **Fix:**
 ```bash
-sudo userdel -f toor                            # delete a fake root
+sudo usermod --expiredate 1970-01-02 toor       # only after confirming this account is unauthorized; preserve evidence first
 sudo usermod -s /usr/sbin/nologin mallory       # stop a hidden user from logging in
 ```
 
 ### 2.6 Check other powerful groups
 - [ ] Done
-
-**Script:** 🔎 The script removes non-admins from root, shadow, disk, kmem, docker and lxd (it asks first); check `sambashare` and any admins in these groups yourself.
 
 **Typing:**
 ```bash
@@ -215,8 +184,6 @@ sudo gpasswd -d carol shadow
 
 ### 2.7 Give users strong passwords
 - [ ] Done
-
-**Script:** 🔎 The script gives every authorized user except you one strong password only if you set NEW_PASSWORD or type one when asked; otherwise do this by hand.
 
 **What:** Change every authorized user's password (except your own, unless the README says so) to something strong.
 
@@ -236,8 +203,6 @@ Use 12+ characters with upper case, lower case, a number and a symbol, e.g. `Blu
 ### 2.8 Lock the root account
 - [ ] Done
 
-**Script:** ✅ Done by the script (`users` section).
-
 **What:** Make sure nobody can log in directly as `root`. Admins use `sudo` instead.
 
 **Typing:**
@@ -253,8 +218,6 @@ sudo passwd -l root      # lock it
 
 ### 2.9 Accounts with no password
 - [ ] Done
-
-**Script:** 🔎 The script lists every account with an empty password and locks the ones that aren't in the README (it asks first); README users with no password get one from you.
 
 **What:** Find accounts that have **no password at all**, so anyone can log in as them by just pressing Enter.
 
@@ -276,8 +239,6 @@ sudo passwd -l mallory                             # account that shouldn't log 
 ### 3.1 Password aging (how long passwords last)
 - [ ] Done
 
-**Script:** ✅ Done by the script (`passwords` section).
-
 **What:** Passwords expire after 90 days, can't be changed again for 7 days, and users get 14 days' warning.
 
 **Typing:**
@@ -297,8 +258,6 @@ Save with **Ctrl+O, Enter**, exit with **Ctrl+X**.
 ### 3.2 Apply aging to the users who already exist
 - [ ] Done
 
-**Script:** ✅ Done by the script (`passwords` section).
-
 **Why:** `login.defs` only affects **new** users.
 
 **Typing (repeat for each user):**
@@ -309,8 +268,6 @@ sudo chage -l bob            # check: "Maximum number of days" = 90
 
 ### 3.3 Password complexity (pwquality)
 - [ ] Done
-
-**Script:** ✅ Done by the script (`passwords` section).
 
 **What:** Make Linux reject weak passwords when someone changes theirs.
 
@@ -343,23 +300,10 @@ It should look like: `password requisite pam_pwquality.so retry=3 ...`. You can 
 ### 3.4 Password history (no re-using old passwords)
 - [ ] Done
 
-**Script:** ✅ Done by the script (`passwords` section).
-
-**Typing:**
-```bash
-sudo nano /etc/pam.d/common-password
-```
-Find the line containing `pam_unix.so` and add ` remember=5` to the end, e.g.:
-```
-password  [success=1 default=ignore]  pam_unix.so obscure use_authtok try_first_pass yescrypt remember=5
-```
-
-**Check it worked:** `grep remember /etc/pam.d/common-password` shows `remember=5`.
+Use the supported `pam_pwhistory` procedure in [17.2](#172-password-aging-pam-and-lockout-without-breaking-login). Do not copy an old `pam_unix remember=` line across releases or append a duplicate module. Preserve the current PAM stack and test with an ordinary user before closing the recovery console.
 
 ### 3.5 No logins with an empty password
 - [ ] Done
-
-**Script:** ✅ Done by the script (`passwords` section).
 
 **What:** Remove the word `nullok` from `/etc/pam.d/common-auth`.
 
@@ -376,42 +320,11 @@ sudo sed -i 's/ nullok//' /etc/pam.d/common-auth
 ### 3.6 Account lockout after failed logins (careful!)
 - [ ] Done
 
-**Script:** 🔎 The script turns on lockout only if ENABLE_LOCKOUT=yes or you answer yes when asked; then do the `su - bob` test in a new terminal.
+**What:** Limit repeated invalid authentication attempts using a module supported by the installed release.
 
-**What:** Lock an account for 15 minutes after 5 wrong passwords.
+**Why it matters:** Incorrect PAM control flow can deny all users or bypass policy. Package versions and authentication providers determine integration; release age alone is not a reliable module test.
 
-**Why:** It stops attackers guessing passwords.
-
-> [!CAUTION]
-> PAM controls **every** login. One mistake here can stop *everyone* (including you) logging in. Before editing:
-> 1. Open a **second terminal** and run `sudo -i`. Leave it open: it's your way back in.
-> 2. Copy the file: `sudo cp /etc/pam.d/common-auth /etc/pam.d/common-auth.bak`
-> 3. After editing, test in a **third terminal**: `su - bob`. If it fails, restore the copy from terminal 2.
-
-1. Settings file:
-   ```bash
-   sudo nano /etc/security/faillock.conf
-   ```
-   Set `deny = 5`, `unlock_time = 900` and `fail_interval = 900` (remove the `#`).
-2. Edit `/etc/pam.d/common-auth`. The **order matters**. Change the start of the "Primary" block to exactly this:
-   ```
-   auth    requisite                       pam_faillock.so preauth
-   auth    [success=2 default=ignore]      pam_unix.so
-   auth    [default=die]                   pam_faillock.so authfail
-   auth    requisite                       pam_deny.so
-   auth    optional                        pam_faillock.so authsucc
-   auth    required                        pam_permit.so
-   ```
-   Note the `success=2` (it used to be `success=1`). It jumps over the `authfail` and `pam_deny` lines when the password is right.
-3. Add this line to the **end** of `/etc/pam.d/common-account`:
-   ```
-   account required                        pam_faillock.so
-   ```
-
-**Check it worked:** `su - bob` with the right password works. `sudo faillock --user bob` shows failures. Locked out a user by testing? `sudo faillock --user bob --reset` unlocks them.
-
-> [!NOTE]
-> Mint 20 and Ubuntu 20.04 are too old for `pam_faillock`. They use `pam_tally2` instead: add `auth required pam_tally2.so onerr=fail deny=5 unlock_time=900` as the **first** `auth` line in `common-auth`, and `account required pam_tally2.so` to the end of `common-account`.
+Use [17.2's complete PAM backup, module discovery, lockout verification and recovery procedure](#172-password-aging-pam-and-lockout-without-breaking-login). Never replace the primary PAM block with a generic example or add obsolete pam_tally2 rules based solely on a version name. Keep a root console and test a separate ordinary user's actual password login.
 
 ---
 
@@ -419,8 +332,6 @@ sudo sed -i 's/ nullok//' /etc/pam.d/common-auth
 
 ### 4.1 Turn on the firewall
 - [ ] Done
-
-**Script:** ✅ Done by the script (`firewall` section).
 
 **What:** Block every incoming connection except the ones the README needs.
 
@@ -440,8 +351,6 @@ sudo ufw logging on
 ### 4.2 Allow the critical services (and nothing else)
 - [ ] Done
 
-**Script:** 🔎 The script opens the ports for the critical services you entered (plus EXTRA_PORTS); check `sudo ufw status` matches the README, especially for services it doesn't know.
-
 | README needs | Command |
 |---|---|
 | SSH | `sudo ufw allow 22/tcp` |
@@ -453,8 +362,6 @@ sudo ufw logging on
 
 ### 4.3 Remove rules an attacker added
 - [ ] Done
-
-**Script:** 🔎 The script lists `allow` rules that aren't for a critical service under REVIEW; you decide which to delete.
 
 **Typing:**
 ```bash
@@ -473,8 +380,6 @@ Look for odd ports like 4444, 1337, 31337, 6667, or "ALLOW Anywhere" on a port n
 ### 5.1 Install all updates
 - [ ] Done
 
-**Script:** 🔎 The script installs all updates only if FULL_UPGRADE=yes or you say yes when asked; otherwise do it here.
-
 **Clicking:** **Menu → Administration → Update Manager** → **Refresh** → **Install Updates**. If it asks to update itself first, say yes.
 
 **Typing:**
@@ -485,8 +390,6 @@ sudo apt full-upgrade -y
 
 ### 5.2 Turn on automatic updates
 - [ ] Done
-
-**Script:** 🔎 The script sets up `20auto-upgrades` and turns on Mint's automatic updates; just check the Update Manager Options tab refreshes automatically.
 
 **Clicking:** **Update Manager → Edit → Preferences → Automation** → turn on **Apply updates automatically**. On the **Options** tab, make sure **Refresh the list of updates automatically** is on.
 
@@ -512,8 +415,6 @@ APT::Periodic::AutocleanInterval "7";
 ### 5.3 Check the software sources
 - [ ] Done
 
-**Script:** 🔎 The script flags unofficial sources, `[trusted=yes]` and a missing security source under REVIEW; you remove the bad ones.
-
 **What:** Make sure updates come from the official Mint and Ubuntu servers only.
 
 **Clicking:** **Menu → Administration → Software Sources**. Look at **PPAs** and **Additional repositories**. Remove anything you don't recognise. Make sure the official repositories are enabled.
@@ -527,8 +428,6 @@ Official addresses: `packages.linuxmint.com`, `archive.ubuntu.com`, `security.ub
 ### 5.4 Packages "held" back from updating
 - [ ] Done
 
-**Script:** ✅ Done by the script (`updates` section).
-
 ```bash
 apt-mark showhold              # anything listed will never update
 sudo apt-mark unhold firefox   # change firefox to each name the line above printed
@@ -538,8 +437,6 @@ sudo apt-mark unhold firefox   # change firefox to each name the line above prin
 
 ### 5.5 Update the apps the README mentions
 - [ ] Done
-
-**Script:** 🔎 Done only if the script installed all updates (FULL_UPGRADE=yes or you said yes); still check Firefox's version.
 
 Firefox, Thunderbird, LibreOffice and any critical service are updated by 5.1. Check Firefox with **Menu (≡) → Help → About Firefox**.
 
@@ -556,8 +453,6 @@ If Update Manager never offers an update for a program, open **Update Manager �
 ### 6.1 See what's running and listening
 - [ ] Done
 
-**Script:** 🔎 The script puts the running services and listening ports in the findings report; you still look through them for anything odd.
-
 **Typing:**
 ```bash
 systemctl list-units --type=service --state=running
@@ -566,8 +461,6 @@ sudo ss -tulpn             # programs listening on network ports
 
 ### 6.2 Turn off services the README doesn't need
 - [ ] Done
-
-**Script:** 🔎 The script offers to stop (or remove) known services the README doesn't list; SSH, uninstalling, and services it doesn't know about are your call.
 
 **Typing:**
 ```bash
@@ -599,8 +492,6 @@ sudo apt purge vsftpd                      # remove it completely (if the README
 ### 6.3 Make sure the critical services are running
 - [ ] Done
 
-**Script:** 🔎 The script starts the critical services it recognises from your list; check each one with `systemctl status`.
-
 ```bash
 systemctl status ssh             # "active (running)" in green = good
 sudo systemctl enable --now ssh  # start it if it isn't
@@ -612,8 +503,6 @@ sudo systemctl enable --now ssh  # start it if it isn't
 
 ### 7.1 Hacking tools
 - [ ] Done
-
-**Script:** 🔎 The script removes known hacking-tool packages (it asks first), but only reports `netcat-openbsd` and hand-copied tools; check its REVIEW lines.
 
 **Clicking:** **Menu → Administration → Synaptic Package Manager**. Search each name, right-click → **Mark for Complete Removal** → **Apply**.
 
@@ -627,8 +516,6 @@ sudo apt autoremove
 ### 7.2 Games
 - [ ] Done
 
-**Script:** 🔎 The script removes the games on its list (it asks first); look for any others and run `sudo apt autoremove`.
-
 ```bash
 dpkg -l | grep -Ei 'aisleriot|gnome-mines|gnome-sudoku|mahjongg|minetest|supertux|freeciv|0ad|wesnoth|bsdgames|steam'
 sudo apt purge aisleriot gnome-mines
@@ -636,8 +523,6 @@ sudo apt purge aisleriot gnome-mines
 
 ### 7.3 File-sharing and remote-access programs
 - [ ] Done
-
-**Script:** 🔎 The script removes known torrent and remote-access programs, snaps and flatpaks (it asks first); check its REVIEW lines for any it skipped.
 
 ```bash
 dpkg -l | grep -Ei 'transmission|qbittorrent|deluge|frostwire|teamviewer|anydesk|x11vnc|tightvnc|vino'
@@ -649,8 +534,6 @@ snap list 2>/dev/null          # Mint has no snap unless someone added it
 
 ### 7.4 Media files (music and video)
 - [ ] Done
-
-**Script:** 🔎 The script lists media files and offers to delete them all at once; read the list first and say no if any must stay (forensics, a website).
 
 **Typing:**
 ```bash
@@ -664,8 +547,6 @@ sudo rm "/home/bob/Music/song.mp3"
 ### 7.5 Other files that break policy
 - [ ] Done
 
-**Script:** 🔎 The script lists password lists, packet captures and similar files under REVIEW; you open each one and decide.
-
 Password lists, credit card or social security number files, packet captures (`.pcap`), and hacking scripts:
 ```bash
 sudo find /home /root /tmp /opt -type f \( -iname '*password*' -o -iname '*.pcap' -o -iname '*creditcard*' -o -iname '*.kdbx' \) 2>/dev/null
@@ -678,8 +559,6 @@ sudo ls -la /home/*/ /tmp /var/tmp /opt     # look for anything odd, including h
 
 ### 8.1 No guest sessions and no automatic login
 - [ ] Done
-
-**Script:** 🔎 The script turns off guest sessions and auto-login and hides the user list in the LightDM files (also old `[SeatDefaults]` sections); run the `grep` check below to be sure no user name is left.
 
 **Clicking:** **Menu → Administration → Login Window → Users** tab. Turn **Allow guest sessions** off (this switch only appears if guest sessions are installed). Clear the **Automatic login** username. Turn **Hide the user list** and **Allow manual login** on, so the login screen doesn't show everyone's name.
 
@@ -705,8 +584,6 @@ grep -rE 'autologin|allow-guest|hide-users' /etc/lightdm/ /etc/xdg/lightdm/ /usr
 ### 8.2 Lock the screen when idle
 - [ ] Done
 
-**Script:** 🔎 The script sets a 5-minute screen lock for all users with dconf; run the `gsettings` check, and set it by hand if the script says REVIEW.
-
 **Clicking:** **Menu → System Settings → Screensaver**:
 - **Delay before starting the screensaver:** 5 minutes
 - **Lock the computer after the screensaver starts:** on
@@ -718,14 +595,12 @@ gsettings set org.cinnamon.desktop.session idle-delay 300           # 300 second
 gsettings set org.cinnamon.desktop.screensaver lock-enabled true
 gsettings set org.cinnamon.desktop.screensaver lock-delay 0         # lock as soon as it starts
 ```
-If it says **The key is not writable**, the script has already set and locked this for every user. That's fine.
+If it says **The key is not writable**, inspect dconf/organizational policy and verify the effective setting; do not assume it is correct.
 
 **Check it worked:** `gsettings get org.cinnamon.desktop.session idle-delay` prints `uint32 300` and `gsettings get org.cinnamon.desktop.screensaver lock-enabled` prints `true`. (The lock is on by default; the 15-minute delay is what usually needs fixing.)
 
 ### 8.3 Don't open USB drives and CDs automatically
 - [ ] Done
-
-**Script:** ✅ Done by the script (`desktop` section, for every user).
 
 **What:** Stop Mint from mounting, opening and running programs from a USB stick or CD the moment it is plugged in.
 
@@ -733,7 +608,7 @@ If it says **The key is not writable**, the script has already set and locked th
 
 **Clicking:** **Menu → Preferences → Preferred Applications → Removable media** tab → turn **Prompt or start programs on media insertion** off.
 
-**Typing:** in **your own** terminal, **without** `sudo` (if it says **The key is not writable**, the script has already set and locked it for every user):
+**Typing:** in **your own** terminal, **without** `sudo` (if a key is not writable, inspect the active dconf policy):
 ```bash
 gsettings set org.cinnamon.desktop.media-handling autorun-never true     # never run programs from media
 gsettings set org.cinnamon.desktop.media-handling automount false        # don't mount drives by themselves
@@ -747,8 +622,6 @@ gsettings set org.cinnamon.desktop.media-handling automount-open false   # don't
 
 ### 8.4 Ctrl + Alt + Delete doesn't restart the computer
 - [ ] Done
-
-**Script:** ✅ Done by the script (`desktop` section).
 
 **What:** Stop **Ctrl + Alt + Delete** on a text console (Ctrl + Alt + F3 and similar) from rebooting the machine straight away.
 
@@ -772,8 +645,6 @@ dpkg -l openssh-server       # "ii" at the start = installed
 ### 9.1 Not needed? Remove it.
 - [ ] Done
 
-**Script:** 🔎 If the README doesn't list SSH, the script offers to stop and disable it, including `ssh.socket` (default no); removing `openssh-server` is up to you.
-
 If the README doesn't mention SSH or remote logins:
 ```bash
 sudo systemctl disable --now ssh
@@ -783,8 +654,6 @@ On **Mint 22**, SSH can also be started on demand by `ssh.socket`; if you keep t
 
 ### 9.2 Needed? Make it safe.
 - [ ] Done
-
-**Script:** ✅ Done by the script (`ssh` section).
 
 ```bash
 sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
@@ -798,7 +667,7 @@ sudo nano /etc/ssh/sshd_config
 | `MaxAuthTries` | `4` | Fewer password guesses per connection |
 | `X11Forwarding` | `no` | Don't forward the desktop |
 | `LoginGraceTime` | `60` | Drop slow, half-finished logins |
-| `ClientAliveInterval` | `300` | Close idle sessions |
+| `ClientAliveInterval` | `300` | Probe whether the encrypted client connection is responsive |
 | `ClientAliveCountMax` | `3` | (with the line above) |
 | `HostbasedAuthentication` | `no` | Old, weak login method |
 | `IgnoreRhosts` | `yes` | Old, weak login method |
@@ -816,12 +685,10 @@ If `sshd -t` says **Missing privilege separation directory: /run/sshd**, SSH is 
 **Check it worked:** `sudo sshd -T | grep -Ei 'permitrootlogin|permitemptypasswords|maxauthtries'` shows `permitrootlogin no`, `permitemptypasswords no` and `maxauthtries 4`.
 
 > [!WARNING]
-> Leave `PasswordAuthentication yes` unless the README says otherwise. Nobody on a practice image has SSH keys set up, so turning passwords off locks everyone out.
+> Leave `PasswordAuthentication yes` unless the README says otherwise. First prove that each required user has a working permitted authentication method in a separate connection; otherwise disabling passwords can lock them out.
 
 ### 9.3 Check for override files
 - [ ] Done
-
-**Script:** ✅ Done by the script (`ssh` section).
 
 Files in `/etc/ssh/sshd_config.d/` are read **first**, and for SSH the first value wins, so they override everything above:
 ```bash
@@ -832,12 +699,10 @@ sudo sshd -T | grep -Ei 'permitrootlogin|permitemptypasswords|passwordauthentica
 ### 9.4 Planted SSH keys
 - [ ] Done
 
-**Script:** 🔎 The script lists every `authorized_keys` file and offers to delete it (yes for root, no for others by default); you decide for each user.
-
 ```bash
 sudo find / -name 'authorized_keys*' 2>/dev/null -exec ls -la {} \; -exec cat {} \;
 ```
-A key in `/root/.ssh/authorized_keys` or in an unauthorized user's folder is almost certainly a backdoor. Delete the file (or the line).
+Record key fingerprints and compare them with the README and known administrators. Root keys can be legitimate management credentials. Back up the file and remove only the confirmed unauthorized key line, then test required users again.
 
 ---
 
@@ -845,8 +710,6 @@ A key in `/root/.ssh/authorized_keys` or in an unauthorized user's folder is alm
 
 ### 10.1 Turn on network and memory protections
 - [ ] Done
-
-**Script:** ✅ Done by the script (`kernel` section).
 
 **Typing:**
 ```bash
@@ -882,8 +745,6 @@ sudo sysctl -p
 ### 10.2 Turn off core dumps
 - [ ] Done
 
-**Script:** ✅ Done by the script (`kernel` section).
-
 **What:** Stop crashing programs from writing a "core dump" (a copy of everything in their memory) to disk.
 
 **Why it matters:** A core dump can contain passwords and keys that were in the program's memory. `fs.suid_dumpable = 0` in 10.1 covers programs that run as root; this line covers everyone else.
@@ -903,8 +764,6 @@ grep -rs core /etc/security/limits.conf /etc/security/limits.d/ | grep -v ':#'  
 ### 11.1 Password files
 - [ ] Done
 
-**Script:** ✅ Done by the script (`permissions` section).
-
 ```bash
 ls -l /etc/passwd /etc/shadow /etc/group /etc/gshadow
 sudo chmod 644 /etc/passwd /etc/group
@@ -917,8 +776,6 @@ sudo chown root:shadow /etc/shadow /etc/gshadow
 ### 11.2 SUID programs (run as root for anyone)
 - [ ] Done
 
-**Script:** 🔎 The script removes SUID from known-dangerous programs like `find` or `vim` (it asks first) and lists unknown ones under REVIEW for you to look up.
-
 **Why:** If `find`, `vim`, `bash` or `python3` has the SUID bit, any user can become root with one command.
 
 ```bash
@@ -930,8 +787,6 @@ Normal SUID programs include `passwd`, `sudo`, `su`, `mount`, `umount`, `chsh`, 
 ### 11.3 Files anyone can change
 - [ ] Done
 
-**Script:** ✅ Done by the script (`permissions` section).
-
 ```bash
 sudo find / -xdev -type f -perm -0002 ! -path '/proc/*' ! -path '/sys/*' 2>/dev/null
 sudo chmod o-w /path/to/file
@@ -941,8 +796,6 @@ sudo chmod o-w /path/to/file
 
 ### 11.4 Home folders
 - [ ] Done
-
-**Script:** ✅ Done by the script (`permissions` section).
 
 ```bash
 ls -ld /home/*
@@ -957,8 +810,6 @@ sudo chmod 750 /home/bob        # other users can't look inside
 
 ### 12.1 Check /etc/sudoers and /etc/sudoers.d/
 - [ ] Done
-
-**Script:** 🔎 The script removes `NOPASSWD` and `!authenticate` and offers to disable rules for non-admins; read the files again afterwards, because a rule can survive.
 
 **Typing:**
 ```bash
@@ -986,8 +837,6 @@ sudo visudo -f /etc/sudoers.d/90-bob # a file in sudoers.d
 ### 13.1 Scheduled jobs (cron)
 - [ ] Done
 
-**Script:** 🔎 The script removes cron jobs that look malicious (it asks first) and lists the rest under REVIEW; you check the others.
-
 ```bash
 sudo ls -la /var/spool/cron/crontabs/                  # one file per user
 for u in $(cut -d: -f1 /etc/passwd); do sudo crontab -l -u $u 2>/dev/null | grep -v '^#' | sed "s/^/$u: /"; done
@@ -1002,8 +851,6 @@ Red flags: `nc`, `ncat`, `bash -i`, `/dev/tcp/`, `curl ... | bash`, `wget`, `bas
 ### 13.2 Services that start a backdoor at boot
 - [ ] Done
 
-**Script:** 🔎 The script lists services that didn't come from a package and offers to disable obviously bad ones; you check the rest and delete the unit files.
-
 ```bash
 systemctl list-unit-files --type=service --state=enabled
 ls -la /etc/systemd/system/ | grep -v '\.wants'
@@ -1016,8 +863,6 @@ sudo systemctl disable --now evil.service && sudo rm /etc/systemd/system/evil.se
 ### 13.3 Programs listening for connections
 - [ ] Done
 
-**Script:** 🔎 The script offers to kill netcat-style listeners and lists every listening port under REVIEW; you still find what starts them.
-
 ```bash
 sudo ss -tulpn
 ```
@@ -1025,8 +870,6 @@ sudo ss -tulpn
 
 ### 13.4 Start-up files and fake commands
 - [ ] Done
-
-**Script:** 🔎 The script comments out suspicious lines and fake aliases in shell start-up files (it asks first); `rc.local`, `/etc/profile.d` and fake commands are only listed under REVIEW.
 
 ```bash
 cat /etc/rc.local 2>/dev/null
@@ -1038,19 +881,15 @@ Watch for aliases that hijack commands, e.g. `alias sudo='...'` or `alias ls='..
 ### 13.5 The hosts file
 - [ ] Done
 
-**Script:** ✅ Done by the script (`backdoors` section).
-
 ```bash
 cat /etc/hosts
 ```
-Only `127.0.0.1 localhost`, `127.0.1.1 <this computer's name>` and the `ip6-` lines are normal. A line like `10.6.6.6 www.google.com` sends that website to an attacker. Put `#` in front of it (`sudo nano /etc/hosts`).
+Localhost, hostname and README-required internal mappings can all be legitimate. Back up `/etc/hosts`, compare each mapping with the scenario, and comment only confirmed unauthorized overrides using `sudo nano /etc/hosts`. Test the actual required hostname afterwards; an unfamiliar address alone is not proof of an attacker.
 
 **Check it worked:** `grep -v '^#' /etc/hosts` shows only the normal lines.
 
 ### 13.6 Hidden root-kit tricks
 - [ ] Done
-
-**Script:** 🔎 The script disables `/etc/ld.so.preload` and `auth sufficient pam_permit.so` lines (it asks first); still read `common-auth` for other `pam_permit` tricks.
 
 ```bash
 cat /etc/ld.so.preload 2>/dev/null          # should not exist or be empty
@@ -1060,16 +899,12 @@ grep -n 'pam_permit' /etc/pam.d/common-auth # "auth sufficient pam_permit.so" = 
 ### 13.7 Programs that start when someone logs in
 - [ ] Done
 
-**Script:** 🔎 The script lists autostart entries under REVIEW; you decide which to remove.
-
 **Clicking:** **Menu → Preferences → Startup Applications**.
 
 **Typing:** `ls /etc/xdg/autostart/ /home/*/.config/autostart/`
 
 ### 13.8 Tampered system programs
 - [ ] Done
-
-**Script:** 🔎 The script reinstalls packages whose programs were changed (it asks first); other changed files in the `dpkg --verify` output are up to you.
 
 ```bash
 sudo dpkg --verify | grep -v ' c '           # takes a minute or two; lines with a 5 = changed file
@@ -1078,8 +913,6 @@ Fix by reinstalling the package that owns it: `dpkg -S /usr/bin/ls`, then `sudo 
 
 ### 13.9 Malware scanners (optional, slow)
 - [ ] Done
-
-**Script:** ✋ Not done by the script. Do this by hand.
 
 ```bash
 sudo apt install clamav rkhunter chkrootkit
@@ -1098,8 +931,6 @@ These tools only **report**. Look at each file they name (forensics first!) befo
 
 ### 14.1 System logs and the audit daemon
 - [ ] Done
-
-**Script:** ✅ Done by the script (`logging` section).
 
 ```bash
 sudo apt install auditd rsyslog
@@ -1122,8 +953,6 @@ sudo augenrules --load
 
 ### 15.1 Make sure AppArmor is on
 - [ ] Done
-
-**Script:** ✅ Done by the script (`apparmor` section).
 
 ```bash
 sudo aa-status
@@ -1148,8 +977,6 @@ If the README needs a web server, database, FTP, Samba or similar, **harden it i
 
 ### 17.1 Firefox security settings
 - [ ] Done
-
-**Script:** 🔎 The script switches pop-up blocking, add-on install warnings and dangerous-site blocking back on when a user's Firefox files turn them off (`browser` section; Firefox must be closed). HTTPS-Only Mode, passwords and extensions are up to you.
 
 **What:** Turn on Firefox's built-in protections. Images often switch them off.
 
@@ -1179,3 +1006,524 @@ Then open **≡ → Add-ons and themes → Extensions** and remove any you don't
 - [ ] All forensics answers are saved
 - [ ] Take a final snapshot
 - [ ] **Don't reboot** unless you need to. If you must, reboot once and check everything still works.
+
+## 17. Detailed manual safety and verification procedures
+
+These procedures supplement every earlier checklist table. Ubuntu and Debian use the same underlying APT/systemd tools where stated; their own checklists describe differences. Open **Menu → Terminal** or press **Ctrl+Alt+T**. Configuration blocks marked `text` are file contents, not commands. Examples use `bob`; substitute the README's actual account. Do not paste placeholders such as `<PID>` literally.
+
+### 17.1 Users, root and privilege recovery
+
+- [ ] Done
+
+**What:** Reconcile people, service identities and powerful groups without losing administrator access.
+
+**Why it matters:** A low UID or an unfamiliar name is not proof of an attacker. Locking a password does not revoke SSH keys, an existing session or a sudo grant.
+
+**Before changing anything:** Record authorized users and service dependencies. Keep a working root terminal open while testing authentication. Protect backups:
+
+```bash
+sudo install -d -m 700 /root/cp-backups
+sudo cp -a /etc/passwd /etc/group /etc/shadow /etc/gshadow /root/cp-backups/
+```
+
+Never copy shadow files to a world-readable desktop directory. Account files form a related database; blindly restoring an old copy can conflict with users created by later package installations.
+
+**Clicking (GUI):** **Menu → Administration → Users and Groups**; select each person, inspect account type and group membership, compare with the README. Do not delete a home directory while forensics remains unresolved. GUI absence means use the terminal; do not install another desktop.
+
+**Typing (check):**
+
+```bash
+whoami
+id
+sudo -v
+getent passwd
+getent group sudo
+sudo awk -F: '$3 == 0 { print $1, $3, $6, $7 }' /etc/passwd
+```
+
+`sudo -v` validates the current user's sudo access. Normally only root has UID 0, but investigate any exception before editing. `getent` can include directory-service accounts that are not in local files. Inspect an account:
+
+```bash
+id bob
+sudo passwd -S bob
+sudo chage -l bob
+sudo -l -U bob
+```
+
+`P` means a usable password hash, `L` a locked password, `NP` no password. None proves the password is strong. `sudo -l -U` lists policy, including grants outside the sudo group.
+
+**Typing (fix, only when appropriate):** Grant only the README-approved administrator and retain other groups:
+
+```bash
+sudo usermod -aG sudo bob
+```
+
+Remove one unauthorized membership:
+
+```bash
+sudo gpasswd -d bob sudo
+```
+
+For a confirmed unauthorized account, after evidence collection use account expiration for reversible denial of normal new logins:
+
+```bash
+sudo usermod --expiredate 1970-01-02 mallory
+```
+
+Investigate existing sessions, processes, keys and services separately. If deletion is explicitly required, preserve its UID, groups and home first, then use `sudo userdel mallory` without `-r`; delete the preserved data only after evidence review and authorization.
+
+**Check it worked:** Log into a **new** permitted session as the authorized user and run `id` and `sudo -l`. Group changes do not alter existing sessions. Check an expired account with `sudo chage -l mallory`.
+
+**Undo:** Re-add a removed group with `sudo usermod -aG sudo bob` only if it was originally authorized. Restore the recorded account expiry with `sudo chage -E YYYY-MM-DD mallory`, or `sudo chage -E -1 mallory` only if it originally had no expiration. Do not unlock an account that was originally locked. Account deletion cannot be undone just by recreating a name.
+
+**Warnings:** Never use `usermod -G sudo` without `-a` to add membership; it replaces supplementary groups. Do not lock root on Debian until a separate administrator and recovery path work. Service identities such as postgres may legitimately use a shell for maintenance.
+
+### 17.2 Password aging, PAM and lockout without breaking login
+
+- [ ] Done
+
+**What:** Set password policy and validate the actual PAM stack used for login/password changes.
+
+**Why it matters:** Incorrect PAM ordering can allow weak passwords or deny every login. `/etc/login.defs` defaults do not change existing users. `pam_tally`/`pam_tally2` examples from older scripts are obsolete on modern releases.
+
+**Before changing anything:** Keep a root console open and back up all affected files:
+
+```bash
+sudo cp -a /etc/pam.d /root/cp-backups/pam.d.before-policy
+sudo cp -a /etc/security /root/cp-backups/security.before-policy
+sudo cp -a /etc/login.defs /root/cp-backups/login.defs.before-policy
+```
+
+Use unique backup names if repeating. Record `sudo chage -l bob` before modifying that user.
+
+**Clicking (GUI):** Use **Users and Groups** to change only approved user passwords. Standard desktop settings do not expose the complete PAM stack or aging policy; use the terminal for those.
+
+**Typing (check):**
+
+```bash
+grep -nE 'pam_unix|pam_pwquality|pam_pwhistory|pam_faillock|nullok' /etc/pam.d/common-auth /etc/pam.d/common-account /etc/pam.d/common-password
+ls /usr/share/pam-configs
+find /usr/lib -name pam_faillock.so -o -name pam_pwhistory.so -o -name pam_pwquality.so 2>/dev/null
+```
+
+Do not insert a module that is absent. Read the installed `man pam_pwquality`, `man pam_pwhistory`, `man pam_faillock` and `man pam-auth-update`; capabilities vary with release and package version.
+
+**Typing (fix, only when appropriate):** Apply README aging values to one existing human user:
+
+```bash
+sudo chage -M 90 -m 1 -W 14 bob
+```
+
+This means maximum age 90 days, minimum age 1 day, warning 14 days. Use scenario values rather than blindly applying these to service accounts. Inspect/edit defaults for future accounts:
+
+```bash
+sudo nano /etc/login.defs
+```
+
+For complexity, install only the applicable policy package if absent and permitted:
+
+```bash
+sudo apt install libpam-pwquality
+```
+
+Use its supplied profile through `sudo pam-auth-update`, selecting password quality without deselecting the required Unix authentication profile. Edit `/etc/security/pwquality.conf` using the settings in section 3.3. A root user can bypass quality unless enforcement is configured; test as an ordinary user.
+
+For history, prefer `pam_pwhistory` when supported. Inspect the existing common-password sequence: quality must obtain the new token, history must check it, and pam_unix must consume it via `use_authtok`. A typical history module line is:
+
+```text
+password required pam_pwhistory.so remember=5 use_authtok
+```
+
+This is **not** a complete PAM stack. Place it after the active quality module and before the password-writing module, accounting for numeric jump controls already present. Do not append a module after `pam_deny` and assume it executes. Do not duplicate `remember` mechanisms.
+
+For supported faillock, `/etc/security/faillock.conf` can specify:
+
+```text
+deny = 5
+fail_interval = 900
+unlock_time = 900
+```
+
+These values alone do not enable lockout: the distribution's PAM stack needs correctly ordered preauth/authfail/account integration. Prefer a supplied distribution profile if present. If none exists, do not paste a generic replacement stack; review the installed module's example and existing control flow with a mentor before changing authentication. Do not lock root or your only administrator to test it.
+
+**Check it worked:** Keep the root console open. From a **separate ordinary user session**, run `passwd` and confirm a deliberately weak test password is rejected before choosing a unique strong one. A root `su - bob` can bypass the password and is not proof authentication works. Test a normal new login and sudo. Inspect errors:
+
+```bash
+sudo journalctl _COMM=sudo -n 30 --no-pager
+sudo chage -l bob
+sudo faillock --user bob
+```
+
+Use `faillock` only if installed/configured. An empty record can mean no failures, not successful integration.
+
+**Undo:** From the root console, restore the specific modified PAM/config files from backup (preserving metadata), then test a separate login again before exiting root. To clear a mistakenly locked test account's faillock counter:
+
+```bash
+sudo faillock --user bob --reset
+```
+
+Restore the user's recorded `chage` values individually. A password reset is not reversible to the unknown old plaintext password.
+
+**Warnings:** Never expose hashes, use one shared password, or test repeated failed logins against the active administrator. Do not restart the desktop display manager while unsaved work is open.
+
+### 17.3 SSH: effective configuration and a second-session test
+
+- [ ] Done
+
+**What:** Secure an installed required SSH server while retaining permitted users.
+
+**Why it matters:** Included files, Match blocks and socket activation can make the effective configuration differ from the file you edited.
+
+**Before changing anything:** Record the required port, authentication methods, source networks and any SFTP/forwarding requirements. Keep your existing remote connection and console open.
+
+**Clicking (GUI):** Use the VM console for recovery. A desktop's sharing panel may configure remote desktop rather than OpenSSH; do not treat them as the same service.
+
+**Typing (check):**
+
+```bash
+dpkg-query -W openssh-server
+systemctl status ssh.service ssh.socket --no-pager
+sudo /usr/sbin/sshd -T | grep -Ei 'port |listenaddress|permitrootlogin|passwordauthentication|pubkeyauthentication|permitemptypasswords|allowusers|allowgroups'
+sudo ss -ltnp
+```
+
+`sshd -T` parses effective defaults. Match-dependent rules need a connection-specific inspection, using real values:
+
+```bash
+sudo /usr/sbin/sshd -T -C user=bob,host=client.example,addr=192.168.10.20
+```
+
+**Typing (fix, only when appropriate):**
+
+```bash
+sudo cp -a /etc/ssh /root/cp-backups/ssh.before-cp
+sudo nano /etc/ssh/sshd_config
+```
+
+Inspect section 9's table and actual included files. Set `PermitRootLogin no` and `PermitEmptyPasswords no` if compatible with the scenario; retain a tested authentication method for each required user. A first parsed value generally wins for a given context; inspect where Include appears rather than assuming all drop-ins always override all main-file lines. `ClientAliveInterval`/`ClientAliveCountMax` detect unresponsive clients; a responsive idle client can stay connected.
+
+Validate:
+
+```bash
+sudo /usr/sbin/sshd -t
+```
+
+No output and exit 0 is expected. Then, for ordinary config changes:
+
+```bash
+sudo systemctl reload ssh.service
+```
+
+For socket-managed port/listen changes follow the Ubuntu-specific procedure; a daemon reload alone might not change the listening socket.
+
+**Check it worked:** In a second terminal on an authorized client, use `ssh bob@server-name` with the actual hostname and port. Confirm login and the required sudo/SFTP function, then repeat `sshd -T`, `ss -ltnp` and the journal check. Close the old connection only after success.
+
+**Undo:** Restore the particular edited SSH config/drop-in from `/root/cp-backups/ssh.before-cp`, remove only newly created drop-ins, run `sshd -t`, and reload/restart the appropriate unit from the console. Restore firewall port/source changes too.
+
+**Warnings:** Do not delete all authorized_keys files. Inspect fingerprints with `ssh-keygen -lf FILE` and remove only confirmed unauthorized keys after preserving them privately. A root key may be legitimate recovery access.
+
+### 17.4 UFW and nftables: one firewall owner
+
+- [ ] Done
+
+**What:** Inspect the active firewall and permit required inbound services before imposing default deny.
+
+**Why it matters:** UFW can use nftables through compatibility tools. Mixing independent policies or flushing rules can break both access and scoring.
+
+**Before changing anything:** Use the console. Record actual server ports, UDP services, IPv6 use and source networks. Do not change `/etc/ufw/before.rules` to copy legacy anti-spoofing snippets without understanding existing defaults.
+
+**Clicking (GUI):** If installed, **Menu → Firewall Configuration** (GUFW) → unlock → inspect profiles and existing rules. Create the required allow rule before switching the firewall on. GUFW configures UFW; it is not a separate firewall engine.
+
+**Typing (check and backup):**
+
+```bash
+sudo ufw status verbose
+sudo nft list ruleset
+sudo iptables-save
+sudo cp -a /etc/ufw /root/cp-backups/ufw.before-cp
+```
+
+Inactive UFW does not prove no firewall exists. Save native nftables rules if that is the owner's tool:
+
+```bash
+sudo nft list ruleset | sudo tee /root/cp-backups/nft-before.nft > /dev/null
+```
+
+**Typing (fix, only when appropriate):** UFW example for required SSH from the example lab network:
+
+```bash
+sudo ufw allow from 192.168.10.0/24 to any port 22 proto tcp
+```
+
+Then:
+
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw enable
+```
+
+Use actual required ports. FTP may need passive data ports, DNS both TCP/UDP 53, DHCP its interface-specific UDP path. Do not guess these from the process name.
+
+If the image already uses native nftables, preserve that policy and edit `/etc/nftables.conf` instead of enabling UFW. Back it up first. In the **existing** input base chain, preserve loopback, established/related traffic and required ICMP/ICMPv6, add source-scoped service rules before any matching drop, then validate:
+
+```bash
+sudo nft -c -f /etc/nftables.conf
+```
+
+Only after reviewing the entire ruleset from the console:
+
+```bash
+sudo nft -f /etc/nftables.conf
+```
+
+Do not paste a second generic input chain. Stateful IPv6 operation needs ICMPv6 neighbor discovery; blanket blocking it breaks networking.
+
+**Check it worked:** Query the owner's rules and test a fresh permitted connection from another machine. Verify required remote services and IPv4/IPv6 as applicable, not merely `ping` or an old established SSH session.
+
+**Undo:** For a newly created UFW rule use `sudo ufw status numbered`, identify its exact number and `sudo ufw delete NUMBER` (replace NUMBER). Restore recorded defaults only if changed. For native nftables restore the reviewed full policy from the console; understand whether the file flushes existing tables before loading. Do not run `nft flush ruleset` remotely as a shortcut.
+
+**Warnings:** Do not add a broad allow-all rule to make one service work. Keep required outbound traffic and DNS; never disable IPv6 merely because an old script did.
+
+### 17.5 Package sources, updates and vulnerability triage
+
+- [ ] Done
+
+**What:** Verify release-matched signed repositories and update installed required software.
+
+**Why it matters:** Mixed releases, obsolete PPAs and untrusted keys can introduce malicious or incompatible packages. Historical 2016 repository lists are unsuitable for current images.
+
+**Before changing anything:** Record release and repositories; keep a working desktop and network.
+
+**Clicking (GUI):** Mint **Menu → Administration → Software Sources**; inspect official repositories and each additional repository/PPA. Use **Update Manager → Refresh**, review updates, then install supported security updates. Do not select a major release upgrade during a timed round.
+
+**Typing (check):**
+
+```bash
+cat /etc/os-release
+apt-cache policy
+sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Components:|Signed-By:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+apt-mark showhold
+```
+
+DEB822 `.sources` files and traditional `.list` files are both valid. A trusted `Signed-By` key is repository-specific; never bypass signature validation with `trusted=yes` or `--allow-unauthenticated` to suppress an error.
+
+**Typing (fix, only when appropriate):** Back up sources before disabling a confirmed unauthorized entry:
+
+```bash
+sudo cp -a /etc/apt /root/cp-backups/apt.before-cp
+```
+
+Use the GUI or `sudo nano` on that specific file. Preserve the matching Mint and Ubuntu base suites; Linux Mint Debian Edition follows Debian instead. Then:
+
+```bash
+sudo apt update
+```
+
+Stop on signature, release or 404 errors and investigate the specific source. After success preview the proposed upgrade:
+
+```bash
+apt -s upgrade
+```
+
+Review changes, then:
+
+```bash
+sudo apt upgrade
+```
+
+Do not blindly purge held packages or run autoremove. Preview any targeted removal with `apt -s remove PACKAGE` using the actual name; preserve required dependencies and desktop metapackages.
+
+**Check it worked:** `apt list --upgradable` reports remaining upgrades; some may be phased, held or require a reviewed dependency transition. Run `sudo dpkg --audit` for incomplete package configuration and open required applications after updating. There is no universal APT command that proves every installed package has no vulnerability; consult distribution security advisories for the exact installed release/version.
+
+**Undo:** Restore the one source file you changed, then `apt update`. Package updates are not undone by restoring sources: use a supported package rollback or allowed practice snapshot only after checking dependencies and preserving later work.
+
+**Warnings:** On interruption inspect the real package-manager error. Do not delete lock files while another package manager is active. If no manager is running and configuration was interrupted, `sudo dpkg --configure -a` can finish pending configuration; review its output before proceeding.
+
+### 17.6 Ownership, permissions, SUID and capabilities
+
+- [ ] Done
+
+**What:** Find dangerous permissions without recursively changing the whole OS.
+
+**Why it matters:** Some SUID/SGID files and capabilities are intentional; removing all privileged bits breaks tools such as passwd and sudo.
+
+**Before changing anything:** Preserve path, owner, group and octal mode with `stat`. Do not print `/etc/shadow` contents into a shared log.
+
+**Clicking (GUI):** File manager → exact file **Properties → Permissions**. Compare owner/group/access with the package or required application's expected state. The GUI may omit ACLs and capabilities.
+
+**Typing (check):**
+
+```bash
+sudo stat -c '%a %U:%G %n' /etc/passwd /etc/group /etc/shadow /etc/gshadow
+sudo find / -xdev -type f -perm /6000 -ls 2>/dev/null
+sudo find /home /tmp /var/tmp -xdev -type f -perm -0002 -ls 2>/dev/null
+sudo getcap -r /usr /opt 2>/dev/null
+```
+
+Mint/Ubuntu/Debian commonly use root:shadow mode 640 for `/etc/shadow`; compare the distribution's baseline rather than applying it on FreeBSD. World-writable temporary directories often legitimately use sticky mode 1777. Check package ownership and modifications:
+
+```bash
+dpkg-query -S /usr/bin/passwd
+sudo dpkg -V passwd
+```
+
+Verification output is a lead; local configuration can legitimately differ, and package metadata on a compromised machine is not an independent trusted baseline.
+
+**Typing (fix, only when appropriate):** If `/etc/shadow` is incorrectly world-readable on the listed Linux families:
+
+```bash
+sudo chown root:shadow /etc/shadow
+sudo chmod 640 /etc/shadow
+```
+
+For a confirmed unauthorized SUID copy only, remove that bit from the exact path:
+
+```bash
+sudo chmod u-s /opt/unauthorized-tool
+```
+
+**Check it worked:** Repeat `stat` and the targeted listing. Test authorized password changes and sudo from a separate session. Inspect ACLs with `getfacl PATH` if available; mode bits alone may not explain effective access.
+
+**Undo:** Restore the recorded owner/group/mode on that exact file. For package-owned executables prefer a trusted package repair after evidence collection, rather than copying an unknown binary.
+
+**Warnings:** Never `chmod -R 777`, recursively chown system directories, remove all SUID files, or overwrite file ACLs simply because a scanner flags them.
+
+### 17.7 Cron, systemd and malicious persistence
+
+- [ ] Done
+
+**What:** Review scheduled and boot/login execution paths.
+
+**Why it matters:** Legitimate backup, update and service tasks also run as root. Deleting all cron jobs destroys required operations and evidence.
+
+**Before changing anything:** Record command, user, schedule, file path and package owner. Keep copies in `/root/cp-backups`, outside executable startup locations.
+
+**Clicking (GUI):** Mint **Menu → Preferences → Startup Applications**; inspect each entry and disable only an unauthorized one. This does not cover systemd, root cron or every user's desktop startup.
+
+**Typing (check):**
+
+```bash
+sudo crontab -l
+sudo crontab -u bob -l
+sudo ls -la /etc/cron.d /etc/cron.daily /etc/cron.hourly
+systemctl list-timers --all
+systemctl list-unit-files --state=enabled
+systemctl --user list-unit-files --state=enabled
+```
+
+“No crontab” is not an error requiring a new job. Inspect a suspicious system unit:
+
+```bash
+systemctl cat example.service
+systemctl show example.service -p FragmentPath -p DropInPaths -p User -p ExecStart
+```
+
+Also inspect `/etc/rc.local`, `/etc/profile.d`, `/etc/ld.so.preload`, `/etc/systemd/system`, user shell profiles and `~/.config/autostart`. Do not run referenced suspicious scripts.
+
+**Typing (fix, only when appropriate):** Save a user's existing crontab first:
+
+```bash
+sudo crontab -u bob -l | sudo tee /root/cp-backups/bob-crontab.before-cp > /dev/null
+```
+
+Only use the backup if the listing succeeded. Edit that user's crontab with `sudo crontab -u bob -e`, removing just the unauthorized line. For a confirmed unauthorized unit:
+
+```bash
+sudo systemctl disable --now example.timer
+sudo systemctl disable --now example.service
+```
+
+Inspect any socket/path activation too; disabling one unit may not prevent another from starting it. Do not disable real system units named by the README.
+
+**Check it worked:** Re-list the crontab, unit state and timers, inspect the process/listener and test required scheduled jobs. `systemctl daemon-reload` is needed after unit-file changes, but is not itself a service restart.
+
+**Undo:** Reinstall a valid saved crontab with `sudo crontab -u bob /root/cp-backups/bob-crontab.before-cp`. Restore the recorded enabled/running states individually; do not enable every unit you inspected. A copied startup file must return to its original owner and mode.
+
+**Warnings:** Do not `crontab -r`, blanket-remove `.desktop` files, or restrict all cron access to root unless the scenario actually requires it. User timers run in the user's manager; root's `systemctl --user` is not the desktop user's manager.
+
+### 17.8 Kernel, AppArmor and logging
+
+- [ ] Done
+
+**What:** Apply supported kernel controls, keep mandatory-access controls active and preserve investigation logs.
+
+**Why it matters:** Linux kernel settings differ from FreeBSD, and routers/VPNs/containers may require forwarding. AppArmor denials can explain an otherwise confusing service failure.
+
+**Before changing anything:** Record current values and inspect existing drop-ins. Do not disable AppArmor or forwarding without checking the role.
+
+**Clicking (GUI):** System Monitor can show processes/resources; use **Logs** if installed for system errors. Kernel and AppArmor policy normally require terminal inspection.
+
+**Typing (check):**
+
+```bash
+sysctl net.ipv4.ip_forward net.ipv4.tcp_syncookies kernel.randomize_va_space
+sudo grep -RHE 'ip_forward|accept_redirects|randomize_va_space' /etc/sysctl.conf /etc/sysctl.d 2>/dev/null
+sudo aa-status
+sudo journalctl -k -g 'apparmor="DENIED"' --no-pager
+sudo journalctl --since '1 hour ago' -p warning --no-pager
+```
+
+No `aa-status` command means inspect whether apparmor utilities are installed before assuming the security mechanism is absent. Do not replace a working LSM configuration blindly.
+
+**Typing (fix, only when appropriate):** Back up any existing chosen drop-in and edit:
+
+```bash
+sudo nano /etc/sysctl.d/60-cp-local.conf
+```
+
+Example supported workstation settings (file contents):
+
+```text
+net.ipv4.tcp_syncookies = 1
+kernel.randomize_va_space = 2
+```
+
+Syncookies help during a TCP SYN backlog overflow; ASLR makes memory layout less predictable. They are not a firewall or malware detector. Do not add unknown keys or disable IPv6 globally. Apply just this file:
+
+```bash
+sudo sysctl -p /etc/sysctl.d/60-cp-local.conf
+```
+
+If a required service is denied by AppArmor, inspect the named profile and denied operation, confirm the operation is legitimate, and update only the relevant local profile rule using distribution guidance. Do not put every profile in complain mode.
+
+**Check it worked:** Query the two sysctl values again, test the required service and review fresh kernel denials. Check `systemctl status systemd-journald`; rsyslog/auth.log may not be installed on every Debian-based image. `journalctl --list-boots` shows retained boots, not a guarantee all historical logs were preserved.
+
+**Undo:** Restore the old drop-in or remove only your newly created file, then explicitly restore the recorded runtime values using `sudo sysctl -w KEY=OLDVALUE` with real values. Removing a file alone does not undo its live settings. Restore only the changed AppArmor rule and reload its individual profile after validation.
+
+**Warnings:** Do not clear journals, truncate logs, or install a logging daemon merely to force one filename to exist. Log output can contain personal data and secrets; keep it private.
+
+### 17.9 Service and desktop completion checks
+
+- [ ] Done
+
+**What:** Verify required services, desktop login and ordinary-user workflows after hardening.
+
+**Why it matters:** A daemon can be running while its application is unreachable, its database is down or its permissions deny required users.
+
+**Before changing anything:** Note the original display manager with `systemctl status display-manager`; Cinnamon, MATE, Xfce and GNOME use different settings schemas.
+
+**Clicking (GUI):** In the logged-in user's **Screensaver / Privacy → Screen Lock**, set an appropriate timeout and require a password. In login settings disable unauthorized autologin. In the browser review extensions, protection settings and **Help → About** updates. Test locking and unlocking before logging out.
+
+**Typing (check):** As the desktop user, without sudo:
+
+```bash
+gsettings list-schemas | grep -E 'cinnamon|gnome.desktop.screensaver|gnome.desktop.session'
+```
+
+Use only the schema that exists. Record `gsettings get SCHEMA KEY` before each earlier desktop change; the exact schema/key in section 8 applies to Cinnamon, not every Mint flavor. For system health:
+
+```bash
+systemctl --failed
+ip -br address
+ip route
+sudo ss -tulpn
+```
+
+**Typing (fix, only when appropriate):** Apply the distribution-specific desktop procedure and the per-service instructions in [Linux service hardening](../guides/linux-service-hardening.md). Do not stop a service merely because it appears in the listening-port list.
+
+**Check it worked:** New authorized login, screen lock/unlock, sudo, hostname resolution, required web/database/share/SSH transactions, all saved forensic answers, current score timestamp, no new service failures. Check package operations have completed before any necessary reboot.
+
+**Undo:** Restore the recorded desktop key with `gsettings set` or its GUI value. Restore the exact display-manager config from backup if login fails, using console access. Do not restart the display manager to test while unsaved work remains.
+
+**Warnings:** A reboot can lose unsaved work and remote access. Finish updates and preserve recovery access first; the rules and actual update state determine whether/when to reboot.
