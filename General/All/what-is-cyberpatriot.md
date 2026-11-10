@@ -47,13 +47,13 @@ Older practice images may also be Windows 10, Windows Server 2019, or Ubuntu. Th
 
 - Each team gets **one 4-hour block**. The clock starts when the first image is powered on.
 - Up to 5 people work at once. Usually each person takes one image or one task.
-- There is also a **Cisco networking** part (a quiz and a Packet Tracer activity). Study it with the [Cisco & Packet Tracer guide](../guides/cisco-networking.md) and the worked subnetting examples in that guide.
+- There is also a **Cisco networking** part (a quiz and a Packet Tracer activity). Study it with the [Cisco & Packet Tracer guide](../../Cisco/cisco-networking.md) and the worked subnetting examples in that guide.
 
 ## Where to go next
 
-Open lesson 2, [Things that lose points](../guides/things-that-lose-points.md), then keep going through the lessons in order.
+Open lesson 2, [Things that lose points](things-that-lose-points.md), then keep going through the lessons in order.
 
-Already know the basics and want to start on an image? Open your checklist: [Windows 10 / 11](../checklists/windows-10-11.md) · [Windows Server](../checklists/windows-server.md) · [Linux Mint](../checklists/linux-mint.md) · [Debian](../checklists/debian.md) · [FreeBSD](../checklists/freebsd.md) · [Ubuntu](../checklists/ubuntu.md). If a word confuses you, look it up in the [Glossary](../guides/glossary.md).
+Already know the basics and want to start on an image? Open your checklist: [Windows 10 / 11](../../Windows/windows-10-11.md) · [Windows Server](../../Windows/windows-server.md) · [Linux Mint](../../Linux/linux-mint.md) · [Debian](../../Linux/debian.md) · [FreeBSD](../../Linux/freebsd.md) · [Ubuntu](../../Linux/ubuntu.md). If a word confuses you, look it up in the [Glossary](glossary.md).
 
 ## Your first safe practice session
 

@@ -15,7 +15,7 @@ Use the per-service manual procedures below for every installed required service
 
 ## Safe service editing workflow
 
-All commands here are for a **terminal on Ubuntu, Linux Mint or Debian**, using `sudo` for privileged operations. They are written individually so you can inspect the result before the next command. They are not commands to run on this handbook's development workspace. For FreeBSD use its [own checklist](../checklists/freebsd.md); packages generally configure under `/usr/local/etc` and use rc services.
+All commands here are for a **terminal on Ubuntu, Linux Mint or Debian**, using `sudo` for privileged operations. They are written individually so you can inspect the result before the next command. They are not commands to run on this handbook's development workspace. For FreeBSD use its [own checklist](freebsd.md); packages generally configure under `/usr/local/etc` and use rc services.
 
 Before every service change: read the README, identify its package/unit, record a working client test, preserve evidence, and keep console access. A package can be absent without being a vulnerability. Do not install an unnecessary server just to complete a checklist. Replace all example site, share, user and network names with the image's actual values.
 
@@ -1028,7 +1028,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
 ## SSH
-See section 9 of the [Linux Mint checklist](../checklists/linux-mint.md#9-ssh-server-only-if-installed).
+See section 9 of the [Linux Mint checklist](linux-mint.md#9-ssh-server-only-if-installed).
 
 ---
 

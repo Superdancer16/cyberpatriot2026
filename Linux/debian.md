@@ -19,7 +19,7 @@ Debian is Ubuntu's and Linux Mint's "parent", so most commands are the same as t
 ### 0.1 Read the README, take a snapshot, open the Scoring Report
 - [ ] Done
 
-See [Reading the README](../start-here/reading-the-readme.md). In VMware: **VM → Snapshot → Take Snapshot**.
+See [Reading the README](../General/All/reading-the-readme.md). In VMware: **VM → Snapshot → Take Snapshot**.
 
 ### 0.2 Open a terminal
 - [ ] Done
@@ -87,7 +87,7 @@ Without `sudo` (or root), `journalctl` shows only **your own** messages, so a lo
 
 **Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -358,7 +358,7 @@ sudo systemctl enable --now apparmor # only if it was turned off
 
 ## 11. Critical services
 
-Follow the [Linux service hardening guide](../guides/linux-service-hardening.md) for every service the README lists.
+Follow the [Linux service hardening guide](linux-service-hardening.md) for every service the README lists.
 
 ---
 
@@ -484,7 +484,7 @@ systemctl status display-manager --no-pager
 
 Unknown rsyslog/UFW units may be normal. Investigate actual logging retention instead of assuming a file must exist.
 
-**Typing (fix, only when appropriate):** Keep the existing firewall owner. Use the full native nftables edit/validation procedure linked above if applicable. Use [Mint 17.6–17.8](linux-mint.md#176-ownership-permissions-suid-and-capabilities) for file permissions, cron/systemd persistence, AppArmor and kernel controls, checking supported keys/modules first. Use the [per-service procedures](../guides/linux-service-hardening.md) for Apache/Nginx, databases, FTP, Samba, DNS, DHCP and mail.
+**Typing (fix, only when appropriate):** Keep the existing firewall owner. Use the full native nftables edit/validation procedure linked above if applicable. Use [Mint 17.6–17.8](linux-mint.md#176-ownership-permissions-suid-and-capabilities) for file permissions, cron/systemd persistence, AppArmor and kernel controls, checking supported keys/modules first. Use the [per-service procedures](linux-service-hardening.md) for Apache/Nginx, databases, FTP, Samba, DNS, DHCP and mail.
 
 **Check it worked:** A new authorized login, sudo, expected logs, new inbound permitted service connections and all required application transactions must succeed. Record the final scoring timestamp and save forensics answers.
 

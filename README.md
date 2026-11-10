@@ -1,19 +1,15 @@
-# CyberPatriot 2026
+# CyberPatriot 2026 — Documentation Handbook
 
-[Documentation index](docs/index.md)
+Choose a category to find detailed manual checklists, copyable commands, verification and recovery procedures.
 
-Documentation reproduced with permission from [Ripper1004/CyberPatriot-Toolkit](https://github.com/Ripper1004/CyberPatriot-Toolkit/tree/main/docs).
+| Category | Guides |
+|---|---|
+| **[General / All](General/All/README.md)** | Getting started, the image README, forensics, round strategy, glossary and credits |
+| **[Windows](Windows/README.md)** | Windows 10/11, Windows Server, PowerShell, policies and investigations |
+| **[Linux](Linux/README.md)** | Linux Mint, Ubuntu, Debian, FreeBSD, services and Linux security |
+| **[Cisco](Cisco/README.md)** | Cisco IOS, Packet Tracer, VLANs, ACLs, routing and troubleshooting |
+| **[Misc Softwares](Misc%20Softwares/README.md)** | Related tools and external-script reference material |
 
-This is a documentation-only handbook. Start with [reading the image README](docs/start-here/reading-the-readme.md), preserve [forensics evidence](docs/guides/forensics-questions.md), and choose the correct platform checklist:
+**Safety:** Always read the competition image README, preserve forensic evidence, protect all required services and verify before/after any change.
 
-- [Windows 10/11](docs/checklists/windows-10-11.md) · [Windows Server](docs/checklists/windows-server.md)
-- [Ubuntu](docs/checklists/ubuntu.md) · [Linux Mint](docs/checklists/linux-mint.md) · [Debian](docs/checklists/debian.md) · [FreeBSD](docs/checklists/freebsd.md)
-- [Linux service procedures](docs/guides/linux-service-hardening.md) · [Cisco IOS and Packet Tracer](docs/guides/cisco-networking.md)
-
-Procedures include inspection, README exceptions, GUI/terminal actions, verification and recovery. Example accounts, addresses and policy values must be adapted to the image. No scripts or website tooling are bundled. See [sources, reuse scope and maintenance](docs/guides/sources-and-attribution.md) for attribution and version-sensitive official references.
-
-## Extra step-by-step investigation guides
-
-- [Windows effective policy and persistence](docs/guides/windows-effective-policy-and-investigation.md)
-- [Linux SSH, PAM, firewall and scheduled persistence](docs/guides/linux-advanced-manual-investigation.md)
-- [Cisco switching, routing, ACLs and Packet Tracer troubleshooting](docs/guides/cisco-switch-routing-troubleshooting.md)
+This repository contains **Markdown documentation only**, not scripts or automated hardening tools. Source documentation was reproduced with permission as previously stated in this repository; see [sources and attribution](General/All/sources-and-attribution.md).

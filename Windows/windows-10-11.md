@@ -5,7 +5,7 @@ Windows 11 is in **Round 1 and Round 2** this season. Windows 10 is the same exc
 **How to use this page**
 - Work **top to bottom**.
 - Each item has: **What** · **Why it matters** · **Clicking** · **Typing** (PowerShell **as Administrator**) · **Check it worked** · ⚠️ warnings.
-- New to PowerShell? Read [PowerShell basics](../start-here/powershell-basics.md) first.
+- New to PowerShell? Read [PowerShell basics](powershell-basics.md) first.
 - This repository contains documentation only. Follow the manual procedures below; do not skip verification.
 - `alice`, `bob` etc. are examples. **Use the names in your README.**
 - `secpol.msc`, `gpedit.msc` and `lusrmgr.msc` only exist on **Pro, Education and Enterprise** (competition images are one of these). To check, run `winver`. On **Home**, use the **Typing** commands instead.
@@ -17,7 +17,7 @@ Windows 11 is in **Round 1 and Round 2** this season. Windows 10 is the same exc
 ### 0.1 Read the README
 - [ ] Done
 
-Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../start-here/reading-the-readme.md).
+Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/All/reading-the-readme.md).
 
 ### 0.2 Take a VMware snapshot
 - [ ] Done
@@ -50,7 +50,7 @@ Get-ChildItem C:\Users -Recurse -Force -Filter *secret* -ErrorAction SilentlyCon
 Get-ChildItem C:\Users -Recurse -File -Force -Include *.txt,*.csv,*.log,*.ps1,*.bat -ErrorAction SilentlyContinue | Select-String -Pattern "password"   # find text inside files
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aGVsbG8='))   # decode base64
 ```
-More: [Forensics questions guide](../guides/forensics-questions.md).
+More: [Forensics questions guide](../General/All/forensics-questions.md).
 
 ### 1.2 Fast path: run the hardening script
 - [ ] Done
@@ -71,7 +71,7 @@ More: [Forensics questions guide](../guides/forensics-questions.md).
 
 **Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 

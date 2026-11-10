@@ -10,11 +10,11 @@ Most of the [Windows 10/11 checklist](windows-10-11.md) also applies to servers.
 
 ## 0. Before you touch anything
 
-- [ ] **Read the README twice.** Servers usually have **critical services** (AD, DNS, IIS, FTP, file shares). Write every one down. See [Reading the README](../start-here/reading-the-readme.md).
+- [ ] **Read the README twice.** Servers usually have **critical services** (AD, DNS, IIS, FTP, file shares). Write every one down. See [Reading the README](../General/All/reading-the-readme.md).
 - [ ] **Take a VMware snapshot.**
 - [ ] **Open PowerShell as Administrator.**
 - [ ] **Open the Scoring Report.**
-- [ ] **Answer the forensics questions** ([guide](../guides/forensics-questions.md)).
+- [ ] **Answer the forensics questions** ([guide](../General/All/forensics-questions.md)).
 
 ---
 
@@ -59,7 +59,7 @@ The `*-AD*`, `*-GPO` and `*-DnsServer*` commands on this page come with the AD D
 
 **Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 

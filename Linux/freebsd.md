@@ -37,7 +37,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 - [ ] Read the README; write down admins, users, critical services.
 - [ ] Take a VMware snapshot.
 - [ ] Become root: `su -` (or `sudo -i` / `doas -s` if those are installed), then type `sh` (see the box above).
-- [ ] Answer the forensics questions ([guide](../guides/forensics-questions.md)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
+- [ ] Answer the forensics questions ([guide](../General/All/forensics-questions.md)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
 
 ### 0.1 Fast path: run the hardening script
 - [ ] Done
@@ -58,7 +58,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 **Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -654,7 +654,7 @@ After no errors:
 service sshd reload
 ```
 
-For another installed server, use the table to identify its file, copy it privately with `cp -p`, open it with `ee`, apply the compatible defensive directives described in [service hardening](../guides/linux-service-hardening.md), then use its actual validation command. Read `service NAME` usage to confirm reload support; use a scheduled restart only when needed. Never assume a Linux package/unit/path applies.
+For another installed server, use the table to identify its file, copy it privately with `cp -p`, open it with `ee`, apply the compatible defensive directives described in [service hardening](linux-service-hardening.md), then use its actual validation command. Read `service NAME` usage to confirm reload support; use a scheduled restart only when needed. Never assume a Linux package/unit/path applies.
 
 **Check it worked:** `service sshd status`, `/usr/sbin/sshd -T` and `sockstat -4 -6 -l`; test a fresh authorized SSH session. For each other service test its actual authorized client operation, not merely its rc status. Inspect `/var/log/messages`, `/var/log/auth.log` and the daemon's configured log.
 
