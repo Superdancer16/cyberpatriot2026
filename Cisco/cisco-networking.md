@@ -619,7 +619,7 @@ arp -a
 - Use **Tab** and short commands to type faster, and `do` to run `show` commands without leaving config mode.
 - When a task doesn't score, compare your `show running-config` with the instructions line by line.
 
-For more terms, see the [glossary](glossary.md).
+For more terms, see the [glossary](../General/All/glossary.md).
 
 ## Complete manual lab procedures
 

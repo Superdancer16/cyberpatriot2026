@@ -4,9 +4,9 @@ This repository is a **manual documentation handbook**. It does not contain the 
 
 | Upstream family | Historical path | Manual replacement |
 |---|---|---|
-| Linux | `scripts/linux/harden.sh` | [Mint](../checklists/linux-mint.md), [Ubuntu](../checklists/ubuntu.md), [Debian](../checklists/debian.md) |
-| Windows | `scripts/windows/Harden.ps1` | [Windows](../checklists/windows-10-11.md), [Server](../checklists/windows-server.md) |
-| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../checklists/freebsd.md) |
+| Linux | `scripts/linux/harden.sh` | [Mint](../Linux/linux-mint.md), [Ubuntu](../Linux/ubuntu.md), [Debian](../Linux/debian.md) |
+| Windows | `scripts/windows/Harden.ps1` | [Windows](../Windows/windows-10-11.md), [Server](../Windows/windows-server.md) |
+| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../Linux/freebsd.md) |
 
 ## 1. Decide whether external automation is appropriate
 
@@ -54,4 +54,4 @@ A hash identifies bytes; it establishes trust only when compared with a trusted 
 | SKIPPED / REVIEW | Make an explicit README-based decision |
 | FAILED | Read the error and use the relevant manual procedure |
 
-Keep logs private and note the time of each change. See [forensics](../guides/forensics-questions.md) before collecting or altering potential evidence.
+Keep logs private and note the time of each change. See [forensics](../General/All/forensics-questions.md) before collecting or altering potential evidence.
