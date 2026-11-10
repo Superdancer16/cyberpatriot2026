@@ -1,15 +1,19 @@
-# CyberPatriot 2026 — Documentation Handbook
+# CyberPatriot 2026–2027 — Prioritized Security Handbooks
 
-Choose a category to find detailed manual checklists, copyable commands, verification and recovery procedures.
+**Start with basics. Protect the README-required system. Work from common tasks to advanced investigation.**
 
-| Category | Guides |
+Every major guide follows the same study and competition workflow:
+
+**Basics / Information Needed → First Things to Do → Commonly Assessed Checks → Services and Software → Advanced Troubleshooting → Final Verification.**
+
+| Category | Full Guides |
 |---|---|
-| **[General / All](General/All/README.md)** | Getting started, the image README, forensics, round strategy, glossary and credits |
-| **[Windows](Windows/README.md)** | Windows 10/11, Windows Server, PowerShell, policies and investigations |
-| **[Linux](Linux/README.md)** | Linux Mint, Ubuntu, Debian, FreeBSD, services and Linux security |
-| **[Cisco](Cisco/README.md)** | Cisco IOS, Packet Tracer, VLANs, ACLs, routing and troubleshooting |
-| **[Misc Softwares](Misc%20Softwares/README.md)** | Related tools and external-script reference material |
+| **[General / All](General/All/README.md)** | README, forensics, round strategy, glossary and source references |
+| **[Windows](Windows/README.md)** | Windows 10/11 and Windows Server, including PowerShell and domain-aware guidance |
+| **[Linux](Linux/README.md)** | Complete Debian, Mint and Ubuntu guides; FreeBSD reference |
+| **[Cisco](Cisco/README.md)** | Packet Tracer step-by-step handbook and 385-question networking Q&A |
+| **[Misc Softwares](Misc%20Softwares/README.md)** | Supplemental software/tool references only |
 
-**Safety:** Always read the competition image README, preserve forensic evidence, protect all required services and verify before/after any change.
+**Non-negotiable:** Read the competition image README and preserve forensic evidence before deleting users/files or disabling services. Retain administrative access, verify every required function and keep rollback notes.
 
-This repository contains **Markdown documentation only**, not scripts or automated hardening tools. Source documentation was reproduced with permission as previously stated in this repository; see [sources and attribution](General/All/sources-and-attribution.md).
+**No scripts, automation or test tooling is bundled.** These are detailed, copyable Markdown instructions for authorized defensive practice. See [sources and attribution](General/All/sources-and-attribution.md); original documentation reuse permission is noted there.

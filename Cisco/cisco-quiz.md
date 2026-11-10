@@ -5,11 +5,37 @@
 > [!IMPORTANT]
 > **Official training takes priority.** The CyberPatriot XIX (2026–27) [round-specific topic schedule](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round) identifies the NetAcad modules that count in each round. These questions are independently written practice, not official quiz wording or an answer key. The exact live quiz, question count and permitted references must follow the current rules and competition instructions, not a third-party web page.
 
-## The fastest way to study for the CyberPatriot Cisco Networking Quiz
+
+> **Guide order:** Basics and vocabulary → First study tasks → Common fundamentals and ports → Intermediate concepts → Advanced scenarios and protocol details → Final review. These are priority study topics, **not** a prediction of secret quiz items.
+
+## Part 1 — Basics / Information Needed
+
+### Cisco quiz basics you should understand first
+
+Know the difference between a **term**, a **protocol**, an **OSI layer**, a **port number**, an **IP protocol number**, a **device**, a **configuration command**, and a **troubleshooting symptom**. Most distractors confuse two of these categories.
+
+| Quick distinction | Remember |
+|---|---|
+| Switch vs router | Ethernet frames and MAC learning inside VLANs vs IP routes between networks |
+| TCP vs UDP | Ordered reliable byte stream vs connectionless datagrams |
+| ARP vs DNS | Local IPv4-to-MAC lookup vs hostname-to-IP lookup |
+| DHCP vs DNS | Client addressing/gateway/DNS settings vs name records |
+| ACL vs NAT | Packet permitting/denying vs address translation |
+| OSPF/EIGRP | IP protocol numbers 89 and 88, **not TCP/UDP port numbers** |
+| CIDR and wildcard | Prefix bits define subnet; Cisco wildcard zeros mean must-match |
+| STP vs port security | Protects switching loop topology vs restricts MACs at a port |
+
+**Scoring caution:** Exact graded quiz questions and answer choices are not public; the official assigned NetAcad module material is the primary source for the current round. This is an **original question-and-answer reference**, not an answer key.
+
+## Part 2 — First Things to Do
+
+Review official modules and the study workflow; this section links to all topic categories.
+
+### The fastest way to study for the CyberPatriot Cisco Networking Quiz
 
 **Use this as an original searchable Q&A study guide.** It organizes concepts from the [official CyberPatriot training description](https://www.uscyberpatriot.org/competition/training-materials), the [NetAcad CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content) and public community study references. The assigned **NetAcad Content Course** is the primary source for your round; the **Competition Course** is where its graded quiz and Packet Tracer exercise are delivered.
 
-### 2026–27 official scope and point values
+#### 2026–27 official scope and point values
 
 The published [CyberPatriot XIX challenge schedule](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round) lists:
 
@@ -27,7 +53,7 @@ The published [CyberPatriot XIX challenge schedule](https://www.uscyberpatriot.o
 
 Module ranges are **official round scopes**, not a claim that a particular Q number below comes from a particular module. The schedule is subject to change. **Do not assume the quiz is open-book or that outside references/collaboration are allowed**; follow the current rulebook and instructions for the competition. Prepare a searchable reference during training where permitted.
 
-### Which kinds of networking questions should you prepare for?
+#### Which kinds of networking questions should you prepare for?
 
 | Question style | Example prompt (original practice) | What the answer must distinguish |
 |---|---|---|
@@ -44,7 +70,7 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 | Wireless | WPA2 key correct but no IP lease | Investigate DHCP, VLAN, isolation, gateway |
 | Multi-step scenario | A PC can reach its gateway but not a remote subnet | Routes, return route, ACL and relevant NAT |
 
-### Training workflow for high retention
+#### Training workflow for high retention
 
 1. **Read the assigned NetAcad module**, including its diagrams and interactive examples. Summarize definitions in your own words.
 2. Use the numbered Q&A below for **active recall**: cover each Answer, speak a concise answer, then compare.
@@ -54,7 +80,7 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 6. Use the [Packet Tracer manual](packet-tracer.md) to make CLI concepts concrete, but remember that the graded **quiz** and **Packet Tracer activity** are distinct tasks.
 7. If reference materials are permitted during an assessment, use **Ctrl+F** with the key concept or standard port/protocol; always verify which resources are permitted before the competition.
 
-### High-value speed tricks and warnings
+#### High-value speed tricks and warnings
 
 - **Spot the question's scope:** "Which protocol?" is not the same as "Which layer?" or "Which port?"
 - **Watch negative wording:** "NOT", "least likely", "except", "incorrect" reverse the expected selection.
@@ -65,7 +91,7 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 - **Do not memorize obsolete inaccuracies:** OSPF is an **open standard**, and OSI **Session** is not the layer that defines TCP/UDP ports.
 - **Do not equate a published challenge maximum with a promise of point values for individual questions.**
 
-### Official and community reading priorities
+#### Official and community reading priorities
 
 1. [CyberPatriot XIX official challenges and modules](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round) and [CyberPatriot training materials](https://www.uscyberpatriot.org/competition/training-materials)
 2. [Cisco NetAcad CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content) and [Getting Started with Packet Tracer](https://www.netacad.com/courses/getting-started-cisco-packet-tracer/1000)
@@ -77,7 +103,9 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 
 ---
 
-## CyberPatriot XIX: which NetAcad modules to study?
+---
+
+### CyberPatriot XIX: which NetAcad modules to study?
 
 | Round / division | Networking quiz scope listed in official CP-19 schedule |
 |---|---|
@@ -92,7 +120,9 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 
 The official [CyberPatriot training page](https://www.uscyberpatriot.org/competition/training-materials) states that quiz and Packet Tracer activities are based on assigned NetAcad **Content Course** materials. Coaches/mentors can enroll teams using [NetAcad's CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content). **Module numbers here come from the published round schedule; they are not asserted as precise tags for individual questions below.**
 
-## Jump to topic
+---
+
+### Jump to topic
 
 - [Network basics and core vocabulary](#network-basics-and-core-vocabulary) — 16 questions
 - [OSI model, TCP/IP model, and data flow](#osi-model-tcpip-model-and-data-flow) — 16 questions
@@ -108,7 +138,25 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 - [Standards organizations and network governance](#standards-organizations-and-network-governance) — 10 questions
 - [Short scenario questions: choose the concept](#short-scenario-questions-choose-the-concept) — 21 questions
 
-## Network basics and core vocabulary
+### First things to do for an efficient Cisco networking study session
+
+1. Check the [official CyberPatriot XIX module schedule](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round) and the coach-assigned NetAcad Content Course modules for your division/round.
+2. Read each assigned module's explanations and diagrams; take notes about **definitions, layer functions, standard ports, addressing and device roles**.
+3. Answer at least 10 short-answer questions **without seeing the answers**; then review missed items.
+4. Study protocols as comparisons (ARP vs DNS, switch vs router, access vs trunk, standard vs extended ACL).
+5. Practice basic /24 to /30 subnetting mentally, then IPv6 representation and address ranges.
+6. Use the Packet Tracer guide only to **reinforce** concepts; the Networking Quiz and Packet Tracer assessment are different.
+7. Follow the current rules about whether notes, Internet access or collaboration are allowed. **Never assume an assessment is open-book solely from a third-party blog.**
+
+**Fast oral drill — answer in one sentence:** What are the seven OSI layers? Which layer uses port numbers? What does DHCP DORA stand for? Which protocol maps IPv4 to MAC? Why is SSH preferred over Telnet? What does a default gateway do? What is VLAN tagging? Why is a /26 not the same as a /24?
+
+The questions below contain answers; cover them while practicing so you learn concepts instead of only recognizing words.
+
+## Part 3 — Common Networking Fundamentals and Vocabulary
+
+These high-frequency fundamentals help answer direct-recall and short scenario questions quickly.
+
+### Network basics and core vocabulary
 
 **Q001. What is a computer network?**
 
@@ -174,7 +222,9 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 **Answer:** Unicast targets one receiver, broadcast all nodes in a broadcast domain, multicast a subscribed group, and anycast one selected member of a group sharing an address.
 
-## OSI model, TCP/IP model, and data flow
+---
+
+### OSI model, TCP/IP model, and data flow
 
 **Q017. List the seven OSI layers from Layer 1 to Layer 7.**
 
@@ -240,7 +290,9 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 **Answer:** The destination IP address, using the best matching route (longest prefix match).
 
-## Network devices, physical media, and Ethernet
+---
+
+### Network devices, physical media, and Ethernet
 
 **Q033. What does a hub do?**
 
@@ -322,7 +374,9 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 **Answer:** A feature allowing an Ethernet port to automatically adapt transmit/receive pairs, reducing the need to choose crossover cables.
 
-## IPv4 addressing and subnetting
+---
+
+### IPv4 addressing and subnetting
 
 **Q053. How many bits are in an IPv4 address?**
 
@@ -420,179 +474,248 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 **Answer:** An inverse-style address match mask; zero bits must match and one bits are ignored. A /24 commonly uses 0.0.0.255.
 
-## IPv6 basics
+---
 
-**Q077. How many bits are in an IPv6 address?**
+### TCP, UDP, applications and common protocols
 
-**Answer:** 128 bits, commonly represented as eight groups of hexadecimal digits.
-
-**Q078. What does :: mean in IPv6 notation?**
-
-**Answer:** Compression of one contiguous run of all-zero 16-bit groups; it can appear only once in an address.
-
-**Q079. What is an IPv6 link-local address?**
-
-**Answer:** An address typically from fe80::/10 for communication on the same link; it is not routed across normal IPv6 routers.
-
-**Q080. What is an IPv6 global unicast address?**
-
-**Answer:** A routable unicast address, commonly allocated from 2000::/3.
-
-**Q081. What is an IPv6 unique local address?**
-
-**Answer:** A privately scoped IPv6 address from fc00::/7, commonly using locally assigned fd00::/8 addresses.
-
-**Q082. What is the IPv6 loopback address?**
-
-**Answer:** ::1/128.
-
-**Q083. Does IPv6 use broadcast addresses?**
-
-**Answer:** No. IPv6 uses multicast and unicast (including anycast) instead of broadcast.
-
-**Q084. What is NDP?**
-
-**Answer:** Neighbor Discovery Protocol, an ICMPv6-based mechanism for discovering neighbors, routers and link information; it replaces ARP's main job.
-
-**Q085. What are SLAAC and DHCPv6?**
-
-**Answer:** SLAAC builds IPv6 addresses using router advertisements; DHCPv6 can provide addresses and/or additional configuration, depending on network design.
-
-**Q086. What are router advertisements (RA)?**
-
-**Answer:** ICMPv6 messages from routers that communicate prefixes, default-router availability and configuration flags.
-
-**Q087. What is an IPv6 prefix length?**
-
-**Answer:** The number of leading network bits, written /n; /64 is common for LAN subnets supporting SLAAC.
-
-**Q088. What is IPv6 hop limit?**
-
-**Answer:** The IPv6 equivalent of IPv4 TTL, decreased by routers to prevent indefinite circulation.
-
-## TCP, UDP, applications and common protocols
-
-**Q089. How do TCP and UDP differ?**
+**Q077. How do TCP and UDP differ?**
 
 **Answer:** TCP is connection-oriented and provides ordered, retransmitted byte-stream delivery; UDP is connectionless, with minimal transport guarantees.
 
-**Q090. What is the TCP three-way handshake?**
+**Q078. What is the TCP three-way handshake?**
 
 **Answer:** SYN, SYN-ACK, ACK, establishing a TCP connection.
 
-**Q091. What are TCP sequence numbers and acknowledgments for?**
+**Q079. What are TCP sequence numbers and acknowledgments for?**
 
 **Answer:** Tracking received byte ranges and enabling loss recovery and ordered delivery.
 
-**Q092. What is a TCP/UDP port number?**
+**Q080. What is a TCP/UDP port number?**
 
 **Answer:** A 16-bit identifier used by transport protocols to distinguish services and application endpoints.
 
-**Q093. What are well-known, registered, and dynamic/private ports?**
+**Q081. What are well-known, registered, and dynamic/private ports?**
 
 **Answer:** 0–1023 well-known/system, 1024–49151 registered/user, and 49152–65535 dynamic/private.
 
-**Q094. What is DNS?**
+**Q082. What is DNS?**
 
 **Answer:** Domain Name System, which resolves names and stores records such as A, AAAA, MX and CNAME; usually UDP 53, sometimes TCP 53.
 
-**Q095. What is an A record versus an AAAA record?**
+**Q083. What is an A record versus an AAAA record?**
 
 **Answer:** A maps a name to an IPv4 address; AAAA maps a name to an IPv6 address.
 
-**Q096. What is an MX record?**
+**Q084. What is an MX record?**
 
 **Answer:** A DNS record identifying mail exchangers for a domain.
 
-**Q097. What is DHCP?**
+**Q085. What is DHCP?**
 
 **Answer:** Dynamic Host Configuration Protocol, which supplies clients with IP configuration such as address, subnet mask, gateway and DNS servers.
 
-**Q098. What are the DHCP DORA steps?**
+**Q086. What are the DHCP DORA steps?**
 
 **Answer:** Discover → Offer → Request → Acknowledge, the common initial IPv4 lease process.
 
-**Q099. Which UDP ports does DHCPv4 normally use?**
+**Q087. Which UDP ports does DHCPv4 normally use?**
 
 **Answer:** Server 67 and client 68.
 
-**Q100. What is BOOTP?**
+**Q088. What is BOOTP?**
 
 **Answer:** Bootstrap Protocol, a predecessor of DHCP used to provide startup IP information and boot-related configuration.
 
-**Q101. What is HTTP and its usual port?**
+**Q089. What is HTTP and its usual port?**
 
 **Answer:** Hypertext Transfer Protocol for web requests/responses, typically TCP 80.
 
-**Q102. What is HTTPS and its usual port?**
+**Q090. What is HTTPS and its usual port?**
 
 **Answer:** HTTP protected by TLS, normally TCP 443; HTTP/3 may use QUIC over UDP 443.
 
-**Q103. What is FTP and which ports matter?**
+**Q091. What is FTP and which ports matter?**
 
 **Answer:** File Transfer Protocol, traditionally TCP 21 for control and TCP 20 for active-mode data; passive-mode data uses negotiated ports.
 
-**Q104. What is TFTP?**
+**Q092. What is TFTP?**
 
 **Answer:** Trivial File Transfer Protocol, a simple UDP-based file transfer protocol that initially uses UDP 69; it has no built-in authentication or encryption.
 
-**Q105. What is SSH and its standard port?**
+**Q093. What is SSH and its standard port?**
 
 **Answer:** Secure Shell, an encrypted remote access protocol typically using TCP 22.
 
-**Q106. What is Telnet and why is it discouraged?**
+**Q094. What is Telnet and why is it discouraged?**
 
 **Answer:** A remote terminal protocol normally using TCP 23; classic Telnet transmits credentials and data without encryption.
 
-**Q107. What is SMTP?**
+**Q095. What is SMTP?**
 
 **Answer:** Simple Mail Transfer Protocol for email transfer; commonly TCP 25 for server-to-server and TCP 587 for message submission.
 
-**Q108. What are POP3 and IMAP?**
+**Q096. What are POP3 and IMAP?**
 
 **Answer:** POP3 normally retrieves/downloads email (TCP 110, TLS TCP 995); IMAP synchronizes messages on a server (TCP 143, TLS TCP 993).
 
-**Q109. What are SNMP and SNMP traps?**
+**Q097. What are SNMP and SNMP traps?**
 
 **Answer:** Simple Network Management Protocol manages/monitors devices, normally UDP 161; notifications/traps commonly use UDP 162.
 
-**Q110. What is NTP?**
+**Q098. What is NTP?**
 
 **Answer:** Network Time Protocol, synchronizing device clocks, normally UDP 123.
 
-**Q111. What is Syslog?**
+**Q099. What is Syslog?**
 
 **Answer:** A system for forwarding log messages to a logging service, often UDP 514; modern deployments also use TCP/TLS variants.
 
-**Q112. What is RDP and its common port?**
+**Q100. What is RDP and its common port?**
 
 **Answer:** Microsoft Remote Desktop Protocol, typically TCP and/or UDP 3389.
 
-**Q113. What is LDAP and LDAPS?**
+**Q101. What is LDAP and LDAPS?**
 
 **Answer:** Lightweight Directory Access Protocol, commonly TCP/UDP 389; LDAP over TLS is commonly TCP 636.
 
-**Q114. What is SMB and its modern direct-hosted port?**
+**Q102. What is SMB and its modern direct-hosted port?**
 
 **Answer:** Server Message Block for file/printer shares, typically TCP 445.
 
-**Q115. What is ICMP used for?**
+**Q103. What is ICMP used for?**
 
 **Answer:** Network diagnostics and control/error messages, such as echo requests and replies; ICMP itself has no TCP/UDP port number.
 
-**Q116. What is ARP?**
+**Q104. What is ARP?**
 
 **Answer:** Address Resolution Protocol, used on IPv4 local networks to find a MAC address for a known on-link IPv4 address.
 
-**Q117. What is PPP?**
+**Q105. What is PPP?**
 
 **Answer:** Point-to-Point Protocol, a Layer 2 protocol for direct serial or other point-to-point connections.
 
-**Q118. What is PPPoE?**
+**Q106. What is PPPoE?**
 
 **Answer:** PPP over Ethernet, often used by broadband providers to carry PPP sessions over Ethernet links.
 
-## DNS, DHCP, NAT, and traffic delivery
+---
+
+### High-speed reference: common port numbers
+
+| Protocol / use | Common port(s) and transport | Key distinction |
+|---|---|---|
+| FTP | TCP 21 (control), TCP 20 (traditional active data) | Passive data negotiated separately |
+| SSH / Telnet | TCP 22 / TCP 23 | SSH encrypts; Telnet usually does not |
+| SMTP | TCP 25, submission TCP 587 | Email transfer/submission |
+| DNS | UDP and TCP 53 | UDP common; TCP also used |
+| DHCPv4 | UDP server 67, client 68 | DORA lease process |
+| TFTP | UDP 69 (initial request) | Simple file transfer |
+| HTTP / HTTPS | TCP 80 / TCP 443 (HTTPS may use UDP 443 for HTTP/3) | TLS secures HTTPS |
+| POP3 / IMAP | TCP 110 / TCP 143 | Email retrieval / synchronization |
+| NTP | UDP 123 | Time synchronization |
+| SNMP / traps | UDP 161 / UDP 162 | Queries / notifications |
+| LDAP / LDAPS | 389 / TCP 636 | Directory services |
+| Syslog | Often UDP 514 | Other transports available |
+| SMB | TCP 445 | File and printer sharing |
+| RADIUS | Usually UDP 1812 / 1813 | AAA auth / accounting |
+| TACACS+ | TCP 49 | AAA |
+| BGP | TCP 179 | Exterior routing protocol |
+| RDP | TCP/UDP 3389 | Remote desktop |
+
+**Trick question:** OSPF, EIGRP and ICMP use **IP protocol numbers** (OSPF 89, EIGRP 88, ICMPv4 1), **not TCP/UDP port numbers**. ARP is a link-layer protocol, not a TCP/UDP service.
+
+---
+
+### Fast contrasts often used as distractors
+
+| Easily confused | Remember this |
+|---|---|
+| Switch vs router | Switch: MAC + frames within VLAN; router: IP + packets between networks |
+| MAC vs IP | MAC is local link identity; IP is logical/routed address |
+| Bandwidth vs throughput | Link capacity vs observed delivered data rate |
+| TCP vs UDP | Reliable ordered byte-stream vs connectionless datagrams |
+| ARP vs DNS | IPv4 → MAC on local link vs hostname → IP address |
+| DNS vs DHCP | Name records vs automatic host configuration |
+| HTTP vs HTTPS | Application web protocol vs web protocol protected by TLS |
+| SSH vs Telnet | Encrypted vs traditionally plaintext remote terminal |
+| Standard vs extended ACL | Mainly source IP vs richer IP/protocol/port matching |
+| OSPF vs EIGRP vs RIP vs BGP | Link-state cost vs DUAL composite metric vs hop count vs inter-AS path-vector routing |
+| VLAN vs subnet | Layer 2 segmentation vs Layer 3 address prefix; often aligned but not identical |
+| STP vs PortFast vs BPDU Guard | Prevent switching loops vs rapid edge forwarding vs block unexpected edge BPDUs |
+| Admin distance vs metric | Choose between route sources for same prefix vs compare paths within routing process |
+| Longest prefix vs AD | Forwarding uses most-specific matching route; AD decides installed route source for a prefix |
+| SSID vs WPA | Wi-Fi network identifier vs wireless security mechanisms |
+| IANA vs ICANN vs IETF | Registries/number coordination vs naming governance vs technical standards/RFC work |
+
+### High-yield question styles and response techniques
+
+- **Definition wording:** Answer with the identifying *function*, not only an acronym expansion.
+- **Layer/protocol/port wording:** State whether the item is an OSI layer, TCP/UDP port, or IP protocol number.
+- **Subnetting:** Identify prefix length, block size, network address, broadcast (where applicable) and usable range.
+- **Routing:** Longest-prefix match controls forwarding among installed routes; administrative distance compares competing route sources for the *same prefix*.
+- **Network troubleshooting:** Check local link and gateway before DNS or distant routers; if IP-based web access works but names fail, inspect DNS.
+- **Security:** Differentiate prevention, monitoring, access control, encryption and authentication; don't assume all controls can be substituted.
+- **Question traps:** Watch NOT / EXCEPT, confusing synonyms, IPv4-versus-IPv6 behavior, old classful addressing and GUI/device-specific terms.
+
+**Source correction notes:** OSPF is an open standards-based protocol, not a Cisco-only protocol. TCP and UDP port numbers belong to **Transport (OSI Layer 4)**, not Session (Layer 5). IPv6 uses Neighbor Discovery instead of ARP.
+
+## Part 4 — Intermediate IPv6, Switching, Services and Security
+
+Study service behavior, protocol distinctions, switch security, IPv6 and command meaning.
+
+### IPv6 basics
+
+**Q107. How many bits are in an IPv6 address?**
+
+**Answer:** 128 bits, commonly represented as eight groups of hexadecimal digits.
+
+**Q108. What does :: mean in IPv6 notation?**
+
+**Answer:** Compression of one contiguous run of all-zero 16-bit groups; it can appear only once in an address.
+
+**Q109. What is an IPv6 link-local address?**
+
+**Answer:** An address typically from fe80::/10 for communication on the same link; it is not routed across normal IPv6 routers.
+
+**Q110. What is an IPv6 global unicast address?**
+
+**Answer:** A routable unicast address, commonly allocated from 2000::/3.
+
+**Q111. What is an IPv6 unique local address?**
+
+**Answer:** A privately scoped IPv6 address from fc00::/7, commonly using locally assigned fd00::/8 addresses.
+
+**Q112. What is the IPv6 loopback address?**
+
+**Answer:** ::1/128.
+
+**Q113. Does IPv6 use broadcast addresses?**
+
+**Answer:** No. IPv6 uses multicast and unicast (including anycast) instead of broadcast.
+
+**Q114. What is NDP?**
+
+**Answer:** Neighbor Discovery Protocol, an ICMPv6-based mechanism for discovering neighbors, routers and link information; it replaces ARP's main job.
+
+**Q115. What are SLAAC and DHCPv6?**
+
+**Answer:** SLAAC builds IPv6 addresses using router advertisements; DHCPv6 can provide addresses and/or additional configuration, depending on network design.
+
+**Q116. What are router advertisements (RA)?**
+
+**Answer:** ICMPv6 messages from routers that communicate prefixes, default-router availability and configuration flags.
+
+**Q117. What is an IPv6 prefix length?**
+
+**Answer:** The number of leading network bits, written /n; /64 is common for LAN subnets supporting SLAAC.
+
+**Q118. What is IPv6 hop limit?**
+
+**Answer:** The IPv6 equivalent of IPv4 TTL, decreased by routers to prevent indefinite circulation.
+
+---
+
+### DNS, DHCP, NAT, and traffic delivery
 
 **Q119. What is NAT?**
 
@@ -642,7 +765,9 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 **Answer:** The client resolves the MAC address of its default gateway, not the remote destination's MAC address.
 
-## Switching, VLANs, trunks, and Layer 2 security
+---
+
+### Switching, VLANs, trunks, and Layer 2 security
 
 **Q131. What is a VLAN?**
 
@@ -736,335 +861,347 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 **Answer:** LLDP is a standards-based neighbor discovery protocol; CDP is Cisco Discovery Protocol, a Cisco-originated neighbor discovery method.
 
-## Routing, OSPF, EIGRP, RIP, and BGP
+---
 
-**Q154. What is a routing table?**
+### Network security and wireless concepts
 
-**Answer:** A table of destination prefixes and next hops or interfaces a router uses to forward IP traffic.
-
-**Q155. What is a static route?**
-
-**Answer:** A route manually configured by an administrator rather than learned from a dynamic routing protocol.
-
-**Q156. What is a dynamic routing protocol?**
-
-**Answer:** A protocol through which routers exchange reachability information and adapt to topology changes.
-
-**Q157. What is an IGP?**
-
-**Answer:** Interior Gateway Protocol, used for routing within one administrative routing domain, such as OSPF, IS-IS, RIP, or EIGRP.
-
-**Q158. What is an EGP?**
-
-**Answer:** Exterior Gateway Protocol, typically referring to BGP for exchanging reachability between autonomous systems.
-
-**Q159. What is RIP?**
-
-**Answer:** Routing Information Protocol, a distance-vector IGP using hop count as its metric; RIPv2 supports classless routes.
-
-**Q160. What is the maximum usable hop count in RIP?**
-
-**Answer:** 15 hops; 16 means unreachable.
-
-**Q161. What is OSPF?**
-
-**Answer:** Open Shortest Path First, a link-state IGP using link-state advertisements and shortest-path calculations to build routes.
-
-**Q162. What metric does OSPF commonly use?**
-
-**Answer:** Cost, often derived from interface bandwidth under Cisco configurations; total path cost is the sum of link costs.
-
-**Q163. What is OSPF area 0?**
-
-**Answer:** The backbone area to which other normal OSPF areas connect, directly or by supported virtual-link design.
-
-**Q164. What is an OSPF LSA?**
-
-**Answer:** Link-State Advertisement containing topology or routing information used in building the OSPF link-state database.
-
-**Q165. What are an OSPF DR and BDR?**
-
-**Answer:** Designated Router and Backup Designated Router, elected on certain multiaccess network types to reduce adjacency overhead.
-
-**Q166. What is EIGRP?**
-
-**Answer:** Enhanced Interior Gateway Routing Protocol, a Cisco-originated advanced distance-vector IGP using the DUAL algorithm.
-
-**Q167. What metric does EIGRP use by default?**
-
-**Answer:** A composite metric primarily based on minimum path bandwidth and cumulative interface delay; other factors exist but are not included by default.
-
-**Q168. What is DUAL?**
-
-**Answer:** Diffusing Update Algorithm, used by EIGRP to determine loop-free routes and alternatives.
-
-**Q169. What is BGP?**
-
-**Answer:** Border Gateway Protocol, a path-vector interdomain routing protocol commonly used between autonomous systems on the Internet.
-
-**Q170. What is an autonomous system (AS)?**
-
-**Answer:** A set of networks governed by a common routing policy, identified by an autonomous system number for BGP.
-
-**Q171. What is administrative distance?**
-
-**Answer:** A Cisco preference value for route sources when competing routes to the same prefix exist; lower is normally preferred.
-
-**Q172. What are common default Cisco administrative distances?**
-
-**Answer:** Connected 0, static 1, internal EIGRP 90, OSPF 110, RIP 120; configurable values can differ.
-
-**Q173. What is longest prefix match?**
-
-**Answer:** The forwarding choice of the most specific matching installed route, such as preferring a /24 over a /16 for the same destination.
-
-**Q174. What is a next hop?**
-
-**Answer:** The neighboring router/address to which a packet is sent on the way toward its destination.
-
-**Q175. What is route convergence?**
-
-**Answer:** The process by which routers update their topology/routing information after a change until the network reaches a consistent state.
-
-## Network security and wireless concepts
-
-**Q176. What are the CIA triad's three goals?**
+**Q154. What are the CIA triad's three goals?**
 
 **Answer:** Confidentiality (prevent unauthorized disclosure), Integrity (prevent unauthorized alteration), and Availability (keep services accessible when needed).
 
-**Q177. What is the principle of least privilege?**
+**Q155. What is the principle of least privilege?**
 
 **Answer:** Grant each user, device or service only the permissions necessary for its authorized job.
 
-**Q178. What is an ACL?**
+**Q156. What is an ACL?**
 
 **Answer:** Access Control List, ordered permit/deny rules used to filter traffic or control access on supported devices.
 
-**Q179. What is the difference between standard and extended Cisco IPv4 ACLs?**
+**Q157. What is the difference between standard and extended Cisco IPv4 ACLs?**
 
 **Answer:** Standard ACLs primarily match source IPv4 addresses; extended ACLs can match source/destination, protocol, and transport ports.
 
-**Q180. What does implicit deny mean in an ACL?**
+**Q158. What does implicit deny mean in an ACL?**
 
 **Answer:** Traffic that matches none of the permit statements is denied at the end of the ACL.
 
-**Q181. What is ACL wildcard-mask logic?**
+**Q159. What is ACL wildcard-mask logic?**
 
 **Answer:** A 0 bit means match the corresponding address bit; a 1 bit means ignore it.
 
-**Q182. What is defense in depth?**
+**Q160. What is defense in depth?**
 
 **Answer:** Using multiple complementary security controls so a single failure does not expose the entire system.
 
-**Q183. What is segmentation?**
+**Q161. What is segmentation?**
 
 **Answer:** Dividing networks into distinct zones or VLANs with controlled routing and filtering to limit unnecessary access.
 
-**Q184. What is a DMZ?**
+**Q162. What is a DMZ?**
 
 **Answer:** A network zone for externally reachable services separated by policy from internal systems.
 
-**Q185. What is an IDS versus an IPS?**
+**Q163. What is an IDS versus an IPS?**
 
 **Answer:** An intrusion detection system alerts on suspicious activity; an intrusion prevention system can actively block it.
 
-**Q186. What is a VPN?**
+**Q164. What is a VPN?**
 
 **Answer:** A virtual private network providing an encrypted or otherwise protected logical tunnel over another network, depending on the protocol.
 
-**Q187. What is 802.1X?**
+**Q165. What is 802.1X?**
 
 **Answer:** Port-based network access control using EAP with an authenticator such as a switch/AP and usually a back-end authentication server.
 
-**Q188. What is RADIUS?**
+**Q166. What is RADIUS?**
 
 **Answer:** A centralized AAA protocol, often used for network access authentication and accounting; common UDP ports are 1812 and 1813.
 
-**Q189. What is TACACS+?**
+**Q167. What is TACACS+?**
 
 **Answer:** A Cisco-originated AAA protocol typically using TCP 49 and separating authentication, authorization and accounting.
 
-**Q190. What is AAA?**
+**Q168. What is AAA?**
 
 **Answer:** Authentication establishes identity; Authorization determines permissions; Accounting records activity.
 
-**Q191. What is SSH preferred over Telnet?**
+**Q169. What is SSH preferred over Telnet?**
 
 **Answer:** SSH encrypts authentication and management traffic; classic Telnet exposes them in plaintext.
 
-**Q192. What is DHCP snooping?**
+**Q170. What is DHCP snooping?**
 
 **Answer:** A Layer 2 security feature that blocks untrusted DHCP server messages and can build client binding data.
 
-**Q193. What is Dynamic ARP Inspection (DAI)?**
+**Q171. What is Dynamic ARP Inspection (DAI)?**
 
 **Answer:** A switch protection that checks ARP packets against trusted bindings or ARP ACLs to reduce ARP spoofing.
 
-**Q194. What is ARP spoofing?**
+**Q172. What is ARP spoofing?**
 
 **Answer:** Sending falsified ARP information to redirect local IPv4 traffic, possibly enabling interception or disruption.
 
-**Q195. What is a rogue access point?**
+**Q173. What is a rogue access point?**
 
 **Answer:** An unauthorized wireless AP that can bypass network controls or attract clients.
 
-**Q196. What is a wireless SSID?**
+**Q174. What is a wireless SSID?**
 
 **Answer:** Service Set Identifier, the name identifying a Wi-Fi network; hiding it is not reliable security.
 
-**Q197. What is WPA2 versus WPA3?**
+**Q175. What is WPA2 versus WPA3?**
 
 **Answer:** Wi-Fi security generations; WPA3-Personal uses SAE, while WPA2-Personal commonly uses a pre-shared-key handshake.
 
-**Q198. Why is WEP insecure?**
+**Q176. Why is WEP insecure?**
 
 **Answer:** Its legacy cryptographic design has practical weaknesses; it should not be used to secure modern Wi-Fi.
 
-**Q199. What is 802.11?**
+**Q177. What is 802.11?**
 
 **Answer:** The IEEE family of wireless LAN standards used by Wi-Fi, including revisions such as 802.11n/ac/ax/be.
 
-**Q200. What is a VLAN hopping attack?**
+**Q178. What is a VLAN hopping attack?**
 
 **Answer:** An attack exploiting trunking or VLAN-tag handling weaknesses to reach traffic in unintended VLANs; careful trunk and access-port settings help mitigate it.
 
-## Cisco IOS and Packet Tracer terminology
+---
 
-**Q201. What is Cisco IOS?**
+### Cisco IOS and Packet Tracer terminology
+
+**Q179. What is Cisco IOS?**
 
 **Answer:** Cisco Internetwork Operating System, the software used to configure and operate many Cisco routers and switches.
 
-**Q202. What are Cisco user EXEC and privileged EXEC modes?**
+**Q180. What are Cisco user EXEC and privileged EXEC modes?**
 
 **Answer:** User EXEC usually shows `>` with limited commands; privileged EXEC shows `#` and allows broader show and administration commands.
 
-**Q203. What does `enable` do?**
+**Q181. What does `enable` do?**
 
 **Answer:** Moves from user EXEC to privileged EXEC mode when authorized; it may request the configured enable secret.
 
-**Q204. What does `configure terminal` do?**
+**Q182. What does `configure terminal` do?**
 
 **Answer:** Enters global configuration mode so device configuration can be changed.
 
-**Q205. What do `(config)#` and `(config-if)#` indicate?**
+**Q183. What do `(config)#` and `(config-if)#` indicate?**
 
 **Answer:** Global configuration mode and interface configuration mode, respectively.
 
-**Q206. What does `exit` versus `end` do?**
+**Q184. What does `exit` versus `end` do?**
 
 **Answer:** `exit` backs out one configuration level; `end` returns directly to privileged EXEC.
 
-**Q207. What does `show running-config` display?**
+**Q185. What does `show running-config` display?**
 
 **Answer:** The current active configuration held in memory.
 
-**Q208. What does `show startup-config` display?**
+**Q186. What does `show startup-config` display?**
 
 **Answer:** The saved configuration used at startup, when one is stored.
 
-**Q209. How do you save the current configuration on typical IOS?**
+**Q187. How do you save the current configuration on typical IOS?**
 
 **Answer:** Use `copy running-config startup-config` from privileged EXEC after verifying settings.
 
-**Q210. What does `show ip interface brief` reveal?**
+**Q188. What does `show ip interface brief` reveal?**
 
 **Answer:** Interface addresses and operational/line-protocol status; it helps identify down or administratively down interfaces.
 
-**Q211. What does `administratively down` mean?**
+**Q189. What does `administratively down` mean?**
 
 **Answer:** The interface was manually disabled, often with `shutdown`.
 
-**Q212. What does `no shutdown` do?**
+**Q190. What does `no shutdown` do?**
 
 **Answer:** Removes the administrative shutdown setting on a selected interface; it does not fix physical cable/VLAN problems.
 
-**Q213. What does `show vlan brief` display?**
+**Q191. What does `show vlan brief` display?**
 
 **Answer:** The switch's VLAN IDs/names and commonly associated access ports.
 
-**Q214. What does `show interfaces trunk` display?**
+**Q192. What does `show interfaces trunk` display?**
 
 **Answer:** Trunk links and information such as allowed VLANs and tagging behavior on supported switches.
 
-**Q215. What does `show ip route` display?**
+**Q193. What does `show ip route` display?**
 
 **Answer:** The IPv4 routing table, including connected and learned routes.
 
-**Q216. What does `show access-lists` display?**
+**Q194. What does `show access-lists` display?**
 
 **Answer:** Configured ACL entries and, on supported platforms, match counters.
 
-**Q217. What is `service password-encryption`?**
+**Q195. What is `service password-encryption`?**
 
 **Answer:** A Cisco IOS feature that obfuscates certain plaintext password representations; it is not equivalent to strong modern password hashing.
 
-**Q218. What is an `enable secret`?**
+**Q196. What is an `enable secret`?**
 
 **Answer:** A privileged EXEC password stored using a one-way hash type supported by the IOS release; generally preferable to legacy `enable password`.
 
-**Q219. What does `line vty` configure?**
+**Q197. What does `line vty` configure?**
 
 **Answer:** Settings for virtual terminal lines used by remote administrative sessions.
 
-**Q220. What does `transport input ssh` do?**
+**Q198. What does `transport input ssh` do?**
 
 **Answer:** Allows SSH on selected VTY lines while excluding Telnet for those lines.
 
-**Q221. What does `show cdp neighbors` do?**
+**Q199. What does `show cdp neighbors` do?**
 
 **Answer:** Lists directly connected Cisco Discovery Protocol neighbors when CDP is enabled.
 
-**Q222. What does `show logging` do?**
+**Q200. What does `show logging` do?**
 
 **Answer:** Displays device log messages and configured logging information on supported IOS.
 
-**Q223. What is Packet Tracer?**
+**Q201. What is Packet Tracer?**
 
 **Answer:** Cisco's network simulation tool for designing, configuring and troubleshooting virtual network devices; not all real IOS features are simulated.
 
-## Standards organizations and network governance
+---
 
-**Q224. What does IEEE stand for and what does it standardize?**
+### Standards organizations and network governance
+
+**Q202. What does IEEE stand for and what does it standardize?**
 
 **Answer:** Institute of Electrical and Electronics Engineers; it publishes many networking standards, including Ethernet (802.3) and Wi-Fi (802.11).
 
-**Q225. What does IETF stand for?**
+**Q203. What does IETF stand for?**
 
 **Answer:** Internet Engineering Task Force, which develops Internet technical standards and publishes many RFCs.
 
-**Q226. What is an RFC?**
+**Q204. What is an RFC?**
 
 **Answer:** Request for Comments, a publication in the Internet technical document series; RFCs may be standards, informational, experimental or other types.
 
-**Q227. What is the IAB?**
+**Q205. What is the IAB?**
 
 **Answer:** Internet Architecture Board, which provides architecture oversight and guidance for Internet standards work.
 
-**Q228. What is the IRTF?**
+**Q206. What is the IRTF?**
 
 **Answer:** Internet Research Task Force, which coordinates longer-term Internet research groups.
 
-**Q229. What is ISOC?**
+**Q207. What is ISOC?**
 
 **Answer:** Internet Society, a nonprofit supporting an open, globally connected Internet and related communities.
 
-**Q230. What is IANA?**
+**Q208. What is IANA?**
 
 **Answer:** Internet Assigned Numbers Authority functions, coordinating global Internet numbers and protocol parameter registries within ICANN's ecosystem.
 
-**Q231. What is ICANN?**
+**Q209. What is ICANN?**
 
 **Answer:** Internet Corporation for Assigned Names and Numbers, which coordinates key Internet naming and addressing systems and performs IANA functions through its affiliate.
 
-**Q232. What are TIA and EIA associated with?**
+**Q210. What are TIA and EIA associated with?**
 
 **Answer:** Telecommunications Industry Association and former Electronic Industries Alliance; historically important in structured cabling and telecommunications standards.
 
-**Q233. What is ITU-T?**
+**Q211. What is ITU-T?**
 
 **Answer:** The ITU Telecommunication Standardization Sector, which develops telecommunications standards and recommendations.
 
-## Short scenario questions: choose the concept
+## Part 5 — Advanced Routing, Scenarios and Expanded Question Bank
+
+Apply concepts through multi-step reasoning, CLI output interpretation, protocol behavior and troubleshooting.
+
+### Routing, OSPF, EIGRP, RIP, and BGP
+
+**Q212. What is a routing table?**
+
+**Answer:** A table of destination prefixes and next hops or interfaces a router uses to forward IP traffic.
+
+**Q213. What is a static route?**
+
+**Answer:** A route manually configured by an administrator rather than learned from a dynamic routing protocol.
+
+**Q214. What is a dynamic routing protocol?**
+
+**Answer:** A protocol through which routers exchange reachability information and adapt to topology changes.
+
+**Q215. What is an IGP?**
+
+**Answer:** Interior Gateway Protocol, used for routing within one administrative routing domain, such as OSPF, IS-IS, RIP, or EIGRP.
+
+**Q216. What is an EGP?**
+
+**Answer:** Exterior Gateway Protocol, typically referring to BGP for exchanging reachability between autonomous systems.
+
+**Q217. What is RIP?**
+
+**Answer:** Routing Information Protocol, a distance-vector IGP using hop count as its metric; RIPv2 supports classless routes.
+
+**Q218. What is the maximum usable hop count in RIP?**
+
+**Answer:** 15 hops; 16 means unreachable.
+
+**Q219. What is OSPF?**
+
+**Answer:** Open Shortest Path First, a link-state IGP using link-state advertisements and shortest-path calculations to build routes.
+
+**Q220. What metric does OSPF commonly use?**
+
+**Answer:** Cost, often derived from interface bandwidth under Cisco configurations; total path cost is the sum of link costs.
+
+**Q221. What is OSPF area 0?**
+
+**Answer:** The backbone area to which other normal OSPF areas connect, directly or by supported virtual-link design.
+
+**Q222. What is an OSPF LSA?**
+
+**Answer:** Link-State Advertisement containing topology or routing information used in building the OSPF link-state database.
+
+**Q223. What are an OSPF DR and BDR?**
+
+**Answer:** Designated Router and Backup Designated Router, elected on certain multiaccess network types to reduce adjacency overhead.
+
+**Q224. What is EIGRP?**
+
+**Answer:** Enhanced Interior Gateway Routing Protocol, a Cisco-originated advanced distance-vector IGP using the DUAL algorithm.
+
+**Q225. What metric does EIGRP use by default?**
+
+**Answer:** A composite metric primarily based on minimum path bandwidth and cumulative interface delay; other factors exist but are not included by default.
+
+**Q226. What is DUAL?**
+
+**Answer:** Diffusing Update Algorithm, used by EIGRP to determine loop-free routes and alternatives.
+
+**Q227. What is BGP?**
+
+**Answer:** Border Gateway Protocol, a path-vector interdomain routing protocol commonly used between autonomous systems on the Internet.
+
+**Q228. What is an autonomous system (AS)?**
+
+**Answer:** A set of networks governed by a common routing policy, identified by an autonomous system number for BGP.
+
+**Q229. What is administrative distance?**
+
+**Answer:** A Cisco preference value for route sources when competing routes to the same prefix exist; lower is normally preferred.
+
+**Q230. What are common default Cisco administrative distances?**
+
+**Answer:** Connected 0, static 1, internal EIGRP 90, OSPF 110, RIP 120; configurable values can differ.
+
+**Q231. What is longest prefix match?**
+
+**Answer:** The forwarding choice of the most specific matching installed route, such as preferring a /24 over a /16 for the same destination.
+
+**Q232. What is a next hop?**
+
+**Answer:** The neighboring router/address to which a packet is sent on the way toward its destination.
+
+**Q233. What is route convergence?**
+
+**Answer:** The process by which routers update their topology/routing information after a change until the network reaches a consistent state.
+
+---
+
+### Short scenario questions: choose the concept
 
 **Q234. A PC can ping its own address but not the local default gateway. What should you inspect first?**
 
@@ -1152,73 +1289,13 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 ---
 
-## High-speed reference: common port numbers
-
-| Protocol / use | Common port(s) and transport | Key distinction |
-|---|---|---|
-| FTP | TCP 21 (control), TCP 20 (traditional active data) | Passive data negotiated separately |
-| SSH / Telnet | TCP 22 / TCP 23 | SSH encrypts; Telnet usually does not |
-| SMTP | TCP 25, submission TCP 587 | Email transfer/submission |
-| DNS | UDP and TCP 53 | UDP common; TCP also used |
-| DHCPv4 | UDP server 67, client 68 | DORA lease process |
-| TFTP | UDP 69 (initial request) | Simple file transfer |
-| HTTP / HTTPS | TCP 80 / TCP 443 (HTTPS may use UDP 443 for HTTP/3) | TLS secures HTTPS |
-| POP3 / IMAP | TCP 110 / TCP 143 | Email retrieval / synchronization |
-| NTP | UDP 123 | Time synchronization |
-| SNMP / traps | UDP 161 / UDP 162 | Queries / notifications |
-| LDAP / LDAPS | 389 / TCP 636 | Directory services |
-| Syslog | Often UDP 514 | Other transports available |
-| SMB | TCP 445 | File and printer sharing |
-| RADIUS | Usually UDP 1812 / 1813 | AAA auth / accounting |
-| TACACS+ | TCP 49 | AAA |
-| BGP | TCP 179 | Exterior routing protocol |
-| RDP | TCP/UDP 3389 | Remote desktop |
-
-**Trick question:** OSPF, EIGRP and ICMP use **IP protocol numbers** (OSPF 89, EIGRP 88, ICMPv4 1), **not TCP/UDP port numbers**. ARP is a link-layer protocol, not a TCP/UDP service.
-
-## Fast contrasts often used as distractors
-
-| Easily confused | Remember this |
-|---|---|
-| Switch vs router | Switch: MAC + frames within VLAN; router: IP + packets between networks |
-| MAC vs IP | MAC is local link identity; IP is logical/routed address |
-| Bandwidth vs throughput | Link capacity vs observed delivered data rate |
-| TCP vs UDP | Reliable ordered byte-stream vs connectionless datagrams |
-| ARP vs DNS | IPv4 → MAC on local link vs hostname → IP address |
-| DNS vs DHCP | Name records vs automatic host configuration |
-| HTTP vs HTTPS | Application web protocol vs web protocol protected by TLS |
-| SSH vs Telnet | Encrypted vs traditionally plaintext remote terminal |
-| Standard vs extended ACL | Mainly source IP vs richer IP/protocol/port matching |
-| OSPF vs EIGRP vs RIP vs BGP | Link-state cost vs DUAL composite metric vs hop count vs inter-AS path-vector routing |
-| VLAN vs subnet | Layer 2 segmentation vs Layer 3 address prefix; often aligned but not identical |
-| STP vs PortFast vs BPDU Guard | Prevent switching loops vs rapid edge forwarding vs block unexpected edge BPDUs |
-| Admin distance vs metric | Choose between route sources for same prefix vs compare paths within routing process |
-| Longest prefix vs AD | Forwarding uses most-specific matching route; AD decides installed route source for a prefix |
-| SSID vs WPA | Wi-Fi network identifier vs wireless security mechanisms |
-| IANA vs ICANN vs IETF | Registries/number coordination vs naming governance vs technical standards/RFC work |
-
-## Where to study more (public references)
-
-1. **Official first:** [CyberPatriot current competition challenges](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round), [CyberPatriot training materials](https://www.uscyberpatriot.org/competition/training-materials), [Cisco NetAcad CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content). The official Content Course should be used for the exact assigned module material.
-2. **Community starting point:** [Networking for CyberPatriot Quizlet](https://quizlet.com/846446350/networking-for-cyberpatriot-flash-cards/) (protocols, OSI/TCP models, standards bodies; independently verify details), [CyberPatriot Study Guide Quizlet](https://quizlet.com/212436050/cyber-patriot-study-guide-flash-cards/) (additional historical study terms; not an official answer bank).
-3. **CyberPatriot training overviews:** [CCA CyberPatriot](https://sites.google.com/view/cca-cyberpatriot/program-info/cyberpatriot), [Cyber4Youth CyberPatriot Cisco training](https://cyber4youth.com/learn/cyberpatriot) (independent), [Discovery Middle School CyberPatriot training materials](https://dms.madisoncity.k12.al.us/cyberpatriot-training-materials).
-4. **Technical fact-checking:** [Cisco support documentation](https://www.cisco.com/c/en/us/support/), [Cisco routing administrative distance](https://www.cisco.com/c/en/us/support/docs/ip/border-gateway-protocol-bgp/15986-admin-distance.html), [IANA port-number registry](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml).
-
-**Source note:** These questions and answers are **original summaries**, built around common topics appearing in public study materials and Cisco's documented behavior. Do not assume student-made flashcards are always accurate. **Not** a reproduction of NetAcad's protected quizzes or an endorsement of any third-party site.
-
-## Related guides in this repository
-
-- [Cisco CLI, concepts and Packet Tracer](packet-tracer.md)
-- [Cisco switching, routing and troubleshooting](packet-tracer.md#22-consolidated-troubleshooting-reference)
-- [Cisco folder index](README.md)
-
 ---
 
-## Additional quiz-style question bank: deeper concepts and exam traps
+### Additional quiz-style question bank: deeper concepts and exam traps
 
 These are **new, original**, short-answer practice items supplementing Q001–Q254. They focus on the interpretation, troubleshooting and vocabulary distractors typical of networking assessments. **These are not copied from proprietary NetAcad exams and not guaranteed live competition questions.**
 
-### Reading Cisco configuration and command intent (20 questions)
+#### Reading Cisco configuration and command intent (20 questions)
 
 **Q255. A Cisco switch shows a port in VLAN 1, but a PC is assigned to VLAN 20. What should you inspect?**
 
@@ -1300,7 +1377,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** Port security state, violation counters, maximum/learned MAC addresses, and associated security behavior where supported.
 
-### Practical IPv4 subnetting questions (14 questions)
+#### Practical IPv4 subnetting questions (14 questions)
 
 **Q275. What is the network and broadcast of 10.2.4.130/26?**
 
@@ -1358,7 +1435,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** All IPv4 source addresses in 192.168.10.0/24; zero bits match, and one bits are ignored.
 
-### Switching, VLAN and security scenarios (13 questions)
+#### Switching, VLAN and security scenarios (13 questions)
 
 **Q289. An access port has been assigned VLAN 40 but hosts still fail to communicate. Name three checks.**
 
@@ -1412,7 +1489,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** It extends that VLAN's Layer 2 reachability to more links/devices than needed, enlarging exposure and configuration risk.
 
-### Routing and end-to-end troubleshooting scenarios (12 questions)
+#### Routing and end-to-end troubleshooting scenarios (12 questions)
 
 **Q302. A router has a /16 static route and a /24 OSPF route matching the destination. Which matters first when forwarding?**
 
@@ -1462,7 +1539,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** IP reachability does not guarantee matching OSPF area, timers, authentication, network type, or enabled interfaces.
 
-### DHCP, DNS, NAT, wireless and application troubleshooting (14 questions)
+#### DHCP, DNS, NAT, wireless and application troubleshooting (14 questions)
 
 **Q314. A DHCP client is on VLAN 10 and the DHCP server is on VLAN 20. What routing feature is commonly needed?**
 
@@ -1520,7 +1597,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** It may introduce an unauthorized second DHCP server or overlapping scope; check the device's assigned LAN/router role.
 
-### Security and management decision questions (12 questions)
+#### Security and management decision questions (12 questions)
 
 **Q328. Why is an enable secret preferred to a legacy enable password on IOS?**
 
@@ -1570,7 +1647,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** Logs may be the only preserved evidence of changes and may be required by the competition activity.
 
-### Commonly mistaken vocabulary and quiz distractors (12 questions)
+#### Commonly mistaken vocabulary and quiz distractors (12 questions)
 
 **Q340. Is OSPF a Cisco-only routing protocol?**
 
@@ -1620,7 +1697,7 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** No. DNS can use UDP or TCP 53 depending on message size, transfers, and transport behavior.
 
-### Packet Tracer activity and troubleshooting literacy (10 questions)
+#### Packet Tracer activity and troubleshooting literacy (10 questions)
 
 **Q352. What is the difference between a .pkt file and a .pka activity?**
 
@@ -1662,15 +1739,15 @@ These are **new, original**, short-answer practice items supplementing Q001–Q2
 
 **Answer:** Identify the exact device and mode, consult supported syntax/help or authorized notes, and avoid guessing potentially destructive commands.
 
+---
 
-
-## Detailed networking concepts, diagrams in words, subnetting and protocol tables (integrated from the former general Cisco guide)
+### Detailed networking concepts, diagrams in words, subnetting and protocol tables (integrated from the former general Cisco guide)
 
 The content below preserves the explanatory networking theory from the former combined Cisco guide, so **all core concepts now live in this quiz guide** instead of forcing you to open the Packet Tracer procedures. The questions above remain the main searchable study path.
 
-#### Networking basics
+##### Networking basics
 
-#### The OSI and TCP/IP models
+##### The OSI and TCP/IP models
 
 A **model** splits networking into layers. Each layer does one job and hands its work to the next layer. The **OSI** model (Open Systems Interconnection) has 7 layers. The **TCP/IP** model, which the internet really uses, has 4.
 
@@ -1689,7 +1766,7 @@ A **model** splits networking into layers. Each layer does one job and hands its
 > [!NOTE]
 > Some books call the bottom TCP/IP layer "Link" instead of "Network Access". They mean the same thing.
 
-#### Network devices
+##### Network devices
 
 | Device | Layer | What it does |
 |---|---|---|
@@ -1699,14 +1776,14 @@ A **model** splits networking into layers. Each layer does one job and hands its
 | **Access point (AP)** | 2 | Lets wireless devices join a wired network. |
 | **Firewall** | 3 and up | Allows or blocks traffic based on rules. |
 
-#### Addresses and traffic types
+##### Addresses and traffic types
 
 - A **MAC address** (Media Access Control) is the physical address burned into a network card. It is 48 bits, written as 12 hexadecimal digits, like `00:1A:2B:3C:4D:5E`. Switches use it. It only matters on the local network.
 - An **IP address** (Internet Protocol) is the logical address you set in software, like `192.168.1.10`. Routers use it to move packets between networks.
 - **Unicast** goes to one device. **Broadcast** goes to every device on the local network (the MAC address `FF:FF:FF:FF:FF:FF`). **Multicast** goes to a group of devices that asked for it.
 - Routers do **not** forward broadcasts. Each router interface is the edge of a **broadcast domain**.
 
-#### TCP vs UDP
+##### TCP vs UDP
 
 | | TCP (Transmission Control Protocol) | UDP (User Datagram Protocol) |
 |---|---|---|
@@ -1715,7 +1792,7 @@ A **model** splits networking into layers. Each layer does one job and hands its
 | Speed | Slower, more overhead | Faster, less overhead |
 | Used for | Web pages, email, file transfer, SSH | DNS lookups, DHCP, video calls, streaming, online games |
 
-#### The protocols that make a network work
+##### The protocols that make a network work
 
 - **DHCP** (Dynamic Host Configuration Protocol) gives a device its IP address, subnet mask, default gateway and DNS server automatically. The four steps are **DORA**: **D**iscover (the client broadcasts "is there a DHCP server?"), **O**ffer (a server offers an address), **R**equest (the client asks for that address), **A**cknowledge (the server confirms).
 - **DNS** (Domain Name System) turns names like `www.example.com` into IP addresses.
@@ -1724,11 +1801,11 @@ A **model** splits networking into layers. Each layer does one job and hands its
 - **ICMP** (Internet Control Message Protocol) carries error and test messages. `ping` and `traceroute` use it.
 - The **default gateway** is the router address a device sends traffic to when the destination is on a *different* network. If it's wrong or missing, a PC can reach its own network but nothing beyond it.
 
-### IPv4 addressing and subnetting
+#### IPv4 addressing and subnetting
 
 An IPv4 address is **32 bits**, written as four numbers (octets) from 0 to 255: `192.168.1.10`. The **subnet mask** says which part is the **network** and which part is the **host** (the device).
 
-#### Binary in one minute
+##### Binary in one minute
 
 Each octet is 8 bits. The bit values, left to right, are:
 
@@ -1737,7 +1814,7 @@ Each octet is 8 bits. The bit values, left to right, are:
 
 Add up the values where the bit is 1. For example, `11000000` = 128 + 64 = **192**, and `10101100` = 128 + 32 + 8 + 4 = **172**.
 
-#### Classes (historical) and special ranges
+##### Classes (historical) and special ranges
 
 Classes are an old system that modern networks no longer use, but quizzes still ask about them.
 
@@ -1759,7 +1836,7 @@ Classes are an old system that modern networks no longer use, but quizzes still 
 
 **Private** addresses are free to use inside any network but are not routed on the internet. NAT translates them to a public address.
 
-#### CIDR and subnet masks
+##### CIDR and subnet masks
 
 **CIDR** (Classless Inter-Domain Routing) notation writes the mask as a slash and the number of network bits: `/24` means the first 24 bits are network bits, so the mask is `255.255.255.0`. Usable hosts = 2^(host bits) − 2, because the first address is the network address and the last is the broadcast address.
 
@@ -1792,7 +1869,7 @@ Classes are an old system that modern networks no longer use, but quizzes still 
 > [!TIP]
 > Memorize the last-octet mask values: **128, 192, 224, 240, 248, 252, 254, 255**. Block size is always **256 minus the mask value** in the octet that isn't 255 or 0.
 
-#### Step-by-step: find the network, broadcast and hosts
+##### Step-by-step: find the network, broadcast and hosts
 
 1. Find the **interesting octet**: the one where the mask is not 255 and not 0.
 2. **Block size** = 256 − the mask value in that octet.
@@ -1801,7 +1878,7 @@ Classes are an old system that modern networks no longer use, but quizzes still 
 5. **First host** = network address + 1. **Last host** = broadcast address − 1.
 6. **Number of hosts** = 2^(32 − prefix) − 2.
 
-#### Worked example 1: 192.168.10.77/26
+##### Worked example 1: 192.168.10.77/26
 
 - /26 = mask `255.255.255.192`. The interesting octet is the 4th.
 - Block size = 256 − 192 = **64**. Networks: .0, .64, .128, .192.
@@ -1809,7 +1886,7 @@ Classes are an old system that modern networks no longer use, but quizzes still 
 - Broadcast = 128 − 1 = **192.168.10.127**.
 - Hosts: **192.168.10.65** to **192.168.10.126**. That is 2^6 − 2 = **62** hosts.
 
-#### Worked example 2: 172.16.45.200/20
+##### Worked example 2: 172.16.45.200/20
 
 - /20 = mask `255.255.240.0`. The interesting octet is the 3rd.
 - Block size = 256 − 240 = **16**. Networks in the 3rd octet: 0, 16, 32, 48, …
@@ -1817,17 +1894,17 @@ Classes are an old system that modern networks no longer use, but quizzes still 
 - Broadcast: the next network is 172.16.48.0, so the broadcast is **172.16.47.255**.
 - Hosts: **172.16.32.1** to **172.16.47.254**. That is 2^12 − 2 = **4,094** hosts.
 
-#### Worked example 3: 10.1.1.5/30
+##### Worked example 3: 10.1.1.5/30
 
 - /30 = mask `255.255.255.252`. Block size = **4**. Networks: .0, .4, .8, …
 - Network **10.1.1.4**, broadcast **10.1.1.7**, hosts **10.1.1.5** and **10.1.1.6** (2 hosts).
 - A /30 is common on a link between two routers, because the link needs exactly two addresses.
 
-#### Picking a mask for a number of hosts
+##### Picking a mask for a number of hosts
 
 Find the smallest number of host bits where 2^(host bits) − 2 is at least the number of hosts you need. Example: you need 50 hosts. 2^5 − 2 = 30 is too small, 2^6 − 2 = 62 is enough. That's 6 host bits, so the prefix is 32 − 6 = **/26**.
 
-#### IPv6 basics
+##### IPv6 basics
 
 - An IPv6 address is **128 bits**, written as 8 groups of 4 hexadecimal digits separated by colons: `2001:0db8:0000:0000:0000:ff00:0042:8329`.
 - **Shortening rule 1:** drop leading zeros in any group (`0db8` becomes `db8`, `0042` becomes `42`).
@@ -1843,7 +1920,7 @@ Find the smallest number of host bits where 2^(host bits) − 2 is at least the 
 
 A normal IPv6 network (LAN) uses a **/64** prefix. IPv6 has no broadcast. It uses multicast instead.
 
-### Common ports
+#### Common ports
 
 A **port** number tells the receiving computer which program the traffic is for. Ports 0 to 1023 are the "well-known" ports.
 
@@ -1869,7 +1946,113 @@ A **port** number tells the receiving computer which program the traffic is for.
 | 3306 | MySQL | TCP | MySQL database |
 | 3389 | RDP (Remote Desktop Protocol) | TCP (also UDP) | Windows Remote Desktop |
 
-## Last-minute quiz review checklist
+### Additional short-answer questions — commonly missed network mechanics
+
+The following new questions are original and reinforce the network topics emphasized by public competition checklists and Cisco foundational materials.
+
+**Q362. Which IOS command displays locally known IPv4-to-MAC address mappings?**
+
+**Answer:** show ip arp (or show arp on supporting platforms). This shows the router/device ARP cache, not DNS records.
+
+**Q363. Which IOS command helps identify learned switch MAC addresses and their ports?**
+
+**Answer:** show mac address-table; learned entries can be VLAN-specific.
+
+**Q364. Which configuration change allows a supported Layer 3 switch to route between SVIs?**
+
+**Answer:** ip routing in global configuration mode, together with correct VLAN interfaces, routes and operational links.
+
+**Q365. What is the difference between a port assigned to an access VLAN and a trunk VLAN?**
+
+**Answer:** An access port normally carries one data VLAN without a tag; a trunk carries multiple VLANs using 802.1Q tagging.
+
+**Q366. Why does a single successful local ping not prove an end-to-end website works?**
+
+**Answer:** It checks only one reachability path; DNS, TCP/HTTP service, ACL and application state may still fail.
+
+**Q367. What does a duplex mismatch often cause on an Ethernet link?**
+
+**Answer:** Poor performance, late collisions or input errors on legacy half-duplex sides, and retransmissions; modern auto-negotiation should be checked.
+
+**Q368. Why is fiber often preferred between distant buildings?**
+
+**Answer:** It provides electrical isolation and resistance to electromagnetic interference, with higher distance capabilities depending on optics.
+
+**Q369. What is the purpose of a Link Aggregation Control Protocol (LACP) bundle?**
+
+**Answer:** Combine compatible physical links into one logical channel; LACP negotiates membership rather than merely connecting extra cables.
+
+**Q370. What happens if both LACP peers are configured passive?**
+
+**Answer:** Neither initiates negotiation, so a LACP bundle usually does not form.
+
+**Q371. What does an EtherChannel Port-channel interface represent?**
+
+**Answer:** The logical interface bundling member physical links so switching/routing sees a single aggregate link.
+
+**Q372. If two PCs in one VLAN fail to communicate, should you add a default route first?**
+
+**Answer:** No. Check physical connection, access VLAN, port security, host IP/mask and spanning-tree forwarding before changing routing.
+
+**Q373. What is the primary advantage of RSTP over traditional STP?**
+
+**Answer:** It converges faster after many topology changes while still preventing Layer 2 loops.
+
+**Q374. Why is a switch port's configured native VLAN a security and connectivity concern?**
+
+**Answer:** Untagged frames can be classified unexpectedly if the connected trunk endpoints disagree, potentially leaking or disrupting traffic.
+
+**Q375. What information does an IPv4 client get from DHCP besides its address?**
+
+**Answer:** Usually subnet mask, default gateway and DNS servers, as allowed by the DHCP server configuration.
+
+**Q376. What is the purpose of DHCP snooping's trusted interface designation?**
+
+**Answer:** Permit DHCP server responses only from approved server-facing paths, reducing rogue DHCP server risks.
+
+**Q377. Can a router's DHCP binding table prove leases assigned by a separate Packet Tracer server?**
+
+**Answer:** No. Check the server's DHCP service/client IP configuration; the router's own binding table may be empty.
+
+**Q378. What is the difference between IPv6 Router Advertisement and DHCPv6?**
+
+**Answer:** RA announces routers/prefix information and flags; DHCPv6 supplies addresses and/or configuration as used by the network.
+
+**Q379. Why do IPv6 clients still require Neighbor Discovery when they know the destination IPv6 address?**
+
+**Answer:** They need link-layer neighbor resolution and/or router information; IPv6 does not use ARP.
+
+**Q380. How can an ACL with a permit for TCP 80 still block other services?**
+
+**Answer:** The implicit deny blocks unmatched traffic unless additional permit statements allow them.
+
+**Q381. Why might an allowed ACL entry appear to have zero matches even when a task works?**
+
+**Answer:** The flow may use a different interface/direction, or the simulator may not implement complete counter behavior.
+
+**Q382. What is the main difference between NAT overload and an interface ACL?**
+
+**Answer:** PAT/NAT overload translates addresses and transport ports; an interface ACL determines whether specified packet flows are permitted.
+
+**Q383. What is the risk of changing every remote line to transport input ssh without first checking SSH service?**
+
+**Answer:** It can lock out legitimate remote administration if SSH keys, IP reachability or credentials are not working.
+
+**Q384. Which common standard port does BGP use, and how does it differ from OSPF transport?**
+
+**Answer:** BGP normally uses TCP 179; OSPF uses IP protocol 89 directly, not a TCP/UDP port.
+
+**Q385. How can a correct DNS A record still fail to provide name resolution?**
+
+**Answer:** The client may use the wrong DNS server, be unable to route to it, or be blocked by a firewall/ACL; record correctness alone is insufficient.
+
+
+
+## Part 6 — Final Review and Sources
+
+Review all missed terms, official course modules and the permitted reference policy before any assessment.
+
+### Last-minute quiz review checklist
 
 - [ ] OSI Layers 1–7, major PDUs, TCP/IP 4-layer mapping
 - [ ] Hub, switch, router, access point, firewall, modem and NIC roles
@@ -1889,3 +2072,25 @@ A **port** number tells the receiving computer which program the traffic is for.
 - [ ] Current official module scope, actual assessment rules and whether outside references are permitted
 
 **This is original practice, not an official or leaked answer key.** Review the assigned NetAcad modules before using these notes to study.
+
+---
+
+### Where to study more (public references)
+
+1. **Official first:** [CyberPatriot current competition challenges](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round), [CyberPatriot training materials](https://www.uscyberpatriot.org/competition/training-materials), [Cisco NetAcad CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content). The official Content Course should be used for the exact assigned module material.
+2. **Community starting point:** [Networking for CyberPatriot Quizlet](https://quizlet.com/846446350/networking-for-cyberpatriot-flash-cards/) (protocols, OSI/TCP models, standards bodies; independently verify details), [CyberPatriot Study Guide Quizlet](https://quizlet.com/212436050/cyber-patriot-study-guide-flash-cards/) (additional historical study terms; not an official answer bank).
+3. **CyberPatriot training overviews:** [CCA CyberPatriot](https://sites.google.com/view/cca-cyberpatriot/program-info/cyberpatriot), [Cyber4Youth CyberPatriot Cisco training](https://cyber4youth.com/learn/cyberpatriot) (independent), [Discovery Middle School CyberPatriot training materials](https://dms.madisoncity.k12.al.us/cyberpatriot-training-materials).
+4. **Technical fact-checking:** [Cisco support documentation](https://www.cisco.com/c/en/us/support/), [Cisco routing administrative distance](https://www.cisco.com/c/en/us/support/docs/ip/border-gateway-protocol-bgp/15986-admin-distance.html), [IANA port-number registry](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml).
+
+**Source note:** These questions and answers are **original summaries**, built around common topics appearing in public study materials and Cisco's documented behavior. Do not assume student-made flashcards are always accurate. **Not** a reproduction of NetAcad's protected quizzes or an endorsement of any third-party site.
+
+---
+
+### Related guides in this repository
+
+- [Cisco CLI, concepts and Packet Tracer](packet-tracer.md)
+- [Cisco switching, routing and troubleshooting](packet-tracer.md#22-consolidated-troubleshooting-reference)
+- [Cisco folder index](README.md)
+
+---
+

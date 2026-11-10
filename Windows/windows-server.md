@@ -8,7 +8,31 @@ All relevant Windows workstation steps are **included below in Appendix 13**, wi
 
 ---
 
-## 0. Before you touch anything
+**Priority is practical, not a guaranteed score ranking.** The README, forensics questions, permitted tools and actual required services override any generic checklist. Do not remove the only admin, delete evidence, or disable a critical role merely because it appears in a public checklist.
+
+## Part 1 — Basics / Information Needed
+
+### Identify what kind of Windows Server this is
+
+A Windows Server can be standalone, a domain member, or a Domain Controller. **Domain Controller services and directory/GPO policies must not be treated like optional workstation services.**
+
+**Clicking:** Open **Server Manager → Local Server**; inspect **Manage → Add Roles and Features** without making changes. ADUC, DNS, DHCP, IIS and Group Policy consoles are available only when the relevant roles/tools exist.
+
+**Typing (check, elevated PowerShell):**
+
+~~~powershell
+Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber
+Get-CimInstance Win32_ComputerSystem | Select-Object DomainRole,Domain,PartOfDomain
+Get-WindowsFeature | Where-Object InstallState -eq Installed | Select-Object Name,DisplayName
+~~~
+
+DomainRole 4 or 5 indicates a domain controller. Domain role and README requirements take precedence over the embedded workstation appendix. Keep console access before changing RDP/WinRM/firewall.
+
+## Part 2 — First Things to Do
+
+Read the README, preserve forensics and determine the server's exact domain role before any account or firewall changes.
+
+### 0. Before you touch anything
 
 - [ ] **Read the README twice.** Servers usually have **critical services** (AD, DNS, IIS, FTP, file shares). Write every one down. See [Reading the README](../General/All/reading-the-readme.md).
 - [ ] **Take a VMware snapshot.**
@@ -18,9 +42,11 @@ All relevant Windows workstation steps are **included below in Appendix 13**, wi
 
 ---
 
-## 1. Is this a Domain Controller?
+---
 
-### 1.1 Find out what kind of server it is
+### 1. Is this a Domain Controller?
+
+#### 1.1 Find out what kind of server it is
 - [ ] Done
 
 **Why it matters:** On a **Domain Controller** (DC), users and password rules live in **Active Directory** and **Group Policy**, not on the local computer. If you change the local settings on a DC, nothing happens.
@@ -40,7 +66,7 @@ Get-WindowsFeature | Where-Object Installed | Select-Object Name, DisplayName   
 
 The `*-AD*`, `*-GPO` and `*-DnsServer*` commands on this page come with the AD DS and DNS roles, so they work on a Domain Controller. On other servers they fail unless those tools are installed; use the "Standalone / member server" steps there.
 
-### 1.2 Fast path: run the hardening script
+#### 1.2 Fast path: run the hardening script
 - [ ] Done
 
 **What:** Prepare a manual baseline. The upstream automation is not included in this repository.
@@ -63,14 +89,18 @@ The `*-AD*`, `*-GPO` and `*-DnsServer*` commands on this page come with the AD D
 
 ---
 
-## 2. Users and groups
+## Part 3 — Commonly Assessed High-Priority Checks
 
-### 2.1 Standalone / member server
+Prioritize authorized users, domain/local privilege, passwords, Defender/firewall and applicable audit policy without breaking domain authentication.
+
+### 2. Users and groups
+
+#### 2.1 Standalone / member server
 - [ ] Done
 
 Same as [Windows 10/11 section 2](windows-10-11.md#2-users-and-groups).
 
-### 2.2 Domain Controller: domain users
+#### 2.2 Domain Controller: domain users
 - [ ] Done
 
 **Clicking:** **Win + R** → `dsa.msc` (**Active Directory Users and Computers**). Users are usually in the **Users** folder, but check **every OU** (folder). Turn on **View → Advanced Features** to see everything.
@@ -89,7 +119,7 @@ Disable-ADAccount -Identity Guest
 > [!CAUTION]
 > **Never delete or change these built-in accounts:** `Administrator` (unless the README says so), `krbtgt` (Active Directory breaks without it), and computer accounts (names ending in `$`). Disable `Guest`.
 
-### 2.3 Domain Controller: powerful groups
+#### 2.3 Domain Controller: powerful groups
 - [ ] Done
 
 Check the members of each group. Remove anyone the README doesn't say should be an admin.
@@ -119,7 +149,7 @@ Get-ADGroupMember 'Domain Admins' -Recursive | Select-Object SamAccountName   # 
 > [!CAUTION]
 > Some members are there by default: leave them. **Administrators** contains the groups **Domain Admins** and **Enterprise Admins** and the built-in **Administrator**; **Domain Admins**, **Enterprise Admins** and **Schema Admins** contain **Administrator**. Remove only *people* (and planted groups) the README doesn't list as admins.
 
-### 2.4 Domain Controller: risky account settings
+#### 2.4 Domain Controller: risky account settings
 - [ ] Done
 
 **Clicking:** in `dsa.msc`, double-click a user → **Account** tab → **Account options**. These should all be **unticked**:
@@ -137,7 +167,7 @@ Set-ADUser bob -PasswordNeverExpires $false -PasswordNotRequired $false -AllowRe
 Set-ADAccountControl bob -DoesNotRequirePreAuth $false
 ```
 
-### 2.5 Strong passwords
+#### 2.5 Strong passwords
 - [ ] Done
 
 ```powershell
@@ -146,14 +176,16 @@ Set-ADAccountPassword -Identity bob -Reset -NewPassword (Read-Host -AsSecureStri
 
 ---
 
-## 3. Password and lockout policy
+---
 
-### 3.1 Standalone / member server
+### 3. Password and lockout policy
+
+#### 3.1 Standalone / member server
 - [ ] Done
 
 Same as [Windows 10/11 section 3](windows-10-11.md#3-account-policies-passwords-and-lockout).
 
-### 3.2 Domain Controller: edit the Default Domain Policy
+#### 3.2 Domain Controller: edit the Default Domain Policy
 - [ ] Done
 
 **Clicking:**
@@ -175,14 +207,45 @@ net accounts /domain
 
 ---
 
-## 4. Audit policy, user rights and security options
+---
 
-### 4.1 Standalone / member server
+### 5. Defender, firewall and updates
+
+#### 5.1 Microsoft Defender
+- [ ] Done
+
+Same as [Windows 10/11 section 5](windows-10-11.md#5-microsoft-defender-antivirus). If Defender isn't installed: **Server Manager → Add Roles and Features → Features → Microsoft Defender Antivirus** (called **Windows Defender Features** on Server 2016), or `Install-WindowsFeature Windows-Defender`, then restart. Server 2016 and 2019 don't show **Tamper Protection** in the Defender settings; skip that part there.
+
+#### 5.2 Firewall
+- [ ] Done
+
+Same as [Windows 10/11 section 6](windows-10-11.md#6-firewall).
+
+> [!CAUTION]
+> On a Domain Controller, **don't disable** the built-in rule groups **Active Directory Domain Services**, **DNS Service**, **Kerberos Key Distribution Center**, **Netlogon Service** or **DFS Replication**. Clients need them.
+
+#### 5.3 Windows Update
+- [ ] Done
+
+**Server Manager → Local Server → Windows Update** (or **Settings → Update & Security**). On Server Core: run `sconfig` and choose **Install updates**.
+
+#### 5.4 IE Enhanced Security Configuration
+- [ ] Done
+
+**Server Manager → Local Server → IE Enhanced Security Configuration** must be **On** for Administrators and Users.
+
+---
+
+---
+
+### 4. Audit policy, user rights and security options
+
+#### 4.1 Standalone / member server
 - [ ] Done
 
 Same as [Windows 10/11 section 4](windows-10-11.md#4-local-policies).
 
-### 4.2 Domain Controller: Default Domain Controllers Policy
+#### 4.2 Domain Controller: Default Domain Controllers Policy
 - [ ] Done
 
 On a DC, these come from the **Default Domain Controllers Policy** GPO. In `gpmc.msc`, right-click it → **Edit** → **Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies** (Audit Policy, User Rights Assignment, Security Options). Use the tables in the Windows 10/11 checklist, plus these DC settings:
@@ -216,7 +279,7 @@ Backup-GPO -All -Path C:\gpo-backup
 
 Detailed audit settings are under **Security Settings → Advanced Audit Policy Configuration**. Set the account logon, account management, logon/logoff, policy change, privilege use, DS access and system categories to **Success and Failure**.
 
-### 4.3 Look for planted bad Group Policies
+#### 4.3 Look for planted bad Group Policies
 - [ ] Done
 
 **Why:** An attacker can create or change a GPO to turn off the firewall, add an admin, or run a script on every computer.
@@ -229,7 +292,7 @@ Get-GPO -All | Sort-Object ModificationTime -Descending | Format-Table DisplayNa
 Get-GPOReport -All -ReportType Html -Path C:\gpo-report.html; Start-Process C:\gpo-report.html
 ```
 
-### 4.4 Domain Controller: Zerologon protection
+#### 4.4 Domain Controller: Zerologon protection
 - [ ] Done
 
 **Why it matters:** Zerologon (CVE-2020-1472) lets anyone on the network take over a Domain Controller without a password. Windows updates since February 2021 always block it, but a planted policy can let chosen accounts use the weak connection again, and an un-updated image is wide open.
@@ -245,125 +308,41 @@ Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters' |
 
 ---
 
-## 5. Defender, firewall and updates
+### Research expansion: check directory, DNS, time and replication safely
 
-### 5.1 Microsoft Defender
-- [ ] Done
+- [ ] Confirmed whether AD DS, DNS, DHCP or other required server roles are installed and functioning.
 
-Same as [Windows 10/11 section 5](windows-10-11.md#5-microsoft-defender-antivirus). If Defender isn't installed: **Server Manager → Add Roles and Features → Features → Microsoft Defender Antivirus** (called **Windows Defender Features** on Server 2016), or `Install-WindowsFeature Windows-Defender`, then restart. Server 2016 and 2019 don't show **Tamper Protection** in the Defender settings; skip that part there.
+~~~powershell
+Get-Service NTDS,DNS,Netlogon,DFSR,W32Time -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
+Get-Command Get-ADUser,Get-DnsServerZone,Get-DhcpServerv4Scope,Get-Website -ErrorAction SilentlyContinue
+~~~
 
-### 5.2 Firewall
-- [ ] Done
+**Only on a Domain Controller or authorized DC diagnostic environment:**
 
-Same as [Windows 10/11 section 6](windows-10-11.md#6-firewall).
+~~~powershell
+dcdiag /q
+repadmin /replsummary
+w32tm /query /status
+~~~
 
-> [!CAUTION]
-> On a Domain Controller, **don't disable** the built-in rule groups **Active Directory Domain Services**, **DNS Service**, **Kerberos Key Distribution Center**, **Netlogon Service** or **DFS Replication**. Clients need them.
+**What to look for:** Directory authentication, SYSVOL/DFSR, DNS, replication and clock health. A single-controller lab may have no replication partners; investigate output instead of "repairing" imaginary peers.
 
-### 5.3 Windows Update
-- [ ] Done
+**Domain privilege review (only when AD PowerShell is available):**
 
-**Server Manager → Local Server → Windows Update** (or **Settings → Update & Security**). On Server Core: run `sconfig` and choose **Install updates**.
+~~~powershell
+Get-ADGroupMember -Identity 'Domain Admins' -ErrorAction SilentlyContinue | Select-Object Name,ObjectClass
+Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires | Select-Object SamAccountName,Enabled,PasswordNeverExpires
+~~~
 
-### 5.4 IE Enhanced Security Configuration
-- [ ] Done
+**Safety:** Do not disable necessary built-in principals, domain service identities or krbtgt. These commands require appropriate domain privileges and management modules. Confirm effective GPO scope and role dependencies before changing policy.
 
-**Server Manager → Local Server → IE Enhanced Security Configuration** must be **On** for Administrators and Users.
+## Part 4 — Required Server Roles and Remote Access
 
----
+Prove required web, directory, DNS, DHCP, SMB and management functions work before hardening them.
 
-## 6. Services
+### 9. Critical server roles (only if the README lists them)
 
-### 6.1 Turn off what the README doesn't need
-- [ ] Done
-
-Same list as [Windows 10/11 section 8](windows-10-11.md#8-services), plus:
-- **Print Spooler**: disable on Domain Controllers unless this is the print server (PrintNightmare).
-- **Windows Remote Management (WinRM)**: Server Manager uses it, so keep it on servers unless the README says otherwise, and lock it down (section 8).
-
-Windows Server has no **Security Center** (`wscsvc`) service, so skip that name in Windows 10/11 step 8.2.
-
-### 6.2 Never touch these on a Domain Controller
-- [ ] Done
-
-| Service | Name |
-|---|---|
-| Active Directory Domain Services | `NTDS` |
-| DNS Server | `DNS` |
-| Kerberos Key Distribution Center | `Kdc` |
-| Netlogon | `Netlogon` |
-| DFS Replication | `DFSR` |
-| Windows Time | `W32Time` |
-| Active Directory Web Services | `ADWS` |
-| Intersite Messaging | `IsmServ` |
-
-```powershell
-Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Table Name, Status, StartType
-```
-All should be **Running** and **Automatic**.
-
-### 6.3 Print Spooler: PrintNightmare fixes
-- [ ] Done
-
-**Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM. If the spooler must keep running, make sure only admins can install drivers.
-
-**Clicking:** `gpedit.msc` (on a DC: the **Default Domain Controllers Policy** in `gpmc.msc`) → **Computer Configuration → Administrative Templates → Printers**:
-- **Limits print driver installation to Administrators**: **Enabled**.
-- **Point and Print Restrictions**: **Enabled**, and both "When installing drivers for a new connection" and "When updating drivers for an existing connection" set to **Show warning and elevation prompt**.
-
-**Typing:**
-```powershell
-$pp = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'
-if (-not (Test-Path $pp)) { New-Item -Path $pp -Force | Out-Null }
-New-ItemProperty -Path $pp -Name RestrictDriverInstallationToAdministrators -Value 1 -PropertyType DWord -Force
-New-ItemProperty -Path $pp -Name NoWarningNoElevationOnInstall -Value 0 -PropertyType DWord -Force
-New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWord -Force
-Get-Service Spooler | Format-Table Name, Status, StartType     # Disabled on a DC unless it's the print server
-```
-**Check it worked:** `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'` shows `RestrictDriverInstallationToAdministrators : 1` and the other two `0`.
-
----
-
-## 7. Roles and features
-
-### 7.1 Remove roles and features that aren't needed
-- [ ] Done
-
-**Clicking:** **Server Manager → Manage → Remove Roles and Features**. Untick unneeded **features**: Telnet Client, TFTP Client, SMB 1.0/CIFS File Sharing Support, Windows PowerShell 2.0 Engine, SNMP Service, Simple TCP/IP Services. Remove **roles** only if the README clearly doesn't need them (e.g. Web Server (IIS) on a plain DC).
-
-**Typing:**
-```powershell
-Get-WindowsFeature | Where-Object Installed | Format-Table Name, DisplayName
-Uninstall-WindowsFeature -Name Telnet-Client, TFTP-Client, FS-SMB1, PowerShell-V2, Simple-TCPIP
-Uninstall-WindowsFeature -Name SNMP-Service      # only if the README doesn't need SNMP
-```
-Restart once when it says a restart is needed (SMBv1 removal needs one).
-
-> [!CAUTION]
-> **Never** remove **AD DS**, **DNS Server**, or any role the README mentions.
-
----
-
-## 8. Remote access
-
-### 8.1 Remote Desktop and Remote Assistance
-- [ ] Done
-
-Same as [Windows 10/11 section 10](windows-10-11.md#10-remote-access). Servers often **need** RDP; if so, keep it on with Network Level Authentication, and control who's in **Remote Desktop Users**.
-
-### 8.2 Lock down WinRM
-- [ ] Done
-
-```powershell
-winrm get winrm/config/service       # AllowUnencrypted = false, Basic = false
-```
-Or with `gpedit.msc` → **Administrative Templates → Windows Components → Windows Remote Management (WinRM) → WinRM Service**: **Allow Basic authentication: Disabled**, **Allow unencrypted traffic: Disabled**.
-
----
-
-## 9. Critical server roles (only if the README lists them)
-
-### 9.1 IIS web server
+#### 9.1 IIS web server
 - [ ] Done
 
 **Clicking:** **Win + R** → `inetmgr` (IIS Manager). For the server **and each site**:
@@ -385,7 +364,7 @@ Get-ChildItem C:\inetpub -Recurse -Include *.aspx,*.asp,*.php | Select-String -P
 ```
 If the X-Powered-By header is already gone, that line may print an error; that's fine.
 
-### 9.2 IIS FTP server
+#### 9.2 IIS FTP server
 - [ ] Done
 
 In `inetmgr`, click the FTP site:
@@ -401,7 +380,7 @@ Get-Website | Where-Object { $_.Bindings.Collection.protocol -contains 'ftp' } |
 Set-ItemProperty 'IIS:\Sites\Default FTP Site' -Name ftpServer.security.authentication.anonymousAuthentication.enabled -Value $false   # use your site's name from the line above
 ```
 
-### 9.3 DNS server
+#### 9.3 DNS server
 - [ ] Done
 
 **Clicking:** **Win + R** → `dnsmgmt.msc`. For each **Forward Lookup Zone**, right-click → **Properties**:
@@ -418,7 +397,7 @@ Get-DnsServerResourceRecord -ZoneName corp.local | Format-Table HostName, Record
 ```
 `-DynamicUpdate Secure` works only when **IsDsIntegrated** is `True`. For a zone that isn't, use `-DynamicUpdate None` (unless the README needs dynamic updates).
 
-### 9.4 Active Directory
+#### 9.4 Active Directory
 - [ ] Done
 
 - **AD Recycle Bin:** **Active Directory Administrative Center (`dsac.exe`)** → click the domain → **Enable Recycle Bin…** (it can't be turned off later, which is fine).
@@ -427,7 +406,7 @@ Get-DnsServerResourceRecord -ZoneName corp.local | Format-Table HostName, Record
 - **Unconstrained delegation:** `Get-ADComputer -Filter 'TrustedForDelegation -eq $true'`. Only DCs should be listed.
 - **Who can add computers:** `Get-ADObject (Get-ADDomain).DistinguishedName -Properties ms-DS-MachineAccountQuota`. Setting it to 0 stops normal users joining computers (optional).
 
-### 9.5 DHCP server
+#### 9.5 DHCP server
 - [ ] Done
 
 `dhcpmgmt.msc`: check the scopes and reservations against the README, and make sure **Enable DHCP audit logging** is ticked (server → **Properties**). Look at **Scope Options** too: a planted **006 DNS Servers** or **003 Router** pointing at a strange IP sends every client to the attacker.
@@ -441,7 +420,7 @@ Set-DhcpServerAuditLog -Enable $true
 Get-DhcpServerAuditLog
 ```
 
-### 9.6 File server shares
+#### 9.6 File server shares
 - [ ] Done
 
 **Clicking:** `fsmgmt.msc` → **Shares**. For each share the README needs: **Properties → Share Permissions** shouldn't give **Everyone: Full Control**, and on the **Security** tab (NTFS), only the right groups should have **Modify / Full control**.
@@ -454,7 +433,7 @@ Get-SmbServerConfiguration | Format-List EnableSMB1Protocol, RequireSecuritySign
 ```
 On a Domain Controller, leave **NETLOGON** and **SYSVOL** alone.
 
-### 9.7 Turn off SSL 3.0, TLS 1.0 and TLS 1.1
+#### 9.7 Turn off SSL 3.0, TLS 1.0 and TLS 1.1
 
 **Compatibility preflight:** Record protocol settings and export the exact SCHANNEL key before editing. Check required clients, application/.NET versions, certificates and patches support modern TLS. Apply changes at a recoverable checkpoint; some need service/system restart. Use [12.5](#125-iis-ftp-and-file-and-storage-services-recovery) for backup/client tests. If a legacy required client fails, restore the recorded per-protocol values, including absence of values that did not previously exist, and investigate a supported compatibility path rather than applying a blanket protocol template.
 - [ ] Done
@@ -478,7 +457,104 @@ This changes only what the server *accepts* (the `Server` keys), not how the ser
 
 ---
 
-## 10. The rest
+---
+
+### 6. Services
+
+#### 6.1 Turn off what the README doesn't need
+- [ ] Done
+
+Same list as [Windows 10/11 section 8](windows-10-11.md#8-services), plus:
+- **Print Spooler**: disable on Domain Controllers unless this is the print server (PrintNightmare).
+- **Windows Remote Management (WinRM)**: Server Manager uses it, so keep it on servers unless the README says otherwise, and lock it down (section 8).
+
+Windows Server has no **Security Center** (`wscsvc`) service, so skip that name in Windows 10/11 step 8.2.
+
+#### 6.2 Never touch these on a Domain Controller
+- [ ] Done
+
+| Service | Name |
+|---|---|
+| Active Directory Domain Services | `NTDS` |
+| DNS Server | `DNS` |
+| Kerberos Key Distribution Center | `Kdc` |
+| Netlogon | `Netlogon` |
+| DFS Replication | `DFSR` |
+| Windows Time | `W32Time` |
+| Active Directory Web Services | `ADWS` |
+| Intersite Messaging | `IsmServ` |
+
+```powershell
+Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Table Name, Status, StartType
+```
+All should be **Running** and **Automatic**.
+
+#### 6.3 Print Spooler: PrintNightmare fixes
+- [ ] Done
+
+**Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM. If the spooler must keep running, make sure only admins can install drivers.
+
+**Clicking:** `gpedit.msc` (on a DC: the **Default Domain Controllers Policy** in `gpmc.msc`) → **Computer Configuration → Administrative Templates → Printers**:
+- **Limits print driver installation to Administrators**: **Enabled**.
+- **Point and Print Restrictions**: **Enabled**, and both "When installing drivers for a new connection" and "When updating drivers for an existing connection" set to **Show warning and elevation prompt**.
+
+**Typing:**
+```powershell
+$pp = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'
+if (-not (Test-Path $pp)) { New-Item -Path $pp -Force | Out-Null }
+New-ItemProperty -Path $pp -Name RestrictDriverInstallationToAdministrators -Value 1 -PropertyType DWord -Force
+New-ItemProperty -Path $pp -Name NoWarningNoElevationOnInstall -Value 0 -PropertyType DWord -Force
+New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWord -Force
+Get-Service Spooler | Format-Table Name, Status, StartType     # Disabled on a DC unless it's the print server
+```
+**Check it worked:** `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'` shows `RestrictDriverInstallationToAdministrators : 1` and the other two `0`.
+
+---
+
+---
+
+### 7. Roles and features
+
+#### 7.1 Remove roles and features that aren't needed
+- [ ] Done
+
+**Clicking:** **Server Manager → Manage → Remove Roles and Features**. Untick unneeded **features**: Telnet Client, TFTP Client, SMB 1.0/CIFS File Sharing Support, Windows PowerShell 2.0 Engine, SNMP Service, Simple TCP/IP Services. Remove **roles** only if the README clearly doesn't need them (e.g. Web Server (IIS) on a plain DC).
+
+**Typing:**
+```powershell
+Get-WindowsFeature | Where-Object Installed | Format-Table Name, DisplayName
+Uninstall-WindowsFeature -Name Telnet-Client, TFTP-Client, FS-SMB1, PowerShell-V2, Simple-TCPIP
+Uninstall-WindowsFeature -Name SNMP-Service      # only if the README doesn't need SNMP
+```
+Restart once when it says a restart is needed (SMBv1 removal needs one).
+
+> [!CAUTION]
+> **Never** remove **AD DS**, **DNS Server**, or any role the README mentions.
+
+---
+
+---
+
+### 8. Remote access
+
+#### 8.1 Remote Desktop and Remote Assistance
+- [ ] Done
+
+Same as [Windows 10/11 section 10](windows-10-11.md#10-remote-access). Servers often **need** RDP; if so, keep it on with Network Level Authentication, and control who's in **Remote Desktop Users**.
+
+#### 8.2 Lock down WinRM
+- [ ] Done
+
+```powershell
+winrm get winrm/config/service       # AllowUnencrypted = false, Basic = false
+```
+Or with `gpedit.msc` → **Administrative Templates → Windows Components → Windows Remote Management (WinRM) → WinRM Service**: **Allow Basic authentication: Disabled**, **Allow unencrypted traffic: Disabled**.
+
+---
+
+---
+
+### 10. The rest
 
 Use the [Windows 10/11 checklist](windows-10-11.md) for:
 - [ ] Prohibited software (section 12)
@@ -489,19 +565,35 @@ Use the [Windows 10/11 checklist](windows-10-11.md) for:
 
 ---
 
-## 11. Final checks
+### Research expansion: required server-role dependency checklist
 
-- [ ] Every critical role still works (e.g. `nslookup corp.local` with your domain name for DNS, open the website for IIS)
-- [ ] On a DC: `dcdiag /q` prints no errors (no output = good)
-- [ ] Scoring Report shows **no penalties**
-- [ ] Forensics answers saved
-- [ ] Final snapshot
+| Role | Inspection tool | Verify with an authorized client |
+|---|---|---|
+| Active Directory | Server Manager, ADUC, dcdiag | Domain user login and directory lookup |
+| DNS | DNS console, Get-DnsServerZone | Required hostname resolves correctly |
+| DHCP | DHCP console, Get-DhcpServerv4Scope | Client receives correct subnet/gateway/DNS |
+| IIS | IIS Manager, Get-Website | Required website responds on correct host/port |
+| SMB file server | File and Storage Services, Get-SmbShare | Correct user can access required share |
+| RDP / WinRM | Remote Desktop settings / winrm config | Approved management connection still works |
 
-## 12. Role-aware manual procedures and recovery
+**Typing (check, where commands are installed):**
+
+~~~powershell
+Get-SmbShare | Select-Object Name,Path,Special
+Get-NetFirewallProfile
+~~~
+
+**Do not** install missing roles merely to run checklist commands. Review any zone transfer, DHCP scope, IIS authentication, file ACL or remote-management change against required functionality. Preserve original configuration and test application login/shares/website after modifications.
+
+## Part 5 — Advanced Server Investigation and Embedded Windows Reference
+
+Use role-specific recovery first. The embedded workstation checklist is a supplemental reference, **not** a license to disable Domain Controller services.
+
+### 12. Role-aware manual procedures and recovery
 
 Use **Windows PowerShell as Administrator on the server**, not a workstation, for these commands. Substitute the actual domain, scope, site and share names. A missing role cmdlet normally means its role/module is absent; do not install a server role just to satisfy a checklist. The [Windows manual verification section](windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps) supplies shared backup, account, firewall, audit, malware and recovery procedures.
 
-### 12.1 Identify version, roles and management dependencies
+#### 12.1 Identify version, roles and management dependencies
 
 - [ ] Done
 
@@ -538,7 +630,7 @@ ProductType 2 means DC; 3 means another server. A **member server has local acco
 
 **Warnings:** Server Manager itself relies on remote management features. Disabling WinRM on a server because it is often disabled on workstations can break management.
 
-### 12.2 AD users, nested groups and service identities
+#### 12.2 AD users, nested groups and service identities
 
 - [ ] Done
 
@@ -587,7 +679,7 @@ Do not rotate a required service account password without coordinating each depe
 
 **Warnings:** Do not remove all operator/service identities from a DC using a workstation rights table. Do not change your only working administrator or krbtgt credentials as a routine checklist step.
 
-### 12.3 Domain password policy and Group Policy precedence
+#### 12.3 Domain password policy and Group Policy precedence
 
 - [ ] Done
 
@@ -629,7 +721,7 @@ Replace the domain and all policy values. Length/complexity affect future passwo
 
 **Warnings:** Requiring LDAP signing/channel binding, restricting NTLM, or removing network-logon principals can break older required clients. Stage compatibility inspection and consult the applicable Microsoft policy documentation; do not apply `Always` blindly to every environment.
 
-### 12.4 DNS, DHCP and DC health
+#### 12.4 DNS, DHCP and DC health
 
 - [ ] Done
 
@@ -675,7 +767,7 @@ Use these on the appropriate DC; no replication partners can be normal for a sin
 
 **Warnings:** Never disable DNS, Kdc, NTDS, Netlogon, DFSR or W32Time on a required DC. DHCP failover and approved secondary DNS servers may be implicit dependencies even if the README does not enumerate every service name.
 
-### 12.5 IIS, FTP and File and Storage Services recovery
+#### 12.5 IIS, FTP and File and Storage Services recovery
 
 - [ ] Done
 
@@ -723,7 +815,7 @@ This affects the saved IIS server configuration. Restore content/database/ACL ch
 
 **Warnings:** Do not disable TLS protocols until required clients have been checked and patches/certificates are ready. Hide-version settings do not substitute for updates. A web shell investigation must preserve evidence and compare files with trusted application sources before deletion.
 
-### 12.6 Remote management, firewall, updates and audit completion
+#### 12.6 Remote management, firewall, updates and audit completion
 
 - [ ] Done
 
@@ -758,7 +850,9 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 
 ---
 
-## 13. Complete Windows operating-system security procedures (embedded workstation reference)
+---
+
+### 13. Complete Windows operating-system security procedures (embedded workstation reference)
 
 > **Server-first precedence:** This appendix is the complete Windows workstation procedures included for convenient offline use. **Do not blindly apply workstation advice to a Domain Controller, member server, required print/web/database/file services, or domain Group Policy.** The original Windows Server sections 0–12 take precedence for all role-dependent decisions. Where a command targets a local SAM account, use AD tooling only after confirming the actual machine role. Inspect rather than remove required administrators or groups.
 
@@ -775,33 +869,33 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 
 ---
 
-### WS.0. Before you touch anything
+#### WS.0. Before you touch anything
 
-#### WS.0.1 Read the README
+##### WS.0.1 Read the README
 - [ ] Done
 
 Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/All/reading-the-readme.md).
 
-#### WS.0.2 Take a VMware snapshot
+##### WS.0.2 Take a VMware snapshot
 - [ ] Done
 
 **VM → Snapshot → Take Snapshot…**
 
-#### WS.0.3 Open PowerShell as Administrator
+##### WS.0.3 Open PowerShell as Administrator
 - [ ] Done
 
 **Start** → type `powershell` → **Run as administrator**. The title must say **Administrator**.
 
-#### WS.0.4 Open the Scoring Report
+##### WS.0.4 Open the Scoring Report
 - [ ] Done
 
 Double-click it on the desktop and refresh it as you work.
 
 ---
 
-### WS.1. Forensics questions (FIRST)
+#### WS.1. Forensics questions (FIRST)
 
-#### WS.1.1 Answer every forensics question before fixing things
+##### WS.1.1 Answer every forensics question before fixing things
 - [ ] Done
 
 Open each `Forensics Question N.txt` on the desktop, put your answer after `ANSWER:`, and save.
@@ -815,7 +909,7 @@ Get-ChildItem C:\Users -Recurse -File -Force -Include *.txt,*.csv,*.log,*.ps1,*.
 ```
 More: [Forensics questions guide](../General/All/forensics-questions.md).
 
-#### WS.1.2 Manual security baseline (no hardening script)
+##### WS.1.2 Manual security baseline (no hardening script)
 - [ ] Done
 
 **What:** Prepare a manual baseline. The upstream automation is not included in this repository.
@@ -838,9 +932,9 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 
 ---
 
-### WS.2. Users and groups
+#### WS.2. Users and groups
 
-#### WS.2.1 List every user
+##### WS.2.1 List every user
 - [ ] Done
 
 **Clicking:** **Win + R** → `lusrmgr.msc` → **Users**. (Or **Settings → Accounts → Other users**.)
@@ -850,7 +944,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, LastLogon
 ```
 
-#### WS.2.2 Delete users who are not in the README
+##### WS.2.2 Delete users who are not in the README
 - [ ] Done
 
 **Why it matters:** Extra accounts are how attackers get back in.
@@ -865,7 +959,7 @@ Remove-LocalUser -Name mallory
 > [!CAUTION]
 > Don't delete the built-in accounts (**Administrator, Guest, DefaultAccount, WDAGUtilityAccount**): *disable* them instead (2.6). Never delete yourself or anyone on the README.
 
-#### WS.2.3 Create users the README says should exist
+##### WS.2.3 Create users the README says should exist
 - [ ] Done
 
 **Clicking:** `lusrmgr.msc` → **Users** → **Action → New User…** → untick "User must change password" only if the README says so.
@@ -876,7 +970,7 @@ New-LocalUser -Name erin -Password (Read-Host -AsSecureString "Password for erin
 Add-LocalGroupMember -Group Users -Member erin
 ```
 
-#### WS.2.4 Fix the Administrators group
+##### WS.2.4 Fix the Administrators group
 - [ ] Done
 
 **What:** Only the README's admins should be in **Administrators**.
@@ -894,7 +988,7 @@ net localgroup Administrators      # use this if Get-LocalGroupMember shows an e
 > [!CAUTION]
 > Never remove **yourself** (the account you are logged in as) from Administrators. You would lose your admin rights.
 
-#### WS.2.5 Check the other powerful groups
+##### WS.2.5 Check the other powerful groups
 - [ ] Done
 
 Open these groups in `lusrmgr.msc` and remove anyone the README doesn't say should be there:
@@ -905,7 +999,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
   "--- $g"; Get-LocalGroupMember $g -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name }
 ```
 
-#### WS.2.6 Disable the Guest account (and the other built-ins)
+##### WS.2.6 Disable the Guest account (and the other built-ins)
 - [ ] Done
 
 **Clicking:** `lusrmgr.msc` → **Users** → right-click **Guest** → **Properties** → tick **Account is disabled**.
@@ -917,7 +1011,7 @@ Get-LocalUser | Where-Object { $_.SID -match '-50[0134]$' } | Format-Table Name,
 ```
 The built-in **Administrator** should usually be disabled too, **unless you're logged in as it** or the README says to keep it.
 
-#### WS.2.7 Fix weak password settings on accounts
+##### WS.2.7 Fix weak password settings on accounts
 - [ ] Done
 
 **What:** No account should have **Password never expires**, **User cannot change password**, or *no password required*.
@@ -932,7 +1026,7 @@ Set-LocalUser -Name bob -UserMayChangePassword $true
 net user bob /passwordreq:yes
 ```
 
-#### WS.2.8 Give users strong passwords
+##### WS.2.8 Give users strong passwords
 - [ ] Done
 
 **Clicking:** `lusrmgr.msc` → right-click the user → **Set Password…**
@@ -945,11 +1039,11 @@ Use 12+ characters with upper case, lower case, a number and a symbol. **Don't c
 
 ---
 
-### WS.3. Account policies (passwords and lockout)
+#### WS.3. Account policies (passwords and lockout)
 
 **Clicking:** **Win + R** → `secpol.msc` → **Account Policies**.
 
-#### WS.3.1 Password Policy
+##### WS.3.1 Password Policy
 - [ ] Done
 
 | Setting | Set to |
@@ -976,7 +1070,7 @@ secedit /export /cfg $env:TEMP\check.inf /areas SECURITYPOLICY; Select-String 'P
 
 **Check it worked:** `net accounts` shows the numbers, and the last line above shows `PasswordComplexity = 1` and `ClearTextPassword = 0`.
 
-#### WS.3.2 Account Lockout Policy
+##### WS.3.2 Account Lockout Policy
 - [ ] Done
 
 | Setting | Set to |
@@ -996,9 +1090,9 @@ net accounts                     # check everything
 
 ---
 
-### WS.4. Local policies
+#### WS.4. Local policies
 
-#### WS.4.1 Audit Policy (record security events)
+##### WS.4.1 Audit Policy (record security events)
 - [ ] Done
 
 **Why:** Without auditing there's no record of logins, account changes, or policy changes.
@@ -1012,7 +1106,7 @@ auditpol /get /category:*
 ```
 Also: **Security Options → Audit: Force audit policy subcategory settings… to override audit policy category settings → Enabled**.
 
-#### WS.4.2 User Rights Assignment
+##### WS.4.2 User Rights Assignment
 - [ ] Done
 
 **Clicking:** `secpol.msc` → **Local Policies → User Rights Assignment**. Double-click a right to see who has it.
@@ -1051,7 +1145,7 @@ Accounts show as SIDs: `*S-1-1-0` = Everyone, `*S-1-5-32-545` = Users, `*S-1-5-3
 > Look carefully at the **Deny** rights. A planted "Deny log on locally: **Users**" locks every normal user out.
 > Don't remove **LOCAL SERVICE**, **NETWORK SERVICE**, **SERVICE** or entries that start with `NT SERVICE\`: Windows needs them.
 
-#### WS.4.3 Security Options
+##### WS.4.3 Security Options
 - [ ] Done
 
 **Clicking:** `secpol.msc` → **Local Policies → Security Options**.
@@ -1101,7 +1195,7 @@ Wanted: `1`, `1`, `1`, `1`, `5`. A blank means the setting was never changed fro
 Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0 | Format-List NTLMMinClientSec, NTLMMinServerSec   # both 537395200 = the two NTLM rows ticked
 ```
 
-#### WS.4.4 PowerShell logging
+##### WS.4.4 PowerShell logging
 - [ ] Done
 
 **What:** Windows records every PowerShell script and command that runs.
@@ -1119,9 +1213,9 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 
 ---
 
-### WS.5. Microsoft Defender antivirus
+#### WS.5. Microsoft Defender antivirus
 
-#### WS.5.1 Turn every protection on
+##### WS.5.1 Turn every protection on
 - [ ] Done
 
 **Clicking:** **Start → Windows Security → Virus & threat protection → Manage settings**. Turn **on**: Real-time protection, Cloud-delivered protection, Automatic sample submission, **Tamper Protection**.
@@ -1133,7 +1227,7 @@ Set-MpPreference -DisableRealtimeMonitoring $false -PUAProtection Enabled -MAPSR
 ```
 **Check it worked:** `RealTimeProtectionEnabled` and `IsTamperProtected` say `True`.
 
-#### WS.5.2 Remove planted exclusions
+##### WS.5.2 Remove planted exclusions
 - [ ] Done
 
 **Why:** Attackers tell Defender to ignore their folder.
@@ -1146,7 +1240,7 @@ Get-MpPreference | Format-List ExclusionPath, ExclusionExtension, ExclusionProce
 Remove-MpPreference -ExclusionPath "C:\Users\Public\tools"
 ```
 
-#### WS.5.3 No policy that turns Defender off
+##### WS.5.3 No policy that turns Defender off
 - [ ] Done
 
 **Clicking:** **Win + R** → `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Microsoft Defender Antivirus** → **Turn off Microsoft Defender Antivirus** must be **Not configured** (or Disabled). Check **Real-time Protection** in the same place.
@@ -1157,7 +1251,7 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -ErrorActi
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection' -ErrorAction SilentlyContinue     # any Disable value of 1 is bad
 ```
 
-#### WS.5.4 Update and scan
+##### WS.5.4 Update and scan
 - [ ] Done
 
 ```powershell
@@ -1168,9 +1262,9 @@ Get-MpThreatDetection           # anything found
 
 ---
 
-### WS.6. Firewall
+#### WS.6. Firewall
 
-#### WS.6.1 Firewall on for every network type
+##### WS.6.1 Firewall on for every network type
 - [ ] Done
 
 **Clicking:** **Windows Security → Firewall & network protection**. **Domain**, **Private** and **Public** must all say *Firewall is on*.
@@ -1183,7 +1277,7 @@ Get-NetFirewallProfile | Format-Table Name, Enabled, DefaultInboundAction, Defau
 
 **Check it worked:** every profile shows `Enabled True`, `DefaultInboundAction Block`, and `DefaultOutboundAction` **Allow** or **NotConfigured**. **Block** there stops updates and can stop the Scoring Report updating; set it back with the first command unless the README asks for it.
 
-#### WS.6.2 Check the inbound rules
+##### WS.6.2 Check the inbound rules
 - [ ] Done
 
 **Clicking:** **Win + R** → `wf.msc` → **Inbound Rules**. Sort by **Enabled**. Look for **allow** rules for strange programs (in `C:\Users\`, `C:\Temp`), strange ports (4444, 1337), or rules called something like "Windows Update Helper" that point at an odd program.
@@ -1197,14 +1291,14 @@ Disable-NetFirewallRule -DisplayName "Evil Rule"
 
 ---
 
-### WS.7. Windows Update
+#### WS.7. Windows Update
 
-#### WS.7.1 Install all updates
+##### WS.7.1 Install all updates
 - [ ] Done
 
 **Clicking:** **Settings → Windows Update → Check for updates** → install everything. If updates are **paused**, click **Resume updates**.
 
-#### WS.7.2 Automatic updates on
+##### WS.7.2 Automatic updates on
 - [ ] Done
 
 **Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows Update** (on Windows 11 it is inside **Manage end user experience**; look there if you don't see it) → **Configure Automatic Updates** → **Enabled**, option **4 – Auto download and schedule the install**.
@@ -1220,14 +1314,14 @@ Set-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -N
 Set-Service wuauserv -StartupType Manual
 ```
 
-#### WS.7.3 Update the other programs
+##### WS.7.3 Update the other programs
 - [ ] Done
 
 Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About Google Chrome**), and anything the README lists (e.g. Notepad++, 7-Zip, VLC). Old versions are a scored problem.
 
 ---
 
-### WS.8. Services
+#### WS.8. Services
 
 **Clicking:** **Win + R** → `services.msc`. To turn a service off: double-click it → **Startup type: Disabled** → **Stop** → **OK**.
 
@@ -1237,7 +1331,7 @@ Stop-Service -Name RemoteRegistry
 Set-Service -Name RemoteRegistry -StartupType Disabled
 ```
 
-#### WS.8.1 Turn off risky services (unless the README needs them)
+##### WS.8.1 Turn off risky services (unless the README needs them)
 - [ ] Done
 
 | Service (name) | Usually |
@@ -1264,7 +1358,7 @@ Set-Service -Name RemoteRegistry -StartupType Disabled
 > [!CAUTION]
 > Never disable a service the README lists as critical, and leave services you don't recognise alone until you have looked them up. Disabling the wrong one (e.g. RPC, DCOM, Windows Event Log) can break the computer.
 
-##### WS.8.1.1 Remote Registry
+###### WS.8.1.1 Remote Registry
 
 - [ ] Done
 
@@ -1324,7 +1418,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Remote administrators may depend on this; do not alter RPC. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.2 Telnet
+###### WS.8.1.2 Telnet
 
 - [ ] Done
 
@@ -1384,7 +1478,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Telnet Client is a separate optional feature. A missing TlntSvr is normal on modern Windows. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.3 SNMP and SNMP Trap
+###### WS.8.1.3 SNMP and SNMP Trap
 
 - [ ] Done
 
@@ -1444,7 +1538,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Retained SNMP needs restricted managers, firewall sources and nondefault community strings; traps and polling have different dependencies. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.4 SSDP Discovery
+###### WS.8.1.4 SSDP Discovery
 
 - [ ] Done
 
@@ -1504,7 +1598,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Media and device discovery may stop; inspect DependentServices first. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.5 UPnP Device Host
+###### WS.8.1.5 UPnP Device Host
 
 - [ ] Done
 
@@ -1564,7 +1658,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** UPnP-dependent applications can fail; do not disable unrelated networking services. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.6 FTP
+###### WS.8.1.6 FTP
 
 - [ ] Done
 
@@ -1624,7 +1718,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** FTP authentication, TLS certificates and passive data ports must remain usable; see the Server FTP procedure. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.7 World Wide Web Publishing
+###### WS.8.1.7 World Wide Web Publishing
 
 - [ ] Done
 
@@ -1684,7 +1778,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Inspect IIS bindings and application pools; do not mistake an intentionally installed website for malware. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.8 Remote Desktop Services
+###### WS.8.1.8 Remote Desktop Services
 
 - [ ] Done
 
@@ -1744,7 +1838,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Never stop it from your only RDP connection. Use the VM console and test NLA and authorized users. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.9 Routing and Remote Access
+###### WS.8.1.9 Routing and Remote Access
 
 - [ ] Done
 
@@ -1804,7 +1898,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Record routes and VPN requirements first; disabling can disconnect entire subnets. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.10 Internet Connection Sharing
+###### WS.8.1.10 Internet Connection Sharing
 
 - [ ] Done
 
@@ -1864,7 +1958,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Inspect VM networking dependencies; never disable the Windows Firewall service mpssvc in its place. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.11 Print Spooler
+###### WS.8.1.11 Print Spooler
 
 - [ ] Done
 
@@ -1924,7 +2018,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Printing and some PDF workflows may stop. Keep required print-server roles; follow section 8.3. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.12 Xbox services
+###### WS.8.1.12 Xbox services
 
 - [ ] Done
 
@@ -1984,7 +2078,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Some builds omit these services. Do not use a wildcard to disable unrelated services. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.13 Simple TCP/IP Services
+###### WS.8.1.13 Simple TCP/IP Services
 
 - [ ] Done
 
@@ -2044,7 +2138,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** The optional component may be absent. Removing it and disabling it are separate changes. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.14 WebClient
+###### WS.8.1.14 WebClient
 
 - [ ] Done
 
@@ -2104,7 +2198,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Mapped WebDAV drives and document workflows may fail; normal SMB shares are a different protocol. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.15 Windows Media Player Network Sharing
+###### WS.8.1.15 Windows Media Player Network Sharing
 
 - [ ] Done
 
@@ -2164,7 +2258,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Local playback and network sharing are different functions; do not remove required media files. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.16 OpenSSH SSH Server
+###### WS.8.1.16 OpenSSH SSH Server
 
 - [ ] Done
 
@@ -2224,7 +2318,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Back up C:\ProgramData\ssh\sshd_config, run sshd.exe -t if available, and test a second authorized connection before closing the first. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.17 WinRM
+###### WS.8.1.17 WinRM
 
 - [ ] Done
 
@@ -2284,7 +2378,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **Warnings and troubleshooting:** Server Manager often depends on WinRM. Check winrm get winrm/config/service; Basic and AllowUnencrypted should normally be false. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
-##### WS.8.1.18 Remote-control applications
+###### WS.8.1.18 Remote-control applications
 
 - [ ] Done
 
@@ -2315,7 +2409,7 @@ Set-Service -Name AnyDesk -StartupType Disabled
 
 **Warnings:** Names and paths are clues, not proof. Do not run `sc.exe delete` as a substitute for an application uninstaller or remove a tool supporting your only access path.
 
-#### WS.8.2 Make sure the security services are running
+##### WS.8.2 Make sure the security services are running
 - [ ] Done
 
 Windows Defender (`WinDefend`), Windows Defender Firewall (`mpssvc`), Windows Event Log (`EventLog`), Windows Update (`wuauserv`, Manual is fine), Security Center (`wscsvc`, not on Windows Server). None of these may be **Disabled**.
@@ -2324,7 +2418,7 @@ Windows Defender (`WinDefend`), Windows Defender Firewall (`mpssvc`), Windows Ev
 Get-Service WinDefend, mpssvc, EventLog, wuauserv, wscsvc -ErrorAction SilentlyContinue | Format-Table Name, Status, StartType   # on Windows Server, wscsvc is simply missing from the list
 ```
 
-#### WS.8.3 Printer drivers: PrintNightmare fixes
+##### WS.8.3 Printer drivers: PrintNightmare fixes
 - [ ] Done
 
 **What:** Only administrators may install printer drivers, and "Point and Print" must always show a warning and ask for an admin password.
@@ -2349,9 +2443,9 @@ New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWo
 
 ---
 
-### WS.9. Windows features
+#### WS.9. Windows features
 
-#### WS.9.1 Turn off old, insecure features
+##### WS.9.1 Turn off old, insecure features
 - [ ] Done
 
 **Clicking:** **Win + R** → `optionalfeatures` → **untick**:
@@ -2375,7 +2469,7 @@ An error saying a feature is unknown just means it isn't on this version (PowerS
 
 **Check it worked:** `Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol` says `False`, and the features above are not in the Enabled list.
 
-#### WS.9.2 Optional features (OpenSSH Server, SNMP)
+##### WS.9.2 Optional features (OpenSSH Server, SNMP)
 - [ ] Done
 
 **What:** Some extras are "optional features" instead of Windows features: **OpenSSH Server** and **SNMP** are the risky ones.
@@ -2391,9 +2485,9 @@ Remove-WindowsCapability -Online -Name SNMP.Client~~~~0.0.1.0       # skip if th
 
 ---
 
-### WS.10. Remote access
+#### WS.10. Remote access
 
-#### WS.10.1 Remote Assistance off
+##### WS.10.1 Remote Assistance off
 - [ ] Done
 
 **Clicking:** **Win + R** → `SystemPropertiesRemote` → untick **Allow Remote Assistance connections to this computer**.
@@ -2403,7 +2497,7 @@ Remove-WindowsCapability -Online -Name SNMP.Client~~~~0.0.1.0       # skip if th
 Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance' | Select-Object fAllowToGetHelp   # 0 = off
 ```
 
-#### WS.10.2 Remote Desktop off (or secured)
+##### WS.10.2 Remote Desktop off (or secured)
 - [ ] Done
 
 > [!CAUTION]
@@ -2428,9 +2522,9 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStat
 
 ---
 
-### WS.11. Shared folders
+#### WS.11. Shared folders
 
-#### WS.11.1 Remove shares that aren't needed
+##### WS.11.1 Remove shares that aren't needed
 - [ ] Done
 
 **Clicking:** **Win + R** → `fsmgmt.msc` → **Shares**. Right-click a share → **Stop Sharing**.
@@ -2447,9 +2541,9 @@ Revoke-SmbShareAccess -Name Public -AccountName Everyone -Force   # take Everyon
 
 ---
 
-### WS.12. Prohibited software
+#### WS.12. Prohibited software
 
-#### WS.12.1 Uninstall hacking tools, games, torrent and remote-control programs
+##### WS.12.1 Uninstall hacking tools, games, torrent and remote-control programs
 - [ ] Done
 
 **Clicking:** **Settings → Apps → Installed apps** (or **Win + R → appwiz.cpl**). Sort by name and read the **whole** list.
@@ -2466,7 +2560,7 @@ Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HK
   Where-Object DisplayName | Sort-Object DisplayName | Format-Table DisplayName, DisplayVersion, Publisher
 ```
 
-#### WS.12.2 Store apps and games
+##### WS.12.2 Store apps and games
 - [ ] Done
 
 ```powershell
@@ -2474,7 +2568,7 @@ Get-AppxPackage -AllUsers | Where-Object Name -match 'Solitaire|CandyCrush|Minec
 Get-AppxPackage -AllUsers *Solitaire* | Remove-AppxPackage -AllUsers
 ```
 
-#### WS.12.3 "Portable" tools that aren't installed
+##### WS.12.3 "Portable" tools that aren't installed
 - [ ] Done
 
 Hacking tools are often just an `.exe` sitting in a folder: look in **Downloads**, **Desktop**, `C:\Users\Public`, `C:\Temp`, and `C:\` itself.
@@ -2484,14 +2578,14 @@ Get-ChildItem C:\Users, C:\Temp -Recurse -Force -Include nc.exe,ncat.exe,nmap.ex
 
 ---
 
-### WS.13. Prohibited files
+#### WS.13. Prohibited files
 
-#### WS.13.1 Show hidden files first
+##### WS.13.1 Show hidden files first
 - [ ] Done
 
 **File Explorer → View → Show → Hidden items** (Windows 10: **View → Hidden items**). Also tick **File name extensions**.
 
-#### WS.13.2 Find media files
+##### WS.13.2 Find media files
 - [ ] Done
 
 ```powershell
@@ -2501,7 +2595,7 @@ Remove-Item "C:\Users\bob\Music\song.mp3"
 ```
 Also look in other folders on `C:\` that aren't part of Windows (e.g. `C:\Media`, `C:\Share`), and **empty the Recycle Bin** when forensics is done.
 
-#### WS.13.3 Password lists and other data
+##### WS.13.3 Password lists and other data
 - [ ] Done
 
 ```powershell
@@ -2510,9 +2604,9 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 
 ---
 
-### WS.14. Backdoors and malware
+#### WS.14. Backdoors and malware
 
-#### WS.14.1 Programs that start at logon
+##### WS.14.1 Programs that start at logon
 - [ ] Done
 
 **Clicking:** **Task Manager (Ctrl+Shift+Esc) → Startup apps**. Also open these folders with **Win + R**: `shell:startup` and `shell:common startup`.
@@ -2525,7 +2619,7 @@ Remove-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Run -N
 ```
 Red flags: `powershell -enc` followed by a long string, `-WindowStyle Hidden`, `nc.exe`, `mshta`, `.vbs`/`.bat`/`.ps1` files, anything in `C:\Users\Public` or `Temp`.
 
-#### WS.14.2 Scheduled tasks
+##### WS.14.2 Scheduled tasks
 - [ ] Done
 
 **Clicking:** **Win + R** → `taskschd.msc` → **Task Scheduler Library**. Check each task's **Actions** tab. Non-Microsoft tasks are usually in the top folder.
@@ -2537,7 +2631,7 @@ Get-ScheduledTask | Where-Object TaskPath -notlike '\Microsoft\*' |
 Unregister-ScheduledTask -TaskName "BadTask" -Confirm:$false
 ```
 
-#### WS.14.3 Services that run strange programs
+##### WS.14.3 Services that run strange programs
 - [ ] Done
 
 ```powershell
@@ -2546,7 +2640,7 @@ Stop-Service -Name BadService -Force; Set-Service -Name BadService -StartupType 
 sc.exe delete BadService            # only for a service you are sure is malware. Type sc.exe: in PowerShell, sc means something else
 ```
 
-#### WS.14.4 Sticky Keys / Utility Manager backdoor
+##### WS.14.4 Sticky Keys / Utility Manager backdoor
 - [ ] Done
 
 **Why:** Replacing `sethc.exe` (press Shift 5 times) or `utilman.exe` (the accessibility button) with `cmd.exe` gives anyone a SYSTEM command prompt **at the login screen**.
@@ -2558,7 +2652,7 @@ foreach ($f in 'sethc','utilman','osk','Magnify','Narrator') { "$f -> " + (Get-I
 ```
 **Fix:** delete the `Debugger` value. If the file itself was replaced, run `sfc /scanfile=C:\Windows\System32\sethc.exe`.
 
-#### WS.14.5 The hosts file
+##### WS.14.5 The hosts file
 - [ ] Done
 
 ```powershell
@@ -2566,7 +2660,7 @@ notepad C:\Windows\System32\drivers\etc\hosts
 ```
 Comments, localhost entries and README-required internal host mappings can all be legitimate. Back up the file, then remove only confirmed unauthorized overrides; verify name resolution afterwards.
 
-#### WS.14.6 Programs listening for connections
+##### WS.14.6 Programs listening for connections
 - [ ] Done
 
 ```powershell
@@ -2576,9 +2670,9 @@ Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess, @{n
 
 ---
 
-### WS.15. Other settings
+#### WS.15. Other settings
 
-#### WS.15.1 User Account Control
+##### WS.15.1 User Account Control
 - [ ] Done
 
 **Start** → type **Change User Account Control settings** → move the slider to the **top** (**Always notify**).
@@ -2589,19 +2683,19 @@ Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
 ```
 Wanted: `1`, `2`, `1`. If `EnableLUA` was `0`, UAC only comes back after a restart.
 
-#### WS.15.2 AutoPlay off
+##### WS.15.2 AutoPlay off
 - [ ] Done
 
 **Settings → Bluetooth & devices → AutoPlay** (Windows 10: **Devices → AutoPlay**) → **Use AutoPlay for all media and devices: Off**.
 
 **Policy:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → AutoPlay Policies → Turn off Autoplay** → **Enabled**, **All drives**.
 
-#### WS.15.3 Screen saver with password
+##### WS.15.3 Screen saver with password
 - [ ] Done
 
 **Settings → Personalization → Lock screen → Screen saver** → pick one, **Wait: 10 minutes**, tick **On resume, display logon screen**.
 
-#### WS.15.4 Turn off LLMNR
+##### WS.15.4 Turn off LLMNR
 - [ ] Done
 
 `gpedit.msc` → **Computer Configuration → Administrative Templates → Network → DNS Client → Turn off multicast name resolution → Enabled**.
@@ -2611,7 +2705,7 @@ Wanted: `1`, `2`, `1`. If `EnableLUA` was `0`, UAC only comes back after a resta
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Select-Object EnableMulticast   # must be 0
 ```
 
-#### WS.15.5 SmartScreen on
+##### WS.15.5 SmartScreen on
 - [ ] Done
 
 **Windows Security → App & browser control → Reputation-based protection settings** → turn everything **on**.
@@ -2619,7 +2713,7 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 > [!WARNING]
 > **Do not turn on BitLocker** on a practice image. Without the recovery key you can lock yourself out of the whole VM.
 
-#### WS.15.6 WDigest off (no plain-text passwords in memory)
+##### WS.15.6 WDigest off (no plain-text passwords in memory)
 - [ ] Done
 
 **Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
@@ -2632,7 +2726,7 @@ Set-ItemProperty $k -Name UseLogonCredential -Value 0 -Type DWord
 Get-ItemProperty $k | Select-Object UseLogonCredential   # must be 0
 ```
 
-#### WS.15.7 NetBIOS over TCP/IP off
+##### WS.15.7 NetBIOS over TCP/IP off
 - [ ] Done
 
 **Why it matters:** Like LLMNR (15.4), attackers answer NetBIOS name lookups to steal password hashes.
@@ -2646,14 +2740,14 @@ Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled=TRUE" | Sel
 
 ---
 
-### WS.16. Web browsers
+#### WS.16. Web browsers
 
-#### WS.16.1 Microsoft Edge
+##### WS.16.1 Microsoft Edge
 - [ ] Done
 
 **⋯ → Settings → Privacy, search, and services** → **Microsoft Defender SmartScreen: On**, **Block potentially unwanted apps: On**. **Cookies and site permissions → Pop-ups and redirects → Block**. **⋯ → Settings → Profiles → Passwords → Offer to save passwords: Off**. Update via **⋯ → Help and feedback → About Microsoft Edge**.
 
-#### WS.16.2 Firefox (if installed)
+##### WS.16.2 Firefox (if installed)
 - [ ] Done
 
 **≡ → Settings → Privacy & Security**:
@@ -2665,20 +2759,20 @@ Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled=TRUE" | Sel
 
 Then **≡ → Help → About Firefox** to update. Also check **Add-ons and themes** for extensions you don't recognise.
 
-#### WS.16.3 Chrome (if installed)
+##### WS.16.3 Chrome (if installed)
 - [ ] Done
 
 **⋮ → Settings → Privacy and security → Security → Standard (or Enhanced) protection**. **Site settings → Pop-ups and redirects → Don't allow**. **Autofill and passwords → Google Password Manager → Settings → Offer to save passwords: Off**. Update via **Help → About Google Chrome**.
 
 ---
 
-### WS.17. Critical services
+#### WS.17. Critical services
 
 If the README says this computer runs a website, FTP or file shares, harden them instead of removing them. See the IIS/FTP sections of the [Windows Server checklist](windows-server.md#9-critical-server-roles-only-if-the-readme-lists-them). They work the same on Windows 10/11.
 
 ---
 
-### WS.18. Final checks
+#### WS.18. Final checks
 
 - [ ] Critical services still running (`services.msc`)
 - [ ] You can still log in and open an admin PowerShell
@@ -2687,9 +2781,9 @@ If the README says this computer runs a website, FTP or file shares, harden them
 - [ ] Final snapshot
 - [ ] Reboot **once** at the end only if updates or Windows features (9.1) need it, then check the Scoring Report again
 
-### WS.19. Manual verification, recovery and missing investigation steps
+#### WS.19. Manual verification, recovery and missing investigation steps
 
-#### WS.19.1 Record a recoverable Windows baseline
+##### WS.19.1 Record a recoverable Windows baseline
 
 - [ ] Done
 
@@ -2750,7 +2844,7 @@ auditpol /restore /file:C:\CP-Backups\audit-before.csv
 
 **Warnings:** Domain policy can override local changes. Password resets cannot recover the previous password and may make EFS files or stored credentials inaccessible. Preserve evidence before resets.
 
-#### WS.19.2 Apply account and privileged-group table entries safely
+##### WS.19.2 Apply account and privileged-group table entries safely
 
 - [ ] Done
 
@@ -2790,7 +2884,7 @@ Remove-LocalGroupMember -Group 'Backup Operators' -Member mallory
 
 **Warnings:** Do not disable every built-in account without checking its purpose. `PasswordExpires` from `Get-LocalUser` is a date or empty value, not simply a true/false policy flag. Service identities may have managed password behavior.
 
-#### WS.19.3 Work through password, rights and security-option tables
+##### WS.19.3 Work through password, rights and security-option tables
 
 - [ ] Done
 
@@ -2836,7 +2930,7 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 
 **Warnings:** The tables are workstation starting points, not universal server baselines. Preserve service SIDs and required operators. Mandatory signing, NTLM restrictions, cached-logon settings and anonymous-access restrictions require client compatibility checks. Do not add your own admin account to a deny right.
 
-#### WS.19.4 Audit selectively and investigate Windows events
+##### WS.19.4 Audit selectively and investigate Windows events
 
 - [ ] Done
 
@@ -2871,7 +2965,7 @@ Use `auditpol /list /subcategory:*` to find localized names. Process creation ev
 
 **Warnings:** Timestamp display follows local time. Correlate with timezone and system clock before inferring event order.
 
-#### WS.19.5 Firewall rule inspection and required ports
+##### WS.19.5 Firewall rule inspection and required ports
 
 - [ ] Done
 
@@ -2917,7 +3011,7 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 
 **Warnings:** Group Policy rules can override local behavior. Avoid broad `Any` source/port exceptions and disabling the whole firewall to troubleshoot one service.
 
-#### WS.19.6 Defender, updates and application health
+##### WS.19.6 Defender, updates and application health
 
 - [ ] Done
 
@@ -2959,7 +3053,7 @@ Use the GUI to install offered OS updates and trusted vendor updates; do not ins
 
 **Warnings:** Tamper Protection or organizational policy may reject PowerShell edits. Do not weaken those controls to force a setting. Updates can require more than one restart; do not interrupt an in-progress update to follow a rigid one-reboot rule.
 
-#### WS.19.7 SMB share permissions and NTFS permissions
+##### WS.19.7 SMB share permissions and NTFS permissions
 
 - [ ] Done
 
@@ -2996,7 +3090,7 @@ Then use the Security GUI to grant the matching folder read access and remove on
 
 **Warnings:** Share permissions do not protect local file access. Removing Everyone without providing the required replacement can break a legitimate share.
 
-#### WS.19.8 Scheduled tasks, startup, registry and suspicious executables
+##### WS.19.8 Scheduled tasks, startup, registry and suspicious executables
 
 - [ ] Done
 
@@ -3045,7 +3139,7 @@ Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' 
 
 **Warnings:** Stop at evidence collection if a forensic question remains unresolved. `sc.exe delete`, `Unregister-ScheduledTask` and `Remove-Item` are destructive; use them only after positive identification and recovery planning. Preserve suspicious scripts as text, never execute decoded payloads.
 
-#### WS.19.9 Final troubleshooting decision path
+##### WS.19.9 Final troubleshooting decision path
 
 - [ ] Done
 
@@ -3080,18 +3174,18 @@ Replace the DNS target with the README-required internal hostname; internet DNS 
 
 ---
 
-### WS.20. Complete PowerShell basics — included in this Windows checklist
+#### WS.20. Complete PowerShell basics — included in this Windows checklist
 
-#### WS.20.0 PowerShell command and terminal primer
+##### WS.20.0 PowerShell command and terminal primer
 
 **PowerShell** is Windows' command window. You can do most CyberPatriot fixes by clicking, but PowerShell is much faster for checking things, like listing every user or every service at once.
 
-### Open it as Administrator (important!)
+#### Open it as Administrator (important!)
 1. Click **Start** and type `powershell`.
 2. Click **Run as administrator** and say **Yes**.
 3. The title bar should say **Administrator: Windows PowerShell**. Without that, most fixes fail with "Access denied".
 
-### How a command looks
+#### How a command looks
 ```powershell
 Get-LocalUser
 ```
@@ -3102,7 +3196,7 @@ Disable-LocalUser -Name "Guest"
 ```
 `-Name "Guest"` is a **parameter**: it tells the command what to work on.
 
-### Keys that save time
+#### Keys that save time
 | Key | What it does |
 |---|---|
 | **Tab** | Auto-complete commands, parameters and file names. Press again to cycle. |
@@ -3111,7 +3205,7 @@ Disable-LocalUser -Name "Guest"
 | Right-click | Paste (in the classic console). |
 | `cls` | Clear the screen. |
 
-### Commands you'll actually use
+#### Commands you'll actually use
 | Command | What it does |
 |---|---|
 | `Get-LocalUser` | List users (Enabled = True/False) |
@@ -3131,14 +3225,14 @@ Disable-LocalUser -Name "Guest"
 | `Get-FileHash .\file.txt -Algorithm SHA256` | Hash a file (forensics) |
 | `Get-Help Get-LocalUser -Examples` | Examples for any command |
 
-### The `|` (pipe)
+#### The `|` (pipe)
 `|` sends the output of one command into the next:
 ```powershell
 Get-Service | Where-Object Status -eq Running | Sort-Object DisplayName
 ```
 Read it as: get services → keep the running ones → sort them by name.
 
-### Useful "run" shortcuts (Win + R)
+#### Useful "run" shortcuts (Win + R)
 Press **Windows key + R**, type one of these, press Enter:
 
 | Type | Opens |
@@ -3157,12 +3251,12 @@ Press **Windows key + R**, type one of these, press Enter:
 | `regedit` | Registry Editor (be careful!) |
 | `SystemPropertiesRemote` | Remote Desktop / Remote Assistance settings |
 
-### Safety tips
+#### Safety tips
 - PowerShell does what you ask **immediately**. There's no undo for `Remove-` commands.
 - Before changing the registry, export the key: in regedit, right-click the key → **Export**.
 - If you're not sure what a command does, add `-WhatIf` to see what *would* happen: `Remove-LocalUser -Name bob -WhatIf`
 
-### Practice objects, paths and reversible changes
+#### Practice objects, paths and reversible changes
 
 - [ ] Done
 
@@ -3226,7 +3320,7 @@ Expected: `original value`. This file restore does not model account/password re
 
 ---
 
-### WS.21. Advanced Windows investigations — included in this checklist
+#### WS.21. Advanced Windows investigations — included in this checklist
 
 
 
@@ -3234,7 +3328,7 @@ Expected: `original value`. This file restore does not model account/password re
 
 This supplement draws topic ideas from public CyberPatriot checklists and verifies key methods with Microsoft documentation. A generic checklist cannot tell you which accounts, shares, or services are authorized on *your* image.
 
-#### WS.21.1 Find the setting that actually applies (GPO versus local policy)
+##### WS.21.1 Find the setting that actually applies (GPO versus local policy)
 
 - [ ] Reviewed effective configuration and policy source.
 
@@ -3262,7 +3356,7 @@ Start-Process "$env:TEMP\cp-rsop.html"
 
 **Recovery:** Revert the *specific* policy change at its actual policy source. Keep an export/screenshot of the original setting. Changing a domain GPO can affect many machines.
 
-#### WS.21.2 Correlate suspicious services with their executable files
+##### WS.21.2 Correlate suspicious services with their executable files
 
 - [ ] Compared service names, binary paths, and required roles.
 
@@ -3299,7 +3393,7 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Path\To\Suspect.exe' |
 
 **Recovery:** If a change is authorized, document the original \`StartMode\`, stop/disabling only that confirmed unwanted service using the existing checklist, and recheck required applications and the score. Never delete the executable before recording relevant forensic answers.
 
-#### WS.21.3 Investigate events: service installation, login attempts and process creation
+##### WS.21.3 Investigate events: service installation, login attempts and process creation
 
 - [ ] Checked available logs without clearing them.
 
@@ -3343,7 +3437,7 @@ auditpol /get /category:*
 
 **Recovery:** If auditing was intentionally changed, restore only its original documented configuration; **never clear logs** to “clean” the machine.
 
-#### WS.21.4 Inspect persistence without executing unknown files
+##### WS.21.4 Inspect persistence without executing unknown files
 
 - [ ] Reviewed login-start items and task actions.
 
@@ -3375,7 +3469,7 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 
 **Recovery:** For a confirmed unauthorized task, prefer **Disable** before **Delete** (after preserving evidence). Record the original trigger and action; test whether required applications still work.
 
-#### WS.21.5 SMB share + NTFS access: check both layers
+##### WS.21.5 SMB share + NTFS access: check both layers
 
 - [ ] Checked authorized shares and effective paths.
 
@@ -3400,7 +3494,7 @@ Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
 
 **Recovery:** Save both ACL layers before changing. Reverse only the particular group entry or share configuration changed; never recursively reset \`C:\Windows\` permissions.
 
-#### WS.21.6 Firewall rules that look open—but aren't applicable
+##### WS.21.6 Firewall rules that look open—but aren't applicable
 
 - [ ] Checked effective profiles, rules, ports, and service ownership.
 
@@ -3429,7 +3523,7 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 
 **Verification:** From an authorized client, test required application connectivity after any **narrow** firewall change. Avoid blanket removal of inbound rules.
 
-#### WS.21.7 Final verification checklist
+##### WS.21.7 Final verification checklist
 
 - [ ] Read and preserved forensic questions.
 - [ ] Confirmed whether the machine is standalone, domain-joined or a Domain Controller.
@@ -3439,11 +3533,23 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 - [ ] Confirmed required shares, services and firewall connectivity remain operational.
 - [ ] Recorded any modification, verification result and rollback information.
 
-#### WS.21.8 Sources and further reading
+##### WS.21.8 Sources and further reading
 
 - [Microsoft: gpresult and Resultant Set of Policy](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/gpresult)
 - [Microsoft: Advanced Audit Policy Configuration](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/advanced-audit-policy-configuration)
 - [Microsoft: Event 4688 (process creation)](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688)
 - [Microsoft: Event 4697 (service installation)](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4697)
 - Topic cross-checks: [chessischess CyberPatriot checklists](https://github.com/chessischess/cyberpatriot-checklist), [Minagera Windows checklist](https://github.com/Minagera/CyberPatriot/blob/main/CyberPatriot/Checklists/Windows/README.md).
+
+## Part 6 — Final Verification
+
+Retest authorized domain/local login, critical role transactions, management access and scoring status.
+
+### 11. Final checks
+
+- [ ] Every critical role still works (e.g. `nslookup corp.local` with your domain name for DNS, open the website for IIS)
+- [ ] On a DC: `dcdiag /q` prints no errors (no output = good)
+- [ ] Scoring Report shows **no penalties**
+- [ ] Forensics answers saved
+- [ ] Final snapshot
 

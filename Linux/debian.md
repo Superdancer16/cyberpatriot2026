@@ -18,44 +18,52 @@
 - Shell commands displayed under `bash` belong in a terminal; file directives under `text` belong **in the appropriate file**, not the shell.
 - For root, sudo, PAM, SSH, firewall and service edits: keep **working console/recovery access** and back up the exact file you will edit. Use unique backup filenames; do not overwrite yesterday's backup.
 
-## Contents
+## How to navigate the new order
 
-0. [Preflight, operating system and administrator access](#0-before-you-touch-anything)
-1. [Forensics questions and evidence preservation](#1-forensics-questions-first)
-2. [Authorized users, groups and root](#2-users-and-groups)
-3. [Password, PAM and account lockout](#3-password-and-lockout-policy)
-4. [Debian host firewall: nftables/UFW](#4-firewall)
-5. [Signed APT sources, updates and browser packages](#5-updates)
-6. [Services and listening sockets](#6-services)
-7. [Prohibited software, files and suspicious utilities](#7-prohibited-software-and-files)
-8. [Desktop, GDM, autologin and screen locking](#8-login-screen-and-screen-lock)
-9. [SSH configuration and authorized keys](#9-ssh-server)
-10. [Kernel and network sysctl](#10-kernel-and-network-settings)
-11. [File permissions, SUID/SGID and ACLs](#11-file-permissions)
-12. [Sudoers and privilege policy](#12-sudo-rules)
-13. [Persistence, malware and suspicious connections](#13-backdoors-and-malware)
-14. [System logs and auditing](#14-logging-and-auditing)
-15. [AppArmor](#15-apparmor)
-16. [Required services: Apache, Nginx, PHP, databases, FTP, Samba, DNS, DHCP and mail](#16-critical-services-complete-manual-procedures)
-17. [Browsers and application updates](#17-web-browser-and-applications)
-18. [Advanced procedures and recovery](#18-advanced-manual-verification-and-recovery)
-19. [Final verification](#19-final-checklist)
+**Basics → First things → Commonly assessed security tasks → Services and persistence → Advanced reference → Final verification.** Original numbered procedure names are retained inside the new phases so existing anchors still identify the topic.
 
 ---
 
-## 0. Before you touch anything
 
-### 0.1 Read the README, record initial state and preserve recovery
+**Prioritization reflects recurring topics in public checklists, not published per-fix score values.** The competition README, required accounts/services and evidence-preservation rules take precedence. Inspect first; change only what is allowed; verify and record rollback.
+
+## Part 1 — Basics / Information Needed
+
+### Understand Debian before hardening
+
+- [ ] Know that Debian **13 trixie is stable**, Debian **12 bookworm receives LTS security support until June 2028** for eligible packages/architectures, and Debian 11 regular LTS ended August 2026. Never replace the installed release mid-round without explicit instructions.
+- [ ] Know **root/sudo, APT/dpkg, PAM, systemd, SSH, nftables/UFW, AppArmor, journald/rsyslog**.
+- [ ] Recognize a missing sudo or UFW package, GNOME desktop, or auth.log as *potentially normal* for a Debian installation.
+- [ ] Keep a working root or authorized sudo session before account, PAM, firewall or SSH changes.
+
+**Typing (check):**
+
+~~~bash
+cat /etc/os-release
+id
+command -v sudo
+systemctl status display-manager --no-pager
+~~~
+
+Read the full terminal primer in the advanced reference if needed. [Debian support statement](https://www.debian.org/News/2026/20260712) and [Debian 11 EOL](https://www.debian.org/News/2026/20260831).
+
+## Part 2 — First Things to Do
+
+Read README, secure your administrative recovery, answer forensics before removing anything, and take an authorized snapshot only if allowed.
+
+### 0. Before you touch anything
+
+#### 0.1 Read the README, record initial state and preserve recovery
 - [ ] Done
 
 See [Reading the README](../General/All/reading-the-readme.md). In VMware: **VM → Snapshot → Take Snapshot**.
 
-### 0.2 Open a terminal
+#### 0.2 Open a terminal
 - [ ] Done
 
 GNOME: press the **Super (Windows) key**, type `terminal`, press Enter.
 
-### 0.3 Become an administrator: `sudo` or `su -`
+#### 0.3 Become an administrator: `sudo` or `su -`
 - [ ] Done
 
 ```bash
@@ -80,7 +88,7 @@ They must **log out and back in** before `sudo` works for them.
 
 ---
 
-### 0.4 Verify installed release, desktop and essential tools
+#### 0.4 Verify installed release, desktop and essential tools
 - [ ] Done
 
 **Typing (check):**
@@ -101,9 +109,11 @@ systemctl status display-manager --no-pager
 
 **Recovery:** Keep the root/administrative session open and test a second authorized login before disabling or locking accounts.
 
-## 1. Forensics questions (FIRST)
+---
 
-### 1.1 Answer them before changing anything
+### 1. Forensics questions (FIRST)
+
+#### 1.1 Answer them before changing anything
 - [ ] Done
 
 Debian forensics uses local commands; check whether logs exist before assuming a missing file means no activity.
@@ -118,7 +128,7 @@ Without `sudo` (or root), `journalctl` shows only **your own** messages, so a lo
 
 `/var/log/auth.log` only exists if `rsyslog` is installed (Debian 11 has it; Debian 12 doesn't until you install it in step 10.1, and then it only has new events).
 
-### 1.2 Manual audit (no hardening scripts)
+#### 1.2 Manual audit (no hardening scripts)
 - [ ] Done
 
 **What:** Prepare a manual baseline. The upstream automation is not included in this repository.
@@ -141,7 +151,7 @@ Without `sudo` (or root), `journalctl` shows only **your own** messages, so a lo
 
 ---
 
-### 1.3 Investigate questions without changing evidence
+#### 1.3 Investigate questions without changing evidence
 - [ ] Done
 
 **What:** Open each forensic question file, copy the exact question and answer format, note required name/path/hash/encoding, and locate evidence **before cleaning or patching**.
@@ -175,9 +185,13 @@ printf '%s' 'aGVsbG8=' | base64 --decode
 
 **Warnings:** Avoid recursive wide searches over `/proc`/`/sys`, avoid opening suspicious executables, and never purge packages/delete users/clear logs before relevant questions are answered. If evidence is found, write down the finding and exact path before changing anything.
 
-## 2. Users and groups
+## Part 3 — Commonly Assessed High-Priority Checks
 
-### 2.1 See every user on the computer
+Review identities/sudo, password policy, firewall and updates before the longer service-specific material.
+
+### 2. Users and groups
+
+#### 2.1 See every user on the computer
 - [ ] Done
 
 **What:** Get the list of real (human) users and compare it with the README.
@@ -190,7 +204,7 @@ awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd
 ```
 This prints every user with a user ID (UID) of 1000 or more, which means the real people.
 
-### 2.2 Delete users who are not in the README
+#### 2.2 Delete users who are not in the README
 - [ ] Done
 
 **What:** Remove each account that isn't listed as an authorized admin or user.
@@ -209,7 +223,7 @@ sudo userdel mallory          # delete the account (keeps /home/mallory for now)
 > [!CAUTION]
 > Check the spelling against the README **three times**. Deleting an authorized user is a penalty. Never delete yourself, `root`, or system accounts (UID below 1000 like `www-data`, `syslog`, `messagebus`).
 
-### 2.3 Create users the README says should exist
+#### 2.3 Create users the README says should exist
 - [ ] Done
 
 **Clicking:** In GNOME, **Settings → Users → Unlock**; other desktops may have a different account utility..
@@ -219,7 +233,7 @@ sudo userdel mallory          # delete the account (keeps /home/mallory for now)
 sudo adduser erin             # asks for a password and details
 ```
 
-### 2.4 Fix who is an administrator
+#### 2.4 Fix who is an administrator
 - [ ] Done
 
 **What:** Only the README's admins should be in the `sudo` group (that's what "Administrator" means on Mint).
@@ -236,7 +250,7 @@ getent group adm                        # 'adm' can read logs - normally admins 
 
 **Check it worked:** `getent group sudo` lists only the README admins.
 
-### 2.5 Look for hidden root accounts and hidden users
+#### 2.5 Look for hidden root accounts and hidden users
 - [ ] Done
 
 **What:** Find accounts with UID 0 (secret root copies), and accounts with a low UID that can still log in.
@@ -256,7 +270,7 @@ sudo usermod --expiredate 1970-01-02 toor       # only after confirming this acc
 sudo usermod -s /usr/sbin/nologin mallory       # stop a hidden user from logging in
 ```
 
-### 2.6 Check other powerful groups
+#### 2.6 Check other powerful groups
 - [ ] Done
 
 **Typing:**
@@ -268,7 +282,7 @@ for g in root shadow disk lxd docker sambashare; do getent group $g; done
 sudo gpasswd -d carol shadow
 ```
 
-### 2.7 Give users strong passwords
+#### 2.7 Give users strong passwords
 - [ ] Done
 
 **What:** Change every authorized user's password (except your own, unless the README says so) to something strong.
@@ -286,7 +300,7 @@ Use a strong unique password matching the README policy; do not record real cred
 > [!WARNING]
 > **Don't change your own password** unless the README asks. If you do, you must remember it, because the screen lock and `sudo` will ask for it.
 
-### 2.8 Debian root account: verify recovery **before** changing it
+#### 2.8 Debian root account: verify recovery **before** changing it
 - [ ] Done
 
 Unlike Mint/Ubuntu, Debian may use a working root password installed intentionally. Inspect root state and required SSH restrictions without assuming a password-bearing root is automatically wrong:
@@ -299,7 +313,7 @@ sudo /usr/sbin/sshd -T 2>/dev/null | grep permitrootlogin
 
 If `sudo` isn't available, run these from `su -` and omit sudo. **Do not execute `passwd -l root`** unless the README/policy explicitly requires it, a separate authorized admin login works, and VM console/recovery access is available. Locking the root password also affects `su -`.
 
-### 2.9 Accounts with no password
+#### 2.9 Accounts with no password
 - [ ] Done
 
 **What:** Find accounts that have **no password at all**, so anyone can log in as them by just pressing Enter.
@@ -317,7 +331,7 @@ sudo passwd -l mallory                             # account that shouldn't log 
 
 ---
 
-### 2.10 Account inventory, privileged groups and safe verification
+#### 2.10 Account inventory, privileged groups and safe verification
 - [ ] Done
 
 **Typing (check):**
@@ -336,9 +350,11 @@ sudo passwd -S -a
 
 **Undo:** Restore only the exact old group membership/account state from your notes; check login and sudo again.
 
-## 3. Password and lockout policy
+---
 
-### 3.1 Password aging defaults for **new** accounts
+### 3. Password and lockout policy
+
+#### 3.1 Password aging defaults for **new** accounts
 - [ ] Done
 
 **What:** Record the README-required password age/history/warning policy, then edit the `PASS_MAX_DAYS`, `PASS_MIN_DAYS`, and `PASS_WARN_AGE` defaults in `/etc/login.defs` **only if the scoring scenario requires it**.
@@ -367,7 +383,7 @@ PASS_WARN_AGE  14
 
 **Check/undo:** Repeat grep and `chage`; to restore, copy back the recorded `login.defs` backup. The defaults do not automatically change existing users.
 
-### 3.2 Apply aging to the users who already exist
+#### 3.2 Apply aging to the users who already exist
 - [ ] Done
 
 **Why:** `login.defs` only affects **new** users.
@@ -378,7 +394,7 @@ sudo chage -M 90 -m 1 -W 14 exampleuser
 sudo chage -l bob            # check: "Maximum number of days" = 90
 ```
 
-### 3.3 Password complexity (pwquality)
+#### 3.3 Password complexity (pwquality)
 - [ ] Done
 
 **What:** Make Linux reject weak passwords when someone changes theirs.
@@ -409,12 +425,12 @@ grep pwquality /etc/pam.d/common-password
 ```
 It should look like: `password requisite pam_pwquality.so retry=3 ...`. You can add the same options to the end of that line (`minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1`).
 
-### 3.4 Password history (no re-using old passwords)
+#### 3.4 Password history (no re-using old passwords)
 - [ ] Done
 
 Use the supported `pam_pwhistory` procedure in [17.2](#172-password-aging-pam-and-lockout-without-breaking-login). Do not copy an old `pam_unix remember=` line across releases or append a duplicate module. Preserve the current PAM stack and test with an ordinary user before closing the recovery console.
 
-### 3.5 No logins with an empty password
+#### 3.5 No logins with an empty password
 - [ ] Done
 
 **What:** Remove the word `nullok` from `/etc/pam.d/common-auth`.
@@ -429,7 +445,7 @@ grep nullok /etc/pam.d/common-auth
 
 **Check it worked:** `grep -c nullok /etc/pam.d/common-auth` prints `0`.
 
-### 3.6 Account lockout after failed logins (careful!)
+#### 3.6 Account lockout after failed logins (careful!)
 - [ ] Done
 
 **What:** Limit repeated invalid authentication attempts using a module supported by the installed release.
@@ -440,7 +456,7 @@ Use [17.2's complete PAM backup, module discovery, lockout verification and reco
 
 ---
 
-### 3.7 Debian PAM safe modification protocol and account-lockout checks
+#### 3.7 Debian PAM safe modification protocol and account-lockout checks
 - [ ] Done
 
 **Before you modify PAM:** Have a confirmed root console or recovery method. Back up the **specific files** and inspect which modules are installed; do not paste a full PAM stack from a Mint or Ubuntu version into Debian.
@@ -468,9 +484,11 @@ sudo pam-auth-update
 
 **Undo:** Restore the specific backed-up PAM files using the retained root/recovery console and retest. Do not disable all PAM checks as a generic repair.
 
-## 4. Firewall
+---
 
-### 4.1 Inspect existing firewall; install and enable UFW only when appropriate
+### 4. Firewall
+
+#### 4.1 Inspect existing firewall; install and enable UFW only when appropriate
 - [ ] Done
 
 **Why:** Debian does not guarantee a particular firewall front end or default firewall state. The image may have no active host firewall, but it may already use native nftables or another manager. First inspect the actual active nftables/UFW/firewalld policy. The UFW commands below apply only if UFW is the chosen manager; do not enable a competing policy blindly. Establish required source/port exceptions before enabling default deny.
@@ -494,7 +512,7 @@ Prefer clicking? `sudo apt install gufw`, then open **Firewall Configuration**.
 
 ---
 
-### 4.2 Define rules by required service, **not** by a universal port list
+#### 4.2 Define rules by required service, **not** by a universal port list
 - [ ] Done
 
 | Required service | Typical network port(s) | Debian firewall considerations |
@@ -528,7 +546,7 @@ sudo ufw allow 443/tcp
 
 **Undo:** List numbered rules again before any `sudo ufw delete NUMBER`, and restore precisely the removed entry. Do not flush `nft` rules or reset UFW to solve one port conflict.
 
-### 4.3 Native nftables policy and fail-safe edit
+#### 4.3 Native nftables policy and fail-safe edit
 - [ ] Done
 
 Debian may manage nftables natively. **Before editing** a rule set, read `systemctl status nftables` and `sudo nft list ruleset`; do **not** enable UFW in parallel with another active policy manager without understanding ownership.
@@ -546,9 +564,11 @@ sudo nft -c -f /etc/nftables.conf
 
 An unsuccessful syntax check means **stop**. If remotely connected, use a permitted out-of-band console or a documented timed rollback plan to avoid being locked out. Verify required connections after approved reload. Do not run `nft flush ruleset` as a standard hardening step.
 
-## 5. Updates
+---
 
-### 5.1 Check the software sources
+### 5. Updates
+
+#### 5.1 Check the software sources
 - [ ] Done
 
 ```bash
@@ -561,7 +581,7 @@ For Debian 12 will normally use **`deb.debian.org/debian`** with **`bookworm`** 
 - Unrecognized third-party repos and `[trusted=yes]`/`Trusted: yes` bypasses warrant investigation; do not remove required signed vendor sources before verifying them.
 - A **`deb cdrom:`** line makes `apt update` fail or ask for the install disc. Put a `#` in front of it (`sudo nano /etc/apt/sources.list`).
 
-### 5.2 Install all updates
+#### 5.2 Install all updates
 - [ ] Done
 
 ```bash
@@ -571,7 +591,7 @@ sudo apt upgrade  # review the proposed changes before confirming
 ```
 (GNOME's **Software** app also shows updates.)
 
-### 5.3 Turn on automatic updates
+#### 5.3 Turn on automatic updates
 - [ ] Done
 
 ```bash
@@ -581,7 +601,7 @@ cat /etc/apt/apt.conf.d/20auto-upgrades
 ```
 **Check it worked:** the file has `APT::Periodic::Update-Package-Lists "1";` and `APT::Periodic::Unattended-Upgrade "1";` (inspect other APT periodic directives too).
 
-### 5.4 Held packages
+#### 5.4 Held packages
 - [ ] Done
 
 ```bash
@@ -589,7 +609,7 @@ apt-mark showhold              # anything listed will never update
 sudo apt-mark unhold firefox-esr        # change firefox-esr to each name the line above printed
 ```
 
-### 5.5 Update Firefox ESR and the README's apps
+#### 5.5 Update Firefox ESR and the README's apps
 - [ ] Done
 
 **What:** On Debian, Firefox is the package **`firefox-esr`** (there is no `firefox` package, so `apt install firefox` fails). Thunderbird, LibreOffice and the README's critical services also update through `apt`. Step 5.2 updates them all; if you skipped it or it failed, update the important ones on their own:
@@ -601,7 +621,7 @@ sudo apt install --only-upgrade firefox-esr thunderbird      # skips any that ar
 
 ---
 
-### 5.6 Debian 11/12/13 repository suites, deb822 files and safe update sequence
+#### 5.6 Debian 11/12/13 repository suites, deb822 files and safe update sequence
 - [ ] Done
 
 **Release table (November 2026):**
@@ -633,9 +653,63 @@ apt -s upgrade
 
 **Recovery:** Restore only the edited sources list or `.sources` file from backup, rerun `apt update`, then separately assess any packages already upgraded. A sources file rollback alone does not downgrade packages. Never remove dpkg lock files while an actual apt/dpkg process is operating.
 
-## 6. Services
+### Research expansion: signed APT sources and Debian LTS package coverage
 
-### 6.1 See what's running and listening
+- [ ] Verify security support for the installed release **and individual required packages**.
+
+~~~bash
+cat /etc/os-release
+apt-cache policy
+apt-mark showhold
+sudo dpkg --audit
+sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Components:|Signed-By:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+~~~
+
+Debian 12/13 sources can be **deb822 .sources** files. Never mix Ubuntu or Mint repositories into Debian, add Trusted: yes to bypass signatures, or change the codename to trixie just because it is stable.
+
+**Optional read-only LTS check (only if tool is installed):**
+
+~~~bash
+command -v check-support-status
+check-support-status
+~~~
+
+The tool comes from the Debian package **debian-security-support**. If absent, investigate availability via signed APT sources only when permitted. Bookworm LTS does not guarantee that every possible installed package has support. **Do not remove a README-required package because a generic security checklist flags it.** Confirm actual advisory and functionality.
+
+**Verification/undo:** Recheck apt sources/policies and normal application function. Restoring sources files does not downgrade packages already upgraded; avoid a release-wide upgrade during a scored round.
+
+### Research expansion: early account, service and persistence inventory
+
+**Typing (read-only):**
+
+~~~bash
+getent passwd
+getent group sudo
+awk -F: '$3 == 0 {print $1, $3, $7}' /etc/passwd
+sudo visudo -c
+~~~
+
+Compare real UID 0 and sudoers privileges against the README, preserving service identities. For services:
+
+~~~bash
+systemctl list-units --type=service --state=running
+sudo ss -lntup
+systemctl list-timers --all
+sudo crontab -l
+sudo journalctl -p warning -n 50 --no-pager
+~~~
+
+A service may start through a timer/socket even if its unit is disabled. Native nftables may be the firewall owner rather than UFW. Record suspicious process/path/hash and evidence before disabling or deleting anything.
+
+**Verification:** A new authorized user login, working sudo, required SSH/web/database/share client tests, correct firewall rules, and current score. Restore only the last proven breaking change.
+
+## Part 4 — Services, Software, Desktop and Persistence
+
+Check required services and suspicious programs, login configuration, SSH, filesystem privileges, sudo, timers, auditing and AppArmor.
+
+### 6. Services
+
+#### 6.1 See what's running and listening
 - [ ] Done
 
 **Typing:**
@@ -644,7 +718,7 @@ systemctl list-units --type=service --state=running
 sudo ss -tulpn             # programs listening on network ports
 ```
 
-### 6.2 Turn off services the README doesn't need
+#### 6.2 Turn off services the README doesn't need
 - [ ] Done
 
 **Typing:**
@@ -674,7 +748,7 @@ sudo apt purge vsftpd                      # remove it completely (if the README
 > [!CAUTION]
 > **Never** turn off a service the README lists as critical. Disabling a critical service is a penalty on almost every image.
 
-### 6.3 Make sure the critical services are running
+#### 6.3 Make sure the critical services are running
 - [ ] Done
 
 ```bash
@@ -684,7 +758,7 @@ sudo systemctl enable --now ssh  # start it if it isn't
 
 ---
 
-### 6.4 Discover installed units and required dependencies
+#### 6.4 Discover installed units and required dependencies
 - [ ] Done
 
 **Typing (check):**
@@ -714,9 +788,11 @@ sudo systemctl disable --now example.service
 
 **Verify/undo:** Repeat status, listener inventory and required-client tests. To undo, restore the **recorded previous** enabled/running state, not blindly `enable --now` for every service. Do not purge the package until forensic evidence and installed dependencies are assessed.
 
-## 7. Prohibited software and files
+---
 
-### 7.1 Investigate prohibited software before uninstalling
+### 7. Prohibited software and files
+
+#### 7.1 Investigate prohibited software before uninstalling
 - [ ] Done
 
 **Typing (check):**
@@ -741,7 +817,7 @@ sudo apt purge example-package
 
 **Verification:** `dpkg-query -W example-package`, the relevant command's path, normal service connectivity, and the score. **Undo:** Reinstall the verified original package/version from signed repositories if required; purging can also remove its configuration, so restore configuration backups as necessary.
 
-### 7.2 Games
+#### 7.2 Games
 - [ ] Done
 
 ```bash
@@ -749,7 +825,7 @@ dpkg -l | grep -Ei 'aisleriot|gnome-mines|gnome-sudoku|mahjongg|minetest|supertu
 # Review installed package and dependencies first; do not mass-purge: sudo apt purge aisleriot gnome-mines
 ```
 
-### 7.3 File-sharing and remote-access programs
+#### 7.3 File-sharing and remote-access programs
 - [ ] Done
 
 ```bash
@@ -760,7 +836,7 @@ snap list 2>/dev/null          # Mint has no snap unless someone added it
 > [!NOTE]
 > Mint installs **Transmission** (a torrent program) by default. Remove it unless the README needs it: `# Review installed package and dependencies first; do not mass-purge: sudo apt purge transmission-gtk transmission-common`
 
-### 7.4 Media files (music and video)
+#### 7.4 Media files (music and video)
 - [ ] Done
 
 **Typing:**
@@ -772,7 +848,7 @@ sudo rm "/home/bob/Music/song.mp3"
 > [!WARNING]
 > Check the forensics questions first. A question might ask about one of these files.
 
-### 7.5 Other files that break policy
+#### 7.5 Other files that break policy
 - [ ] Done
 
 Password lists, credit card or social security number files, packet captures (`.pcap`), and hacking scripts:
@@ -783,7 +859,7 @@ sudo ls -la /home/*/ /tmp /var/tmp /opt     # look for anything odd, including h
 
 ---
 
-### 7.6 Debian-specific prohibited software review and forensic preservation
+#### 7.6 Debian-specific prohibited software review and forensic preservation
 - [ ] Done
 
 **Check installed GNOME games** (some are bundled in desktop metapackages; removing the metapackage can have unexpected effects):
@@ -808,9 +884,11 @@ sha256sum /path/to/suspicious-file
 
 **Warnings:** Screenshots, forensics evidence, user-required media and authorized program files may match these patterns. Do not run wildcard `rm`, indiscriminately purge packages, or remove the desktop metapackage simply because a game appeared in the listing.
 
-## 8. Login screen and screen lock
+---
 
-### 8.1 No automatic login (GDM)
+### 8. Login screen and screen lock
+
+#### 8.1 No automatic login (GDM)
 - [ ] Done
 
 **Clicking:** **Settings → Users** → **Unlock** → turn off **Automatic Login** for every user.
@@ -826,7 +904,7 @@ TimedLoginEnable=false
 ```
 In `[security]`: `DisallowTCP=true`.
 
-### 8.2 Screen lock
+#### 8.2 Screen lock
 - [ ] Done
 
 **Clicking:** **Settings → Privacy → Screen** (Debian 11: **Privacy → Screen Lock**): **Blank Screen Delay: 5 minutes**, **Automatic Screen Lock: On**, **Automatic Screen Lock Delay: Screen Turns Off**.
@@ -837,7 +915,7 @@ gsettings get org.gnome.desktop.screensaver lock-enabled     # true
 gsettings get org.gnome.desktop.session idle-delay           # uint32 300
 ```
 
-### 8.3 Hide the list of users on the login screen
+#### 8.3 Hide the list of users on the login screen
 - [ ] Done
 
 **What:** Make the GDM login screen ask for a user name instead of showing every account.
@@ -858,7 +936,7 @@ Or by hand: `sudo nano /etc/gdm3/greeter.dconf-defaults`, find `[org/gnome/login
 
 ---
 
-### 8.4 Other Debian desktop environments and remote-desktop tools
+#### 8.4 Other Debian desktop environments and remote-desktop tools
 - [ ] Done
 
 **Typing (check):**
@@ -875,13 +953,15 @@ GNOME generally uses GDM and GNOME `gsettings`; KDE often uses SDDM, Xfce may us
 
 **Check/undo:** From the signed-in desktop account, record `gsettings get` values before changing the corresponding key. Test **screen lock/unlock in a second authorized session** where possible. Do not restart GDM/lightdm to test while unsaved forensic work exists.
 
-## 9. SSH server (only if installed)
+---
+
+### 9. SSH server (only if installed)
 
 ```bash
 dpkg -l openssh-server       # "ii" at the start = installed
 ```
 
-### 9.1 SSH not required? Investigate before disabling
+#### 9.1 SSH not required? Investigate before disabling
 - [ ] Done
 
 ```bash
@@ -893,7 +973,7 @@ sudo ss -lntp
 
 If SSH is confirmed unnecessary by README and no remote session depends on it, record the original unit/socket state, then disable precisely the applicable service/socket. **Do not purge SSH or change the listening port to force a scoring increase.**
 
-### 9.2 Needed? Make it safe.
+#### 9.2 Needed? Make it safe.
 - [ ] Done
 
 ```bash
@@ -928,7 +1008,7 @@ If `sshd -t` says **Missing privilege separation directory: /run/sshd**, SSH is 
 > [!WARNING]
 > Leave `PasswordAuthentication yes` unless the README says otherwise. First prove that each required user has a working permitted authentication method in a separate connection; otherwise disabling passwords can lock them out.
 
-### 9.3 Check for override files
+#### 9.3 Check for override files
 - [ ] Done
 
 Files in `/etc/ssh/sshd_config.d/` are read **first**, and for SSH the first value wins, so they override everything above:
@@ -937,7 +1017,7 @@ grep -r . /etc/ssh/sshd_config.d/ 2>/dev/null
 sudo sshd -T | grep -Ei 'permitrootlogin|permitemptypasswords|passwordauthentication'   # the settings actually in use
 ```
 
-### 9.4 Planted SSH keys
+#### 9.4 Planted SSH keys
 - [ ] Done
 
 ```bash
@@ -947,7 +1027,7 @@ Record key fingerprints and compare them with the README and known administrator
 
 ---
 
-### 9.5 Debian SSH effective configuration, Match rules and safe reload
+#### 9.5 Debian SSH effective configuration, Match rules and safe reload
 - [ ] Done
 
 **Check without changing:**
@@ -964,9 +1044,369 @@ sudo /usr/sbin/sshd -T | grep -Ei '^(port|permitrootlogin|passwordauthentication
 
 **Undo:** Restore the edited config from its actual backup using local console and reload SSH. Check ssh.socket if present; Debian's unit behavior depends on release and package configuration.
 
-## 10. Kernel and network settings
+---
 
-### 10.1 Turn on network and memory protections
+### 11. File permissions and ownership
+
+#### 11.1 Password files
+- [ ] Done
+
+```bash
+ls -l /etc/passwd /etc/shadow /etc/group /etc/gshadow
+sudo chmod 644 /etc/passwd /etc/group
+sudo chmod 640 /etc/shadow /etc/gshadow
+sudo chown root:shadow /etc/shadow /etc/gshadow
+```
+
+**Check it worked:** run the `ls -l` line again: `passwd` and `group` show `-rw-r--r-- root root`, `shadow` and `gshadow` show `-rw-r----- root shadow`.
+
+#### 11.2 SUID programs (run as root for anyone)
+- [ ] Done
+
+**Why:** If `find`, `vim`, `bash` or `python3` has the SUID bit, any user can become root with one command.
+
+```bash
+sudo find / -xdev -perm -4000 -type f 2>/dev/null
+sudo chmod u-s /usr/bin/find
+```
+Normal SUID programs include `passwd`, `sudo`, `su`, `mount`, `umount`, `chsh`, `chfn`, `gpasswd`, `newgrp`, `pkexec`, `fusermount3` and `ssh-keysign`. Look up anything else.
+
+#### 11.3 Files anyone can change
+- [ ] Done
+
+```bash
+sudo find / -xdev -type f -perm -0002 ! -path '/proc/*' ! -path '/sys/*' 2>/dev/null
+sudo chmod o-w /path/to/file
+```
+
+**Check it worked:** the `find` line prints nothing (files inside `/tmp` are OK).
+
+#### 11.4 Home folders
+- [ ] Done
+
+```bash
+ls -ld /home/*
+sudo chmod 750 /home/bob        # other users can't look inside
+```
+
+**Check it worked:** in `ls -ld /home/*` every folder ends in `---`, e.g. `drwxr-x--- bob bob`. Each folder should also belong to its own user (`sudo chown bob: /home/bob` fixes one that doesn't).
+
+---
+
+#### 11.5 System account files, capabilities and ACL review
+- [ ] Done
+
+**Typing (check):**
+
+```bash
+stat -c '%A %a %U:%G %n' /etc/passwd /etc/group /etc/shadow /etc/gshadow
+sudo find /usr/bin /usr/sbin /usr/local/bin -xdev -type f -perm /4000 -ls 2>/dev/null
+sudo find /home /tmp /var/tmp -xdev -type f -perm /0002 -ls 2>/dev/null
+command -v getcap && sudo getcap -r /usr/bin /usr/sbin 2>/dev/null
+```
+
+Files such as `/etc/shadow` should be unreadable by ordinary users, but **exact ownership and group/mode vary by Debian configuration**. `SUID` and `world-writable` entries require investigation; don't remove every SUID bit automatically or recursively change ownership of `/usr`, `/var`, home directories or web roots.
+
+**Check/undo:** Determine package ownership with `dpkg -S /path`, inspect `getfacl` if installed, and record `stat` before any narrow change. Restore specific owner/mode if the service/login breaks.
+
+---
+
+### 12. Sudo rules
+
+#### 12.1 Check /etc/sudoers and /etc/sudoers.d/
+- [ ] Done
+
+**Typing:**
+```bash
+sudo cat /etc/sudoers
+sudo ls -la /etc/sudoers.d/ && sudo cat /etc/sudoers.d/*
+```
+Look for:
+- `NOPASSWD`: sudo without a password. Remove it.
+- Lines giving a **normal user** `ALL=(ALL) ALL`.
+- `Defaults !authenticate`. Remove it.
+
+**Edit only with visudo** (it checks for mistakes before saving):
+```bash
+sudo visudo                          # main file
+sudo visudo -f /etc/sudoers.d/90-bob # a file in sudoers.d
+```
+
+> [!CAUTION]
+> A typo in sudoers can break `sudo` for everyone. That's why you **always** use `visudo`.
+
+---
+
+#### 12.2 Safe sudoers modification and syntax verification
+- [ ] Done
+
+```bash
+sudo visudo -c
+sudo grep -RnsE 'NOPASSWD|ALL=|%sudo|%admin' /etc/sudoers /etc/sudoers.d 2>/dev/null
+```
+
+To edit one include file, use `sudo visudo -f /etc/sudoers.d/ACTUAL-FILE` after recording a backup and checking the authorized admin list. `visudo` validates syntax on save; repeat `sudo visudo -c` and test in a second login.
+
+**Recovery:** Use retained root shell or VM console to restore the specific file if sudo fails. Do not grant passwordless `ALL` to a student simply to make commands work.
+
+---
+
+### 13. Backdoors and malware
+
+#### 13.1 Scheduled jobs (cron)
+- [ ] Done
+
+```bash
+sudo ls -la /var/spool/cron/crontabs/                  # one file per user
+for u in $(cut -d: -f1 /etc/passwd); do sudo crontab -l -u $u 2>/dev/null | grep -v '^#' | sed "s/^/$u: /"; done
+cat /etc/crontab; ls -la /etc/cron.d /etc/cron.hourly /etc/cron.daily
+sudo atq 2>/dev/null                                   # one-off "at" jobs (remove one: sudo atrm 3)
+systemctl list-timers --all                            # systemd timers: another kind of scheduled job
+```
+Red flags: `nc`, `ncat`, `bash -i`, `/dev/tcp/`, `curl ... | bash`, `wget`, `base64 -d`, `python -c`, files in `/tmp`.
+
+**Fix:** `sudo crontab -e -u bob` (delete the line), or `sudo rm /etc/cron.d/badfile`.
+
+#### 13.2 Services that start a backdoor at boot
+- [ ] Done
+
+```bash
+systemctl list-unit-files --type=service --state=enabled
+ls -la /etc/systemd/system/ | grep -v '\.wants'
+```
+For any unit you don't recognise: `systemctl cat name.service` shows what it runs. Remove a bad one:
+```bash
+sudo systemctl disable --now evil.service && sudo rm /etc/systemd/system/evil.service && sudo systemctl daemon-reload
+```
+
+#### 13.3 Programs listening for connections
+- [ ] Done
+
+```bash
+sudo ss -tulpn
+```
+`nc`, `ncat`, `socat`, `python`, `perl` or `bash` listening on a port is almost always a backdoor. Note the PID, stop it (`sudo kill -9 PID`), **then find what starts it** (13.1, 13.2, 13.4).
+
+#### 13.4 Start-up files and fake commands
+- [ ] Done
+
+```bash
+cat /etc/rc.local 2>/dev/null
+ls /etc/profile.d/
+grep -n 'alias' /home/*/.bashrc /root/.bashrc /etc/bash.bashrc
+```
+Watch for aliases that hijack commands, e.g. `alias sudo='...'` or `alias ls='...'`. Also check `/usr/local/bin` for programs named like system commands (a fake `ls` or `sudo`).
+
+#### 13.5 The hosts file
+- [ ] Done
+
+```bash
+cat /etc/hosts
+```
+Localhost, hostname and README-required internal mappings can all be legitimate. Back up `/etc/hosts`, compare each mapping with the scenario, and comment only confirmed unauthorized overrides using `sudo nano /etc/hosts`. Test the actual required hostname afterwards; an unfamiliar address alone is not proof of an attacker.
+
+**Check it worked:** `grep -v '^#' /etc/hosts` shows only the normal lines.
+
+#### 13.6 Hidden root-kit tricks
+- [ ] Done
+
+```bash
+cat /etc/ld.so.preload 2>/dev/null          # should not exist or be empty
+grep -n 'pam_permit' /etc/pam.d/common-auth # "auth sufficient pam_permit.so" = anyone can log in
+```
+
+#### 13.7 Programs that start when someone logs in
+- [ ] Done
+
+**Clicking:** **Menu → Preferences → Startup Applications**.
+
+**Typing:** `ls /etc/xdg/autostart/ /home/*/.config/autostart/`
+
+#### 13.8 Tampered system programs
+- [ ] Done
+
+```bash
+sudo dpkg --verify | grep -v ' c '           # takes a minute or two; lines with a 5 = changed file
+```
+Fix by reinstalling the package that owns it: `dpkg -S /usr/bin/ls`, then `sudo apt install --reinstall coreutils`.
+
+#### 13.9 Malware scanners (optional, slow)
+- [ ] Done
+
+```bash
+sudo apt install clamav rkhunter chkrootkit
+sudo systemctl stop clamav-freshclam      # the updater service blocks a manual update while it runs
+sudo freshclam                            # download the newest virus list
+sudo systemctl start clamav-freshclam
+sudo clamscan -ri /home                   # -r = every subfolder, -i = list only infected files
+sudo rkhunter --check --sk                # --sk = don't stop for Enter after each part
+sudo chkrootkit | grep INFECTED           # nothing printed = nothing found
+```
+These tools only **report**. Look at each file they name (forensics first!) before you delete it. Warnings from `rkhunter` and `chkrootkit` are often false alarms (for example `Linux.Xor.DDoS` for a harmless script in `/tmp`); `sudo less /var/log/rkhunter.log` shows the details.
+
+---
+
+#### 13.10 Correlate cron, systemd, login hooks and suspicious binaries
+- [ ] Done
+
+**Typing (check):**
+
+```bash
+sudo cat /etc/crontab
+sudo ls -la /etc/cron.d /etc/cron.daily /etc/cron.hourly
+sudo crontab -l
+systemctl list-timers --all
+systemctl list-unit-files --type=service --state=enabled
+sudo ss -lntup
+```
+
+For one **identified** service:
+
+```bash
+systemctl cat example.service
+systemctl show example.service -p FragmentPath -p ExecStart -p User
+sudo journalctl -u example.service -n 80 --no-pager
+```
+
+**Interpret:** Unknown scheduled commands, user-writable executable paths, recently created unit files and unexpected network listeners deserve investigation, but package timers and update services can be legitimate. Preserve exact tasks/configuration first; do not run suspicious jobs or `systemctl enable` them as a test.
+
+**Check/undo:** After an authorized narrow disable, verify the original critical service still functions, inspect logs and refresh score. Restore only that specific original timer/service if later found required.
+
+---
+
+### 14. Logging and auditing
+
+#### 14.1 System logs and the audit daemon
+- [ ] Done
+
+```bash
+sudo apt install auditd rsyslog
+sudo systemctl enable --now auditd rsyslog
+```
+Add audit rules that record changes to the password files:
+```bash
+echo '-w /etc/passwd -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/sudoers -p wa -k sudoers' | sudo tee /etc/audit/rules.d/50-practice.rules
+sudo augenrules --load
+```
+
+**Check it worked:** `systemctl is-active auditd rsyslog` prints `active` twice, and `sudo auditctl -l` lists the `-w /etc/passwd` rules.
+
+---
+
+#### 14.2 Debian journal, rsyslog, auditd and log-retention checks
+- [ ] Done
+
+**Typing (check):**
+
+```bash
+sudo journalctl --list-boots
+sudo journalctl -p warning -n 50 --no-pager
+sudo journalctl -u ssh --since today --no-pager
+systemctl status systemd-journald rsyslog auditd --no-pager
+ls -ld /var/log/journal
+```
+
+**What to know:** Debian journal data may be volatile or persistent according to systemd-journald configuration; do not assume a missing `/var/log/auth.log` means disabled logging. `rsyslog` generates text log files on installations configured to use it. `auditd` can supply additional security events if installed and configured.
+
+**Change, only if required and signed packages are available:**
+
+```bash
+sudo apt update
+sudo apt install rsyslog auditd
+```
+
+**Check:** Inspect relevant units, configured journald retention, current boot log, service-specific errors and, if present, `/var/log/auth.log`. Do not clear audit logs or set unlimited log storage in an undersized competition VM.
+
+**Undo:** If newly installed logging components cause unexpected failures, diagnose their configuration first. Restore only an explicitly changed config; retain required audit logs.
+
+---
+
+### 15. AppArmor
+
+#### 15.1 Make sure AppArmor is on
+- [ ] Done
+
+```bash
+sudo aa-status
+sudo systemctl enable --now apparmor
+```
+If a profile is in **complain** mode for no reason, enforce it (needs `sudo apt install apparmor-utils`):
+```bash
+sudo aa-enforce /usr/bin/man      # change /usr/bin/man to the name aa-status listed under "complain mode"
+```
+
+**Check it worked:** `sudo aa-status` starts with `apparmor module is loaded` and lists profiles `in enforce mode`; `systemctl is-enabled apparmor` prints `enabled`.
+
+---
+
+#### 15.2 Debian AppArmor profiles and status
+- [ ] Done
+
+**Typing (check):**
+
+```bash
+command -v aa-status
+sudo aa-status
+systemctl status apparmor --no-pager
+sudo journalctl -k -n 60 --no-pager | grep -i apparmor
+```
+
+If AppArmor or `aa-status` is absent, verify the package, kernel support and README before installation; not every server image includes the full profile set. An enforcing profile can break a required application if misconfigured. Do not disable AppArmor globally to troubleshoot one `DENIED` event; inspect the profile and application path.
+
+**Check/undo:** Test required services after any specific profile edit and restore that profile or mode if needed.
+
+---
+
+### 17. Web browser and applications
+
+#### 17.1 Firefox ESR and browser security
+- [ ] Done
+
+**What:** Turn on Firefox's built-in protections. Images often switch them off.
+
+**Why it matters:** Pop-ups, add-on installs and fake websites are how malware gets onto a desktop.
+
+**Clicking:** open Firefox → **≡ → Settings → Privacy & Security**. Labels move between Firefox versions, so if you can't find one, type a word from it (`pop-up`, `add-ons`, `deceptive`, `HTTPS`) into the **Find in Settings** box at the top.
+- **Block pop-up windows** ✔
+- **Warn you when websites try to install add-ons** ✔
+- **Block dangerous and deceptive content** ✔ (and the boxes under it)
+- **HTTPS-Only Mode** → on in all windows
+- **Passwords:** untick saving passwords unless the README needs it, and check **Saved passwords** for any that shouldn't be there
+
+Then open **≡ → Add-ons and themes → Extensions** and remove any you don't recognise.
+
+**Check it worked:** close and reopen Firefox, then look at the same page again: the boxes are still ticked. If a box is greyed out with "Your browser is being managed by your organization", look at `about:policies` to see which rule sets it.
+
+> [!NOTE]
+> Do this in the Firefox of the user you are logged in as. Each user has their own Firefox settings.
+
+---
+
+#### 17.2 Debian Firefox ESR, Thunderbird, desktop software and required applications
+- [ ] Done
+
+**Typing (check):**
+
+```bash
+dpkg-query -W firefox-esr thunderbird libreoffice-common 2>/dev/null
+apt list --upgradable 2>/dev/null
+apt-cache policy firefox-esr
+```
+
+**Clicking:** In GNOME, open **Software** (if installed) for updates. In Firefox ESR, use **Help → About Firefox** to identify release. Match README-required browsers and add-ons rather than assuming every browser or extension is disallowed.
+
+**Fix, only when appropriate:** Update through signed Debian repositories and preserve package holds required by the image. Do not replace ESR with an arbitrary upstream binary or Snap solely because an Ubuntu example recommends it. Confirm required browser functionality and scores afterwards.
+
+## Part 5 — Advanced Kernel, Critical Services and Recovery
+
+Full service-hardening and terminal reference instructions are retained here, after the common initial checks.
+
+### 10. Kernel and network settings
+
+#### 10.1 Turn on network and memory protections
 - [ ] Done
 
 **Typing:**
@@ -1000,7 +1440,7 @@ sudo sysctl -p
 
 **Check:** `sysctl kernel.randomize_va_space` prints `= 2`. Also look for files in `/etc/sysctl.d/` that set the opposite (for example `ip_forward=1`): `grep -r . /etc/sysctl.d/`
 
-### 10.2 Turn off core dumps
+#### 10.2 Turn off core dumps
 - [ ] Done
 
 **What:** Stop crashing programs from writing a "core dump" (a copy of everything in their memory) to disk.
@@ -1017,7 +1457,7 @@ grep -rs core /etc/security/limits.conf /etc/security/limits.d/ | grep -v ':#'  
 
 ---
 
-### 10.3 Inspect supported sysctl parameters before editing
+#### 10.3 Inspect supported sysctl parameters before editing
 - [ ] Done
 
 ```bash
@@ -1030,311 +1470,9 @@ sudo grep -RnsE 'net.ipv4|net.ipv6|kernel.randomize_va_space' /etc/sysctl.conf /
 
 **Interpret:** Router, VPN, DNS and DHCP images may require forwarding and IPv6. Do not blindly set all examples from a desktop hardening table. Before editing `/etc/sysctl.d/NAME.conf`, inspect overrides and preserve the old value. Apply only a confirmed policy, verify with `sysctl -n key`, and restore if required network functionality breaks. Do not execute `sysctl --system` blindly against an unreviewed collection of config files.
 
-## 11. File permissions and ownership
-
-### 11.1 Password files
-- [ ] Done
-
-```bash
-ls -l /etc/passwd /etc/shadow /etc/group /etc/gshadow
-sudo chmod 644 /etc/passwd /etc/group
-sudo chmod 640 /etc/shadow /etc/gshadow
-sudo chown root:shadow /etc/shadow /etc/gshadow
-```
-
-**Check it worked:** run the `ls -l` line again: `passwd` and `group` show `-rw-r--r-- root root`, `shadow` and `gshadow` show `-rw-r----- root shadow`.
-
-### 11.2 SUID programs (run as root for anyone)
-- [ ] Done
-
-**Why:** If `find`, `vim`, `bash` or `python3` has the SUID bit, any user can become root with one command.
-
-```bash
-sudo find / -xdev -perm -4000 -type f 2>/dev/null
-sudo chmod u-s /usr/bin/find
-```
-Normal SUID programs include `passwd`, `sudo`, `su`, `mount`, `umount`, `chsh`, `chfn`, `gpasswd`, `newgrp`, `pkexec`, `fusermount3` and `ssh-keysign`. Look up anything else.
-
-### 11.3 Files anyone can change
-- [ ] Done
-
-```bash
-sudo find / -xdev -type f -perm -0002 ! -path '/proc/*' ! -path '/sys/*' 2>/dev/null
-sudo chmod o-w /path/to/file
-```
-
-**Check it worked:** the `find` line prints nothing (files inside `/tmp` are OK).
-
-### 11.4 Home folders
-- [ ] Done
-
-```bash
-ls -ld /home/*
-sudo chmod 750 /home/bob        # other users can't look inside
-```
-
-**Check it worked:** in `ls -ld /home/*` every folder ends in `---`, e.g. `drwxr-x--- bob bob`. Each folder should also belong to its own user (`sudo chown bob: /home/bob` fixes one that doesn't).
-
 ---
 
-### 11.5 System account files, capabilities and ACL review
-- [ ] Done
-
-**Typing (check):**
-
-```bash
-stat -c '%A %a %U:%G %n' /etc/passwd /etc/group /etc/shadow /etc/gshadow
-sudo find /usr/bin /usr/sbin /usr/local/bin -xdev -type f -perm /4000 -ls 2>/dev/null
-sudo find /home /tmp /var/tmp -xdev -type f -perm /0002 -ls 2>/dev/null
-command -v getcap && sudo getcap -r /usr/bin /usr/sbin 2>/dev/null
-```
-
-Files such as `/etc/shadow` should be unreadable by ordinary users, but **exact ownership and group/mode vary by Debian configuration**. `SUID` and `world-writable` entries require investigation; don't remove every SUID bit automatically or recursively change ownership of `/usr`, `/var`, home directories or web roots.
-
-**Check/undo:** Determine package ownership with `dpkg -S /path`, inspect `getfacl` if installed, and record `stat` before any narrow change. Restore specific owner/mode if the service/login breaks.
-
-## 12. Sudo rules
-
-### 12.1 Check /etc/sudoers and /etc/sudoers.d/
-- [ ] Done
-
-**Typing:**
-```bash
-sudo cat /etc/sudoers
-sudo ls -la /etc/sudoers.d/ && sudo cat /etc/sudoers.d/*
-```
-Look for:
-- `NOPASSWD`: sudo without a password. Remove it.
-- Lines giving a **normal user** `ALL=(ALL) ALL`.
-- `Defaults !authenticate`. Remove it.
-
-**Edit only with visudo** (it checks for mistakes before saving):
-```bash
-sudo visudo                          # main file
-sudo visudo -f /etc/sudoers.d/90-bob # a file in sudoers.d
-```
-
-> [!CAUTION]
-> A typo in sudoers can break `sudo` for everyone. That's why you **always** use `visudo`.
-
----
-
-### 12.2 Safe sudoers modification and syntax verification
-- [ ] Done
-
-```bash
-sudo visudo -c
-sudo grep -RnsE 'NOPASSWD|ALL=|%sudo|%admin' /etc/sudoers /etc/sudoers.d 2>/dev/null
-```
-
-To edit one include file, use `sudo visudo -f /etc/sudoers.d/ACTUAL-FILE` after recording a backup and checking the authorized admin list. `visudo` validates syntax on save; repeat `sudo visudo -c` and test in a second login.
-
-**Recovery:** Use retained root shell or VM console to restore the specific file if sudo fails. Do not grant passwordless `ALL` to a student simply to make commands work.
-
-## 13. Backdoors and malware
-
-### 13.1 Scheduled jobs (cron)
-- [ ] Done
-
-```bash
-sudo ls -la /var/spool/cron/crontabs/                  # one file per user
-for u in $(cut -d: -f1 /etc/passwd); do sudo crontab -l -u $u 2>/dev/null | grep -v '^#' | sed "s/^/$u: /"; done
-cat /etc/crontab; ls -la /etc/cron.d /etc/cron.hourly /etc/cron.daily
-sudo atq 2>/dev/null                                   # one-off "at" jobs (remove one: sudo atrm 3)
-systemctl list-timers --all                            # systemd timers: another kind of scheduled job
-```
-Red flags: `nc`, `ncat`, `bash -i`, `/dev/tcp/`, `curl ... | bash`, `wget`, `base64 -d`, `python -c`, files in `/tmp`.
-
-**Fix:** `sudo crontab -e -u bob` (delete the line), or `sudo rm /etc/cron.d/badfile`.
-
-### 13.2 Services that start a backdoor at boot
-- [ ] Done
-
-```bash
-systemctl list-unit-files --type=service --state=enabled
-ls -la /etc/systemd/system/ | grep -v '\.wants'
-```
-For any unit you don't recognise: `systemctl cat name.service` shows what it runs. Remove a bad one:
-```bash
-sudo systemctl disable --now evil.service && sudo rm /etc/systemd/system/evil.service && sudo systemctl daemon-reload
-```
-
-### 13.3 Programs listening for connections
-- [ ] Done
-
-```bash
-sudo ss -tulpn
-```
-`nc`, `ncat`, `socat`, `python`, `perl` or `bash` listening on a port is almost always a backdoor. Note the PID, stop it (`sudo kill -9 PID`), **then find what starts it** (13.1, 13.2, 13.4).
-
-### 13.4 Start-up files and fake commands
-- [ ] Done
-
-```bash
-cat /etc/rc.local 2>/dev/null
-ls /etc/profile.d/
-grep -n 'alias' /home/*/.bashrc /root/.bashrc /etc/bash.bashrc
-```
-Watch for aliases that hijack commands, e.g. `alias sudo='...'` or `alias ls='...'`. Also check `/usr/local/bin` for programs named like system commands (a fake `ls` or `sudo`).
-
-### 13.5 The hosts file
-- [ ] Done
-
-```bash
-cat /etc/hosts
-```
-Localhost, hostname and README-required internal mappings can all be legitimate. Back up `/etc/hosts`, compare each mapping with the scenario, and comment only confirmed unauthorized overrides using `sudo nano /etc/hosts`. Test the actual required hostname afterwards; an unfamiliar address alone is not proof of an attacker.
-
-**Check it worked:** `grep -v '^#' /etc/hosts` shows only the normal lines.
-
-### 13.6 Hidden root-kit tricks
-- [ ] Done
-
-```bash
-cat /etc/ld.so.preload 2>/dev/null          # should not exist or be empty
-grep -n 'pam_permit' /etc/pam.d/common-auth # "auth sufficient pam_permit.so" = anyone can log in
-```
-
-### 13.7 Programs that start when someone logs in
-- [ ] Done
-
-**Clicking:** **Menu → Preferences → Startup Applications**.
-
-**Typing:** `ls /etc/xdg/autostart/ /home/*/.config/autostart/`
-
-### 13.8 Tampered system programs
-- [ ] Done
-
-```bash
-sudo dpkg --verify | grep -v ' c '           # takes a minute or two; lines with a 5 = changed file
-```
-Fix by reinstalling the package that owns it: `dpkg -S /usr/bin/ls`, then `sudo apt install --reinstall coreutils`.
-
-### 13.9 Malware scanners (optional, slow)
-- [ ] Done
-
-```bash
-sudo apt install clamav rkhunter chkrootkit
-sudo systemctl stop clamav-freshclam      # the updater service blocks a manual update while it runs
-sudo freshclam                            # download the newest virus list
-sudo systemctl start clamav-freshclam
-sudo clamscan -ri /home                   # -r = every subfolder, -i = list only infected files
-sudo rkhunter --check --sk                # --sk = don't stop for Enter after each part
-sudo chkrootkit | grep INFECTED           # nothing printed = nothing found
-```
-These tools only **report**. Look at each file they name (forensics first!) before you delete it. Warnings from `rkhunter` and `chkrootkit` are often false alarms (for example `Linux.Xor.DDoS` for a harmless script in `/tmp`); `sudo less /var/log/rkhunter.log` shows the details.
-
----
-
-### 13.10 Correlate cron, systemd, login hooks and suspicious binaries
-- [ ] Done
-
-**Typing (check):**
-
-```bash
-sudo cat /etc/crontab
-sudo ls -la /etc/cron.d /etc/cron.daily /etc/cron.hourly
-sudo crontab -l
-systemctl list-timers --all
-systemctl list-unit-files --type=service --state=enabled
-sudo ss -lntup
-```
-
-For one **identified** service:
-
-```bash
-systemctl cat example.service
-systemctl show example.service -p FragmentPath -p ExecStart -p User
-sudo journalctl -u example.service -n 80 --no-pager
-```
-
-**Interpret:** Unknown scheduled commands, user-writable executable paths, recently created unit files and unexpected network listeners deserve investigation, but package timers and update services can be legitimate. Preserve exact tasks/configuration first; do not run suspicious jobs or `systemctl enable` them as a test.
-
-**Check/undo:** After an authorized narrow disable, verify the original critical service still functions, inspect logs and refresh score. Restore only that specific original timer/service if later found required.
-
-## 14. Logging and auditing
-
-### 14.1 System logs and the audit daemon
-- [ ] Done
-
-```bash
-sudo apt install auditd rsyslog
-sudo systemctl enable --now auditd rsyslog
-```
-Add audit rules that record changes to the password files:
-```bash
-echo '-w /etc/passwd -p wa -k identity
--w /etc/shadow -p wa -k identity
--w /etc/group -p wa -k identity
--w /etc/sudoers -p wa -k sudoers' | sudo tee /etc/audit/rules.d/50-practice.rules
-sudo augenrules --load
-```
-
-**Check it worked:** `systemctl is-active auditd rsyslog` prints `active` twice, and `sudo auditctl -l` lists the `-w /etc/passwd` rules.
-
----
-
-### 14.2 Debian journal, rsyslog, auditd and log-retention checks
-- [ ] Done
-
-**Typing (check):**
-
-```bash
-sudo journalctl --list-boots
-sudo journalctl -p warning -n 50 --no-pager
-sudo journalctl -u ssh --since today --no-pager
-systemctl status systemd-journald rsyslog auditd --no-pager
-ls -ld /var/log/journal
-```
-
-**What to know:** Debian journal data may be volatile or persistent according to systemd-journald configuration; do not assume a missing `/var/log/auth.log` means disabled logging. `rsyslog` generates text log files on installations configured to use it. `auditd` can supply additional security events if installed and configured.
-
-**Change, only if required and signed packages are available:**
-
-```bash
-sudo apt update
-sudo apt install rsyslog auditd
-```
-
-**Check:** Inspect relevant units, configured journald retention, current boot log, service-specific errors and, if present, `/var/log/auth.log`. Do not clear audit logs or set unlimited log storage in an undersized competition VM.
-
-**Undo:** If newly installed logging components cause unexpected failures, diagnose their configuration first. Restore only an explicitly changed config; retain required audit logs.
-
-## 15. AppArmor
-
-### 15.1 Make sure AppArmor is on
-- [ ] Done
-
-```bash
-sudo aa-status
-sudo systemctl enable --now apparmor
-```
-If a profile is in **complain** mode for no reason, enforce it (needs `sudo apt install apparmor-utils`):
-```bash
-sudo aa-enforce /usr/bin/man      # change /usr/bin/man to the name aa-status listed under "complain mode"
-```
-
-**Check it worked:** `sudo aa-status` starts with `apparmor module is loaded` and lists profiles `in enforce mode`; `systemctl is-enabled apparmor` prints `enabled`.
-
----
-
-### 15.2 Debian AppArmor profiles and status
-- [ ] Done
-
-**Typing (check):**
-
-```bash
-command -v aa-status
-sudo aa-status
-systemctl status apparmor --no-pager
-sudo journalctl -k -n 60 --no-pager | grep -i apparmor
-```
-
-If AppArmor or `aa-status` is absent, verify the package, kernel support and README before installation; not every server image includes the full profile set. An enforcing profile can break a required application if misconfigured. Do not disable AppArmor globally to troubleshoot one `DENIED` event; inspect the profile and application path.
-
-**Check/undo:** Test required services after any specific profile edit and restore that profile or mode if needed.
-
-## 16. Critical services: complete manual procedures
+### 16. Critical services: complete manual procedures
 
 - [ ] Checked every service the README explicitly requires.
 
@@ -1348,7 +1486,7 @@ sudo ss -lntup
 sudo journalctl -p err -n 50 --no-pager
 ```
 
-### 16.1 General service editing workflow
+#### 16.1 General service editing workflow
 
 When the README says a service **must keep working**, you don't remove it. You make it **safer**. This guide covers the services that appear most often on Mint, Debian and Ubuntu images.
 
@@ -1363,7 +1501,7 @@ Use the per-service manual procedures below for every installed required service
 
 ---
 
-### Safe service editing workflow
+#### Safe service editing workflow
 
 All commands here are for a **terminal on Ubuntu, Linux Mint or Debian**, using `sudo` for privileged operations. They are written individually so you can inspect the result before the next command. They are not commands to run on this handbook's development workspace. For FreeBSD use its the FreeBSD checklist; packages generally configure under `/usr/local/etc` and use rc services.
 
@@ -1374,7 +1512,7 @@ For a config edit, `sudo cp -a` preserves metadata. Use a unique backup suffix i
 If a service fails: read `systemctl status` and `journalctl -u UNIT -n 50 --no-pager`, restore the edited file, recheck syntax, then reload/restart. Do not purge and reinstall as a first repair.
 
 
-### Apache web server (`apache2`)
+#### Apache web server (`apache2`)
 
 | What | Where | Change to |
 |---|---|---|
@@ -1404,7 +1542,7 @@ Also check:
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -1485,7 +1623,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### Nginx web server
+#### Nginx web server
 
 ```bash
 sudo nano /etc/nginx/nginx.conf
@@ -1504,7 +1642,7 @@ sudo systemctl reload nginx
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -1583,7 +1721,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### PHP (used by the website)
+#### PHP (used by the website)
 
 Edit the **web** PHP settings, not the command-line ones: `/etc/php/<version>/apache2/php.ini` (Apache) or `/etc/php/<version>/fpm/php.ini` (Nginx).
 
@@ -1605,7 +1743,7 @@ Then `sudo systemctl reload apache2` (or `php8.1-fpm` etc.).
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -1689,15 +1827,15 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### MySQL / MariaDB
+#### MySQL / MariaDB
 
-#### Built-in hardening tool
+##### Built-in hardening tool
 ```bash
 sudo mysql_secure_installation
 ```
 Answer **yes** to: remove anonymous users, disallow root login remotely, remove the test database, reload privileges.
 
-#### Settings file
+##### Settings file
 `/etc/mysql/mysql.conf.d/mysqld.cnf` (MySQL) or `/etc/mysql/mariadb.conf.d/50-server.cnf` (MariaDB), under `[mysqld]`:
 ```
 bind-address = 127.0.0.1      # only this computer can connect (skip if the README says others connect)
@@ -1707,7 +1845,7 @@ local_infile = 0              # SQL can't read files from the server's disk
 sudo systemctl restart mysql      # or mariadb
 ```
 
-#### Look at the database users
+##### Look at the database users
 ```bash
 sudo mysql
 ```
@@ -1725,7 +1863,7 @@ Accounts that aren't needed, or that have `ALL PRIVILEGES` without needing them,
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -1806,7 +1944,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### vsftpd (FTP server)
+#### vsftpd (FTP server)
 
 ```bash
 sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.bak
@@ -1828,7 +1966,7 @@ sudo systemctl restart vsftpd && systemctl status vsftpd
 ```
 Also check `/etc/ftpusers` (users **not** allowed to use FTP; `root` should be in it) and the `userlist_*` settings.
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -1909,10 +2047,10 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### ProFTPD
+#### ProFTPD
 In `/etc/proftpd/proftpd.conf`: `DefaultRoot ~`, `RootLogin off`, `ServerIdent off`, and comment out (`#`) the whole `<Anonymous ~ftp> ... </Anonymous>` block. Test with `sudo proftpd -t`.
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -1993,7 +2131,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### Pure-FTPd
+#### Pure-FTPd
 ```bash
 echo yes | sudo tee /etc/pure-ftpd/conf/NoAnonymous
 echo yes | sudo tee /etc/pure-ftpd/conf/ChrootEveryone
@@ -2002,7 +2140,7 @@ sudo systemctl restart pure-ftpd
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -2083,7 +2221,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### Samba (Windows file sharing)
+#### Samba (Windows file sharing)
 
 ```bash
 sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
@@ -2106,7 +2244,7 @@ sudo smbpasswd -x mallory
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -2188,7 +2326,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### BIND DNS server
+#### BIND DNS server
 
 In `/etc/bind/named.conf.options`, inside `options { ... };`:
 ```
@@ -2203,7 +2341,7 @@ Also look in `/etc/bind/named.conf.local` for zones with `allow-transfer { any; 
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -2285,7 +2423,7 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### Postfix mail server
+#### Postfix mail server
 
 ```bash
 sudo postconf -e 'disable_vrfy_command = yes'        # can't ask "does user X exist?"
@@ -2297,7 +2435,7 @@ sudo postfix check && sudo systemctl reload postfix
 
 ---
 
-#### Manual procedure: inspect, change, verify and recover
+##### Manual procedure: inspect, change, verify and recover
 
 - [ ] Done
 
@@ -2377,18 +2515,18 @@ Repeat the same validation, apply command and client test. For a directory backu
 
 **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
 
-### SSH
+#### SSH
 See section 9 of the Linux Mint checklist.
 
 ---
 
-### WordPress (and other web apps)
+#### WordPress (and other web apps)
 - Update WordPress, plugins and themes from the admin dashboard.
 - Delete admin accounts in WordPress that the README doesn't list (**Users** page).
 - In `wp-config.php`, add `define('DISALLOW_FILE_EDIT', true);` so the dashboard can't edit PHP files.
 - Make sure `wp-config.php` isn't readable by everyone: `sudo chmod 640 wp-config.php`.
 
-### PostgreSQL: local and required remote database access
+#### PostgreSQL: local and required remote database access
 
 - [ ] Done
 
@@ -2463,7 +2601,7 @@ sudo pg_ctlcluster 15 main restart
 
 **Warnings:** A config backup is not a database backup. Do not drop roles or databases until ownership, application dependencies and forensics are resolved.
 
-### ISC DHCP and Kea: identify the implementation first
+#### ISC DHCP and Kea: identify the implementation first
 
 - [ ] Done
 
@@ -2519,7 +2657,7 @@ Then restart `kea-dhcp4-server` only after success. Do not apply ISC syntax to K
 
 **Warnings:** ISC DHCP is a legacy implementation; preserve the scenario's installed server rather than migrating implementations during a timed round. Do not renew your only remote-management client's lease until console access exists.
 
-### Web application files and certificates
+#### Web application files and certificates
 
 - [ ] Done
 
@@ -2549,7 +2687,7 @@ Unexpected recent or world-writable files need comparison with a trusted package
 
 **Warnings:** Headers, hidden version strings and disabled PHP functions are supporting controls, not proof an application is secure. Keep required functionality and patch vulnerabilities.
 
-### 16.2 Debian-specific installed service packages and access verification
+#### 16.2 Debian-specific installed service packages and access verification
 
 - [ ] Confirmed installed daemon names and actual sockets.
 
@@ -2576,51 +2714,13 @@ sudo ss -lntup
 
 **Important:** Database/FTP/web app configuration can be **stateful**, not just a text file. Back up application data and grants using an appropriate supported method before a destructive change. A config-file copy cannot undo a database schema migration or user deletion.
 
-## 17. Web browser and applications
-
-### 17.1 Firefox ESR and browser security
-- [ ] Done
-
-**What:** Turn on Firefox's built-in protections. Images often switch them off.
-
-**Why it matters:** Pop-ups, add-on installs and fake websites are how malware gets onto a desktop.
-
-**Clicking:** open Firefox → **≡ → Settings → Privacy & Security**. Labels move between Firefox versions, so if you can't find one, type a word from it (`pop-up`, `add-ons`, `deceptive`, `HTTPS`) into the **Find in Settings** box at the top.
-- **Block pop-up windows** ✔
-- **Warn you when websites try to install add-ons** ✔
-- **Block dangerous and deceptive content** ✔ (and the boxes under it)
-- **HTTPS-Only Mode** → on in all windows
-- **Passwords:** untick saving passwords unless the README needs it, and check **Saved passwords** for any that shouldn't be there
-
-Then open **≡ → Add-ons and themes → Extensions** and remove any you don't recognise.
-
-**Check it worked:** close and reopen Firefox, then look at the same page again: the boxes are still ticked. If a box is greyed out with "Your browser is being managed by your organization", look at `about:policies` to see which rule sets it.
-
-> [!NOTE]
-> Do this in the Firefox of the user you are logged in as. Each user has their own Firefox settings.
-
 ---
 
-### 17.2 Debian Firefox ESR, Thunderbird, desktop software and required applications
-- [ ] Done
-
-**Typing (check):**
-
-```bash
-dpkg-query -W firefox-esr thunderbird libreoffice-common 2>/dev/null
-apt list --upgradable 2>/dev/null
-apt-cache policy firefox-esr
-```
-
-**Clicking:** In GNOME, open **Software** (if installed) for updates. In Firefox ESR, use **Help → About Firefox** to identify release. Match README-required browsers and add-ons rather than assuming every browser or extension is disallowed.
-
-**Fix, only when appropriate:** Update through signed Debian repositories and preserve package holds required by the image. Do not replace ESR with an arbitrary upstream binary or Snap solely because an Ubuntu example recommends it. Confirm required browser functionality and scores afterwards.
-
-## 18. Advanced manual verification and recovery
+### 18. Advanced manual verification and recovery
 
 These procedures supplement every earlier checklist table. Ubuntu and Debian use the same underlying APT/systemd tools where stated; their own checklists describe differences. Open **Menu → Terminal** or press **Ctrl+Alt+T**. Configuration blocks marked `text` are file contents, not commands. Examples use `bob`; substitute the README's actual account. Do not paste placeholders such as `<PID>` literally.
 
-### 18.1 Users, root and privilege recovery
+#### 18.1 Users, root and privilege recovery
 
 - [ ] Done
 
@@ -2687,7 +2787,7 @@ Investigate existing sessions, processes, keys and services separately. If delet
 
 **Warnings:** Never use `usermod -G sudo` without `-a` to add membership; it replaces supplementary groups. Do not lock root on Debian until a separate administrator and recovery path work. Service identities such as postgres may legitimately use a shell for maintenance.
 
-### 18.2 Password aging, PAM and lockout without breaking login
+#### 18.2 Password aging, PAM and lockout without breaking login
 
 - [ ] Done
 
@@ -2775,7 +2875,7 @@ Restore the user's recorded `chage` values individually. A password reset is not
 
 **Warnings:** Never expose hashes, use one shared password, or test repeated failed logins against the active administrator. Do not restart the desktop display manager while unsaved work is open.
 
-### 18.3 SSH: effective configuration and a second-session test
+#### 18.3 SSH: effective configuration and a second-session test
 
 - [ ] Done
 
@@ -2831,7 +2931,7 @@ For socket-managed port/listen changes follow the Ubuntu-specific procedure; a d
 
 **Warnings:** Do not delete all authorized_keys files. Inspect fingerprints with `ssh-keygen -lf FILE` and remove only confirmed unauthorized keys after preserving them privately. A root key may be legitimate recovery access.
 
-### 18.4 UFW and nftables: one firewall owner
+#### 18.4 UFW and nftables: one firewall owner
 
 - [ ] Done
 
@@ -2894,7 +2994,7 @@ Do not paste a second generic input chain. Stateful IPv6 operation needs ICMPv6 
 
 **Warnings:** Do not add a broad allow-all rule to make one service work. Keep required outbound traffic and DNS; never disable IPv6 merely because an old script did.
 
-### 18.5 Package sources, updates and vulnerability triage
+#### 18.5 Package sources, updates and vulnerability triage
 
 - [ ] Done
 
@@ -2949,7 +3049,7 @@ Do not blindly purge held packages or run autoremove. Preview any targeted remov
 
 **Warnings:** On interruption inspect the real package-manager error. Do not delete lock files while another package manager is active. If no manager is running and configuration was interrupted, `sudo dpkg --configure -a` can finish pending configuration; review its output before proceeding.
 
-### 18.6 Ownership, permissions, SUID and capabilities
+#### 18.6 Ownership, permissions, SUID and capabilities
 
 - [ ] Done
 
@@ -2998,7 +3098,7 @@ sudo chmod u-s /opt/unauthorized-tool
 
 **Warnings:** Never `chmod -R 777`, recursively chown system directories, remove all SUID files, or overwrite file ACLs simply because a scanner flags them.
 
-### 18.7 Cron, systemd and malicious persistence
+#### 18.7 Cron, systemd and malicious persistence
 
 - [ ] Done
 
@@ -3051,7 +3151,7 @@ Inspect any socket/path activation too; disabling one unit may not prevent anoth
 
 **Warnings:** Do not `crontab -r`, blanket-remove `.desktop` files, or restrict all cron access to root unless the scenario actually requires it. User timers run in the user's manager; root's `systemctl --user` is not the desktop user's manager.
 
-### 18.8 Kernel, AppArmor and logging
+#### 18.8 Kernel, AppArmor and logging
 
 - [ ] Done
 
@@ -3102,7 +3202,7 @@ If a required service is denied by AppArmor, inspect the named profile and denie
 
 **Warnings:** Do not clear journals, truncate logs, or install a logging daemon merely to force one filename to exist. Log output can contain personal data and secrets; keep it private.
 
-### 18.9 Service and desktop completion checks
+#### 18.9 Service and desktop completion checks
 
 - [ ] Done
 
@@ -3137,7 +3237,7 @@ sudo ss -tulpn
 
 **Warnings:** A reboot can lose unsaved work and remote access. Finish updates and preserve recovery access first; the rules and actual update state determine whether/when to reboot.
 
-### 18.10 Supplementary investigations: sudo, SSH, PAM, UFW, cron, service persistence and package checks
+#### 18.10 Supplementary investigations: sudo, SSH, PAM, UFW, cron, service persistence and package checks
 
 The following procedure references are included for completeness, with Debian root-console and service-required exceptions overriding generic Ubuntu/Mint assumptions.
 
@@ -3146,7 +3246,7 @@ The following procedure references are included for completeness, with Debian ro
 
 These are individually copyable terminal commands. **Inspection is not the same as permission to modify.** Run modifications only after verifying accounts, critical services, connectivity and backups.
 
-### 18.L1. Verify user identities and sudo privileges—don't guess from names
+#### 18.L1. Verify user identities and sudo privileges—don't guess from names
 
 - [ ] Matched every privileged identity to the competition README.
 
@@ -3188,7 +3288,7 @@ sudo visudo -c
 
 **Recovery:** Restore the backed-up single file through a root/recovery console if sudo stops working. Test a separate authorized session before leaving the administrator session.
 
-### 18.L2. SSH: inspect *effective* settings and socket activation
+#### 18.L2. SSH: inspect *effective* settings and socket activation
 
 - [ ] Confirmed whether SSH is required, listening and correctly configured.
 
@@ -3234,7 +3334,7 @@ sudo systemctl reload ssh
 
 **Recovery:** Restore the exact backed-up config and reload/activate the appropriate unit using VM console if the remote test fails. If you changed the listening port on a socket-activated release, verify the socket generator/unit state too; don't assume an \`sshd_config\` reload alone changes the listener.
 
-### 18.L3. PAM policy: inspect order before adding modules
+#### 18.L3. PAM policy: inspect order before adding modules
 
 - [ ] Inspected current PAM stack and package availability.
 
@@ -3262,7 +3362,7 @@ If changing aging is required, consult the policy specified in the README and th
 
 **Recovery:** Restore the specific original PAM file using recovery/console access, then retest. This is a high-risk category and should not be changed merely because a generic checklist recommends a number.
 
-### 18.L4. Check scheduled persistence in cron and systemd
+#### 18.L4. Check scheduled persistence in cron and systemd
 
 - [ ] Investigated scheduler entries before deleting anything.
 
@@ -3301,7 +3401,7 @@ systemctl show example.service -p FragmentPath -p ExecStart -p User -p WantedBy
 
 **Recovery:** For an unauthorized entry, document and preserve it before making the smallest authorized change. To undo a previous disable operation, restore the recorded original unit enablement/state only; do not indiscriminately enable every listed service.
 
-### 18.L5. Firewall: preserve required access before enabling UFW
+#### 18.L5. Firewall: preserve required access before enabling UFW
 
 - [ ] Identified real listeners, rule owner and permitted clients.
 
@@ -3340,7 +3440,7 @@ sudo ufw status verbose
 
 **Recovery:** If you blocked access, use the VM console to restore the documented previous UFW state/rules; avoid deleting all firewall rules as a first response.
 
-### 18.L6. Narrow file and package investigations
+#### 18.L6. Narrow file and package investigations
 
 - [ ] Inspected evidence, not deleted files by extension alone.
 
@@ -3370,64 +3470,16 @@ who
 
 Confirm normal login, sudo, DNS/networking and all required services. Record any unverified concern rather than destroy unknown files.
 
-## References and cross-checks
+### References and cross-checks
 
 - [Ubuntu 24.04 OpenSSH socket activation notes](https://documentation.ubuntu.com/release-notes/24.04/)
 - [Ubuntu security: Unnecessarily open ports](https://documentation.ubuntu.com/security/common-mistakes/unnecessarily-open-ports/)
 - [Ubuntu security: Firewalls](https://documentation.ubuntu.com/security/security-features/network/firewall/)
 - CyberPatriot community topic inventories: [PeapGit CPLHF](https://github.com/PeapGit/cplhf) (historical hardening automation: **do not execute as part of this guide**), [Minagera Linux checklist](https://github.com/Minagera/CyberPatriot/blob/main/Checklists/Linux/README.md), [chessischess Linux checklist](https://github.com/chessischess/cyberpatriot-checklist/blob/master/Linux_Checklist.md).
 
-## 19. Final checklist
-
-- [ ] Answered and **saved** every forensics question before deleting/modifying evidence.
-- [ ] Recorded all README-authorized normal users, admin users and necessary system/service accounts.
-- [ ] Preserved a working administrator/root recovery session and tested a second authorized login.
-- [ ] Verified password aging, empty passwords, relevant PAM profiles and sudo membership.
-- [ ] Checked installed APT sources match Debian **codename** and have valid signature verification.
-- [ ] Reviewed and applied approved available security updates; inspected held packages and `dpkg --audit`.
-- [ ] Confirmed one appropriate firewall manager and only README-required inbound access.
-- [ ] Confirmed SSH, DNS, web, database, Samba, FTP, DHCP, mail and other **required** services function from authorized clients.
-- [ ] Checked known unwanted daemons, unauthorized packages and unwanted media/files without mass deletion.
-- [ ] Reviewed cron, systemd timers, startup entries, accounts, SUID/capabilities, suspicious ports and file hashes.
-- [ ] Checked AppArmor, journald/rsyslog/auditd, and desktop lock/autologin for this actual Debian image.
-- [ ] Refreshed the Scoring Report and recorded each changed item and verification result.
-- [ ] Saved changes and forensic answers, but **do not reboot** before the rules and outstanding updates permit it.
-
-**Typing (final inspection):**
-
-```bash
-cat /etc/os-release
-id
-sudo visudo -c
-sudo dpkg --audit
-apt list --upgradable 2>/dev/null
-systemctl --failed
-sudo ss -lntup
-sudo journalctl -p err -n 30 --no-pager
-```
-
-**If something breaks:** Look at the last change, exact unit status, kernel/application logs, network listener, authorization and file backup. Restore the **smallest changed setting**, retest the README-required service, then refresh the score. Never reset the whole firewall, wipe logs, remove all media or purge unrelated packages to solve one failure.
-
-## Technical references and scope
-
-- [Debian releases and lifecycle](https://www.debian.org/releases/)
-- [Debian administration documentation](https://www.debian.org/doc/)
-- [Debian security information](https://www.debian.org/security/)
-- [Debian LTS / Bookworm](https://wiki.debian.org/LTS/)
-- [Debian manual pages](https://manpages.debian.org/)
-- [Debian Wiki: nftables](https://wiki.debian.org/nftables)
-- [Debian Wiki: PAM](https://wiki.debian.org/PAM)
-- [Debian Wiki: SSH](https://wiki.debian.org/SSH)
-- [Ripper1004 CyberPatriot Toolkit](https://github.com/Ripper1004/CyberPatriot-Toolkit/tree/main/docs)
-- [BiermanM historical security script themes](https://github.com/BiermanM/CyberPatriot-Scripts) — **concept reference only**, no scripts reproduced or run.
-
-**Content scope:** This is a consolidated reference and not a statement that every change earns a point. Where inherited historical instructions conflict with the current Debian package/version or a competition image's README, **inspect the installed implementation and prioritize the README**. The guide intentionally includes overlapping manual procedures so it remains independently usable.
-
-
-
 ---
 
-## 20. Complete Linux terminal basics (embedded)
+### 20. Complete Linux terminal basics (embedded)
 
 The original practical text and copyable command blocks are retained here for self-contained study. For a Debian image, use Debian-specific explanations in Sections 0–19 before changing a setting.
 
@@ -3436,7 +3488,7 @@ The **terminal** is a window where you type commands instead of clicking. On Lin
 
 **Open it:** press **Ctrl + Alt + T**, or open the menu and search for "Terminal".
 
-#### How a command looks
+##### How a command looks
 
 ```bash
 id bob
@@ -3447,7 +3499,7 @@ id bob
 
 Press **Enter** to run it. If it worked, Linux often prints **nothing**. Check the exit status and repeat the native verification; silence alone is not proof of success.
 
-#### Keys that save time
+##### Keys that save time
 | Key | What it does |
 |---|---|
 | **Tab** | Auto-complete a file or command name. Press it twice to see the choices. |
@@ -3456,7 +3508,7 @@ Press **Enter** to run it. If it worked, Linux often prints **nothing**. Check t
 | **Ctrl + Shift + C / V** | Copy / paste *inside the terminal* (plain Ctrl+C means "stop"!). |
 | **q** | Quit a viewer like `less` or `man`. |
 
-#### The 20 commands you'll actually use
+##### The 20 commands you'll actually use
 | Command | What it does | Example |
 |---|---|---|
 | `pwd` | Show which folder you're in | `pwd` |
@@ -3480,7 +3532,7 @@ Press **Enter** to run it. If it worked, Linux often prints **nothing**. Check t
 | `history` | Show your past commands | `history` |
 | `man` | The manual for a command | `man userdel` |
 
-#### Reading permissions
+##### Reading permissions
 ```
 -rw-r----- 1 root shadow 1234 Oct 22 10:00 /etc/shadow
  ^^^ owner can read+write
@@ -3489,7 +3541,7 @@ Press **Enter** to run it. If it worked, Linux often prints **nothing**. Check t
 ```
 Numbers: r=4, w=2, x=1. So `640` = owner rw (6), group r (4), others none (0).
 
-#### Paths you'll see a lot
+##### Paths you'll see a lot
 | Path | What's there |
 |---|---|
 | `/etc/` | Settings files for almost everything |
@@ -3498,13 +3550,13 @@ Numbers: r=4, w=2, x=1. So `640` = owner rw (6), group r (4), others none (0).
 | `/tmp/` | Temporary files (attackers like hiding things here) |
 | `/root/` | The root user's home folder |
 
-#### Safety tips
+##### Safety tips
 - **Read the command before pressing Enter**, especially anything with `rm`.
 - Before editing a settings file, **copy it**: `sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak`
 - If a command asks `[Y/n]`, read what it's about to remove before answering.
 - Recovery depends on the operation. Record values/backups before changes; deletion and credential changes may have no simple undo.
 
-#### Practice a safe inspect–edit–verify–undo cycle
+##### Practice a safe inspect–edit–verify–undo cycle
 
 - [ ] Done
 
@@ -3559,4 +3611,58 @@ cat "$HOME/cp-terminal-practice/example notes.txt"
 Expect `original value`. Practice files may be removed through the file manager after you have checked their paths.
 
 **Warnings:** `sudo command > /protected/file` elevates the command, not the shell opening the file. Do not solve permission errors with `chmod 777`. Avoid `rm -rf`, guessed wildcards, copied shell prompts and piping downloads into a shell. **Ctrl+C** is appropriate for a stuck search, but interrupting package configuration or file writes can leave incomplete work.
+
+## Part 6 — Final Verification
+
+Verify every required service, account, journal/forensic answer, firewall path and score before finishing.
+
+### 19. Final checklist
+
+- [ ] Answered and **saved** every forensics question before deleting/modifying evidence.
+- [ ] Recorded all README-authorized normal users, admin users and necessary system/service accounts.
+- [ ] Preserved a working administrator/root recovery session and tested a second authorized login.
+- [ ] Verified password aging, empty passwords, relevant PAM profiles and sudo membership.
+- [ ] Checked installed APT sources match Debian **codename** and have valid signature verification.
+- [ ] Reviewed and applied approved available security updates; inspected held packages and `dpkg --audit`.
+- [ ] Confirmed one appropriate firewall manager and only README-required inbound access.
+- [ ] Confirmed SSH, DNS, web, database, Samba, FTP, DHCP, mail and other **required** services function from authorized clients.
+- [ ] Checked known unwanted daemons, unauthorized packages and unwanted media/files without mass deletion.
+- [ ] Reviewed cron, systemd timers, startup entries, accounts, SUID/capabilities, suspicious ports and file hashes.
+- [ ] Checked AppArmor, journald/rsyslog/auditd, and desktop lock/autologin for this actual Debian image.
+- [ ] Refreshed the Scoring Report and recorded each changed item and verification result.
+- [ ] Saved changes and forensic answers, but **do not reboot** before the rules and outstanding updates permit it.
+
+**Typing (final inspection):**
+
+```bash
+cat /etc/os-release
+id
+sudo visudo -c
+sudo dpkg --audit
+apt list --upgradable 2>/dev/null
+systemctl --failed
+sudo ss -lntup
+sudo journalctl -p err -n 30 --no-pager
+```
+
+**If something breaks:** Look at the last change, exact unit status, kernel/application logs, network listener, authorization and file backup. Restore the **smallest changed setting**, retest the README-required service, then refresh the score. Never reset the whole firewall, wipe logs, remove all media or purge unrelated packages to solve one failure.
+
+### Technical references and scope
+
+- [Debian releases and lifecycle](https://www.debian.org/releases/)
+- [Debian administration documentation](https://www.debian.org/doc/)
+- [Debian security information](https://www.debian.org/security/)
+- [Debian LTS / Bookworm](https://wiki.debian.org/LTS/)
+- [Debian manual pages](https://manpages.debian.org/)
+- [Debian Wiki: nftables](https://wiki.debian.org/nftables)
+- [Debian Wiki: PAM](https://wiki.debian.org/PAM)
+- [Debian Wiki: SSH](https://wiki.debian.org/SSH)
+- [Ripper1004 CyberPatriot Toolkit](https://github.com/Ripper1004/CyberPatriot-Toolkit/tree/main/docs)
+- [BiermanM historical security script themes](https://github.com/BiermanM/CyberPatriot-Scripts) — **concept reference only**, no scripts reproduced or run.
+
+**Content scope:** This is a consolidated reference and not a statement that every change earns a point. Where inherited historical instructions conflict with the current Debian package/version or a competition image's README, **inspect the installed implementation and prioritize the README**. The guide intentionally includes overlapping manual procedures so it remains independently usable.
+
+
+
+---
 
