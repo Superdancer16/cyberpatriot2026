@@ -1724,7 +1724,7 @@ A **model** splits networking into layers. Each layer does one job and hands its
 - **ICMP** (Internet Control Message Protocol) carries error and test messages. `ping` and `traceroute` use it.
 - The **default gateway** is the router address a device sends traffic to when the destination is on a *different* network. If it's wrong or missing, a PC can reach its own network but nothing beyond it.
 
-#### IPv4 addressing and subnetting
+### IPv4 addressing and subnetting
 
 An IPv4 address is **32 bits**, written as four numbers (octets) from 0 to 255: `192.168.1.10`. The **subnet mask** says which part is the **network** and which part is the **host** (the device).
 
@@ -1843,7 +1843,7 @@ Find the smallest number of host bits where 2^(host bits) − 2 is at least the 
 
 A normal IPv6 network (LAN) uses a **/64** prefix. IPv6 has no broadcast. It uses multicast instead.
 
-#### Common ports
+### Common ports
 
 A **port** number tells the receiving computer which program the traffic is for. Ports 0 to 1023 are the "well-known" ports.
 
