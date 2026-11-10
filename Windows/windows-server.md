@@ -775,14 +775,69 @@ This changes only what the server *accepts* (the `Server` keys), not how the ser
 
 ### 6. Services
 
-#### 6.1 Turn off what the README doesn't need
+#### 6.1 Inventory and safely disable only unauthorized services
+
 - [ ] Done
 
-Same list as [Windows 10/11 section 8](windows-10-11.md#8-services), plus:
-- **Print Spooler**: disable on Domain Controllers unless this is the print server (PrintNightmare).
-- **Windows Remote Management (WinRM)**: Server Manager uses it, so keep it on servers unless the README says otherwise, and lock it down (section 8).
+**What:** Review services by their **real Windows service name**, executable path and dependencies. This section contains the Server-specific service table directly; no workstation checklist is necessary.
 
-Windows Server has no **Security Center** (`wscsvc`) service, so skip that name in Windows 10/11 step 8.2.
+**GUI:** Win + R → services.msc → select the exact service → Properties. Record **Service name, Display name, Service status, Startup type, Log On As, Dependencies, Path to executable**. If Server Core lacks services.msc, use PowerShell below.
+
+**Typing (check, elevated PowerShell):**
+
+~~~powershell
+Get-CimInstance Win32_Service |
+  Select-Object Name,DisplayName,State,StartMode,StartName,PathName |
+  Sort-Object Name | Format-Table -Wrap
+~~~
+
+For **one identified service**:
+
+~~~powershell
+Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Format-List *
+sc.exe qc RemoteRegistry
+~~~
+
+**Choose by README and role.** Services may not be installed on every Server build.
+
+| Service / feature | Internal name / package (typical) | When to leave enabled |
+|---|---|---|
+| Remote Registry | RemoteRegistry | Required remote registry administration only |
+| Telnet Server | TlntSvr (legacy, if installed) | Extremely rare authorized legacy need; consider secured alternatives |
+| SNMP / SNMP Trap | SNMP, SNMPTRAP | Authorized legacy monitoring only |
+| SSDP Discovery | SSDPSRV | Required discovery workflows only |
+| UPnP Device Host | upnphost | Device discovery workflows that truly need it |
+| FTP Server | FTPSVC / IIS FTP feature | **Keep** if a required FTP site or client transfer exists |
+| IIS / WWW Publishing | W3SVC / Web-Server | **Keep** for any required web/application role |
+| Remote Desktop Services | TermService | **Keep** for required RDP administration or RDS role |
+| Routing and Remote Access | RemoteAccess | **Keep** for an assigned VPN/RRAS/router role |
+| Internet Connection Sharing | SharedAccess | Rare role-specific need; confirm before disabling |
+| Print Spooler | Spooler | Required print server/printing only; DC risk needs separate check |
+| WebClient | WebClient | Required WebDAV or associated application |
+| OpenSSH SSH Server | sshd | Keep when README requires SSH management/file transfer |
+| Windows Remote Management | WinRM | **Often required** by Server Manager/PowerShell remoting; restrict access, not automatically disable |
+| Simple TCP/IP Services | simptcp | Legacy and generally unneeded unless explicitly required |
+| Xbox / media sharing | varies, may be absent | Typically unnecessary on Server, but absence is normal |
+| Remote-control software | TeamViewer/AnyDesk/VNC product services | Only if explicitly authorized; inspect executable/product first |
+
+**Domain Controller — do not disable required infrastructure:** NTDS, Kdc, Netlogon, DNS (if DC hosts DNS), DFSR (if used), W32Time, ADWS, RPCSS, DcomLaunch, EventLog, Dnscache, LanmanServer, and other role-dependent services. WinRM also supports many administrative workflows. Do not assume every listed DC-related service has to show Running all the time; inspect configured dependencies and actual client behavior.
+
+**Typing (change example, ONLY if Remote Registry is confirmed prohibited/unneeded):**
+
+~~~powershell
+Stop-Service -Name 'RemoteRegistry' -ErrorAction Stop
+Set-Service -Name 'RemoteRegistry' -StartupType Disabled
+~~~
+
+**Verification:**
+
+~~~powershell
+Get-Service -Name 'RemoteRegistry' | Format-Table Name,Status,StartType
+~~~
+
+**Undo:** Restore the *recorded original* startup type using Set-Service; start the service only if it had been running and is required. A stopped service can be appropriate even when startup is Manual. Do not apply blanket Stop-Service -Force, bulk disable lists or mass uninstalls to required roles.
+
+**Warn:** Services may depend on each other; disabling a listed generic desktop service on a server may break printing, IIS FTP, remote management, backups or an app. Confirm dependencies via the GUI or Get-Service -DependentServices and actual required-client test.
 
 #### 6.2 Never touch these on a Domain Controller
 - [ ] Done
@@ -851,10 +906,37 @@ Restart once when it says a restart is needed (SMBv1 removal needs one).
 
 ### 8. Remote access
 
-#### 8.1 Remote Desktop and Remote Assistance
+#### 8.1 Remote Desktop and Remote Assistance — Server-specific procedure
+
 - [ ] Done
 
-Same as [Windows 10/11 section 10](windows-10-11.md#10-remote-access). Servers often **need** RDP; if so, keep it on with Network Level Authentication, and control who's in **Remote Desktop Users**.
+**What:** Determine whether RDP, Remote Assistance or an RDS role is required. Do **not** turn off RDP if it is an approved management path or the system is an RDS Session Host.
+
+**GUI:** Server Manager → Local Server → **Remote Desktop**. If enabled, require **Network Level Authentication (NLA)** when compatible with the authorized clients. Inspect **Select Users** / Remote Desktop Users group and effective GPO. On a DC, members and logon rights come from **domain groups and domain policy**, not local Get-LocalGroupMember.
+
+**Typing (check, elevated PowerShell):**
+
+~~~powershell
+Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections -ErrorAction SilentlyContinue
+Get-Service TermService -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
+Get-NetFirewallRule -DisplayGroup 'Remote Desktop' -ErrorAction SilentlyContinue |
+  Select-Object Name,DisplayName,Enabled,Profile,Direction,Action
+~~~
+
+fDenyTSConnections = 0 usually permits incoming RDP subject to other controls; 1 denies it. **Service state alone** does not prove remote RDP reachability. A role-specific GPO can override local configuration.
+
+**GUI change (when approved):**
+1. Confirm console/alternate management access, authorized users and client requirements.
+2. Server Manager → Local Server → Remote Desktop.
+3. Choose the README-required enabled/disabled state. If RDP is required, enable NLA if supported and restrict users/source firewall rules to approved management hosts.
+4. Recheck **User Rights Assignment → Allow log on through Remote Desktop Services / Deny log on through Remote Desktop Services** in the applicable local or DC GPO; a deny right overrides an allow.
+5. Validate from an authorized separate RDP client; on a DC ensure administrators retain required access.
+
+**Remote Assistance:** Inspect the installed policy in system remote settings or applicable GPO; disable unsolicited/unapproved invitations only if the scenario does not require it. Do not confuse Remote Assistance with RDP.
+
+**Verify:** Check effective GPO, firewall profile/rules, NLA/login restrictions, authorized RDP connection (if required), and other required service functions. For disabled RDP, verify it is not listening or reachable from an unauthorized client **without** breaking the VM console.
+
+**Undo:** Restore only the original documented Remote Desktop/Assistance value, group membership, GPO or firewall scope using console access. Avoid blindly editing multiple registry values, which can be overridden by policy.
 
 #### 8.2 Lock down WinRM
 - [ ] Done
@@ -868,14 +950,37 @@ Or with `gpedit.msc` → **Administrative Templates → Windows Components → W
 
 ---
 
-### 10. The rest
+### 10. Prohibited software, files, startup persistence, browser and security settings
 
-Use the [Windows 10/11 checklist](windows-10-11.md) for:
-- [ ] Prohibited software (section 12)
-- [ ] Prohibited files (section 13)
-- [ ] Backdoors and malware (section 14)
-- [ ] Other settings (section 15)
-- [ ] Browsers (section 16)
+These tasks are **fully supported here** by the role-aware commands below and the complete Server OS security reference in Part 5 (**WS.12 through WS.21**). No separate Windows guide is needed.
+
+- [ ] Done — Compare installed applications and portable binaries to the README's prohibited list; preserve evidence before uninstall.
+- [ ] Done — Check suspicious desktop files and media in the named user profiles; do not mass-delete user data.
+- [ ] Done — Inspect startup entries, Run/RunOnce keys, scheduled tasks, services, network listeners and file hashes.
+- [ ] Done — Check browsers used by required IIS/app management tools and their approved updates/extension policies.
+- [ ] Done — Review role-compatible UAC, SMB signing, anonymous access, NTLM/LM, auditing, PowerShell logging, screen locking and removable-media policies.
+
+**Typing (read-only on Windows Server; local and domain contexts differ):**
+
+~~~powershell
+Get-Package | Select-Object Name,Version,ProviderName | Sort-Object Name
+Get-CimInstance Win32_StartupCommand | Select-Object Name,Command,Location,User
+Get-ScheduledTask | Select-Object TaskPath,TaskName,State
+Get-CimInstance Win32_Service | Select-Object Name,StartName,State,PathName
+Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess
+~~~
+
+**Forensic file investigation (replace with the actual discovered path):**
+
+~~~powershell
+Get-Item -LiteralPath 'C:\Users\Example\Documents\suspect.exe' | Format-List FullName,Length,CreationTime,LastWriteTime
+Get-FileHash -LiteralPath 'C:\Users\Example\Documents\suspect.exe' -Algorithm SHA256
+Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' | Select-Object Status,SignerCertificate
+~~~
+
+**Interpret:** A suspicious name/signature/listener is only an investigation lead. Required service accounts, scheduled backup jobs and remote-management tools can be legitimate. On a Domain Controller, preserve NTDS/AD/DNS/Kerberos, authorized SYSVOL content, event logs and necessary service identities.
+
+**Verify/undo:** After any narrowly approved remediation, test ordinary login and all required IIS/FTP/SMB/DNS/DHCP/AD functions, check system/service events, and restore only the changed item from its baseline.
 
 ---
 
@@ -901,11 +1006,11 @@ Get-NetFirewallProfile
 
 ## Part 5 — Advanced Server Investigation and Embedded Windows Reference
 
-Use role-specific recovery first. The embedded workstation checklist is a supplemental reference, **not** a license to disable Domain Controller services.
+Use role-specific recovery first. The in-file Windows security reference covers common settings, but **the earlier Server roles and domain-specific instructions override generic workstation defaults**.
 
 ### 12. Role-aware manual procedures and recovery
 
-Use **Windows PowerShell as Administrator on the server**, not a workstation, for these commands. Substitute the actual domain, scope, site and share names. A missing role cmdlet normally means its role/module is absent; do not install a server role just to satisfy a checklist. The [Windows manual verification section](windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps) supplies shared backup, account, firewall, audit, malware and recovery procedures.
+Use **Windows PowerShell as Administrator on the server**, not a workstation, for these commands. Substitute the actual domain, scope, site and share names. A missing role cmdlet normally means its role/module is absent; do not install a server role just to satisfy a checklist. The complete **server-local backup, account, firewall, audit, malware and recovery procedures are included in Part 5, WS.19.1–WS.19.9 below**; there is no need to consult a workstation guide.
 
 #### 12.1 Identify version, roles and management dependencies
 
@@ -1019,7 +1124,7 @@ A null resultant fine-grained policy can mean the domain default applies. Save a
 gpresult /h C:\CP-Backups\server-gpresult.html
 ```
 
-Create and restrict that backup folder using Windows 19.1 first. A GPO report can contain sensitive infrastructure details.
+Create and restrict that backup folder using the **WS.19.1 baseline procedure below** first. A GPO report can contain sensitive infrastructure details.
 
 **Typing (fix, only when appropriate):** Use the policy GUI row-by-row, or, for a confirmed domain and README values:
 
@@ -1097,7 +1202,7 @@ Use these on the appropriate DC; no replication partners can be normal for a sin
 
 Choose a unique name on subsequent runs. Separately back up content and databases; IIS config backup does not preserve them.
 
-**Clicking (GUI):** `inetmgr` → site → **Bindings**, **Authentication**, **Directory Browsing**, **Logging** and **Application Pools → Advanced Settings → Identity**. Apply the earlier section's settings at the intended site, considering inheritance. For FTP inspect **FTP Authentication**, **Authorization Rules**, **SSL Settings**, **User Isolation** and **Firewall Support**. In **Server Manager → File and Storage Services → Shares**, inspect required shares; then inspect each folder's NTFS Security tab as in Windows 19.7.
+**Clicking (GUI):** `inetmgr` → site → **Bindings**, **Authentication**, **Directory Browsing**, **Logging** and **Application Pools → Advanced Settings → Identity**. Apply the earlier section's settings at the intended site, considering inheritance. For FTP inspect **FTP Authentication**, **Authorization Rules**, **SSL Settings**, **User Isolation** and **Firewall Support**. In **Server Manager → File and Storage Services → Shares**, inspect required shares; then inspect each folder's NTFS Security tab as described in **WS.19.7 below**.
 
 **Typing (check):**
 
@@ -1137,7 +1242,7 @@ This affects the saved IIS server configuration. Restore content/database/ACL ch
 
 **Why it matters:** Broad firewall blocks can break RPC-dependent AD/management even when obvious ports are open. A workstation port list is insufficient for a DC.
 
-**Before changing anything:** Export firewall/audit policy using Windows 19.1. Record required management source networks and installed antivirus/WSUS configuration. Keep console access.
+**Before changing anything:** Export firewall/audit policy using **WS.19.1 below**. Record required management source networks and installed antivirus/WSUS configuration. Keep console access.
 
 **Clicking (GUI):** **Server Manager → Local Server → Remote management / Remote Desktop**. Use NLA and authorized RDP membership. `wf.msc` → inspect built-in **role-specific** rules and their scopes; keep required AD/DNS/DHCP/SMB/RPC traffic. **Settings → Update & Security / Windows Update** varies by version; on Core use supported `sconfig` update options. In Event Viewer inspect **Security**, **System**, **Directory Service**, **DNS Server** and **DFS Replication** as applicable.
 
@@ -1155,7 +1260,7 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 
 **Typing (fix, only when appropriate):** In the WinRM policy GUI disable Basic and unencrypted traffic at the correct scope. Restrict the corresponding built-in firewall rules to authorized management sources after confirming the management connection will remain allowed. Apply approved security/role updates, preserving a legitimate organizational WSUS configuration.
 
-**Check it worked:** From an authorized management host test `Test-WSMan server-name`, an authorized RDP login if required, role-specific client transactions, then DC health commands from 12.4. Confirm new audit events and no relevant new service errors. Use selective advanced audit subcategories as described in Windows 19.4.
+**Check it worked:** From an authorized management host test `Test-WSMan server-name`, an authorized RDP login if required, role-specific client transactions, then DC health commands from 12.4. Confirm new audit events and no relevant new service errors. Use selective advanced audit subcategories as described in **WS.19.4 below**.
 
 **Undo:** Restore the exact changed listener/authentication/rule scope from its record, using the console. For an update regression use the supported recovery method for that exact update; do not disable all updates or the firewall.
 
@@ -1166,20 +1271,20 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 
 ---
 
-### 13. Complete Windows operating-system security procedures (embedded workstation reference)
+### 13. Complete Windows Server operating-system security procedures (self-contained reference)
 
-> **Server-first precedence:** This appendix is the complete Windows workstation procedures included for convenient offline use. **Do not blindly apply workstation advice to a Domain Controller, member server, required print/web/database/file services, or domain Group Policy.** The original Windows Server sections 0–12 take precedence for all role-dependent decisions. Where a command targets a local SAM account, use AD tooling only after confirming the actual machine role. Inspect rather than remove required administrators or groups.
+> **Server-first precedence:** The following in-file security reference provides detailed commands for Server hosts. Where an original example was written for a Windows desktop, the **Server role and Domain Controller instructions in Parts 1–4 take precedence**. Local-user cmdlets apply only to standalone/member servers; Active Directory users require AD tools. Never disable required print/web/AD/DNS/SMB/FTP, RDP/WinRM or domain policy merely to follow a general example.
 
 
-**Version note (November 2026):** Windows 10 mainstream support ended October 14, 2025; use only the specific security-update/ESU support arrangements available to your image, and never substitute an OS upgrade for an authorized CyberPatriot task. Windows 11 editions, policy behavior, features and installed roles can differ; check `winver` and the actual README.
+**Windows Server version note (November 2026):** Server 2016, 2019 and 2022 differ in features and management tools. Verify installed edition/build and support lifecycle using the command in Part 1. Server Core lacks many Windows GUI tools, so use PowerShell and Server Manager from an authorized management host when relevant.
 
-**How to use this page**
-- Work **top to bottom**.
+**How to use this embedded reference**
+- Work by role and task; check Parts 1–4 for priority and exceptions.
 - Each item has: **What** · **Why it matters** · **Clicking** · **Typing** (PowerShell **as Administrator**) · **Check it worked** · ⚠️ warnings.
-- New to PowerShell? Read [PowerShell basics in Section 20](windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist) first.
+- New to PowerShell? Read **WS.20: Complete PowerShell basics** below (in this same file).
 - This repository contains documentation only. Follow the manual procedures below; do not skip verification.
 - `alice`, `bob` etc. are examples. **Use the names in your README.**
-- `secpol.msc`, `gpedit.msc` and `lusrmgr.msc` only exist on **Pro, Education and Enterprise** (competition images are one of these). To check, run `winver`. On **Home**, use the **Typing** commands instead.
+- **Windows Server Desktop Experience** generally offers local policy editors and Server Manager tools; **Server Core** uses CLI/remote administration. `lusrmgr.msc` / `Get-LocalUser` do **not** administer domain accounts on a Domain Controller.
 
 ---
 
@@ -3082,7 +3187,7 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 
 #### WS.17. Critical services
 
-If the README says this computer runs a website, FTP or file shares, harden them instead of removing them. See the IIS/FTP sections of the [Windows Server checklist](windows-server.md#9-critical-server-roles-only-if-the-readme-lists-them). They work the same on Windows 10/11.
+If the README says this server runs a website, FTP or file shares, harden those **required server roles** instead of removing them. The full IIS/FTP/share procedures are already in **9.1–9.6 and 12.5** above.
 
 ---
 
@@ -3335,7 +3440,7 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 
 **Before changing anything:** Answer relevant forensics questions. Record third-party antivirus, exclusions, update policy and required application versions. Windows 10's ordinary support ended in October 2025; check the image's edition/support arrangement instead of assuming all versions receive regular updates.
 
-**Clicking (GUI):** **Windows Security → Virus & threat protection → Manage settings**; inspect real-time/cloud protection, exclusions and **Protection history**. Do not remove an exclusion merely because it exists; verify its purpose. Open **Settings → Windows Update → Update history** and each required application's **Help → About** page. On Server use its corresponding checklist.
+**Clicking (GUI):** **Windows Security → Virus & threat protection → Manage settings**; inspect real-time/cloud protection, exclusions and **Protection history**. Do not remove an exclusion merely because it exists; verify its purpose. Open **Settings → Windows Update → Update history** and each required application's **Help → About** page. On this Server, use the Server Manager, Server Core/sconfig or organizational update tool procedure in **5.3** above.
 
 **Typing (check):**
 
@@ -3488,7 +3593,7 @@ Replace the DNS target with the README-required internal hostname; internet DNS 
 
 ---
 
-#### WS.20. Complete PowerShell basics — included in this Windows checklist
+#### WS.20. Complete PowerShell basics — included in this Windows Server handbook
 
 ##### WS.20.0 PowerShell command and terminal primer
 
@@ -3634,11 +3739,11 @@ Expected: `original value`. This file restore does not model account/password re
 
 ---
 
-#### WS.21. Advanced Windows investigations — included in this checklist
+#### WS.21. Advanced Windows Server investigations — included in this handbook
 
 
 
-> **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
+> **Use after:** Server roles and required services are identified in Parts 1–4. These are **manual Windows Server procedures inside this document**, not a script. Read the README, preserve forensic evidence, and retain a working admin/management path first.
 
 This supplement draws topic ideas from public CyberPatriot checklists and verifies key methods with Microsoft documentation. A generic checklist cannot tell you which accounts, shares, or services are authorized on *your* image.
 
