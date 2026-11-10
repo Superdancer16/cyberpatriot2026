@@ -19,21 +19,15 @@ Debian is Ubuntu's and Linux Mint's "parent", so most commands are the same as t
 ### 0.1 Read the README, take a snapshot, open the Scoring Report
 - [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
-
 See [Reading the README](../start-here/reading-the-readme.md). In VMware: **VM → Snapshot → Take Snapshot**.
 
 ### 0.2 Open a terminal
 - [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
-
 GNOME: press the **Super (Windows) key**, type `terminal`, press Enter.
 
 ### 0.3 Become an administrator: `sudo` or `su -`
 - [ ] Done
-
-**Script:** ✋ Not done by the script. Do this by hand.
 
 ```bash
 sudo -v
@@ -62,8 +56,6 @@ They must **log out and back in** before `sudo` works for them.
 ### 1.1 Answer them before changing anything
 - [ ] Done
 
-**Script:** ✋ Not done by the script. Do this by hand.
-
 Same tools as [Mint section 1](linux-mint.md#1-forensics-questions-do-these-first), **except the logs:**
 ```bash
 sudo journalctl _COMM=sshd | tail -50         # SSH logins
@@ -79,40 +71,23 @@ Without `sudo` (or root), `journalctl` shows only **your own** messages, so a lo
 ### 1.2 Fast path: run the hardening script
 - [ ] Done
 
-**What:** Once **every forensics question is answered**, run the toolkit's script `scripts/linux/harden.sh`. It fixes many of the steps below for you and gives you a to-do list for the rest.
+**What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
-**Why it matters:** The script does in a few minutes what takes an hour by hand, and it backs up every file before changing it. That leaves you more time for the steps that need a human.
+**Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
-**Typing:**
-1. Get the script onto the image: open [Download the scripts](/downloads/) on this website and run the **Linux** download commands there. They save `harden.sh` and an example config in the `cp` folder inside your home folder (`~/cp`). No internet on the image? See [Using the scripts](../start-here/using-the-scripts.md).
-2. Optional: make a config file with the [README config builder](/tools/config-builder/) and save it as `my.conf` in `~/cp`, next to `harden.sh`. No config? Leave out `--config my.conf` and the script asks you for the README names instead.
-3. Run it in **audit** mode first (it changes nothing) and read every `REVIEW` line. Then run it in **apply** mode:
-```bash
-cd ~/cp
-sudo bash harden.sh --audit --config my.conf        # report only: read the REVIEW lines
-sudo bash harden.sh --apply --config my.conf        # make the changes (it asks before risky ones)
-sudo cat /root/cyberpatriot/findings-*.txt          # your to-do list: every REVIEW item
-```
+**Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
-**`sudo` doesn't work yet (step 0.3)?** Use `su -` and leave out `sudo`. `su -` takes you to root's home folder, so `cd` back to the folder with the script first:
-```bash
-su -                                                # asks for ROOT's password
-cd /home/alice/cp                                  # your own user's home folder + /cp
-bash harden.sh --apply --config my.conf
-```
-Run this way, the script can't tell who you are, so make sure **your own account** is in the README admin list you give it. It also won't lock root (see step 2.6).
+**Clicking (GUI):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
 
-**Check it worked:** The summary at the end shows mostly `OK` and `CHANGED`. Refresh the **Scoring Report**: your score should have gone up.
+**Typing (check):** Use the read-only inventory commands in the next section of this checklist. Save their output in a private working folder; do not publish passwords or password hashes.
 
-Every step below has a **Script:** line:
-- **✅** the script does the whole step.
-- **🔎** the script does part of it or only reports it. Finish it yourself.
-- **✋** the script doesn't do it. Do it by hand.
+**Typing (fix, only when appropriate):** Work through one manual item at a time below. Read every command before entering it. There is no script to download from this repository.
 
-Now skip every step marked **Script: ✅** below (on the website, press **Tick the script's ✅ steps** at the top of the page). Do the 🔎 and ✋ steps.
+**Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
 
-> [!WARNING]
-> If any line says `FAILED`, do that step by hand. If your score goes **down**, find the change that caused it and undo it from the backups in `/root/cyberpatriot/backups/` (see [Using the scripts](../start-here/using-the-scripts.md#undoing-a-change)).
+**Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
+
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -120,8 +95,6 @@ Now skip every step marked **Script: ✅** below (on the website, press **Tick t
 
 ### 2.1 List users
 - [ ] Done
-
-**Script:** 🔎 The script shows the users on this machine and flags every one that isn't in the README; you still type the README names in correctly.
 
 **Clicking (GNOME):** **Settings → Users** → click **Unlock** (top right) and enter a password.
 
@@ -133,8 +106,6 @@ awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd
 ### 2.2 Delete users who are not in the README
 - [ ] Done
 
-**Script:** ✅ Done by the script (`users` section).
-
 **Clicking:** **Settings → Users** → **Unlock** → click the user → **Remove User…**
 
 **Typing:**
@@ -145,16 +116,12 @@ sudo deluser mallory              # or as root: deluser mallory
 ### 2.3 Add missing users
 - [ ] Done
 
-**Script:** 🔎 The script creates missing README users (and makes README admins administrators), but they only get a password if you give it one (NEW_PASSWORD or when asked).
-
 ```bash
 sudo adduser erin
 ```
 
 ### 2.4 Fix administrators (the `sudo` group)
 - [ ] Done
-
-**Script:** ✅ Done by the script (`users` section).
 
 **Clicking:** **Settings → Users** → click the user → toggle **Administrator**.
 
@@ -168,20 +135,16 @@ sudo usermod -aG sudo alice
 ### 2.5 Hidden root accounts, hidden users, powerful groups, weak passwords
 - [ ] Done
 
-**Script:** 🔎 The script handles much of Mint 2.5–2.7 but asks you about hidden users and only sets passwords if you give one; follow the tags on those Mint steps.
-
 Same as [Mint 2.5 – 2.7](linux-mint.md#25-look-for-hidden-root-accounts-and-hidden-users).
 
 ### 2.6 The root account
 - [ ] Done
 
-**Script:** 🔎 The script locks root only if you ran it with `sudo` from an admin account; if you still need `su -`, give root a strong password yourself.
-
 On Debian, **root may have a password** (Mint and Ubuntu lock it).
 ```bash
 sudo passwd -S root       # P = has a password, L = locked
 ```
-- If the README's admins can use `sudo` (0.3), lock root: `sudo passwd -l root`
+- If the README/policy requires disabling root password login, first prove a separate authorized sudo/recovery path works (0.3), then use `sudo passwd -l root`. A working sudo setup alone does not require this change.
 - If you still need `su -`, **don't lock root**. Just make sure its password is strong: `passwd root`
 
 ---
@@ -191,9 +154,7 @@ sudo passwd -S root       # P = has a password, L = locked
 ### 3.1 Same as Mint
 - [ ] Done
 
-**Script:** 🔎 The script does Mint 3.1–3.5 (and installs `libpam-pwquality`), but lockout (3.6) only if ENABLE_LOCKOUT=yes or you answer yes.
-
-Follow [Mint section 3](linux-mint.md#3-password-and-lockout-policy). Debian 12 has `pam_faillock`, and its `common-auth` has the same layout (including the comment line between `pam_unix` and `pam_deny`, which is why the order in Mint 3.6 matters).
+Follow [Mint section 3](linux-mint.md#3-password-and-lockout-policy) and [the full PAM procedure](linux-mint.md#172-password-aging-pam-and-lockout-without-breaking-login). Inspect installed modules, profiles and control flow; Debian PAM layouts can differ by release, package version and enabled identity providers. Do not replace the stack based on an assumed layout.
 
 `libpam-pwquality` isn't installed by default (Mint 3.3 starts by installing it):
 ```bash
@@ -207,9 +168,7 @@ sudo apt install libpam-pwquality
 ### 4.1 Install and turn on UFW
 - [ ] Done
 
-**Script:** 🔎 The script installs and turns on UFW and opens ports for the critical services you entered; check `sudo ufw status verbose` matches the README.
-
-**Why:** Debian ships **without** a firewall turned on.
+**Why:** The image may have no active host firewall, but it may already use native nftables or another manager. First inspect [the existing firewall owner](linux-mint.md#174-ufw-and-nftables-one-firewall-owner). The UFW commands below apply only if UFW is the chosen manager; do not enable a competing policy blindly. Establish required source/port exceptions before enabling default deny.
 
 ```bash
 sudo apt install ufw
@@ -229,8 +188,6 @@ Prefer clicking? `sudo apt install gufw`, then open **Firewall Configuration**.
 ### 5.1 Check the software sources
 - [ ] Done
 
-**Script:** 🔎 The script flags unofficial sources, `[trusted=yes]` and a missing security source under REVIEW; you remove the bad ones.
-
 ```bash
 grep -rs '^[^#]' /etc/apt/sources.list*       # every source line, with the file it is in
 ```
@@ -244,8 +201,6 @@ For Debian 12 you should see **`deb.debian.org/debian`** with **`bookworm`** and
 ### 5.2 Install all updates
 - [ ] Done
 
-**Script:** 🔎 The script installs all updates only if FULL_UPGRADE=yes or you say yes when asked; otherwise do it here.
-
 ```bash
 sudo apt update
 sudo apt full-upgrade -y
@@ -255,19 +210,15 @@ sudo apt full-upgrade -y
 ### 5.3 Turn on automatic updates
 - [ ] Done
 
-**Script:** ✅ Done by the script (`updates` section).
-
 ```bash
 sudo apt install unattended-upgrades
 sudo dpkg-reconfigure -plow unattended-upgrades       # answer Yes
 cat /etc/apt/apt.conf.d/20auto-upgrades
 ```
-**Check it worked:** the file has `APT::Periodic::Update-Package-Lists "1";` and `APT::Periodic::Unattended-Upgrade "1";` (the script also adds two more lines; that's fine).
+**Check it worked:** the file has `APT::Periodic::Update-Package-Lists "1";` and `APT::Periodic::Unattended-Upgrade "1";` (inspect other APT periodic directives too).
 
 ### 5.4 Held packages
 - [ ] Done
-
-**Script:** ✅ Done by the script (`updates` section).
 
 ```bash
 apt-mark showhold              # anything listed will never update
@@ -276,8 +227,6 @@ sudo apt-mark unhold firefox-esr        # change firefox-esr to each name the li
 
 ### 5.5 Update Firefox ESR and the README's apps
 - [ ] Done
-
-**Script:** 🔎 Done only if the script installed all updates (FULL_UPGRADE=yes or you said yes); still check these apps.
 
 **What:** On Debian, Firefox is the package **`firefox-esr`** (there is no `firefox` package, so `apt install firefox` fails). Thunderbird, LibreOffice and the README's critical services also update through `apt`. Step 5.2 updates them all; if you skipped it or it failed, update the important ones on their own:
 ```bash
@@ -293,14 +242,10 @@ sudo apt install --only-upgrade firefox-esr thunderbird      # skips any that ar
 ### 6.1 GNOME "Sharing" settings
 - [ ] Done
 
-**Script:** 🔎 The script can stop SSH, VNC and Samba if the README doesn't need them, but it doesn't change GNOME's Sharing settings; turn those off here.
-
 **Clicking:** **Settings → Sharing** (in the list on the left). Turn **off** anything the README doesn't need: **Remote Desktop / Screen Sharing**, **Remote Login** (that's SSH), **File Sharing**, **Media Sharing**.
 
 ### 6.2 Turn off services that aren't needed
 - [ ] Done
-
-**Script:** 🔎 The script offers to stop (or remove) known services the README doesn't list; SSH, uninstalling, and services it doesn't know about are your call.
 
 Same table and commands as [Mint section 6](linux-mint.md#6-services):
 ```bash
@@ -317,14 +262,12 @@ sudo apt purge vsftpd                   # remove it completely (change the name 
 ### 7.1 Same as Mint
 - [ ] Done
 
-**Script:** 🔎 The script removes known prohibited packages (including GNOME games) and lists files under REVIEW; follow the tags on the Mint section 7 steps.
-
 Follow [Mint section 7](linux-mint.md#7-prohibited-software-and-files). Debian's GNOME install can include games (`gnome-games`, `aisleriot`, `gnome-mines`, `gnome-sudoku`…):
 ```bash
 dpkg -l | grep -Ei 'gnome-games|aisleriot|mines|sudoku|mahjongg|chess|robots|tetravex|nibbles|klotski|quadrapassel|swell-foop|tali|four-in-a-row|five-or-more|hitori|iagno|lightsoff'
 sudo apt purge gnome-games && sudo apt autoremove
 ```
-Debian's standard install also includes **`netcat-traditional`** (the `nc` command, a favourite for backdoors). The script removes it; by hand: `sudo apt purge netcat-traditional`, unless the README needs it.
+Debian's standard install also includes **`netcat-traditional`** (the `nc` command, a favourite for backdoors). Remove it only if prohibited by the README, using: `sudo apt purge netcat-traditional`, unless the README needs it.
 
 ---
 
@@ -332,8 +275,6 @@ Debian's standard install also includes **`netcat-traditional`** (the `nc` comma
 
 ### 8.1 No automatic login (GDM)
 - [ ] Done
-
-**Script:** ✅ Done by the script (`desktop` section).
 
 **Clicking:** **Settings → Users** → **Unlock** → turn off **Automatic Login** for every user.
 
@@ -351,8 +292,6 @@ In `[security]`: `DisallowTCP=true`.
 ### 8.2 Screen lock
 - [ ] Done
 
-**Script:** 🔎 The script sets a 5-minute screen lock for all users with dconf; run the `gsettings` check, and set it by hand if the script says REVIEW.
-
 **Clicking:** **Settings → Privacy → Screen** (Debian 11: **Privacy → Screen Lock**): **Blank Screen Delay: 5 minutes**, **Automatic Screen Lock: On**, **Automatic Screen Lock Delay: Screen Turns Off**.
 
 **Check** (in a terminal as **your own user**, not after `su -` or with `sudo`: as root, `gsettings` shows root's settings, not yours):
@@ -363,8 +302,6 @@ gsettings get org.gnome.desktop.session idle-delay           # uint32 300
 
 ### 8.3 Hide the list of users on the login screen
 - [ ] Done
-
-**Script:** ✅ Done by the script (`desktop` section).
 
 **What:** Make the GDM login screen ask for a user name instead of showing every account.
 
@@ -401,8 +338,6 @@ These are the same on Debian. Follow the Mint sections:
 ### 10.1 Install rsyslog and auditd
 - [ ] Done
 
-**Script:** ✅ Done by the script (`logging` section).
-
 **Why:** Without `rsyslog`, there's no `/var/log/auth.log`. Many people (and some scoring checks) expect it.
 ```bash
 sudo apt install rsyslog auditd
@@ -412,8 +347,6 @@ Audit rules: same as [Mint 14.1](linux-mint.md#14-logging-and-auditing).
 
 ### 10.2 AppArmor
 - [ ] Done
-
-**Script:** ✅ Done by the script (`apparmor` section).
 
 Debian has AppArmor turned on by default. Check it's still on:
 ```bash
@@ -436,3 +369,125 @@ Follow the [Linux service hardening guide](../guides/linux-service-hardening.md)
 - [ ] `sudo ufw status` → active
 - [ ] Scoring Report shows **no penalties**
 - [ ] Forensics answers saved, final snapshot taken
+
+## 13. Debian-specific manual verification and recovery
+
+### 13.1 Root, sudo and account policy
+
+- [ ] Done
+
+**What:** Establish the image's actual administration path before changing root or PAM.
+
+**Why it matters:** Debian can be installed with a usable root password and no sudo setup. Locking root first can remove the only recovery path.
+
+**Before changing anything:** Keep a root console (`su -`, then enter the root password interactively) open. Do not paste the root password into a command. Follow [Mint 17.1–17.2](linux-mint.md#171-users-root-and-privilege-recovery) for private backups, account reconciliation, aging and PAM tests; inspect the modules actually installed on Debian.
+
+**Clicking (GUI):** In GNOME use **Settings → Users → Unlock**. Xfce/KDE use their own account panels. GUI account panels do not show every service account or sudoers include.
+
+**Typing (check):** In the normal user's terminal:
+
+```bash
+cat /etc/os-release
+id
+command -v sudo
+getent group sudo
+```
+
+From the root console inspect `passwd -S root` and `visudo -c` if sudo is installed. Do not presume that `su - bob` from root validates Bob's password.
+
+**Typing (fix, only when appropriate):** If the README authorizes your user as an administrator and sudo is absent, from the existing root shell:
+
+```bash
+apt install sudo
+```
+
+Then, substituting the actual authorized account:
+
+```bash
+usermod -aG sudo alice
+visudo -c
+```
+
+Do not add a duplicate blanket line to sudoers. In a **new login** as Alice run `sudo -v` and `sudo -l`. Only after an independently tested admin/recovery path exists should you consider locking root's password if appropriate; root need not be locked merely to match Ubuntu.
+
+**Check it worked:** New admin login succeeds; approved ordinary users lack unauthorized sudo grants; `sudo chage -l bob` matches the README. Test a normal password change after any PAM modification.
+
+**Undo:** From the retained root console restore the original individual sudoers/group/PAM settings. If root was mistakenly password-locked, restore the recorded state only after checking the authorized access policy; do not unlock it blindly.
+
+**Warnings:** Debian 11/12 package versions differ in PAM profiles and algorithms. Never replace common-auth/common-password with a copied internet stack or re-enable obsolete pam_tally modules.
+
+### 13.2 Debian repositories, security pockets and updates
+
+- [ ] Done
+
+**What:** Use signed repositories for the actual installed Debian release.
+
+**Why it matters:** Mixing stable/testing/Ubuntu packages can make dependency recovery difficult. Debian 11 and 12 support status differs over time; verify current official security/LTS coverage for the image's architecture and packages.
+
+**Before changing anything:** Back up `/etc/apt` using [Mint 17.5](linux-mint.md#175-package-sources-updates-and-vulnerability-triage). Read the installed `man sources.list` and record the release codename.
+
+**Clicking (GUI):** If installed, **Software & Updates / Software Sources** or Synaptic's **Settings → Repositories**. Do not install a new package manager merely for this screen.
+
+**Typing (check):**
+
+```bash
+cat /etc/os-release
+apt-cache policy
+sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Components:|Signed-By:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+```
+
+Debian 12 uses `bookworm`, `bookworm-updates` and `bookworm-security` for the respective pockets when supported. Debian 11 uses its own `bullseye` suites. Both `.list` and `.sources` formats can be valid. Do not change codenames to those of a newer release during a round.
+
+**Typing (fix, only when appropriate):** Edit only the identified bad entry using `sudo nano` on that file, preserving signed official entries. Then run separately:
+
+```bash
+sudo apt update
+```
+
+```bash
+apt -s upgrade
+```
+
+After reviewing a clean preview:
+
+```bash
+sudo apt upgrade
+```
+
+**Check it worked:** `sudo dpkg --audit` should report no incomplete package configuration; `apt list --upgradable` explains what remains. Verify Firefox ESR and required applications through their supported Debian package updates; Debian security fixes can be backported without adopting an upstream major version.
+
+**Undo:** Restore the affected source file and refresh metadata; installed-package recovery is separate. Do not delete package-manager locks while another manager runs.
+
+**Warnings:** A repository error can reflect a mirror, DNS, clock or lifecycle problem. Do not disable signature checking or copy a historical sources.list to silence it.
+
+### 13.3 Native firewall ownership, logs and desktop
+
+- [ ] Done
+
+**What:** Preserve Debian's actual firewall/logging/desktop design.
+
+**Why it matters:** Debian may use native nftables and journald without UFW or `/var/log/auth.log`. Absence of an Ubuntu GUI does not mean protection is missing.
+
+**Before changing anything:** Save the active rules and identify the existing manager with [Mint 17.4](linux-mint.md#174-ufw-and-nftables-one-firewall-owner). Record GNOME/KDE/Xfce and the display manager.
+
+**Clicking (GUI):** GNOME **Settings → Privacy / Privacy & Security → Screen Lock**; KDE **System Settings → Screen Locking**; Xfce's lock behavior depends on its installed locker. Set and test the actual one. Do not use Cinnamon gsettings keys on Debian GNOME.
+
+**Typing (check):**
+
+```bash
+sudo nft list ruleset
+systemctl status nftables systemd-journald rsyslog --no-pager
+sudo journalctl _COMM=sshd -n 50 --no-pager
+sudo journalctl _COMM=sudo -n 50 --no-pager
+systemctl status display-manager --no-pager
+```
+
+Unknown rsyslog/UFW units may be normal. Investigate actual logging retention instead of assuming a file must exist.
+
+**Typing (fix, only when appropriate):** Keep the existing firewall owner. Use the full native nftables edit/validation procedure linked above if applicable. Use [Mint 17.6–17.8](linux-mint.md#176-ownership-permissions-suid-and-capabilities) for file permissions, cron/systemd persistence, AppArmor and kernel controls, checking supported keys/modules first. Use the [per-service procedures](../guides/linux-service-hardening.md) for Apache/Nginx, databases, FTP, Samba, DNS, DHCP and mail.
+
+**Check it worked:** A new authorized login, sudo, expected logs, new inbound permitted service connections and all required application transactions must succeed. Record the final scoring timestamp and save forensics answers.
+
+**Undo:** Restore only the changed rule/config/key using its backup, validate syntax and retest. Do not flush all nftables rules, clear logs or restart the display manager as a generic repair.
+
+**Warnings:** On remote sessions get console access before changing firewall or authentication. Required services stay enabled even if the README uses different wording from the checklist.
