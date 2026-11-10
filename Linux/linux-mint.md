@@ -6,7 +6,7 @@ Linux Mint is in **Round 1, the State round, and the Semifinals** this season. I
 - Work **top to bottom**. The order matches where points usually are.
 - Each item has: **What** · **Why it matters** · **Clicking** (the GUI way) · **Typing** (terminal commands) · **Check it worked** · and sometimes a ⚠️ warning about when *not* to do it.
 - `alice`, `bob` etc. are example names. **Use the names from your README.**
-- New to the terminal? Read [Linux terminal basics](../start-here/linux-terminal-basics.md) first (10 minutes).
+- New to the terminal? Read [Linux terminal basics](linux-terminal-basics.md) first (10 minutes).
 - Follow the manual procedures and verify every item; automation is not included in this repository.
 
 ---
@@ -16,7 +16,7 @@ Linux Mint is in **Round 1, the State round, and the Semifinals** this season. I
 ### 0.1 Read the README
 - [ ] Done
 
-Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../start-here/reading-the-readme.md).
+Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/All/reading-the-readme.md).
 
 ### 0.2 Take a snapshot
 - [ ] Done
@@ -61,7 +61,7 @@ sha256sum /path/to/file                            # hash of a file
 echo 'aGVsbG8=' | base64 -d                        # decode base64
 sudo grep -E 'Accepted|Failed' /var/log/auth.log   # who logged in / failed to
 ```
-More techniques: [Forensics questions guide](../guides/forensics-questions.md).
+More techniques: [Forensics questions guide](../General/All/forensics-questions.md).
 
 > [!WARNING]
 > Answers must be **exact**: right spelling, capitals, and full paths when asked. Don't delete the "ANSWER:" line.
@@ -85,7 +85,7 @@ More techniques: [Forensics questions guide](../guides/forensics-questions.md).
 
 **Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../start-here/using-the-scripts.md) for the limits of external tools.
+**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -969,7 +969,7 @@ sudo aa-enforce /usr/bin/man      # change /usr/bin/man to the name aa-status li
 
 ## 16. Critical services (only what the README lists)
 
-If the README needs a web server, database, FTP, Samba or similar, **harden it instead of removing it**. Step-by-step: [Linux service hardening guide](../guides/linux-service-hardening.md).
+If the README needs a web server, database, FTP, Samba or similar, **harden it instead of removing it**. Step-by-step: [Linux service hardening guide](linux-service-hardening.md).
 
 ---
 
@@ -1520,7 +1520,7 @@ ip route
 sudo ss -tulpn
 ```
 
-**Typing (fix, only when appropriate):** Apply the distribution-specific desktop procedure and the per-service instructions in [Linux service hardening](../guides/linux-service-hardening.md). Do not stop a service merely because it appears in the listening-port list.
+**Typing (fix, only when appropriate):** Apply the distribution-specific desktop procedure and the per-service instructions in [Linux service hardening](linux-service-hardening.md). Do not stop a service merely because it appears in the listening-port list.
 
 **Check it worked:** New authorized login, screen lock/unlock, sudo, hostname resolution, required web/database/share/SSH transactions, all saved forensic answers, current score timestamp, no new service failures. Check package operations have completed before any necessary reboot.
 

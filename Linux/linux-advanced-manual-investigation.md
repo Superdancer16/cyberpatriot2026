@@ -1,6 +1,6 @@
 # Linux advanced manual investigations: SSH, PAM, UFW and persistence
 
-> Use alongside [Linux Mint](../checklists/linux-mint.md), [Ubuntu](../checklists/ubuntu.md), [Debian](../checklists/debian.md), and [critical service hardening](linux-service-hardening.md). This page assumes **Ubuntu / Debian / Linux Mint using systemd**; consult the [FreeBSD checklist](../checklists/freebsd.md) for FreeBSD-specific commands. **Read the image README and preserve forensics evidence first.**
+> Use alongside [Linux Mint](linux-mint.md), [Ubuntu](ubuntu.md), [Debian](debian.md), and [critical service hardening](linux-service-hardening.md). This page assumes **Ubuntu / Debian / Linux Mint using systemd**; consult the [FreeBSD checklist](freebsd.md) for FreeBSD-specific commands. **Read the image README and preserve forensics evidence first.**
 
 These are individually copyable terminal commands. **Inspection is not the same as permission to modify.** Run modifications only after verifying accounts, critical services, connectivity and backups.
 
@@ -112,7 +112,7 @@ grep -E '^[[:space:]]*PASS_(MAX|MIN|WARN)' /etc/login.defs
 sudo chage -l exampleuser
 ~~~
 
-If changing aging is required, consult the policy specified in the README and the [Mint checklist](../checklists/linux-mint.md#3-password-and-lockout-policy) for \`chage\` examples.
+If changing aging is required, consult the policy specified in the README and the [Mint checklist](linux-mint.md#3-password-and-lockout-policy) for \`chage\` examples.
 
 **Before edits:** Preserve backups of \`/etc/pam.d/common-password\`, \`common-auth\` and the relevant original config, plus working console/root access. When available, use distribution-maintained \`pam-auth-update\` rather than inventing a new stack.
 

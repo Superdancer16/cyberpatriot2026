@@ -229,7 +229,7 @@ A missing socket unit is normal on some installations; do not install one merely
 
 **Why it matters:** `sudo gsettings` targets the wrong user; a secure desktop does not compensate for an open server.
 
-**Before changing anything:** Record the user's current values and inspect installed schemas. Use [Mint 17.4–17.9](linux-mint.md#174-ufw-and-nftables-one-firewall-owner) for firewall, package, permissions, persistence, kernel/AppArmor, log and recovery procedures, and [service hardening](../guides/linux-service-hardening.md) for each installed required daemon.
+**Before changing anything:** Record the user's current values and inspect installed schemas. Use [Mint 17.4–17.9](linux-mint.md#174-ufw-and-nftables-one-firewall-owner) for firewall, package, permissions, persistence, kernel/AppArmor, log and recovery procedures, and [service hardening](linux-service-hardening.md) for each installed required daemon.
 
 **Clicking (GUI):** **Settings → Privacy → Screen Lock** on older GNOME, or **Privacy & Security → Screen Lock** on newer versions. Enable automatic locking and require a password; disable automatic login in **Users** if unauthorized. **Files → Preferences** contains removable-media behavior on some releases; other versions use **Settings → Removable Media**.
 
