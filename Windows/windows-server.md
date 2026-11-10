@@ -1,6 +1,6 @@
 # Windows Server 2016 / 2019 / 2022 — Complete Standalone CyberPatriot Hardening Handbook
 
-Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competition's actual image README and official round materials. **Version and support (November 2026):** Server 2016 extended support ends January 12, 2027; Server 2019 ends January 9, 2029; Server 2022 ends October 14, 2031. Server 2022 moved to extended support in October 2026 but still receives monthly security updates. Never perform a release upgrade to earn speculative points. See [Microsoft's Windows Server release information](https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info).
+Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competition's actual image README and official round materials. **Version and support (November 2026):** Server 2016 extended support ends in January 2027, Server 2019 in January 2029, and Server 2022 in October 2031. Confirm the exact lifecycle date for the installed edition in Microsoft's current lifecycle documentation. Server 2022 moved to extended support in October 2026 but still receives monthly security updates. Never perform a release upgrade to earn speculative points. See [Microsoft's Windows Server release information](https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info).
 
 **This is a self-contained Windows Server guide.** It includes the local-server, domain-member and Domain Controller procedures, plus a complete server-adapted Windows security reference in Part 5. You do **not** need to open the Windows workstation guide. Domain/role requirements take precedence over generic workstation hardening.
 
@@ -9,6 +9,26 @@ Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competi
 ---
 
 **Priority is practical, not a guaranteed score ranking.** The README, forensics questions, permitted tools and actual required services override any generic checklist. Do not remove the only admin, delete evidence, or disable a critical role merely because it appears in a public checklist.
+
+## At-a-glance task map — everything in this one guide
+
+| Need to do | Read this section inside THIS file | Do not overlook |
+|---|---|---|
+| Determine version, DC/member/standalone, GUI/Core | Part 1 and **1.1** | AD DS installed does not prove the machine is promoted |
+| README, forensic questions, initial score and backups | **0**, **0.1**, **1.2** | Preserve evidence before cleanup |
+| Standalone/member local users and administrators | **2.1**; **WS.2** | Do not treat domain users as local |
+| Active Directory users, privileged groups and service accounts | **2.2–2.5**, **12.2** | krbtgt, computer accounts, managed service accounts |
+| Local passwords, domain policy and FGPP | **3.1–3.2**, **12.3** | Account scope and GPO precedence |
+| Defender, Firewall, Updates, audit and security options | **5.1–5.4**, **4.1–4.4** | Role-required ports, WSUS and effective policies |
+| Services, features, spooler, remote access | **6.1–6.3**, **7.1**, **8.1–8.2** | WinRM, RDP and DC dependency services |
+| AD DS, DNS, DHCP, IIS, FTP, SMB and TLS | **9.1–9.7**, **12.4–12.5** | Verify actual client transactions |
+| Unwanted software/files, scheduled tasks and persistence | **10**, **WS.12–WS.16**, **WS.19.8**, **WS.21** | Signed/authorized software versus malware |
+| PowerShell basics, local permissions, audit and recovery | **WS.19–WS.21** | All present directly below |
+| Final cross-role validation | Part 6 | Check score only after functionality |
+
+**Read this document from start to finish for a full image**, or jump to the numbered task for a quick repair. The "WS" reference sections are **embedded in this file**; they are not an external Windows guide. The service, account and policy exceptions for Domain Controllers always take precedence.
+
+---
 
 ## Part 1 — Basics / Information Needed
 
@@ -856,51 +876,77 @@ Get-Service -Name 'RemoteRegistry' | Format-Table Name,Status,StartType
 ```powershell
 Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Table Name, Status, StartType
 ```
-All should be **Running** and **Automatic**.
+**Do not require every service in this list to be Running and Automatic on every DC.** Some are Manual/trigger-start or absent depending on installed role and topology (for example Intersite Messaging). Compare installed dependencies, expected operational state and the README. Required **NTDS, Kdc, Netlogon, DNS when hosted, time and SYSVOL replication** need role-specific health tests; a generic StartType column is not the full test.
 
-#### 6.3 Print Spooler: PrintNightmare fixes
+#### 6.3 Print Spooler, Point and Print and PrintNightmare
+
 - [ ] Done
 
-**Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM. If the spooler must keep running, make sure only admins can install drivers.
+**Why:** Print Spooler has been involved in serious privilege-escalation/remote-code-execution vulnerabilities. Whether it should be disabled depends on whether this machine is a required print server and the installed update/policy state.
 
-**Clicking:** `gpedit.msc` (on a DC: the **Default Domain Controllers Policy** in `gpmc.msc`) → **Computer Configuration → Administrative Templates → Printers**:
-- **Limits print driver installation to Administrators**: **Enabled**.
-- **Point and Print Restrictions**: **Enabled**, and both "When installing drivers for a new connection" and "When updating drivers for an existing connection" set to **Show warning and elevation prompt**.
+**Typing (check):**
 
-**Typing:**
-```powershell
-$pp = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'
-if (-not (Test-Path $pp)) { New-Item -Path $pp -Force | Out-Null }
-New-ItemProperty -Path $pp -Name RestrictDriverInstallationToAdministrators -Value 1 -PropertyType DWord -Force
-New-ItemProperty -Path $pp -Name NoWarningNoElevationOnInstall -Value 0 -PropertyType DWord -Force
-New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWord -Force
-Get-Service Spooler | Format-Table Name, Status, StartType     # Disabled on a DC unless it's the print server
-```
-**Check it worked:** `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'` shows `RestrictDriverInstallationToAdministrators : 1` and the other two `0`.
+~~~powershell
+Get-Service Spooler -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
+Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' -ErrorAction SilentlyContinue |
+  Select-Object RestrictDriverInstallationToAdministrators,NoWarningNoElevationOnInstall,UpdatePromptSettings
+~~~
 
----
+**GUI:** Server Manager → Local Server → identify **Print and Document Services** if installed. Win + R → services.msc → Print Spooler. For GPO, open the correct linked GPO in gpmc.msc (DC) or local gpedit.msc (standalone/member) → Computer Configuration → Administrative Templates → Printers and inspect Point and Print Restrictions / Limits print driver installation to Administrators.
 
----
+**Server-specific decision:**
+1. If **no printing is required** and the README permits it, consider disabling only Spooler after identifying dependencies and recording its original startup state.
+2. If this is a **required print server**, keep Spooler functional, install approved security patches and apply compatible driver-installation restrictions; confirm legitimate printers and administrator installation workflows still work.
+3. For a Domain Controller, the spooler is usually not required, but confirm the actual assigned role before stopping it.
+4. Review Point-and-Print policies in the effective GPO; an explicit **NoWarningNoElevationOnInstall=1** can be a dangerous bypass. A missing registry value is not by itself proof of insecurity; inspect inherited policy and defaults.
+
+**Change (ONLY when policy and role require the restriction):** In the applicable Printers policy enable **Limits print driver installation to Administrators**; inspect user elevation prompts. Avoid blindly creating several registry values in one command because the effective GPO can override them.
+
+**Verify:** Confirm expected policy, installed update status and required printer client functionality. Test from an authorized printer/client context if this is a print server.
+
+**Undo:** Restore exactly the prior documented service state or policy if a needed printer application breaks, while maintaining the strongest feasible protective controls.
 
 ### 7. Roles and features
 
-#### 7.1 Remove roles and features that aren't needed
+#### 7.1 Inspect and safely remove **only specifically prohibited** roles/features
+
 - [ ] Done
 
-**Clicking:** **Server Manager → Manage → Remove Roles and Features**. Untick unneeded **features**: Telnet Client, TFTP Client, SMB 1.0/CIFS File Sharing Support, Windows PowerShell 2.0 Engine, SNMP Service, Simple TCP/IP Services. Remove **roles** only if the README clearly doesn't need them (e.g. Web Server (IIS) on a plain DC).
+**Why:** An unauthorized feature can expose attack surface, but deleting a role may break domain authentication, a required website/share or application data. Removing role binaries often does **not** restore required configuration if later reinstalled.
 
-**Typing:**
-```powershell
-Get-WindowsFeature | Where-Object Installed | Format-Table Name, DisplayName
-Uninstall-WindowsFeature -Name Telnet-Client, TFTP-Client, FS-SMB1, PowerShell-V2, Simple-TCPIP
-Uninstall-WindowsFeature -Name SNMP-Service      # only if the README doesn't need SNMP
-```
-Restart once when it says a restart is needed (SMBv1 removal needs one).
+**GUI (read-only first):** Server Manager → **Manage → Add Roles and Features** to review installed roles/features, or **Remove Roles and Features** to inspect candidates/dependencies **without confirming removal**. Note installed AD DS, DNS, DHCP, IIS, file services and Windows Defender.
 
-> [!CAUTION]
-> **Never** remove **AD DS**, **DNS Server**, or any role the README mentions.
+**Typing (check, elevated PowerShell):**
 
----
+~~~powershell
+Get-WindowsFeature | Where-Object Installed | Format-Table Name,DisplayName,InstallState
+Get-WindowsFeature | Where-Object Name -match 'Telnet|TFTP|SMB1|PowerShell-V2|SNMP|Simple-TCPIP' | Format-Table Name,InstallState
+~~~
+
+**Candidate table:**
+
+| Legacy feature | Typical risk | Keep if... |
+|---|---|---|
+| Telnet Client/Server | Unencrypted legacy remote terminal access | Specifically required for a legitimate lab task |
+| TFTP Client/Server | Unauthenticated file transfer (legacy) | An approved boot/provisioning function requires it |
+| SMB 1.0 / CIFS | Obsolete, weak file-sharing protocol | Explicit legacy client/service compatibility is necessary |
+| PowerShell 2.0 engine | Legacy scripting engine with fewer modern security protections | A strictly required legacy application needs it |
+| SNMP Service | Legacy monitoring can use weak community strings | Required monitoring is present and protected |
+
+**Typing (check dependencies and simulate ONE specific removal):**
+
+~~~powershell
+Get-WindowsFeature -Name 'Telnet-Client'
+Uninstall-WindowsFeature -Name 'Telnet-Client' -WhatIf
+~~~
+
+This is only an example if Telnet Client is **installed and prohibited**. Do not execute an unconditional comma-separated removal list. Certain features vary by Windows Server release, and some removals need a restart.
+
+**Change only if justified:** Through the wizard or a targeted Uninstall-WindowsFeature -Name 'ACTUAL-FEATURE' command **after** reviewing the role's services, installed dependencies and necessary data. Never remove AD DS or DNS on a required DC; never strip IIS/FTP/SMB/DHCP from a server whose README needs it.
+
+**Verify:** Repeat feature inspection and test the exact required role functions from an authorized client. Review pending reboot requirements.
+
+**Undo:** Reinstalling a role's binaries may not restore its prior data and configuration. Use a valid role-specific backup and supported recovery procedure, not blanket reinstallation.
 
 ---
 
@@ -1276,7 +1322,7 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 > **Server-first precedence:** The following in-file security reference provides detailed commands for Server hosts. Where an original example was written for a Windows desktop, the **Server role and Domain Controller instructions in Parts 1–4 take precedence**. Local-user cmdlets apply only to standalone/member servers; Active Directory users require AD tools. Never disable required print/web/AD/DNS/SMB/FTP, RDP/WinRM or domain policy merely to follow a general example.
 
 
-**Windows Server version note (November 2026):** Server 2016, 2019 and 2022 differ in features and management tools. Verify installed edition/build and support lifecycle using the command in Part 1. Server Core lacks many Windows GUI tools, so use PowerShell and Server Manager from an authorized management host when relevant.
+**Windows Server version note (November 2026):** Server 2016, 2019 and 2022 differ in features and management tools. Verify installed edition/build and support lifecycle using the command in Part 1. Server Core lacks many Windows GUI tools, so use PowerShell and Server Manager from an authorized management host when relevant. Local SAM commands in WS.2 are **not for domain user accounts on a DC**.
 
 **How to use this embedded reference**
 - Work by role and task; check Parts 1–4 for priority and exceptions.
