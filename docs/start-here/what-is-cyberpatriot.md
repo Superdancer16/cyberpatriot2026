@@ -47,10 +47,32 @@ Older practice images may also be Windows 10, Windows Server 2019, or Ubuntu. Th
 
 - Each team gets **one 4-hour block**. The clock starts when the first image is powered on.
 - Up to 5 people work at once. Usually each person takes one image or one task.
-- There is also a **Cisco networking** part (a quiz and a Packet Tracer activity). Study it with the [Cisco & Packet Tracer guide](../guides/cisco-networking.md) and the [Networking quiz](/tools/networking-quiz/).
+- There is also a **Cisco networking** part (a quiz and a Packet Tracer activity). Study it with the [Cisco & Packet Tracer guide](../guides/cisco-networking.md) and the worked subnetting examples in that guide.
 
 ## Where to go next
 
-Press **Next** below for lesson 2, [Things that lose points](../guides/things-that-lose-points.md), then keep going through the lessons in order.
+Open lesson 2, [Things that lose points](../guides/things-that-lose-points.md), then keep going through the lessons in order.
 
 Already know the basics and want to start on an image? Open your checklist: [Windows 10 / 11](../checklists/windows-10-11.md) · [Windows Server](../checklists/windows-server.md) · [Linux Mint](../checklists/linux-mint.md) · [Debian](../checklists/debian.md) · [FreeBSD](../checklists/freebsd.md) · [Ubuntu](../checklists/ubuntu.md). If a word confuses you, look it up in the [Glossary](../guides/glossary.md).
+
+## Your first safe practice session
+
+- [ ] Done
+
+**What:** Learn to inspect and verify one setting in an authorized practice VM.
+
+**Why it matters:** The goal is a secure computer that still performs its assigned job. The score is feedback, not a complete security audit.
+
+**Before changing anything:** Confirm the VM is a permitted practice image, read current rules and the desktop README, and keep the host computer separate from the guest. The season/round table above is inherited reference material; confirm the current official announcement and round packet rather than treating it as a guaranteed lineup or schedule.
+
+**Clicking (GUI):** Open the guest VM, then its README, forensic questions and scoring report. Identify which OS checklist applies. Keep host settings and the VM's virtual network unchanged unless the exercise explicitly instructs otherwise.
+
+**Typing (check):** In a guest Linux terminal use `id`; in guest Windows PowerShell use `whoami /user`. Compare that identity with the README's administrator list. No account change is needed just to identify yourself.
+
+**Typing (fix, only when appropriate):** Choose one reversible setting from the appropriate checklist and follow its exact GUI/terminal procedure after recording the original state. Do not begin with user deletion, PAM edits, role removal or disk encryption.
+
+**Check it worked:** Repeat the native inspection, test the required function and observe a current scoring report. Explain to a teammate what changed and how you would undo it before moving on.
+
+**Undo:** Follow that setting's rollback instructions. If you cannot identify the original value or a recovery path, stop before applying it and practice inspection instead.
+
+**Warnings:** Never scan outside authorized lab systems, share active competition answers, modify the scoring agent or assume a practice-tool permission applies to a live round. Resources and assistance rules depend on the actual round.

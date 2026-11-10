@@ -620,3 +620,398 @@ arp -a
 - When a task doesn't score, compare your `show running-config` with the instructions line by line.
 
 For more terms, see the [glossary](glossary.md).
+
+## Complete manual lab procedures
+
+The earlier tables remain quick references. These procedures add validation, rollback and missing routing/security topics. **All addresses, ports, VLANs and credentials here are lab examples.** Use the activity's actual topology and requirements. On Packet Tracer click the router/switch → **CLI**, press Enter, and answer `no` to the initial setup dialog only if appropriate. On real equipment use an authorized console connection and record the model/IOS version first.
+
+### C.1 Console baseline, modes and recovery
+
+- [ ] Done
+
+**What:** Record current configuration and understand which command mode you are using.
+
+**Why it matters:** Running configuration changes are immediate. Saving persists mistakes as well as fixes.
+
+**Before changing anything:** Read activity instructions, map ports and networks, retain console access and save a private copy of the current configuration. Packet Tracer **File → Save As** makes a separate practice copy; follow competition file rules.
+
+**Clicking (GUI):** On a real console use the terminal settings specified for the hardware (often 9600 baud, 8 data bits, no parity, 1 stop bit, no flow control). Packet Tracer's device CLI bypasses cabling; its PC **Desktop → Terminal** uses the console cable.
+
+**Typing (check):** Enter one command at a time, without typing a displayed `Router#` prompt:
+
+```text
+enable
+show version
+show running-config
+show startup-config
+show ip interface brief
+show interfaces status
+```
+
+The last command is a switch command and may be unsupported on a router. `>` is user EXEC, `#` privileged EXEC, `(config)#` global config, `(config-if)#` interface config. `exit` goes up one level; `end` or **Ctrl+Z** returns to privileged EXEC. `?` shows context-sensitive help. A caret marks where the parser stopped, not necessarily the root cause.
+
+**Typing (fix, only when appropriate):** Set a required hostname from privileged EXEC:
+
+```text
+configure terminal
+hostname Lab-SW1
+end
+```
+
+The prompt should now use Lab-SW1. To inspect without leaving configuration mode, use `do show running-config` when supported.
+
+**Check it worked:** Run the relevant show command after each small change. Only after function checks save:
+
+```text
+copy running-config startup-config
+```
+
+Press Enter to accept the destination. Check `[OK]` and compare the relevant startup-config lines.
+
+**Undo:** Restore the exact previous hostname/settings. `copy startup-config running-config` **merges**, rather than cleanly replacing, configuration. Supported real IOS may offer `configure replace` with a saved backup; check platform support and impact first. Reloading without saving discards **all** unsaved work and interrupts service; never use it casually or during a timed activity without understanding consequences.
+
+**Warnings:** Do not erase startup-config, delete vlan.dat, reset the activity, or paste entire configuration files without reviewing topology and platform support. Save Packet Tracer's `.pka/.pkt` file separately from IOS's startup-config.
+
+### C.2 Local passwords, console/VTY and SSH
+
+- [ ] Done
+
+**What:** Authenticate local console and remote access and use SSH instead of cleartext Telnet.
+
+**Why it matters:** `service password-encryption` type 7 is reversible obfuscation. It does not make line passwords equivalent to modern secrets.
+
+**Before changing anything:** Keep console access, record line ranges from `show running-config`, choose unique strong private credentials, and use the required hostname/domain. In the commands below replace the example secrets before entering them; never deploy the printed example.
+
+**Clicking (GUI):** Packet Tracer device → **CLI**; use a PC **Desktop → Command Prompt** for the SSH test. Real terminal clients should verify the expected device/host key where supported.
+
+**Typing (check):** Privileged EXEC:
+
+```text
+show running-config
+show ip ssh
+show users
+show line
+```
+
+**Typing (fix, only when appropriate):** From privileged EXEC, replacing both secret placeholders with private values:
+
+```text
+configure terminal
+enable secret REPLACE_WITH_PRIVATE_ENABLE_SECRET
+username labadmin privilege 15 secret REPLACE_WITH_PRIVATE_USER_SECRET
+ip domain-name lab.example
+line console 0
+login local
+exec-timeout 5 0
+logging synchronous
+exit
+line vty 0 4
+login local
+transport input ssh
+exec-timeout 5 0
+exit
+end
+```
+
+Global commands set secrets and domain; line-mode commands select local login, protocol and idle timeout (minutes/seconds). Repeat VTY settings for every actual range, such as 5–15, if present. Some devices use a single 0–15 range. Create the user **before** `login local`. Privilege 15 grants full control; only use it for an authorized administrator.
+
+Generate a key on a device with no suitable existing SSH key:
+
+```text
+configure terminal
+crypto key generate rsa modulus 2048
+ip ssh version 2
+end
+```
+
+Some Packet Tracer versions prompt for modulus after `crypto key generate rsa` instead. Use `?` to discover support. Avoid replacing an existing key without recording the impact on client trust. On real IOS prefer supported modern secret algorithms (for example type 8/9 where supported); do not claim every simulator supports them.
+
+**Check it worked:** `show ip ssh` should report SSH version 2; inspect all VTY ranges. From an authorized Packet Tracer PC:
+
+```text
+ssh -l labadmin 192.168.99.2
+```
+
+Use the actual reachable management address. Confirm login and authorized privilege. A ping alone does not test SSH authentication.
+
+**Undo:** From the console restore the recorded line login/transport/timeout and account settings. Do not enable Telnet as a permanent workaround. Deleting new RSA keys can break existing sessions/trust; review before changing them.
+
+**Warnings:** SSH also needs a reachable interface/SVI, proper mask/gateway/routes and permitted ACLs. A password rejected by a minimum-length policy is not fixed by repeatedly entering it. Never publish real secrets in configuration screenshots.
+
+### C.3 Addressing, subnetting, VLANs, trunks and inter-VLAN routing
+
+- [ ] Done
+
+**What:** Build a consistent Layer 2 VLAN and Layer 3 gateway path.
+
+**Why it matters:** Two PCs in different VLANs cannot communicate without routing, even if cabled to one switch. Overlapping IP subnets on different VLANs are not repaired by a trunk.
+
+**Before changing anything:** Draw a port/VLAN/address table. Example: VLAN 10 uses 192.168.10.0/24, gateway .1; VLAN 20 uses 192.168.20.0/24, gateway .1. For /26, host bits=6, block size=64, ordinary usable hosts=62. The earlier 192.168.10.77/26 example therefore has network .64, broadcast .127, hosts .65–.126. Network and broadcast addresses are not PC addresses. /31 and /32 have special uses outside this ordinary host-count rule.
+
+**Clicking (GUI):** Packet Tracer PC → **Desktop → IP Configuration**; enter its actual unique host address, mask and own VLAN gateway. Do not put the network or broadcast address in the host field.
+
+**Typing (check):** Privileged switch EXEC:
+
+```text
+show vlan brief
+show interfaces trunk
+show interfaces gigabitEthernet 0/1 switchport
+show ip interface brief
+```
+
+Use actual interfaces from the inventory, such as GigabitEthernet1/0/1 on other models.
+
+**Typing (fix, only when appropriate):** Switch configuration example, retaining all other required VLANs on the trunk:
+
+```text
+configure terminal
+vlan 10
+name Students
+exit
+vlan 20
+name Staff
+exit
+interface fastEthernet 0/1
+switchport mode access
+switchport access vlan 10
+exit
+interface fastEthernet 0/2
+switchport mode access
+switchport access vlan 20
+exit
+interface gigabitEthernet 0/1
+switchport mode trunk
+switchport trunk allowed vlan add 10,20
+no shutdown
+end
+```
+
+`add` preserves an existing allowed list; using a new list without `add` replaces it. Native VLANs must match at both ends. If changing native VLAN, create the chosen VLAN on both devices and record management dependencies first. On platforms requiring encapsulation selection use the supported `switchport trunk encapsulation dot1q` before mode trunk; 2960 does not accept it.
+
+For router-on-a-stick, router privileged EXEC:
+
+```text
+configure terminal
+interface gigabitEthernet 0/0
+no shutdown
+exit
+interface gigabitEthernet 0/0.10
+encapsulation dot1Q 10
+ip address 192.168.10.1 255.255.255.0
+exit
+interface gigabitEthernet 0/0.20
+encapsulation dot1Q 20
+ip address 192.168.20.1 255.255.255.0
+end
+```
+
+On a supported multilayer switch the alternative is `ip routing` plus gateway addresses on `interface vlan 10` and `interface vlan 20`; do not simultaneously duplicate those gateway IPs on a router. An SVI normally needs the VLAN and an active forwarding member/trunk before its protocol becomes up.
+
+**Check it worked:** On switches check VLAN membership/trunks; on the router check `show ip interface brief` and `show ip route` for connected VLAN networks. Ping the local gateway from each PC, then an authorized host in the other VLAN. If the first ping loses packets, ARP may be resolving; repeat once. Required ACLs may intentionally prevent some cross-VLAN traffic.
+
+**Undo:** Restore the exact original port VLAN, trunk allowed list and interface address; remove only newly created unused subinterfaces/VLANs. Do not `default interface` on a live uplink as a generic repair.
+
+**Warnings:** Real hardware may support auto-MDI/MDIX; Packet Tracer cable behavior/model support varies. Diagnose link state before assuming a red link is an IP problem.
+
+### C.4 Port security, STP and BPDU Guard
+
+- [ ] Done
+
+**What:** Limit endpoint MAC addresses and prevent an unplanned switch on a true edge port from influencing spanning tree.
+
+**Why it matters:** STP prevents Layer 2 loops. PortFast skips listening/learning delay for endpoints; BPDU Guard disables a PortFast edge port receiving a BPDU.
+
+**Before changing anything:** Identify end-user ports versus switch/router uplinks, IP phones and virtualization hosts. Record existing secure/sticky MACs, expected MAC count and STP root. Never apply an endpoint template to every interface.
+
+**Clicking (GUI):** In Packet Tracer inspect both cable endpoints and attached devices. Use the CLI for explicit port-security/STP behavior; a green link does not prove the VLAN policy is right.
+
+**Typing (check):** Privileged EXEC:
+
+```text
+show spanning-tree vlan 10
+show port-security interface fastEthernet 0/1
+show interfaces status
+```
+
+**Typing (fix, only when appropriate):** For one actual endpoint port:
+
+```text
+configure terminal
+interface fastEthernet 0/1
+switchport mode access
+switchport access vlan 10
+switchport port-security
+switchport port-security maximum 1
+switchport port-security mac-address sticky
+switchport port-security violation restrict
+spanning-tree portfast
+spanning-tree bpduguard enable
+end
+```
+
+Choose the scenario's count and violation mode; phones/VMs may need more than one MAC. Restrict drops violating traffic and counts/logs violations; shutdown err-disables the port. Do not connect the endpoint until ready to learn its intended MAC; sticky learning can capture an attacker's address first.
+
+**Check it worked:** `show port-security interface fastEthernet 0/1` should show the intended maximum/count/mode, and `show spanning-tree interface fastEthernet 0/1 detail` should reflect edge behavior. Test the approved endpoint. Verify the intended root bridge, forwarding and blocked redundant links; blocked links can be healthy STP behavior.
+
+**Undo:** Restore the recorded per-port settings. If err-disabled, first remove the unexpected switch/loop or violating MAC source; then in that interface use `shutdown` followed by `no shutdown`. Clear only the stale authorized sticky MAC using the actual platform-supported command after inspection, not all switch security state.
+
+**Warnings:** Do not enable PortFast/BPDU Guard on ordinary inter-switch trunks or disable STP to make every link forward. That can produce a broadcast storm.
+
+### C.5 Static routes and OSPF
+
+- [ ] Done
+
+**What:** Route between networks either explicitly or through the OSPF link-state routing protocol.
+
+**Why it matters:** Every path needs a return route. OSPF `network` selects participating interfaces using a wildcard mask, not a subnet mask.
+
+**Before changing anything:** Record the topology, next hops, area design and existing routing table. Example link: R1 10.0.0.1/30 to R2 10.0.0.2/30; each router has its own nonoverlapping LAN. Do not add routes that bypass required segmentation.
+
+**Clicking (GUI):** In Packet Tracer inspect each router/interface and PC gateway. Use CLI for routing and Simulation mode to see where an authorized test packet stops.
+
+**Typing (check):** Privileged EXEC:
+
+```text
+show ip route
+show ip protocols
+show ip ospf neighbor
+show ip interface brief
+```
+
+**Typing (fix, only when appropriate):** Static-route example on R1:
+
+```text
+configure terminal
+ip route 192.168.20.0 255.255.255.0 10.0.0.2
+end
+```
+
+The next hop must be reachable. R2 also needs its return route. Use a default route only toward the actual intended gateway, not an arbitrary documentation address.
+
+For an OSPF lab instead, R1 example:
+
+```text
+configure terminal
+router ospf 1
+router-id 1.1.1.1
+passive-interface default
+no passive-interface gigabitEthernet 0/1
+network 10.0.0.0 0.0.0.3 area 0
+network 192.168.10.0 0.0.0.255 area 0
+end
+```
+
+Process ID 1 is locally significant; router ID must be unique. Replace Gi0/1 with the actual router-to-router link. Passive-interface advertises the LAN but avoids forming neighbors with endpoint devices. Configure R2 consistently with a different router ID and its own LAN. Do not run `clear ip ospf process` merely to refresh a lab; it interrupts adjacencies.
+
+**Check it worked:** On both routers inspect neighbors and routes. Neighbors normally reach FULL on a simple two-router link; some multiaccess non-DR pairs can legitimately remain 2WAY. Remote OSPF routes show `O`. Ping an authorized remote LAN host and trace the path; check return routing, ACLs and host gateways.
+
+**Undo:** For the example static route, global configuration `no ip route 192.168.20.0 255.255.255.0 10.0.0.2` removes only that route. For OSPF restore the specific changed network/passive setting. Do not `no router ospf 1` on an existing production/lab process with other required networks.
+
+**Warnings:** Neighbor failures often come from area, mask, timer, authentication, MTU or passive-interface mismatch. Authentication syntax varies across IOS/Packet Tracer; follow platform guidance and activity requirements rather than pasting an unsupported modern command.
+
+### C.6 Extended ACLs and management access
+
+- [ ] Done
+
+**What:** Apply ordered Layer 3/4 rules at the intended interface/direction or VTY access path.
+
+**Why it matters:** ACLs have an implicit deny at the end, and the first match wins. A rule can block your management session as soon as it is attached.
+
+**Before changing anything:** Keep a console, record the existing ACL and binding, and list all traffic that must remain. Interface ACLs normally are stateless; do not assume automatic reply allowances like a host stateful firewall.
+
+**Clicking (GUI):** In Packet Tracer use CLI and test from separate authorized/unauthorized lab PCs; Simulation mode can help identify the drop location.
+
+**Typing (check):** Privileged EXEC:
+
+```text
+show access-lists
+show ip interface gigabitEthernet 0/0
+show running-config
+```
+
+**Typing (fix, only when appropriate):** Example policy permits HTTPS from Students to one server and denies other Students traffic to Staff while preserving unrelated routed traffic. Adapt the entire policy to the actual requirements:
+
+```text
+configure terminal
+ip access-list extended STUDENT-IN
+10 permit tcp 192.168.10.0 0.0.0.255 host 192.168.20.10 eq 443
+20 deny ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+30 permit ip any any
+exit
+interface gigabitEthernet 0/0.10
+ip access-group STUDENT-IN in
+end
+```
+
+The example is attached where Students traffic **enters** the router. Wildcard `0.0.0.255` matches a /24. The last permit preserves other flows for this teaching example; omit or narrow it only after explicitly defining all required paths. Do not replace an existing required ACL without preserving its rules.
+
+For VTY source restriction, use a standard ACL separately, after confirming the management subnet:
+
+```text
+configure terminal
+ip access-list standard MGMT-SOURCES
+permit 192.168.99.0 0.0.0.255
+exit
+line vty 0 4
+access-class MGMT-SOURCES in
+end
+```
+
+Apply to every actual VTY range as needed. IPv6 requires separate supported IPv6 controls; an IPv4 ACL does not cover it.
+
+**Check it worked:** Run `show access-lists` and confirm relevant counters increase during authorized lab tests. Verify the correct interface/direction in `show ip interface`. Test HTTPS, intended denials and a **new** management SSH session. Packet Tracer may not implement every counter/logging detail.
+
+**Undo:** From the console, remove only the binding you added with `no ip access-group STUDENT-IN in` in the same interface, or `no access-class MGMT-SOURCES in` in the same VTY range. Restore the previous binding immediately if one existed. Remove unused ACL definitions only after checking references.
+
+**Warnings:** An `established` TCP keyword is not a complete stateful firewall. Do not paste `deny ip any any` as the first rule, assume an ACL acts before it is attached, or test a security policy solely with ping.
+
+### C.7 DHCP, logging and final troubleshooting
+
+- [ ] Done
+
+**What:** Verify address allocation, event visibility and saved device state.
+
+**Why it matters:** DHCP needs correct excluded ranges/gateway/DNS, and a server on a different network needs a relay. Logging without accurate time is hard to correlate.
+
+**Before changing anything:** Record DHCP bindings/pools, required relay addresses, logging destinations and time configuration. Do not clear live leases or logs as a first troubleshooting step.
+
+**Clicking (GUI):** Packet Tracer PC → **Desktop → IP Configuration → DHCP** on a noncritical test client. Use **Simulation** to inspect Discover/Offer/Request/Ack if allocation fails. On real hardware use the approved monitoring/logging system.
+
+**Typing (check):** Privileged EXEC:
+
+```text
+show ip dhcp pool
+show ip dhcp binding
+show ip dhcp conflict
+show logging
+show clock
+show running-config
+```
+
+**Typing (fix, only when appropriate):** Use the DHCP pool example earlier with the real subnet, exclusions, gateway and DNS. Where the DHCP server is remote, on the **client-facing** router interface:
+
+```text
+configure terminal
+interface gigabitEthernet 0/0.10
+ip helper-address 192.168.20.5
+end
+```
+
+Use the actual server; a helper may relay other UDP broadcasts depending on IOS, so inspect platform behavior. Do not put the helper arbitrarily on every link.
+
+A basic local logging example on supported IOS:
+
+```text
+configure terminal
+service timestamps log datetime msec
+logging buffered 16384 informational
+end
+```
+
+Configure approved NTP/syslog destinations only when supplied; never point lab devices at an unapproved real service. Some Packet Tracer models implement only a subset.
+
+**Check it worked:** A test client receives an address in the intended pool, correct mask/gateway/DNS and resolves/reaches required destinations. Inspect DHCP bindings and logging. Work through layers: link → interface up/up → VLAN/trunk → host address/gateway → route/return route → ACL → application. Save running-config and the Packet Tracer file after successful tests.
+
+**Undo:** Restore the recorded specific pool option/helper/log setting. Do not clear all leases, erase startup-config or Reset Activity to undo one command.
+
+**Warnings:** A failed unsupported command may be a simulator limitation; use `?`, `show version` and the activity instructions. Do not claim a real IOS feature was tested merely because a simplified Packet Tracer equivalent worked.

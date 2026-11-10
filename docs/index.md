@@ -1,6 +1,6 @@
 # CyberPatriot Toolkit
 
-Step-by-step checklists, beginner guides and hardening scripts for practicing **CyberPatriot** image challenges.
+Step-by-step manual checklists and beginner guides for practicing **CyberPatriot** image challenges.
 
 ## New here? Start with these (in order)
 
@@ -29,9 +29,20 @@ Step-by-step checklists, beginner guides and hardening scripts for practicing **
 - [Glossary](guides/glossary.md): every acronym explained
 - [For mentors and teachers](guides/for-mentors-and-teachers.md): running practice sessions with this toolkit
 
-## Scripts
+## External scripts and manual verification
 
 - [Using the scripts safely](start-here/using-the-scripts.md): **audit first, then apply**
-- `scripts/linux/harden.sh`: Linux Mint, Debian, Ubuntu
-- `scripts/windows/Harden.ps1`: Windows 10/11, Windows Server (Domain Controller aware)
-- `scripts/freebsd/harden.sh`: FreeBSD
+This repository contains documentation only; upstream scripts and website tools are not bundled. Verify every checklist item manually.
+
+
+## Detailed procedures and recovery
+
+- [Windows service-by-service procedures](checklists/windows-10-11.md#811-remote-registry) and [Windows backup/policy/firewall recovery](checklists/windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps)
+- [Windows Server role-aware procedures](checklists/windows-server.md#12-role-aware-manual-procedures-and-recovery)
+- [Linux authentication, firewall, package and persistence recovery](checklists/linux-mint.md#17-detailed-manual-safety-and-verification-procedures)
+- [FreeBSD-native recovery and service workflow](checklists/freebsd.md#13-freebsd-specific-recovery-and-service-workflow)
+- [Cisco complete manual lab procedures](guides/cisco-networking.md#complete-manual-lab-procedures)
+- [Forensic investigation procedures](guides/forensics-questions.md#repeatable-investigation-procedures)
+- [Sources, attribution and maintenance](guides/sources-and-attribution.md)
+
+The inherited season/round table is reference context. Confirm the actual current lineup and rules from the official round materials before using it to plan work.

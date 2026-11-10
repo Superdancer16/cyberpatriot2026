@@ -1,138 +1,57 @@
 # Using the scripts safely
 
-There is one script per OS family:
+This repository is a **manual documentation handbook**. It does not contain the scripts, download pages, or configuration builder described in the original toolkit. Historical script names below identify external tools; they are not local files to run.
 
-| Script | Works on |
-|---|---|
-| `scripts/linux/harden.sh` | Linux Mint 20–22, Debian 11–12, Ubuntu 20.04–24.04 |
-| `scripts/windows/Harden.ps1` | Windows 10, Windows 11, Windows Server 2016 / 2019 / 2022 (including Domain Controllers) |
-| `scripts/freebsd/harden.sh` | FreeBSD 13 / 14 |
+| Upstream family | Historical path | Manual replacement |
+|---|---|---|
+| Linux | `scripts/linux/harden.sh` | [Mint](../checklists/linux-mint.md), [Ubuntu](../checklists/ubuntu.md), [Debian](../checklists/debian.md) |
+| Windows | `scripts/windows/Harden.ps1` | [Windows](../checklists/windows-10-11.md), [Server](../checklists/windows-server.md) |
+| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../checklists/freebsd.md) |
 
-All three work the same way:
+## 1. Decide whether external automation is appropriate
 
-1. They ask you for the README info first: **admins, users, critical services**.
-2. **Audit mode** only *reports* problems. It changes nothing, so it's safe to run any time.
-3. **Apply mode** fixes problems. It asks before anything risky (deleting a user, uninstalling a program, deleting files).
-4. Every file or setting is **backed up** before it's changed.
-5. At the end you get a **summary** and a **findings report**, your to-do list of things a human has to decide.
+- [ ] Done
 
-> [!IMPORTANT]
-> The scripts never delete or disable anything you list as authorized or critical. But **they only know what you type in.** If you misspell a user's name, the script thinks that user is unauthorized. Double-check the names!
+**What:** Review a tool before allowing it to change an image.
 
-## What the results mean
+**Why it matters:** Old hardening scripts can remove required accounts, expose password hashes, rewrite repositories for an obsolete release, or destroy evidence. An audit mode can still create logs, caches and backups; do not assume it is forensically read-only.
 
-| Result | Meaning |
-|---|---|
-| `OK` | Already secure. Nothing to do. |
-| `CHANGED` | The script fixed it. |
-| `WOULD` | (Audit mode) The script would fix this in Apply mode. |
-| `SKIPPED` | Not done, because you said no or it didn't apply. |
-| `REVIEW` | **A human needs to look at this.** It's in the findings report. |
-| `FAILED` | It tried and failed. The log file says why. Fix it by hand using the checklist. |
+**Before changing anything:** Check competition rules on outside tools, internet access and snapshots. Finish relevant forensic questions. Record the upstream repository, revision, license, scope, inputs and proposed changes. A README claim that a tool is safe is not verification.
 
-> [!TIP]
-> **No internet on the image?** Download the files on another computer (same page) and copy them over with a USB drive or a shared folder into `~/cp` (Linux, FreeBSD) or `C:\cp` (Windows). You can also download the whole project as a ZIP from the GitHub page (**Code → Download ZIP**) and find the scripts in its `scripts` folder.
+**Clicking (GUI):** Open the script as text in Notepad or a text editor. Search for user deletion, file removal, package removal, firewall changes, password handling and downloads. Do not double-click an unknown script.
 
----
+**Typing (check):** In a Linux terminal, inspect a downloaded script without executing it:
 
-## Linux (Mint / Debian / Ubuntu)
-
-### 1. Get the script onto the image
-Open [Download the scripts](/downloads/) on this website (on the image, in Firefox) and copy the **Linux** download commands into a terminal. They save `harden.sh` and an example config in the `cp` folder inside your home folder. Then:
 ```bash
-cd ~/cp
+less ./harden.sh
 ```
 
-### 2. Run it
-```bash
-sudo bash harden.sh
-```
-On **Debian**, if `sudo` says you're not allowed, use `su -` first (it asks for the **root** password), then run `bash harden.sh` without `sudo`.
+Press `/` to search, `n` for the next match and `q` to leave. In Windows PowerShell:
 
-The script asks for the README info, then shows a menu. It starts in **AUDIT** mode:
-```
- 1) Users and groups
- 2) Password and lockout policy
- ...
- a) Run ALL sections
- m) Switch to APPLY mode (make changes)
-```
-- Type `a` to audit everything. Read the output.
-- Type `m` to switch to APPLY mode, then `a` again (or a number like `1` to do one section).
-
-### 3. Optional: use a config file instead of typing
-```bash
-cp config.example.conf my.conf
-nano my.conf            # fill in the names from the README, save with Ctrl+O, exit with Ctrl+X
-sudo bash harden.sh --audit --config my.conf
-sudo bash harden.sh --apply --config my.conf
-```
-
-### 4. Read the results
-```bash
-sudo cat /root/cyberpatriot/findings-*.txt      # your to-do list
-sudo less /root/cyberpatriot/harden-*.log       # everything that happened (q to quit)
-```
-
-### Undoing a change
-Every edited file is copied to `/root/cyberpatriot/backups/<date-time>/` with its full path. To put one back:
-```bash
-sudo cp -a /root/cyberpatriot/backups/20261022-140501/etc/ssh/sshd_config /etc/ssh/sshd_config
-```
-
----
-
-## Windows
-
-### 1. Get the script onto the image
-Open [Download the scripts](/downloads/) on this website (on the image, in Edge) and copy the **Windows** download commands into PowerShell. They save `Harden.ps1` and an example config in `C:\cp`.
-
-### 2. Open PowerShell as Administrator
-Click **Start**, type `powershell`, then choose **Run as administrator**.
-
-### 3. Run it
 ```powershell
-cd C:\cp
-powershell -ExecutionPolicy Bypass -File .\Harden.ps1
-```
-`-ExecutionPolicy Bypass` lets this one script run without changing the computer's script policy.
-
-The menu works like the Linux one: it starts in **Audit** mode, `a` runs everything, and `m` switches to Apply.
-
-### 4. Optional: config file
-```powershell
-copy config.example.psd1 my-readme.psd1
-notepad my-readme.psd1
-powershell -ExecutionPolicy Bypass -File .\Harden.ps1 -Mode Audit -Config .\my-readme.psd1
-powershell -ExecutionPolicy Bypass -File .\Harden.ps1 -Mode Apply -Config .\my-readme.psd1
+Get-Content -LiteralPath .\Harden.ps1
+Get-FileHash -LiteralPath .\Harden.ps1 -Algorithm SHA256
+Get-AuthenticodeSignature -LiteralPath .\Harden.ps1
 ```
 
-### 5. Read the results
-Everything is in `C:\harden-toolkit\`:
-- `findings-*.txt`: your to-do list
-- `harden-*.log`: everything that happened
-- `backups\<date-time>\`: registry exports (`.reg` files: double-click one to put the old settings back) and the old security policy.
+A hash identifies bytes; it establishes trust only when compared with a trusted published hash. An unsigned script is not automatically malicious, and a valid signature is not proof of suitability.
 
----
+**Typing (fix, only when appropriate):** Use the manual checklist for the individual setting. Do not paste a download-and-execute command or bypass execution policy merely to make an unknown file run.
 
-## FreeBSD
+**Check it worked:** Repeat the native OS inspection after any authorized tool run. Test actual logins, web pages, file shares and other required functions. Read the full log, including errors and skipped items.
 
-Open [Download the scripts](/downloads/) on this website and run the **FreeBSD** command there as root. It saves `harden.sh` in `~/cp`. Then:
+**Undo:** Use the tool's actual recorded backup path after inspecting its contents. Restore one setting at a time and repeat syntax and function checks. Restoring a registry export merges keys; it does not necessarily remove newly added values. Restoring files alone does not undo account deletion or package removal.
 
-```sh
-su -
-cd ~/cp
-sh harden.sh
-```
+**Warnings:** Never reuse one password for all users, put passwords on command lines, publish hash files, assume every change is backed up, or skip checklist items because a tool reports success.
 
----
+## 2. Interpret tool reports as leads
 
-## Golden rules
-1. **Forensics questions first**, then the script.
-2. **Audit before Apply.** Read the REVIEW items.
-3. **Check the Scoring Report** after running Apply. If the score went **down**, find the change that caused it (the log has a timestamp for every change) and undo it from the backups.
-4. The script is a starting point. **Use the checklist** for everything it marks REVIEW and for things scripts can't detect.
-5. **Every checklist step is tagged** with what the script does for it:
-   - **Script: ✅** the script does it. After a clean Apply run you can skip it. On the website, **Tick the script's ✅ steps** ticks them all at once.
-   - **Script: 🔎** the script checks it and lists it under REVIEW, but you decide.
-   - **Script: ✋** the script doesn't do it. Do it by hand.
+| Report word | Next manual step |
+|---|---|
+| OK | Inspect the effective setting; verify it matches the README |
+| CHANGED | Inspect the new value and test the required function |
+| WOULD | Review the proposed action; nothing has been verified as fixed |
+| SKIPPED / REVIEW | Make an explicit README-based decision |
+| FAILED | Read the error and use the relevant manual procedure |
+
+Keep logs private and note the time of each change. See [forensics](../guides/forensics-questions.md) before collecting or altering potential evidence.

@@ -56,3 +56,47 @@ That is exactly what the scripts ask for when they start.
 
 ## After the README: the Forensics Questions
 Open each Forensics Question file and **answer them before fixing anything**. Fixing things can destroy evidence: deleting a user deletes the clue that was in their home folder. See [Forensics questions](../guides/forensics-questions.md).
+
+## Turn requirements into a verification sheet
+
+- [ ] Done
+
+**What:** Translate prose into explicit keep/change/test decisions.
+
+**Why it matters:** A README can require a capability without naming every supporting service. For example, AD requires DNS/time/replication and a website may depend on a database service account.
+
+**Before changing anything:** Keep the original README unchanged. Record requirements privately without copying passwords into a shared log. Compare usernames exactly, while remembering service and built-in accounts may be omitted from the human-user lists.
+
+**Clicking (GUI):** Open the README, every forensic question and the Scoring Report side by side. For each required service identify its application and a client test before opening settings.
+
+**Typing (check):** Linux terminal:
+
+```bash
+whoami
+id
+hostname
+```
+
+Windows PowerShell:
+
+```powershell
+whoami /user
+hostname
+```
+
+Use these to identify your own account and machine; do not guess based on a display name.
+
+| Requirement | Inspect | Verification | Recovery to record |
+|---|---|---|---|
+| Bob is an ordinary user | Account exists; group and sudo/AD privileges | New ordinary login, no unauthorized elevation | Original memberships and enabled state |
+| Required HTTPS site | Binding, hostname, certificate, app identity/database | Real client loads required page and logs in | Site/app config and data backups |
+| Staff file share | Share + filesystem ACL and actual users | Authorized read/write; unauthorized denied | Both ACL layers and share path |
+| Required SSH | Daemon + socket, auth, firewall sources | New authorized connection and required command/SFTP | Config, units and original firewall rule |
+
+**Typing (fix, only when appropriate):** No system fix is performed here. Use the correct OS checklist for each requirement and enter the actual names/values, not the handbook's example names.
+
+**Check it worked:** You can point to a README sentence for every removal or restriction and a function test for every required service. Unclear requirements remain marked for review rather than guessed.
+
+**Undo:** Correct your working notes if you misread a requirement; preserve the original README and forensic question text.
+
+**Warnings:** A tool's default baseline never overrides scenario requirements. Read round-specific rules on outside assistance, internet use, scripts and snapshots before applying general practice advice.
