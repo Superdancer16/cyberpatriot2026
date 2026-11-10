@@ -35,6 +35,14 @@ Step-by-step manual checklists and beginner guides for practicing **CyberPatriot
 This repository contains documentation only; upstream scripts and website tools are not bundled. Verify every checklist item manually.
 
 
+## Additional Windows, Linux and Cisco investigations
+
+These original, documentation-only supplements add targeted material found by comparing community checklists with official vendor references. They use individual **copyable commands**, inspection first, README exceptions, verification and rollback—no scripts.
+
+- [Windows: effective Group Policy, services, events, persistence, SMB and firewall](guides/windows-effective-policy-and-investigation.md)
+- [Linux: sudo, SSH socket activation, PAM, cron/systemd, firewall and file investigations](guides/linux-advanced-manual-investigation.md)
+- [Cisco: VLAN/trunk troubleshooting, router-on-a-stick, port security, STP, ACLs and DHCP](guides/cisco-switch-routing-troubleshooting.md)
+
 ## Detailed procedures and recovery
 
 - [Windows service-by-service procedures](checklists/windows-10-11.md#811-remote-registry) and [Windows backup/policy/firewall recovery](checklists/windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps)

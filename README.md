@@ -11,3 +11,9 @@ This is a documentation-only handbook. Start with [reading the image README](doc
 - [Linux service procedures](docs/guides/linux-service-hardening.md) · [Cisco IOS and Packet Tracer](docs/guides/cisco-networking.md)
 
 Procedures include inspection, README exceptions, GUI/terminal actions, verification and recovery. Example accounts, addresses and policy values must be adapted to the image. No scripts or website tooling are bundled. See [sources, reuse scope and maintenance](docs/guides/sources-and-attribution.md) for attribution and version-sensitive official references.
+
+## Extra step-by-step investigation guides
+
+- [Windows effective policy and persistence](docs/guides/windows-effective-policy-and-investigation.md)
+- [Linux SSH, PAM, firewall and scheduled persistence](docs/guides/linux-advanced-manual-investigation.md)
+- [Cisco switching, routing, ACLs and Packet Tracer troubleshooting](docs/guides/cisco-switch-routing-troubleshooting.md)
