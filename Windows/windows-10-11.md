@@ -1,11 +1,11 @@
-# Windows 10 / 11 checklist
+# Windows 10 / 11 — complete standalone CyberPatriot checklist
 
-Windows 11 is in **Round 1 and Round 2** this season. Windows 10 is the same except where noted.
+**Version note (November 2026):** Windows 10 mainstream support ended October 14, 2025; use only the specific security-update/ESU support arrangements available to your image, and never substitute an OS upgrade for an authorized CyberPatriot task. Windows 11 editions, policy behavior, features and installed roles can differ; check `winver` and the actual README.
 
 **How to use this page**
 - Work **top to bottom**.
 - Each item has: **What** · **Why it matters** · **Clicking** · **Typing** (PowerShell **as Administrator**) · **Check it worked** · ⚠️ warnings.
-- New to PowerShell? Read [PowerShell basics](powershell-basics.md) first.
+- New to PowerShell? Read [PowerShell basics in Section 20](windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist) first.
 - This repository contains documentation only. Follow the manual procedures below; do not skip verification.
 - `alice`, `bob` etc. are examples. **Use the names in your README.**
 - `secpol.msc`, `gpedit.msc` and `lusrmgr.msc` only exist on **Pro, Education and Enterprise** (competition images are one of these). To check, run `winver`. On **Home**, use the **Typing** commands instead.
@@ -52,7 +52,7 @@ Get-ChildItem C:\Users -Recurse -File -Force -Include *.txt,*.csv,*.log,*.ps1,*.
 ```
 More: [Forensics questions guide](../General/All/forensics-questions.md).
 
-### 1.2 Fast path: run the hardening script
+### 1.2 Manual security baseline (no hardening script)
 - [ ] Done
 
 **What:** Prepare a manual baseline. The upstream automation is not included in this repository.
@@ -2313,3 +2313,373 @@ Replace the DNS target with the README-required internal hostname; internet DNS 
 **Undo:** If a proposed repair fails, return that repair to its recorded starting state before trying another theory.
 
 **Warnings:** An error message is evidence. Record it exactly and investigate its source rather than hiding it with broad `-ErrorAction SilentlyContinue`.
+
+
+---
+
+## 20. Complete PowerShell basics — included in this Windows checklist
+
+### 20.0 PowerShell command and terminal primer
+
+**PowerShell** is Windows' command window. You can do most CyberPatriot fixes by clicking, but PowerShell is much faster for checking things, like listing every user or every service at once.
+
+### Open it as Administrator (important!)
+1. Click **Start** and type `powershell`.
+2. Click **Run as administrator** and say **Yes**.
+3. The title bar should say **Administrator: Windows PowerShell**. Without that, most fixes fail with "Access denied".
+
+### How a command looks
+```powershell
+Get-LocalUser
+```
+PowerShell commands are **Verb-Noun**: `Get-` reads things, `Set-` changes them, `Remove-` deletes them, `Disable-` turns them off.
+
+```powershell
+Disable-LocalUser -Name "Guest"
+```
+`-Name "Guest"` is a **parameter**: it tells the command what to work on.
+
+### Keys that save time
+| Key | What it does |
+|---|---|
+| **Tab** | Auto-complete commands, parameters and file names. Press again to cycle. |
+| **↑ / ↓** | Earlier commands. |
+| **Ctrl + C** | Stop the running command. |
+| Right-click | Paste (in the classic console). |
+| `cls` | Clear the screen. |
+
+### Commands you'll actually use
+| Command | What it does |
+|---|---|
+| `Get-LocalUser` | List users (Enabled = True/False) |
+| `Get-LocalGroupMember Administrators` | Who is an admin |
+| `Remove-LocalUser -Name bob` | Delete a user |
+| `Remove-LocalGroupMember -Group Administrators -Member bob` | Take away admin rights |
+| `net accounts` | Show the password and lockout policy |
+| `Get-Service \| Where-Object Status -eq Running` | Running services |
+| `Stop-Service -Name Spooler` | Stop a service |
+| `Set-Service -Name Spooler -StartupType Disabled` | Stop it from starting again |
+| `Get-NetFirewallProfile` | Is the firewall on? |
+| `Get-MpComputerStatus` | Is Defender on? |
+| `Get-SmbShare` | Shared folders |
+| `Get-ScheduledTask \| Where-Object TaskPath -notlike '\Microsoft\*'` | Scheduled tasks that aren't from Microsoft |
+| `Get-NetTCPConnection -State Listen` | Ports that are listening |
+| `Get-ChildItem C:\Users -Recurse -Include *.mp3,*.mp4 -Force -ErrorAction SilentlyContinue` | Find media files |
+| `Get-FileHash .\file.txt -Algorithm SHA256` | Hash a file (forensics) |
+| `Get-Help Get-LocalUser -Examples` | Examples for any command |
+
+### The `|` (pipe)
+`|` sends the output of one command into the next:
+```powershell
+Get-Service | Where-Object Status -eq Running | Sort-Object DisplayName
+```
+Read it as: get services → keep the running ones → sort them by name.
+
+### Useful "run" shortcuts (Win + R)
+Press **Windows key + R**, type one of these, press Enter:
+
+| Type | Opens |
+|---|---|
+| `lusrmgr.msc` | Local Users and Groups |
+| `secpol.msc` | Local Security Policy (passwords, audit, user rights, security options) |
+| `gpedit.msc` | Group Policy Editor |
+| `services.msc` | Services |
+| `wf.msc` | Windows Firewall (advanced) |
+| `taskschd.msc` | Task Scheduler |
+| `eventvwr.msc` | Event Viewer (logs) |
+| `compmgmt.msc` | Computer Management (users, shares, disks...) |
+| `fsmgmt.msc` | Shared Folders |
+| `appwiz.cpl` | Uninstall programs |
+| `optionalfeatures` | Turn Windows features on or off |
+| `regedit` | Registry Editor (be careful!) |
+| `SystemPropertiesRemote` | Remote Desktop / Remote Assistance settings |
+
+### Safety tips
+- PowerShell does what you ask **immediately**. There's no undo for `Remove-` commands.
+- Before changing the registry, export the key: in regedit, right-click the key → **Export**.
+- If you're not sure what a command does, add `-WhatIf` to see what *would* happen: `Remove-LocalUser -Name bob -WhatIf`
+
+### Practice objects, paths and reversible changes
+
+- [ ] Done
+
+**What:** Learn how to inspect PowerShell output and edit a harmless file before modifying security settings.
+
+**Why it matters:** PowerShell pipelines pass objects, not just printed text. Formatting is for display; it should normally come last in a pipeline.
+
+**Before changing anything:** Use ordinary Windows PowerShell for this exercise; administrator rights are not needed. Most handbook examples target Windows PowerShell 5.1 on Windows. A module absent from PowerShell 7 is not proof the Windows role is missing.
+
+**Clicking (GUI):** **Start → Windows PowerShell**. Use File Explorer to view your personal profile folder. Run as administrator only for procedures that require it; do not approve an unknown script merely because it requests elevation.
+
+**Typing (check):**
+
+```powershell
+$PSVersionTable.PSVersion
+Get-Location
+Get-Service | Get-Member
+Get-Service | Select-Object -First 5 Name,Status,StartType
+```
+
+`Get-Member` describes available properties/methods. `Select-Object` keeps properties; `Format-Table` displays them. For CSV export, select properties then `Export-Csv`, without `Format-Table` in between.
+
+**Typing (practice edit):**
+
+```powershell
+$practiceFolder = Join-Path $env:USERPROFILE 'CP PowerShell Practice'
+New-Item -ItemType Directory -Path $practiceFolder -ErrorAction Stop
+```
+
+If it exists, inspect it and choose a new folder rather than overwriting work.
+
+```powershell
+$practiceFile = Join-Path $practiceFolder 'example notes.txt'
+'original value' | Set-Content -LiteralPath $practiceFile
+Copy-Item -LiteralPath $practiceFile -Destination "$practiceFile.before"
+notepad.exe $practiceFile
+```
+
+Edit and save the file. `-LiteralPath` treats wildcard characters literally; quote paths containing spaces. A backtick is PowerShell's escape/continuation character; copying a broken continuation can change a command.
+
+**Check it worked:**
+
+```powershell
+Get-Content -LiteralPath $practiceFile
+Test-Path -LiteralPath "$practiceFile.before"
+```
+
+Expected: your changed text and `True`. For cmdlets inspect the full red error and `$Error[0]`; for native programs inspect `$LASTEXITCODE` immediately after that program. ErrorAction SilentlyContinue hides errors and can make incomplete searches look empty.
+
+**Undo:**
+
+```powershell
+Copy-Item -LiteralPath "$practiceFile.before" -Destination $practiceFile
+Get-Content -LiteralPath $practiceFile
+```
+
+Expected: `original value`. This file restore does not model account/password recovery; those have different limits.
+
+**Warnings:** `-WhatIf` exists only on commands that support it, and its preview does not test downstream dependencies. Use `Get-Help COMMAND -Full` to check support. Use `sc.exe` for Service Control; `sc` in Windows PowerShell is an alias for Set-Content. Never use `Invoke-Expression` to inspect a suspicious string.
+
+
+---
+
+## 21. Advanced Windows investigations — included in this checklist
+
+
+
+> **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
+
+This supplement draws topic ideas from public CyberPatriot checklists and verifies key methods with Microsoft documentation. A generic checklist cannot tell you which accounts, shares, or services are authorized on *your* image.
+
+### 21.1 Find the setting that actually applies (GPO versus local policy)
+
+- [ ] Reviewed effective configuration and policy source.
+
+**Why:** A value changed in \`secpol.msc\` or the registry can be replaced by a domain Group Policy. On a Domain Controller, editing an arbitrary local policy is not a substitute for checking domain-level policy.
+
+**Clicking:** Press **Win + R** → \`rsop.msc\` (if available); review **Computer Configuration**. On domain-joined systems use **Group Policy Management** (\`gpmc.msc\`) **only if installed and authorized**. Do not disable a linked GPO merely to fix one setting.
+
+**Typing (check, elevated Command Prompt or PowerShell):**
+
+~~~powershell
+(Get-CimInstance Win32_ComputerSystem) | Select-Object Name,PartOfDomain,Domain,DomainRole
+gpresult /r /scope computer
+~~~
+
+On a system with applicable policies, save an **HTML report locally**, then open it:
+
+~~~powershell
+gpresult /h "$env:TEMP\cp-rsop.html" /f
+Start-Process "$env:TEMP\cp-rsop.html"
+~~~
+
+**Interpretation:** \`PartOfDomain = True\` means domain policies may apply. The report's **Applied Group Policy Objects** and **Denied GPOs** help explain conflicts; a local-only or unconfigured policy may show less information. \`gpresult\` can report no RSoP data for the target scope—investigate context rather than assume a missing policy is a security failure.
+
+**Verification:** Compare the effective policy with the README and with the relevant **Local Security Policy** or **Group Policy** editor. If a setting changes after refresh, identify its **winning policy** before editing it.
+
+**Recovery:** Revert the *specific* policy change at its actual policy source. Keep an export/screenshot of the original setting. Changing a domain GPO can affect many machines.
+
+### 21.2 Correlate suspicious services with their executable files
+
+- [ ] Compared service names, binary paths, and required roles.
+
+**Clicking:** **Win + R → services.msc** → double-click a service → note **Service name**, **Path to executable**, **Log On**, **Dependencies**. Do not stop it yet.
+
+**Typing (check, elevated PowerShell):**
+
+~~~powershell
+Get-CimInstance Win32_Service |
+  Select-Object Name,DisplayName,State,StartMode,StartName,PathName |
+  Sort-Object Name | Format-Table -Wrap
+~~~
+
+To examine **one** service without guessing its executable:
+
+~~~powershell
+Get-CimInstance Win32_Service -Filter "Name='RemoteRegistry'" |
+  Format-List Name,DisplayName,PathName,StartName,State,StartMode
+~~~
+
+**What to look for:** Unexpected user-profile or temporary-directory paths, impersonated names, newly introduced binaries, unusual service accounts, or services inconsistent with the README. Some legitimate software uses nonstandard locations; **a strange path is a clue, not proof**.
+
+**Typing (investigate a known file, replace the sample path):**
+
+~~~powershell
+Get-Item -LiteralPath 'C:\Path\To\Suspect.exe' |
+  Select-Object FullName,Length,CreationTime,LastWriteTime
+Get-FileHash -LiteralPath 'C:\Path\To\Suspect.exe' -Algorithm SHA256
+Get-AuthenticodeSignature -LiteralPath 'C:\Path\To\Suspect.exe' |
+  Format-List Status,SignerCertificate
+~~~
+
+**Verification:** Compare publisher, path, hash, and service need against trusted vendor information and the README. A missing signature does not automatically prove malware.
+
+**Recovery:** If a change is authorized, document the original \`StartMode\`, stop/disabling only that confirmed unwanted service using the existing checklist, and recheck required applications and the score. Never delete the executable before recording relevant forensic answers.
+
+### 21.3 Investigate events: service installation, login attempts and process creation
+
+- [ ] Checked available logs without clearing them.
+
+**Clicking:** **Win + R → eventvwr.msc** → **Windows Logs → System** or **Security** → **Filter Current Log**. Record timestamps with timezone, event IDs, provider, and the full message.
+
+**Typing (check):**
+
+~~~powershell
+Get-WinEvent -FilterHashtable @{
+  LogName='System'; Id=7045; StartTime=(Get-Date).AddDays(-7)
+} -MaxEvents 30 | Select-Object TimeCreated,Id,ProviderName,Message |
+  Format-List
+~~~
+
+Event **7045** in the System log can record a service installation. Security event **4697** also describes service installation **when the relevant auditing is enabled**.
+
+~~~powershell
+Get-WinEvent -FilterHashtable @{
+  LogName='Security'; Id=4624,4625,4720,4732,4688,4697
+  StartTime=(Get-Date).AddDays(-3)
+} -MaxEvents 80 | Select-Object TimeCreated,Id,Message |
+  Format-List
+~~~
+
+| Event | Meaning and limitation |
+|---|---|
+| 4624 / 4625 | Successful / failed logon; interpret logon type and account |
+| 4720 | A user account was created, when auditing is present |
+| 4732 | A member was added to a security-enabled local group |
+| 4688 | New process created **only if process-creation auditing was active** |
+| 4697 | Service installation recorded in Security if configured |
+| 7045 | Service installed, shown in System |
+
+**Interpretation:** Errors such as **No events were found** do not prove an action never happened. Logging, retention, permissions, and audit policy affect visibility. To check the present policy:
+
+~~~powershell
+auditpol /get /category:*
+~~~
+
+**Verification:** Tie a suspicious event to an account, timestamp, executable and known system change. Avoid relying on one isolated log entry.
+
+**Recovery:** If auditing was intentionally changed, restore only its original documented configuration; **never clear logs** to “clean” the machine.
+
+### 21.4 Inspect persistence without executing unknown files
+
+- [ ] Reviewed login-start items and task actions.
+
+**GUI:** **Win + R → taskschd.msc** → **Task Scheduler Library**; inspect **Triggers**, **Actions**, **Author** and **History**. Open **Task Manager → Startup apps** for login items.
+
+**Typing (check):**
+
+~~~powershell
+Get-CimInstance Win32_StartupCommand |
+  Select-Object Name,Command,Location,User | Format-List
+~~~
+
+~~~powershell
+Get-ScheduledTask |
+  Select-Object TaskPath,TaskName,State,
+    @{Name='Actions';Expression={($_.Actions | ForEach-Object {
+      "$($_.Execute) $($_.Arguments)"
+    }) -join '; '}} | Format-List
+~~~
+
+~~~powershell
+Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
+Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
+~~~
+
+**Interpretation:** A task with an obscure name or PowerShell arguments warrants inspection, but scheduled updates and enterprise management agents are legitimate too. Record the exact executable and arguments before taking action.
+
+**Verification:** Correlate task path, binary signature and Event Viewer findings. Do not run the task to see what happens.
+
+**Recovery:** For a confirmed unauthorized task, prefer **Disable** before **Delete** (after preserving evidence). Record the original trigger and action; test whether required applications still work.
+
+### 21.5 SMB share + NTFS access: check both layers
+
+- [ ] Checked authorized shares and effective paths.
+
+**GUI:** **Win + R → fsmgmt.msc** (when available) → **Shares**. Review share name, local path and active sessions. In File Explorer: folder → **Properties → Sharing / Security**.
+
+**Typing (check):**
+
+~~~powershell
+Get-SmbShare | Select-Object Name,Path,Description,Special
+~~~
+
+For one **known** required share, substitute its actual name and path:
+
+~~~powershell
+Get-SmbShareAccess -Name 'ExampleShare'
+Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
+~~~
+
+**Interpretation:** Share permissions and NTFS permissions both matter. Hidden administrative shares (for example \`C$\`) are not by themselves proof of malware. A broad \`Everyone\` share right may be constrained by NTFS, but it still needs review.
+
+**Verification:** Test with a **legitimate non-admin** account that should read or write, and a separate account that should be denied. Protect required shared folders and server roles.
+
+**Recovery:** Save both ACL layers before changing. Reverse only the particular group entry or share configuration changed; never recursively reset \`C:\Windows\` permissions.
+
+### 21.6 Firewall rules that look open—but aren't applicable
+
+- [ ] Checked effective profiles, rules, ports, and service ownership.
+
+~~~powershell
+Get-NetFirewallProfile | Format-Table Name,Enabled,DefaultInboundAction,DefaultOutboundAction
+Get-NetTCPConnection -State Listen |
+  Select-Object LocalAddress,LocalPort,OwningProcess |
+  Sort-Object LocalPort
+~~~
+
+Identify the process for a suspicious PID shown by the preceding command:
+
+~~~powershell
+Get-Process -Id 1234
+~~~
+
+Replace \`1234\` with the observed PID; if it already exited, the command fails.
+
+~~~powershell
+Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
+  Select-Object DisplayName,Action,Profile |
+  Format-Table -AutoSize
+~~~
+
+**Interpretation:** An allowed rule is not necessarily reachable: scope, profile, address filters, enabled state, underlying service and other policy conditions matter. A listening port may serve an explicitly required role.
+
+**Verification:** From an authorized client, test required application connectivity after any **narrow** firewall change. Avoid blanket removal of inbound rules.
+
+### 21.7 Final verification checklist
+
+- [ ] Read and preserved forensic questions.
+- [ ] Confirmed whether the machine is standalone, domain-joined or a Domain Controller.
+- [ ] Found the **effective** source for changed policies.
+- [ ] Correlated unknown services with executable paths and relevant logs.
+- [ ] Reviewed scheduled tasks/startup entries without executing unknown payloads.
+- [ ] Confirmed required shares, services and firewall connectivity remain operational.
+- [ ] Recorded any modification, verification result and rollback information.
+
+### 21.8 Sources and further reading
+
+- [Microsoft: gpresult and Resultant Set of Policy](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/gpresult)
+- [Microsoft: Advanced Audit Policy Configuration](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/advanced-audit-policy-configuration)
+- [Microsoft: Event 4688 (process creation)](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4688)
+- [Microsoft: Event 4697 (service installation)](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4697)
+- Topic cross-checks: [chessischess CyberPatriot checklists](https://github.com/chessischess/cyberpatriot-checklist), [Minagera Windows checklist](https://github.com/Minagera/CyberPatriot/blob/main/CyberPatriot/Checklists/Windows/README.md).

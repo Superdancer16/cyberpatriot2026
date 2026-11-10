@@ -1,18 +1,14 @@
 # Linux and FreeBSD
 
-## Distribution checklists
+## Complete distribution checklists
 
-- [Linux Mint](linux-mint.md)
-- [Ubuntu](ubuntu.md)
-- [Debian](debian.md)
-- [FreeBSD](freebsd.md) (a Unix-like BSD operating system, **not Linux**)
+- [Debian — comprehensive standalone hardening handbook](debian.md) — fully integrated Debian user/password, firewall, updates, forensics, service configuration, security/persistence and recovery procedures.
+- [Linux Mint — full workstation checklist with integrated service, investigation and terminal references](linux-mint.md).
+- [Ubuntu — version-specific desktop and OS differences](ubuntu.md) (links to integrated Mint material for shared procedures).
+- [FreeBSD](freebsd.md) — FreeBSD-native administration; **FreeBSD is not a Linux distribution**.
 
-## Reference procedures
+**There are no separate scripting, Linux service, terminal or investigation files to download.** The complete shared manual reference sections are embedded in the Debian and Mint checklists.
 
-- [Linux terminal basics](linux-terminal-basics.md)
-- [Linux critical-service hardening](linux-service-hardening.md)
-- [Linux manual investigations: sudo, SSH, PAM, UFW, and persistence](linux-advanced-manual-investigation.md)
-
-Read the [image README](../General/All/reading-the-readme.md) and preserve [forensics answers](../General/All/forensics-questions.md) before changing security policy or removing files. Commands and package managers differ between Ubuntu/Mint/Debian and FreeBSD.
+Read the [image README](../General/All/reading-the-readme.md) and preserve [forensics evidence](../General/All/forensics-questions.md) before changing settings. Keep essential services operational and verify each manual fix.
 
 [Back to all categories](../README.md).

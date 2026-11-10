@@ -8,7 +8,7 @@ Step-by-step manual checklists and beginner guides for practicing **CyberPatriot
 2. [Things that lose points](things-that-lose-points.md): read this **before** touching an image
 3. [Reading the README](reading-the-readme.md): the most important 10 minutes of a round
 4. [Round game plan](round-game-plan.md): what to do in your 4 hours
-5. Never used a terminal? [Linux terminal basics](../../Linux/linux-terminal-basics.md) · [PowerShell basics](../../Windows/powershell-basics.md)
+5. Never used a terminal? [Linux terminal basics](../../Linux/linux-mint.md#22-complete-linux-terminal-basics-embedded) · [PowerShell basics](../../Windows/windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist)
 
 ## Pick your checklist
 
@@ -24,7 +24,7 @@ Step-by-step manual checklists and beginner guides for practicing **CyberPatriot
 ## Guides
 
 - [Forensics questions](forensics-questions.md): hashes, decoding, finding files, reading logs
-- [Linux critical service hardening](../../Linux/linux-service-hardening.md): Apache, Nginx, PHP, MySQL, FTP, Samba, DNS, Postfix
+- [Linux critical service hardening](../../Linux/debian.md#16-critical-services-complete-manual-procedures): Apache, Nginx, PHP, MySQL, FTP, Samba, DNS, Postfix
 - [Cisco networking and Packet Tracer](../../Cisco/cisco-networking.md): IOS commands, subnetting, ports
 - [Glossary](glossary.md): every acronym explained
 - [For mentors and teachers](for-mentors-and-teachers.md): running practice sessions with this toolkit
@@ -39,8 +39,8 @@ This repository contains documentation only; upstream scripts and website tools 
 
 These original, documentation-only supplements add targeted material found by comparing community checklists with official vendor references. They use individual **copyable commands**, inspection first, README exceptions, verification and rollback—no scripts.
 
-- [Windows: effective Group Policy, services, events, persistence, SMB and firewall](../../Windows/windows-effective-policy-and-investigation.md)
-- [Linux: sudo, SSH socket activation, PAM, cron/systemd, firewall and file investigations](../../Linux/linux-advanced-manual-investigation.md)
+- [Windows: effective Group Policy, services, events, persistence, SMB and firewall](../../Windows/windows-10-11.md#21-advanced-windows-investigations--included-in-this-checklist)
+- [Linux: sudo, SSH socket activation, PAM, cron/systemd, firewall and file investigations](../../Linux/debian.md#18-advanced-manual-verification-and-recovery)
 - [Cisco: VLAN/trunk troubleshooting, router-on-a-stick, port security, STP, ACLs and DHCP](../../Cisco/cisco-switch-routing-troubleshooting.md)
 
 ## Detailed procedures and recovery
