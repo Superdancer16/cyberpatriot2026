@@ -1,29 +1,29 @@
-# Linux Image Checklist
+# Linux image guide
 
-This checklist is a set of inspection prompts for authorized CyberPatriot Linux images. Distributions, versions, and round requirements differ; verify each item in the image instructions before making changes.
+## Inventory
 
-## Accounts and access
+Read /etc/os-release and identify desktop, init system, package manager and active firewall. Record the image brief’s authorized users, administrative groups and expected services.
 
-- [ ] Review local users, groups, and administrative privileges.
-- [ ] Compare required accounts with the image instructions.
-- [ ] Review password and account policies where applicable.
-- [ ] Inspect SSH access and other remote login settings against required functionality.
-- [ ] Do not delete or lock accounts until their purpose and round requirements are known.
+## Accounts
 
-## System security
+Use read-only getent passwd and getent group to inspect effective account sources. Check individual membership with id. Distinguish service accounts from interactive users and retain the approved administrator session during changes.
 
-- [ ] Review firewall status and rules against required network behavior.
-- [ ] Check update status and enabled security controls where permitted.
-- [ ] Review file permissions on sensitive system and configuration files.
-- [ ] Inspect enabled services and listening network services; investigate unfamiliar items before changing them.
-- [ ] Review scheduled jobs and startup configuration for unexpected entries.
-- [ ] Check logging status when relevant to the instructions.
+## Authentication
 
-## Software and verification
+Review password aging, PAM policy and administrative grants against the brief. Use visudo for syntax validation when authorized to edit sudoers. Keep an existing session open and verify a second approved login before ending it.
 
-- [ ] Review installed packages for unauthorized or clearly suspicious software.
-- [ ] Preserve packages and services required by the image instructions.
-- [ ] Confirm every change took effect and required applications still work.
-- [ ] Recheck the score and record any remaining uncertainty.
+## Services and listeners
 
-Use commands only when permitted, understood, and appropriate for the specific image. Review command effects before execution; avoid copying unreviewed commands from the internet or using broad automated cleanup.
+On systemd images inspect systemctl status SERVICE and journalctl -u SERVICE. Match each expected listener to a required service and check its bind address. Inspect the actual dependency before changing startup behavior.
+
+## Firewall and updates
+
+Identify the active firewall manager and current rules before editing. Preserve required traffic and verify it through the intended client. Review package sources and proposed package changes before updating. Stop if the package manager proposes removing required components.
+
+## Permissions and logs
+
+Use ls -ld on relevant paths to inspect owner and mode. Check whether service accounts can still read their configuration and write required data. Review authentication and service logs around the baseline and last change.
+
+## Distribution notes
+
+Use the [platform notes](platform-notes.md) for Ubuntu, Debian, Mint and FreeBSD. Use the [service guide](service-hardening.md) when a service must remain available.

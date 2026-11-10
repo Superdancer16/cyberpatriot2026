@@ -1,22 +1,16 @@
-# Documentation Index
+# CyberPatriot documentation
 
-This folder contains a general workflow and checklists for CyberPatriot image rounds. Adapt them to the current competition environment and coach instructions.
+Start with the image brief and current coach guidance. These guides cover manual defensive work on authorized images.
 
-## Round preparation and execution
-
-- [Round workflow](competition/round-workflow.md) — triage, prioritization, controlled changes, and final review.
-- [Round day checklist](round-day-checklist.md) — concise before, during, and after-round reminders.
-- [Team operations](team-operations.md) — role assignment, communication, decision records, and handoff practices.
-
-## Image review
-
-- [Image review checklist](image-review-checklist.md) — platform-neutral initial inspection and verification.
-- [Windows image checklist](windows-image-checklist.md) — defensive Windows review areas.
-- [Linux image checklist](linux-image-checklist.md) — defensive Linux review areas.
-
-## Keeping these docs useful
-
-- Confirm every action against the current round instructions.
-- Replace general prompts with platform and image details only when verified by the team.
-- Record confirmed changes and outcomes in the team’s approved location.
-- Never add passwords, answer keys, flags, or personal information to this public repository.
+- [Windows 10 and 11 image guide](windows-image-checklist.md)
+- [Linux image guide](linux-image-checklist.md)
+- [Ubuntu, Debian, Linux Mint and FreeBSD](platform-notes.md)
+- [Windows Server roles](windows-server.md)
+- [Required service hardening](service-hardening.md)
+- [Forensics and evidence handling](forensics.md)
+- [Packet Tracer and network fundamentals](networking.md)
+- [Round workflow](competition/round-workflow.md)
+- [Image intake checklist](image-review-checklist.md)
+- [Round day checklist](round-day-checklist.md)
+- [Team operations](team-operations.md)
+- [Getting started and glossary](basics.md)

@@ -1,32 +1,37 @@
-# Windows Image Checklist
+# Windows 10 and 11 image guide
 
-This checklist is a set of inspection prompts for authorized CyberPatriot Windows images. Windows editions and round requirements differ; verify each item in the image instructions before making changes.
+## Accounts
 
-## Accounts and access
+Open Computer Management → Local Users and Groups where available, or Settings → Accounts for basic inventory. Compare named users and Administrators membership against the brief. Distinguish built-in, service and human accounts. Record the original membership before correcting an unauthorized grant. Keep an approved administrator session open and confirm a second approved login before closing it.
 
-- [ ] Review local users and groups for unexpected accounts or memberships.
-- [ ] Compare required accounts and administrators with the image instructions.
-- [ ] Review password, lockout, and sign-in policies.
-- [ ] Check guest access and remote sign-in settings where relevant.
-- [ ] Do not disable, delete, rename, or change credentials for required accounts without explicit authorization.
+## Password and lockout policy
 
-## Security settings
+In Local Security Policy, inspect Account Policies → Password Policy and Account Lockout Policy. Capture current values and apply the brief’s explicit requirements. Consider service identities and lockout risk before changing credentials. On a managed machine, inspect effective policy before editing local settings.
 
-- [ ] Review Microsoft Defender or the installed security product status.
-- [ ] Check Windows Firewall profiles and rules against required network behavior.
-- [ ] Review Remote Desktop, file sharing, and other remote access settings.
-- [ ] Inspect update status and security policy settings where permitted.
-- [ ] Review audit and event logging status if the round instructions call for it.
+## User rights and audit
 
-## Software and persistence
+Under Local Policies, review User Rights Assignment and Security Options. Check who may sign in locally or remotely and whether policy changes affect service identities. Use Event Viewer → Windows Logs → Security to review recent sign-in and account changes. Record event time, outcome and account without copying secrets.
 
-- [ ] Review installed applications for unauthorized or clearly suspicious software.
-- [ ] Inspect startup applications and scheduled tasks for unfamiliar entries.
-- [ ] Review services and processes that appear unexpected; research before changing them.
-- [ ] Preserve software and services required by the image instructions.
+## Defender
 
-## Verification
+Open Windows Security → Virus & threat protection. Check the active provider, protection status, definitions, protection history and exclusions. Investigate the purpose and owner of an exclusion before removing it. Confirm the provider reports healthy and required workloads still run.
 
-- [ ] Confirm every change took effect.
-- [ ] Confirm required logins, services, and applications still function.
-- [ ] Recheck the score and record any remaining uncertainty.
+## Firewall and remote access
+
+Open Windows Defender Firewall with Advanced Security. Record the active profile and inspect inbound rule scope, program and enabled status. Preserve explicitly required traffic. In Settings → System → Remote Desktop, inspect whether RDP is enabled and which users can connect. Verify authorized access from the approved client after any scoped change.
+
+## Shares and permissions
+
+Use Computer Management → Shared Folders and inspect each share’s intended audience. Compare share permissions with NTFS permissions on the folder’s Security tab. Check effective access as an authorized standard user. Avoid recursive permission changes to Windows or application directories.
+
+## Services and startup
+
+In Services, Task Scheduler and Task Manager → Startup apps, record entry owner, path, publisher, triggers and dependencies. Check the executable’s properties and corroborate with logs before deciding whether to disable an entry. Change one entry at a time and confirm the required application still opens.
+
+## Updates and software
+
+Use Settings → Windows Update and Apps → Installed apps. Check pending restarts and distinguish prohibited applications from dependencies and drivers. Coordinate permitted updates with the team lead. Confirm required software starts after approved removal or restart.
+
+## Final review
+
+Recheck approved sign-in, required apps, firewall rules, scoring and remaining time. If something breaks, restore the last known setting and verify the affected feature before continuing.
