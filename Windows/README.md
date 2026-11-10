@@ -1,10 +1,10 @@
-# Windows
+# Windows — Prioritized CyberPatriot Manuals
 
-Complete, **self-contained** Markdown handbooks:
+Choose one self-contained guide. Each starts with **Basics / Info**, then **First Things to Do**, followed by **Commonly Assessed Checks**, **Services/Software**, **Advanced Investigation**, and **Final Verification**.
 
-- [Windows 10 and Windows 11 — complete workstation checklist](windows-10-11.md) — account policies, Defender, firewall, services, updates, forensics, malware investigation, **PowerShell basics**, effective Group Policy, auditing, troubleshooting and recovery all in one file.
-- [Windows Server 2016/2019/2022 — complete standalone server handbook](windows-server.md) — server roles, Active Directory, DNS/DHCP, IIS/FTP, file shares, domain policy, remote administration, and embedded Windows workstation security/PowerShell procedures.
+- [Windows 10 / 11 — Complete Workstation Handbook](windows-10-11.md) — PowerShell basics, forensics, authorized users, password policies, Defender, firewall, updates, services, remote access, startup persistence, audit/event evidence and recovery.
+- [Windows Server — Complete Role-Aware Handbook](windows-server.md) — Domain Controller versus member server, Active Directory, DNS/DHCP, IIS, SMB/NTFS, domain policy, server-only security, and full embedded workstation procedures.
 
-All commands and explanations are written directly in these main guides; no separate Windows command or investigation files are necessary. **The README and server role requirements always take precedence** over generic hardening steps.
+**Top priorities:** Read [the image README](../General/All/reading-the-readme.md), preserve [forensic evidence](../General/All/forensics-questions.md), keep admin access, and verify services before any changes. A score increase is never guaranteed by any particular generic setting.
 
-Start with [reading the image README](../General/All/reading-the-readme.md) and [answering forensics questions](../General/All/forensics-questions.md). [Back to all categories](../README.md).
+[All categories](../README.md)

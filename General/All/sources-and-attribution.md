@@ -39,3 +39,21 @@ Consult the documentation matching the **installed version**, especially when a 
 - [ ] Record whether commands were reviewed from documentation or actually exercised on a matching lab system. This documentation expansion was reviewed statically; its Windows, Linux, FreeBSD and IOS examples were not executed against competition images.
 
 Round schedules, resource rules, team limits and scoring behavior come from the current official round materials. The inherited season tables are reference context, not an authoritative schedule or guarantee of a particular image.
+
+
+## Additional public research reviewed for the 2026–27 priority-order expansion
+
+These are **supplemental topic inventories**, not authorities for unverified numeric point values or permission to run third-party scripts:
+
+- [CyberPatriot official CP-19 challenges by round](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round): published lineups, module ranges and challenge maximums; not individual vulnerability scoring.
+- [CyberPatriot official training materials](https://www.uscyberpatriot.org/competition/training-materials): quiz/Packet Tracer modules and the distinction between Content Course and Competition Course.
+- [Minagera Windows CyberPatriot checklist](https://github.com/Minagera/CyberPatriot/blob/main/CyberPatriot/Checklists/Windows/README.md): local account and privilege, Defender, policy, startup and persistence categories.
+- [Minagera Linux CyberPatriot checklist](https://github.com/Minagera/CyberPatriot/blob/main/CyberPatriot/Checklists/Linux/README.md): user/sudo, packages, SSH, file permission, persistence and service categories.
+- [chessischess Windows/Server/Linux checklist collection](https://github.com/chessischess/cyberpatriot-checklist): student-friendly inspection sequence, service and troubleshooting topics.
+- [Ripper1004 CyberPatriot Security Script checklists](https://github.com/Ripper1004/CyberPatriot-Security-Script): historical topic coverage; **scripts were not copied or run**.
+- [Microsoft Security Baselines](https://learn.microsoft.com/windows/security/threat-protection/windows-security-configuration-framework/windows-security-baselines): vetted Windows and Server hardening context, subject to required-role exceptions.
+- [Debian Bookworm LTS announcement (July 2026)](https://www.debian.org/News/2026/20260712): LTS support through June 2028 with package/architecture limits.
+- [Debian Bullseye LTS end (August 2026)](https://www.debian.org/News/2026/20260831): historical Debian 11 support status.
+- [Linux Mint LightDM settings project](https://github.com/linuxmint/lightdm-settings): Linux Mint-specific login window/autologin controls.
+
+**Practice priority rationale:** Public checklist consensus frequently begins with image constraints, forensics, user/admin privilege, security tooling, system updates, firewall and required-service availability, then persistence and advanced configuration. **No source establishes that any particular generic fix is worth a stated number of competition points.** Disagreements are resolved by official vendor documentation and the actual competition image requirements.

@@ -1,12 +1,10 @@
-# Cisco — Two comprehensive study guides
+# Cisco — Networking Quiz and Packet Tracer
 
-Choose one of the two complete guides:
+Both Cisco guides follow **Basics / Information Needed → First Things to Do → Common Fundamentals/High-Priority Tasks → Intermediate → Advanced → Final Review**.
 
-1. **[Cisco Packet Tracer — Step-by-Step Handbook](packet-tracer.md)** — practical configurations, worked CLI examples, interface/VLAN/trunk setup, routing, OSPF/EIGRP/RIP, DHCP/DNS, ACLs, NAT/PAT, Wi-Fi, IPv6, SSH, device validation, troubleshooting, and recovery. Includes all useful material from the two former practical Cisco files.
-2. **[Cisco Quiz — 361 Common Questions and Answers](cisco-quiz.md)** — vocabulary, protocol explanations, OSI/TCP-IP, addressing and subnetting, port numbers, switching, wireless, security, routing, Cisco IOS concepts, comparison tables, tips, and quiz-style scenarios. Uses original **free-response questions with answers immediately below**, not four-option practice tests.
+1. **[Packet Tracer — Complete Step-by-Step Guide](packet-tracer.md)**: first identify activity tasks, topology, interface IPs and gateways, then VLANs, trunks, routes, DHCP, ACLs/SSH and required services; advanced OSPF/EIGRP, NAT/PAT, IPv6, wireless, STP, simulation and troubleshooting follow.
+2. **[Cisco Quiz — 385 Original Short-Answer Questions](cisco-quiz.md)**: fundamental networking vocabulary, OSI/TCP/IP, subnetting, devices and ports first; then IPv6, routing, VLANs, security, CLI commands, scenarios and technical distractors. Answers appear immediately under each question.
 
-**Study priority:** Follow the assigned Cisco NetAcad **Content Course** for the current CyberPatriot round and actual competition rules. The two guides are original reference material, **not live competition answer keys**.
+**Study with the official [NetAcad CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content)** and follow the actual round's assigned modules. This repository does **not** provide live competition answers or a promised scoring checklist. Use outside notes only when assessment rules allow them.
 
-For Packet Tracer, follow the activity's instructions and permitted features. Preserve working settings and back up the activity only when allowed. Keep required network connectivity while changing configurations.
-
-[Back to all categories](../README.md).
+[All categories](../README.md)
