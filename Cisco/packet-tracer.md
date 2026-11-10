@@ -951,9 +951,9 @@ Some tasks grade running configuration directly; use the actual submission instr
 
 ## 21. Expanded original configuration reference
 
-These additional configuration steps and full lab procedures are retained from the existing Cisco guide. **Sections 0–20 above are the primary workflow**; use the earlier section if a legacy example conflicts with current requirements or the device's feature support.
+These additional configuration steps and full lab procedures are retained from the previous Cisco guide. **Sections 0–20 are the primary workflow**; if a legacy example conflicts with the activity or Cisco device, use the device-specific task requirements and verify before applying.
 
-#### Cisco IOS basics
+### Cisco IOS basics
 
 **IOS** (Internetwork Operating System) is the software on Cisco routers and switches. You talk to it through a command line, the **CLI** (command-line interface). In Packet Tracer, click a device and open the **CLI** tab.
 
@@ -1019,7 +1019,7 @@ All of these run in privileged EXEC (`Router#`), or with `do` in config mode.
 | down / down | No cable, or the other end is off | Check the cable and the device on the other end |
 | up / down | Cable is fine but the link doesn't work | Check the other side's settings (for example, clock rate on a serial link) |
 
-#### Securing a device
+### Securing a device
 
 These are the classic Packet Tracer security tasks. The examples use simple passwords. Always type exactly the passwords and names the activity instructions give you, because the grader checks for them.
 
@@ -1157,7 +1157,7 @@ Press **Enter** at the question. `write memory` (or just `wr`) does the same thi
 > [!IMPORTANT]
 > Some Packet Tracer activities check the startup-config. Save on **every** device when you're done, and again after any later change.
 
-#### Interfaces and addressing
+### Interfaces and addressing
 
 #### Router interface
 
@@ -1209,7 +1209,7 @@ ipconfig /all
 ping 192.168.1.1
 ```
 
-#### VLANs and trunks
+### VLANs and trunks
 
 A **VLAN** (virtual LAN) splits one switch into separate networks. Devices in different VLANs can't talk to each other without a router (or a multilayer switch). VLAN 1 is the default VLAN that every port starts in.
 
@@ -1281,7 +1281,7 @@ R1(config-if)# no shutdown
 
 `encapsulation dot1Q 10` must come **before** the IP address. Each PC uses its own VLAN's subinterface address as its default gateway.
 
-#### Routing and DHCP
+### Routing and DHCP
 
 #### Static and default routes
 
@@ -1317,7 +1317,7 @@ R1(dhcp-config)# exit
 - Check which addresses were handed out with `show ip dhcp binding`.
 - If the DHCP server is on a different network, the router interface facing the clients needs `ip helper-address` followed by the server's IP, because routers don't forward the DHCP broadcast otherwise.
 
-#### Troubleshooting checklist
+### Troubleshooting checklist
 
 Work from the bottom layer up.
 
@@ -1339,7 +1339,7 @@ arp -a
 > [!TIP]
 > The first ping often loses a packet or two while ARP finds the MAC address. On a router you'll see `.!!!!`. Ping again before you start changing things.
 
-#### Packet Tracer tips
+### Packet Tracer tips
 
 - **Read the instructions twice** before you start. Write down every name, password and address. Spelling and capital letters must match exactly.
 - The **Check Results** button in the instructions window shows your completion percentage and which assessment items are correct. Check it often.
@@ -1352,7 +1352,7 @@ arp -a
 
 For more terms, see the [glossary](../General/All/glossary.md).
 
-#### Complete manual lab procedures
+### Complete manual lab procedures
 
 The earlier tables remain quick references. These procedures add validation, rollback and missing routing/security topics. **All addresses, ports, VLANs and credentials here are lab examples.** Use the activity's actual topology and requirements. On Packet Tracer click the router/switch → **CLI**, press Enter, and answer `no` to the initial setup dialog only if appropriate. On real equipment use an authorized console connection and record the model/IOS version first.
 
