@@ -1,7 +1,20 @@
-# CyberPatriot 2026–2027 Handbook — General / All
+# 📚 CyberPatriot 2026–2027 Handbook — General / All
+
+> [!TIP]
+> **🧭 Quick start:** Follow the category links and open the most relevant guide. Look for **🔎 Check**, **🛠️ Fix**, **✅ Verify**, **↩️ Undo**, and **⚠️ Caution** throughout.
+
+## 🧭 Quick links
+
+[Basics / Information Needed](#topic-1) · [First Things to Do](#topic-2) · [Choose Your Platform Guide](#topic-3) · [Commonly Assessed Concepts — Where to Start](#topic-4) · [Advanced Investigations, Recovery and Sources](#topic-5)
+
+---
+
 
 **Read this before selecting an operating-system guide.** Each revised platform guide now follows the same order: **Basics / Information Needed → First Things to Do → Commonly Assessed High-Priority Checks → Services and Software → Advanced Topics → Final Verification.**
 
+---
+
+<a id="topic-1"></a>
 ## Basics / Information Needed
 
 - [What is CyberPatriot?](what-is-cyberpatriot.md) — competition concepts and scoring
@@ -11,6 +24,9 @@
 
 **Priority is not a published scoring rubric.** The actual image README and current competition instructions override public checklists.
 
+---
+
+<a id="topic-2"></a>
 ## First Things to Do
 
 1. Open the image README and record required users, roles, server services, ports, passwords or accounts that **must not be changed**.
@@ -22,6 +38,9 @@
 
 For team coordination use the [Round Game Plan](round-game-plan.md) and [Mentor/teacher resources](for-mentors-and-teachers.md).
 
+---
+
+<a id="topic-3"></a>
 ## Choose Your Platform Guide
 
 | Guide | Content | CP-19 (2026–27) published scope |
@@ -37,6 +56,9 @@ For team coordination use the [Round Game Plan](round-game-plan.md) and [Mentor/
 
 **Official round lineup and point totals:** [CyberPatriot CP-19 challenges by round](https://www.uscyberpatriot.org/competition/current-competition/challenges-by-round). The schedule is subject to change; the coach's instructions are authoritative.
 
+---
+
+<a id="topic-4"></a>
 ## Commonly Assessed Concepts — Where to Start
 
 - **Windows:** authorized accounts/admin groups, passwords, Defender, firewall, updates, policies, startup/tasks, required software and services.
@@ -46,6 +68,9 @@ For team coordination use the [Round Game Plan](round-game-plan.md) and [Mentor/
 
 These categories are **prioritization aids inferred from educational checklists**, not guaranteed scoring items.
 
+---
+
+<a id="topic-5"></a>
 ## Advanced Investigations, Recovery and Sources
 
 - [Forensics investigation procedures](forensics-questions.md#repeatable-investigation-procedures)

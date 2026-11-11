@@ -1,4 +1,8 @@
-# CyberPatriot 2026–2027 — Prioritized Security Handbooks
+# 🛡️ CyberPatriot 2026–2027 — Prioritized Security Handbooks
+
+> [!TIP]
+> **🧭 Quick start:** Follow the category links and open the most relevant guide. Look for **🔎 Check**, **🛠️ Fix**, **✅ Verify**, **↩️ Undo**, and **⚠️ Caution** throughout.
+
 
 **Start with basics. Protect the README-required system. Work from common tasks to advanced investigation.**
 
