@@ -40,7 +40,6 @@ Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competi
 
 
 > [!NOTE]
-> **📚 Evidence guide for CyberPatriot XVI–XIX:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the additional procedures below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
 
 ---
 
@@ -141,11 +140,11 @@ Never run suspicious executables or clear event logs to investigate them. Record
 - [ ] **🎯 DO THIS — 1.1 Find out what kind of server it is**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Distinguish standalone/member server from a promoted Domain Controller **before** using account or Group Policy commands.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Simply seeing the **AD DS** role installed does not prove the machine was promoted to a Domain Controller. Likewise, being **domain-joined** does not make a server a Domain Controller.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open Server Manager → **Local Server** (look at Domain and roles). On an actual Domain Controller, Server Manager → Tools may offer **Active Directory Users and Computers (dsa.msc)**, **Group Policy Management (gpmc.msc)**, **DNS** and other management consoles. The presence of a management console alone is not proof the local machine is a DC.
@@ -173,7 +172,7 @@ A server's exact DomainRole, installed role, and running NTDS service are comple
 **🔎 Check:** Record domain name, primary services and whether this machine must provide AD, DNS, DHCP, IIS or file shares.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** No changes occur in this step. If a role is not active, do not install/promote it as a quick fix without an explicit task.
 
 #### 1.2 Make a manual baseline (no hardening scripts)
@@ -196,11 +195,11 @@ Get-ScheduledTask | Select-Object TaskName,TaskPath,State
 **🔎 Check:** Verify with the corresponding Get-* command, role/client functional test and fresh scoring report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the single prior policy/group membership/firewall or service setting from your notes; do not reset or reinstall the entire server to undo one step.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** A server role may have dependencies not explicitly listed in the README (e.g. AD uses DNS and time). Ask what the server is actually serving before changing listener or startup state.
 
 ---
@@ -222,7 +221,7 @@ Prioritize authorized users, domain/local privilege, passwords, Defender/firewal
 - [ ] **🎯 DO THIS — 2.1 Standalone / member server — fully documented local accounts**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Reconcile the *local* accounts and Administrators group on a standalone/member server. Domain accounts are still administered in Active Directory at the proper domain scope.
 
 **⭐ EASIEST WAY — Click through the GUI:** Win + R → **lusrmgr.msc** (or Computer Management → Local Users and Groups → Users/Groups). Review **Users** and then double-click **Administrators**, **Remote Desktop Users**, **Backup Operators** and any other privileged groups.
@@ -283,11 +282,11 @@ Set-LocalUser -Name 'exampleuser' -Password (Read-Host -AsSecureString 'New loca
 **✅ Check it worked:** Repeat Get-LocalUser and Get-LocalGroupMember; test a new permitted admin login and required local software or file sharing.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Use Enable-LocalUser, Add-LocalGroupMember or Remove-LocalGroupMember to reverse only the original exact account/group change; a deleted account or home directory is not reliably restored by simply creating a new user.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Caution:** Never delete Administrator, Guest, DefaultAccount, or other built-in identities. Disable the Guest account unless the actual README requires it; built-in Administrator may be needed for recovery and should not be disabled blindly. Do not remove domain service accounts or domain groups based on local-only naming assumptions. Account deletion is irreversible without suitable backups.
 
 #### 2.2 Domain Controller — domain users and authorized accounts
@@ -334,7 +333,7 @@ Set-ADAccountPassword -Identity 'exampleuser' -Reset -NewPassword (Read-Host -As
 **🔎 Check:** Query the exact user again and confirm a fresh authorized login. Password changes to service identities can break scheduled tasks, IIS pools, databases and other services.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Enable-ADAccount restores a mistakenly disabled account when permitted; deleted AD objects require AD-aware backup/recycle-bin restoration and are **not** equivalent to creating another user with the same name.
 
 **Never:** Blindly run Remove-ADUser, clear user profiles, change krbtgt, delete computer objects or rotate a service credential without explicit justification and recovery.
@@ -444,7 +443,7 @@ Complexity and reversible encryption are **not set by net accounts**. Use **secp
 **✅ Check it worked:** Rerun net accounts, inspect the corresponding effective security setting, test a noncritical authorized local login, and refresh the score.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the individual documented starting policy values using secpol.msc/net accounts. A configured threshold of 0 disables lockout; a lockout duration of 0 means administrative unlock is required on many systems—do not choose them accidentally. Domain account rules belong in the actual domain policy section below.
 
 #### 3.2 Domain Controller — domain default policy and fine-grained policies
@@ -452,7 +451,7 @@ Complexity and reversible encryption are **not set by net accounts**. Use **secp
 - [ ] **🎯 DO THIS — 3.2 Domain Controller — domain default policy and fine-grained policies**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Apply account policy to the **domain**, not a nonexistent DC local account database. The domain-root-linked account policy GPO (commonly **Default Domain Policy**) controls domain default account policy; **fine-grained password policies (FGPP)** can provide different effective settings for chosen users/groups.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -486,7 +485,7 @@ This illustrative command does **not** set maximum/minimum password age; verify 
 **🔎 Check:** Repeat the default and resultant policies; inspect RSoP/Group Policy results and test an authorized fresh domain login. Password policy changes generally affect future password changes, not automatically the strength of every existing password.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the individual recorded setting or a specific GPO backup after reviewing its intended scope. Do not delete the Default Domain Policy to correct one entry. Domain account lockout may be influenced by FGPP; investigate before editing default values.
 
 ### 5. Defender, firewall and updates
@@ -496,7 +495,7 @@ This illustrative command does **not** set maximum/minimum password age; verify 
 - [ ] **🎯 DO THIS — 5.1 Microsoft Defender Antivirus on Windows Server**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Servers 2016, 2019 and 2022 have Windows Defender Antivirus capabilities, but feature availability, security UI, other antivirus modes and management policies differ. The absence of a Windows 11-style GUI on **Server Core** is not proof antivirus protection is missing.
 
 **⭐ EASIEST WAY — Click through the GUI:** On Desktop Experience, use **Windows Security → Virus & threat protection** when available (on Server 2016 the Defender GUI may need a separate feature). In Server Manager inspect **Add Roles and Features → Features → Microsoft Defender Antivirus** without installing anything yet.
@@ -513,7 +512,7 @@ This illustrative command does **not** set maximum/minimum password age; verify 
 > ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpret:** Another enterprise antivirus may put Defender in a passive mode. Existing exclusions may be required for IIS, SQL, AD, backup or other approved workloads; investigate each before removing. A service not continuously running can be normal for some protective components; confirm effective provider and policies.
 
 > [!NOTE]
@@ -535,7 +534,7 @@ The above changes server features and may require a reboot; do **not** run solel
 **✅ Verify:** Repeat Get-MpComputerStatus, review protection/error events and required workloads, and refresh the score.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore only a changed antivirus setting/exclusion/feature from its approved baseline. Never disable antivirus broadly to work around one application error.
 
 **Vendor reference:** [Microsoft Defender Antivirus on Windows Server](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure).
@@ -545,7 +544,7 @@ The above changes server features and may require a reboot; do **not** run solel
 - [ ] **🎯 DO THIS — 5.2 Windows Server Firewall — role-aware, standalone procedure**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Keep the host firewall enabled on all required profiles while allowing **only the necessary authorized sources** to reach Active Directory, DNS, DHCP, IIS, SMB, remote management and other installed roles.
 
 **⭐ EASIEST WAY — Click through the GUI:** Win + R → **wf.msc** → Windows Defender Firewall with Advanced Security. Review **Properties → Domain, Private and Public Profile**, then **Inbound Rules** and the existing built-in role-specific groups. On Server Core use the PowerShell method below.
@@ -587,7 +586,7 @@ Never run a blanket disable command for all role-specific rules. For a specific 
 **✅ Check it worked:** Repeat profile/rule inspections and test approved DNS, AD logon, DHCP lease, IIS page, share and remote admin from a proper client. Preserve at least one management recovery path.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Revert only the explicitly changed profile or rule to its original documented state and retest. Restoring a firewall profile blindly to Disabled can expose the server; investigate the original intended policy and actual failure.
 
 #### 5.3 Windows Server updates and security maintenance
@@ -621,7 +620,7 @@ Never run a blanket disable command for all role-specific rules. For a specific 
 **🔎 Check:** Record the actual intended role of IE/legacy components; don't enable an obsolete browser or disable modern protections for scoring. No configuration change is required if the setting is already compliant.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the recorded original setting using Server Manager if the change breaks a required legacy application.
 
 ---
@@ -666,7 +665,7 @@ Never run a blanket disable command for all role-specific rules. For a specific 
 **✅ Verify:** Re-export the relevant security policy, run auditpol /get, inspect effective GPO, perform an authorized login, test required file/network access, and check fresh Security log events.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the precise original right/audit/option from notes or a valid scoped backup; do not remove NT SERVICE, LOCAL SERVICE or NETWORK SERVICE principals as a blanket restriction.
 
 #### 4.2 Domain Controller — DC-specific Group Policy, auditing and user rights
@@ -718,14 +717,14 @@ auditpol /get /category:*
 Review actual DC audit events and test fresh domain user logon, DC DNS, SYSVOL/NETLOGON access and any other README-required role.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the **specific** GPO backup/setting after verifying the affected scope, not every GPO. Re-run policy and required-client tests; never delete the Default Domain Controllers Policy to undo one change.
 
 #### 4.3 Look for planted bad Group Policies
 - [ ] **🎯 DO THIS — 4.3 Look for planted bad Group Policies**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** An attacker can create or change a GPO to turn off the firewall, add an admin, or run a script on every computer.
 
 **⭐ EASIEST WAY — Click through the GUI:** In `gpmc.msc`, click each GPO → **Settings** tab (it shows a report). Look for anything that weakens security. Check the **Scope** tab to see where it's linked.
@@ -742,7 +741,7 @@ Review actual DC audit events and test fresh domain user logon, DC DNS, SYSVOL/N
 - [ ] **🎯 DO THIS — 4.4 Domain Controller: Zerologon protection**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Zerologon (CVE-2020-1472) lets anyone on the network take over a Domain Controller without a password. Windows updates since February 2021 always block it, but a planted policy can let chosen accounts use the weak connection again, and an un-updated image is wide open.
 
 **⭐ EASIEST WAY — Click through the GUI:** In the **Default Domain Controllers Policy** (4.2) → **Security Options** → **Domain controller: Allow vulnerable Netlogon secure channel connections** must be **Not Defined** (no accounts listed). Install updates too (5.3).
@@ -777,7 +776,7 @@ w32tm /query /status
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **What to look for:** Directory authentication, SYSVOL/DFSR, DNS, replication and clock health. A single-controller lab may have no replication partners; investigate output instead of "repairing" imaginary peers.
 
 **Domain privilege review (only when AD PowerShell is available):**
@@ -796,11 +795,11 @@ Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires | Select-Object Sa
 - [ ] **🎯 DO THIS — 🔐 AD privileged groups, service accounts and safe reversibility**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community/training categories with vendor-backed Active Directory management commands. Not a guarantee of actual scoring.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Domain Admins, Enterprise Admins, Schema Admins and nested membership can confer privileges beyond a user's visible OU. Service identities and computer objects may be required.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → dsa.msc → View → Advanced Features**. Examine all OUs, the group **Members** and each user's **Member Of / Account** tabs; identify built-in, managed service and computer accounts.
@@ -837,7 +836,7 @@ Disable-ADAccount -Identity 'EXAMPLE_USER'
 **✅ Verification:** Re-run both direct and recursive group queries; verify a new legitimate domain logon and required IIS/task/service identity functions. Existing sessions may retain old group tokens until reauthentication.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore **only** the mistakenly removed direct membership with **Add-ADGroupMember** or re-enable a mistakenly disabled account using **Enable-ADAccount**. Never delete or reset **krbtgt**, domain built-in Administrator, computer objects or required service accounts during routine checklist hardening.
 
 <a id="research-report-expansion-ws-r2--domain-password-policy-fgpp-and-resultant-policy"></a>
@@ -846,7 +845,7 @@ Disable-ADAccount -Identity 'EXAMPLE_USER'
 - [ ] **🎯 DO THIS — 🔐 Domain password policy, FGPP and resultant policy**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed. Domain password and lockout settings are not interchangeable with member-server local policy.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → gpmc.msc → Forest → Domains → your domain**. Inspect the **domain-root-linked** account policy GPO (often Default Domain Policy) → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies. Check OU links and GPO precedence, and back up the specific GPO before editing.
@@ -863,7 +862,7 @@ Disable-ADAccount -Identity 'EXAMPLE_USER'
 > ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **What to look for:** A weak *effective* policy for a user because of fine-grained precedence, password-not-required flags or missing complexity settings; use exact values from the README. The report records conflicting historical community settings (minimum lengths 10–14; maximum ages 60–90 days). These are **examples, not fixed competition scores**.
 
 > [!NOTE]
@@ -879,7 +878,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 **✅ Verify:** Re-query domain default/resultant policy for affected users and test a normal authorized login. Test required applications that depend on service credentials before considering a password reset.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore exact old values or scoped GPO backup; account password resets are not reversed by restoring policy. Never delete Default Domain Policy or change the entire forest password policy for one misunderstood workstation issue.
 
 <a id="research-report-expansion-ws-r3--ldap-signingchannel-binding-with-compatibility-checks"></a>
@@ -888,11 +887,11 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 - [ ] **🎯 DO THIS — 🧰 LDAP signing/channel binding with compatibility checks**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed; Microsoft has dedicated guidance. Strict enforcement can break old required applications.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Unsigned LDAP binds and absent channel-binding protections can permit credential-relay and downgrade risks. However, a required application may have legacy LDAP behavior; you must identify clients before enforcing stricter settings.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Event Viewer → Applications and Services Logs → Directory Service** (or **Windows Logs** when the platform uses that provider) and **gpmc.msc → appropriate DC-linked GPO → Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options**.
@@ -909,7 +908,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 > ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpretation:** Event 2887 can summarize unsigned LDAP binds when logging is configured. Individual client events such as 2889 may require extra diagnostic logging; **absence of events does not demonstrate that all clients support enforcement**. Channel-binding diagnostics may include other Directory Service event IDs depending on OS and policy.
 
 **Fix only when clients have been inventoried and requirements permit:** Under **Domain controller: LDAP server signing requirements**, choose **Require signing** when compatible. Review the separately configured LDAP channel binding policy according to the installed Server release and client capabilities rather than setting **Always** blindly.
@@ -917,7 +916,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 **✅ Verification:** Confirm effective GPO; test LDAP/LDAPS from every required client/application and inspect new Directory Service events. Check normal domain logon and DNS SRV resolution.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore only the documented policy value from the prior GPO backup if a required legacy client fails. Do not disable LDAP signing globally as a reflexive repair or alter domain-wide NTLM settings blindly.
 
 **Vendor reference:** [Microsoft LDAP signing guidance](https://learn.microsoft.com/en-us/troubleshoot/windows-server/active-directory/ldap-signing) and current Windows Server security baselines.
@@ -928,7 +927,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 - [ ] **🎯 DO THIS — 🧰 SMB1, signing and domain-critical shares**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed; SMB signing and SMB1 support are separately configurable.
 
 > [!NOTE]
@@ -942,7 +941,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 > ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **What to look for:** Unauthorized SMB1 compatibility, weak signing if the role requires it, unapproved custom shares and overly broad share rights. **SYSVOL, NETLOGON, administrative shares, and required data shares must not be removed indiscriminately.**
 
 **⭐ EASIEST WAY — Click through the GUI:** Server Manager → **File and Storage Services → Shares**, then the backing folder's **Properties → Security → Advanced**; inspect **both** share permissions and NTFS ACLs.
@@ -964,7 +963,7 @@ These changes can affect active sessions, GPO and older clients; retain a consol
 **✅ Verification:** Repeat Get-SmbServerConfiguration, check Get-SmbShareAccess for actual required shares and test SMB read/write from an authorized ordinary user plus an explicitly denied user.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore only the known old protocol/signing value if the README explicitly requires legacy compatibility. Do not re-enable SMB1 simply to chase points; address compatible client migration where permitted. A removed share must be restored with both the correct share and original NTFS permissions.
 
 **Sources:** [Microsoft SMB signing](https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-signing-overview) and [SMB server cmdlets](https://learn.microsoft.com/en-us/powershell/module/smbshare/set-smbserverconfiguration).
@@ -1081,7 +1080,7 @@ On a Domain Controller, leave **NETLOGON** and **SYSVOL** alone.
 - [ ] **🎯 DO THIS (only if authorized) — 9.7 Turn off SSL 3.0, TLS 1.0 and TLS 1.1**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** These old encryption versions have known breaks. Websites (IIS), FTP over SSL, Remote Desktop and LDAPS should all use TLS 1.2 or newer. Server 2016-2022 still allow TLS 1.0 and 1.1 unless you turn them off.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
@@ -1109,7 +1108,7 @@ This changes only what the server *accepts* (the `Server` keys), not how the ser
 - [ ] **🎯 DO THIS (only if authorized) — 6.1 Inventory and safely disable only unauthorized services**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Review services by their **real Windows service name**, executable path and dependencies. This section contains the Server-specific service table directly; no workstation checklist is necessary.
 
 **⭐ EASIEST WAY — Click through the GUI:** Win + R → services.msc → select the exact service → Properties. Record **Service name, Display name, Service status, Startup type, Log On As, Dependencies, Path to executable**. If Server Core lacks services.msc, use PowerShell below.
@@ -1171,7 +1170,7 @@ Get-Service -Name 'RemoteRegistry' | Format-Table Name,Status,StartType
 ~~~
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the *recorded original* startup type using Set-Service; start the service only if it had been running and is required. A stopped service can be appropriate even when startup is Manual. Do not apply blanket Stop-Service -Force, bulk disable lists or mass uninstalls to required roles.
 
 **Warn:** Services may depend on each other; disabling a listed generic desktop service on a server may break printing, IIS FTP, remote management, backups or an app. Confirm dependencies via the GUI or Get-Service -DependentServices and actual required-client test.
@@ -1200,7 +1199,7 @@ Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Tabl
 - [ ] **🎯 DO THIS — 6.3 Print Spooler, Point and Print and PrintNightmare**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Print Spooler has been involved in serious privilege-escalation/remote-code-execution vulnerabilities. Whether it should be disabled depends on whether this machine is a required print server and the installed update/policy state.
 
 > [!NOTE]
@@ -1226,7 +1225,7 @@ Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Tabl
 **✅ Verify:** Confirm expected policy, installed update status and required printer client functionality. Test from an authorized printer/client context if this is a print server.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore exactly the prior documented service state or policy if a needed printer application breaks, while maintaining the strongest feasible protective controls.
 
 ### 7. Roles and features
@@ -1236,7 +1235,7 @@ Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Tabl
 - [ ] **🎯 DO THIS (only if authorized) — 7.1 Inspect and safely remove **only specifically prohibited** roles/features**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** An unauthorized feature can expose attack surface, but deleting a role may break domain authentication, a required website/share or application data. Removing role binaries often does **not** restore required configuration if later reinstalled.
 
 **⭐ EASIEST WAY — Click through the GUI:** Server Manager → **Manage → Add Roles and Features** to review installed roles/features, or **Remove Roles and Features** to inspect candidates/dependencies **without confirming removal**. Note installed AD DS, DNS, DHCP, IIS, file services and Windows Defender.
@@ -1276,7 +1275,7 @@ This is only an example if Telnet Client is **installed and prohibited**. Do not
 **✅ Verify:** Repeat feature inspection and test the exact required role functions from an authorized client. Review pending reboot requirements.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Reinstalling a role's binaries may not restore its prior data and configuration. Use a valid role-specific backup and supported recovery procedure, not blanket reinstallation.
 
 ---
@@ -1288,7 +1287,7 @@ This is only an example if Telnet Client is **installed and prohibited**. Do not
 - [ ] **🎯 DO THIS — 8.1 Remote Desktop and Remote Assistance — Server-specific procedure**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Determine whether RDP, Remote Assistance or an RDS role is required. Do **not** turn off RDP if it is an approved management path or the system is an RDS Session Host.
 
 **⭐ EASIEST WAY — Click through the GUI:** Server Manager → Local Server → **Remote Desktop**. If enabled, require **Network Level Authentication (NLA)** when compatible with the authorized clients. Inspect **Select Users** / Remote Desktop Users group and effective GPO. On a DC, members and logon rights come from **domain groups and domain policy**, not local Get-LocalGroupMember.
@@ -1318,7 +1317,7 @@ fDenyTSConnections = 0 usually permits incoming RDP subject to other controls; 1
 **✅ Verify:** Check effective GPO, firewall profile/rules, NLA/login restrictions, authorized RDP connection (if required), and other required service functions. For disabled RDP, verify it is not listening or reachable from an unauthorized client **without** breaking the VM console.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore only the original documented Remote Desktop/Assistance value, group membership, GPO or firewall scope using console access. Avoid blindly editing multiple registry values, which can be overridden by policy.
 
 #### 8.2 Lock down WinRM
@@ -1361,7 +1360,7 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' 
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpret:** A suspicious name/signature/listener is only an investigation lead. Required service accounts, scheduled backup jobs and remote-management tools can be legitimate. On a Domain Controller, preserve NTDS/AD/DNS/Kerberos, authorized SYSVOL content, event logs and necessary service identities.
 
 **Verify/undo:** After any narrowly approved remediation, test ordinary login and all required IIS/FTP/SMB/DNS/DHCP/AD functions, check system/service events, and restore only the changed item from its baseline.
@@ -1396,7 +1395,7 @@ Get-NetFirewallProfile
 - [ ] **🎯 DO THIS — 📦 DNS zone transfers, updates and AD-integrated records**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed DNS hardening; depends on whether this server actually hosts DNS.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → dnsmgmt.msc → Forward Lookup Zones → actual zone → Properties**. Inspect **General → Dynamic Updates** and **Zone Transfers**. AD-integrated zones can support **Secure only** dynamic updates when appropriate; a secondary DNS server may require tightly restricted zone transfers.
@@ -1412,7 +1411,7 @@ Get-NetFirewallProfile
 > ~~~
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record the original zone type, AD replication scope, allowed secondaries, clients and SRV records. **Do not delete unfamiliar SRV records** or redirect domain DNS to a public resolver.
 
 **🛠️ Fix:** On the exact zone, use its GUI to restrict unwanted zone transfers to approved secondary servers, and set dynamic updates to the appropriate secure mode only for an AD-integrated zone whose clients support it. Do not use a blanket change across all zones.
@@ -1420,7 +1419,7 @@ Get-NetFirewallProfile
 **✅ Verification:** Test client A/AAAA and required SRV records, DC name resolution, and authorized dynamic updates. If an approved secondary exists, verify its transfer still succeeds.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the recorded per-zone setting or role-aware DNS backup. A DNS zone deletion is not fixed by simply adding one A record.
 
 <a id="research-report-expansion-ws-r6--dhcp-scopes-reservations-authorization-and-auditing"></a>
@@ -1429,7 +1428,7 @@ Get-NetFirewallProfile
 - [ ] **🎯 DO THIS — 🔎 DHCP scopes, reservations, authorization and auditing**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community; vendor-supported DHCP configuration inventory.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → dhcpmgmt.msc → Server → IPv4 → Scope**. Review address ranges, exclusions, **Reservations**, **Address Leases**, and **Scope Options** (003 Router, 006 DNS Servers, 015 Domain Name). Check server authorization and any configured failover pair.
@@ -1457,7 +1456,7 @@ Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
 **✅ Verification:** On an approved test client, renew or inspect the lease, confirm actual gateway/DNS/domain suffix and reach required services. Then re-run DHCP scope/option queries and check relevant audit records.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the one altered option/reservation, or use a reviewed DHCP-specific backup procedure for larger changes. Never delete a scope or reauthorize arbitrary servers to silence one lease error.
 
 <a id="research-report-expansion-ws-r7--iis-directory-browsing-webdav-app-pools-and-web-shell-triage"></a>
@@ -1466,7 +1465,7 @@ Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
 - [ ] **🎯 DO THIS — 🧰 IIS directory browsing, WebDAV, app pools and web-shell triage**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed, applies only to an installed/required IIS web/FTP role.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → inetmgr → Sites → required site**. Review **Basic Settings → Physical path**, **Bindings**, **Directory Browsing**, **Authentication**, **Request Filtering**, **Modules**, **WebDAV Authoring Rules** (if installed), **Logging** and **Application Pools → Identity**.
@@ -1483,7 +1482,7 @@ Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
 > ~~~
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before edits:** Export/back up the effective IIS configuration, bindings and relevant content; record any application pool identity and required login/upload/database operations. An IIS configuration backup alone does not save its content/database.
 
 **Fix only if the required site must forbid directory listings:**
@@ -1495,7 +1494,7 @@ Set-WebConfigurationProperty -PSPath 'IIS:\Sites\Default Web Site' -Filter syste
 Replace **Default Web Site** with the actual site; do not apply to every site by default. If WebDAV is enabled but unused, inspect installed module/authorization and disable it only for the correct site after client compatibility checks. Avoid disabling Basic Authentication where the task requires it over HTTPS.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Evidence check (read-only, replace actual site directory):**
 
 ~~~powershell
@@ -1504,13 +1503,13 @@ Get-ChildItem 'C:\inetpub\wwwroot' -Recurse -File -Include *.asp,*.aspx,*.php,*.
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpret:** Script files may be legitimate; unknown scripts need metadata, publisher/source comparison and forensic preservation. Do not execute or delete files purely because of their extension.
 
 **✅ Verification:** Load the actual hostname/HTTPS binding from an authorized client, test required login/upload/API/database behavior, and check IIS error/request logs. A successful local homepage does not prove the required virtual host works.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the one site setting/permission from the recorded original or a reviewed IIS backup; restore file content and DB separately if removed.
 
 <a id="research-report-expansion-ws-r8--required-service-recovery-before-removing-any-role"></a>
@@ -1519,7 +1518,7 @@ Get-ChildItem 'C:\inetpub\wwwroot' -Recurse -File -Include *.asp,*.aspx,*.php,*.
 - [ ] **🎯 DO THIS — 🧰 Required service recovery before removing any role**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **📚 Evidence:** Official scenario/service-preservation principle; role-specific command behavior is vendor-backed.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
@@ -1531,7 +1530,7 @@ Get-WindowsFeature | Where-Object Installed | Select-Object Name,DisplayName
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **What to look for:** A required role unexpectedly Disabled/Stopped or a suspicious role added. **Some healthy services are demand-start or absent**; never force the entire list to Automatic.
 
 **Change ONLY if the exact required service was accidentally disabled and its original startup was Automatic (replace placeholder):**
@@ -1544,7 +1543,7 @@ Start-Service -Name 'EXAMPLE_REQUIRED_SERVICE'
 **✅ Verification:** Recheck status and the application-level operation: domain login, required DNS SRV query, DHCP lease, IIS page, authorized SMB file access or other README-specified transaction. On a DC also verify directory, time and replication health as relevant.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the original recorded service startup and running state if a change was incorrect. Do not disable a role only because a generic checklist labels it risky; do not re-create a deleted directory/database with a blank role installation.
 
 ---
@@ -1567,15 +1566,15 @@ Use **Windows PowerShell as Administrator on the server**, not a workstation, fo
 - [ ] **🎯 DO THIS — 12.1 Identify version, roles and management dependencies**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Determine whether this is a Domain Controller, member server or standalone server, and identify installed roles.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** A DC stores domain identities and requires DNS, Kerberos, replication and time services. Removing a role is much more disruptive than stopping a workstation application.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record required services and client tests from the README. Keep VM console access and an authorized administrator. A practice VM snapshot is not an AD-aware production backup; follow round rules and do not casually revert a replicated DC.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Start → Server Manager → Local Server** shows domain membership, remote management and version. **Manage → Remove Roles and Features** can display installed roles; cancel after inspection. Do not click Remove merely because a role was not named explicitly in a short README.
@@ -1606,11 +1605,11 @@ ProductType 2 means DC; 3 means another server. A **member server has local acco
 **✅ Check it worked:** Compare the role list and test each required client function after each change. Keep AD DS, DNS, Netlogon, KDC, time and replication functions operational where required.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore a mistakenly removed role only with its recorded configuration, data and supported recovery method; installing binaries alone does not restore a deleted directory/database. Use a pre-change role-specific backup.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Server Manager itself relies on remote management features. Disabling WinRM on a server because it is often disabled on workstations can break management.
 
 #### 12.2 AD users, nested groups and service identities
@@ -1618,15 +1617,15 @@ ProductType 2 means DC; 3 means another server. A **member server has local acco
 - [ ] **🎯 DO THIS — 12.2 AD users, nested groups and service identities**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Reconcile domain users and privileged group membership with the README.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** A nested group can confer Domain Admin access even when a user is not a direct member. Service accounts may run databases, scheduled tasks and IIS pools.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Preserve forensics and record distinguished names, SIDs, group memberships and service dependencies. Never use local-user cmdlets as an AD substitute.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Server Manager → Tools → Active Directory Users and Computers** (`dsa.msc`). Enable **View → Advanced Features**. Find the exact account/OU, open **Properties → Member Of / Account** and inspect privileges, expiration, delegation and password options. Open each group from the earlier powerful-group table and inspect **Members**; nested groups require inspection too. Prefer **Disable Account** before irreversible deletion of a confirmed unauthorized user.
@@ -1669,11 +1668,11 @@ Do not rotate a required service account password without coordinating each depe
 **✅ Check it worked:** Repeat direct/recursive queries, test a new permitted login and verify dependent services. Existing tokens can retain privileges until a new logon; disabling an account does not terminate every existing session automatically.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** `Add-ADGroupMember -Identity 'Domain Admins' -Members bob` or `Enable-ADAccount -Identity mallory` restores only a mistakenly changed original state. Deleted AD objects need a supported AD recovery method, not name recreation.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Do not remove all operator/service identities from a DC using a workstation rights table. Do not change your only working administrator or krbtgt credentials as a routine checklist step.
 
 #### 12.3 Domain password policy and Group Policy precedence
@@ -1681,15 +1680,15 @@ Do not rotate a required service account password without coordinating each depe
 - [ ] **🎯 DO THIS — 12.3 Domain password policy and Group Policy precedence**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Apply account policy at the scope that actually governs the account, and inspect the winning GPO.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** A local policy does not control domain user passwords. Fine-grained password policies can override the default for selected users/groups. A deny user right can block logon despite an allow grant.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record the current default/resultant policy and back up the specific GPO before editing it. Keep the Default Domain Policy and Default Domain Controllers Policy roles distinct.
 
 **⭐ EASIEST WAY — Click through the GUI:** `gpmc.msc` → **Forest → Domains → actual domain**. Select the GPO, inspect **Scope**, links, security filtering and **Settings**; right-click **Back Up** to a private folder. Edit domain account policy in the domain-root-linked account-policy GPO, commonly **Default Domain Policy → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies**. For DC-specific audit/rights/options inspect the GPO linked to the **Domain Controllers OU**, not the workstation baseline. Use **Group Policy Results** for a specific machine/user.
@@ -1725,11 +1724,11 @@ Replace the domain and all policy values. Length/complexity affect future passwo
 **✅ Check it worked:** Re-query default and resultant policies; inspect Group Policy Results for the affected computer. If appropriate, run `gpupdate /target:computer /force` and read its errors; some settings require logoff/restart. Test ordinary authorized access without deliberately locking the active admin.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the individual recorded setting or specific GPO backup via GPMC **Manage Backups → Restore** after reviewing scope. GPO deletion is not a normal way to undo one planted setting. Changing a domain policy does not undo a password reset.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Requiring LDAP signing/channel binding, restricting NTLM, or removing network-logon principals can break older required clients. Stage compatibility inspection and consult the applicable Microsoft policy documentation; do not apply `Always` blindly to every environment.
 
 #### 12.4 DNS, DHCP and DC health
@@ -1737,15 +1736,15 @@ Replace the domain and all policy values. Length/complexity affect future passwo
 - [ ] **🎯 DO THIS — 12.4 DNS, DHCP and DC health**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Validate required name resolution, leases, replication and time after hardening.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** AD relies on internal DNS SRV records and reasonably synchronized time. Using a public resolver as the DC's primary DNS can break domain discovery.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record DNS zones/forwarders, DHCP scopes/options/reservations, authorized servers and expected DC topology. Back up the affected role, not just a screenshot.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Server Manager → Tools → DNS**; open the server and each zone **Properties → Zone Transfers**. Permit transfers only to required secondary servers rather than blindly disallowing required replication. For AD-integrated zones inspect the appropriate secure dynamic-update setting. **Tools → DHCP → IPv4 → scope** shows range, exclusions, reservations, leases and **Scope Options** (003 Router, 006 DNS Servers, 015 DNS Domain Name). Record each before editing.
@@ -1785,11 +1784,11 @@ w32tm /query /status
 Use these on the appropriate DC; no replication partners can be normal for a single-DC lab. Investigate errors rather than assuming they are all scoring issues. Renew a noncritical authorized client's DHCP lease and test internal hostname lookup and domain login.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the recorded specific zone/scope option or use the role's reviewed backup procedure. Restore AD-integrated data with AD-aware recovery; arbitrary file copying into DNS/NTDS directories is unsafe.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Never disable DNS, Kdc, NTDS, Netlogon, DFSR or W32Time on a required DC. DHCP failover and approved secondary DNS servers may be implicit dependencies even if the README does not enumerate every service name.
 
 #### 12.5 IIS, FTP and File and Storage Services recovery
@@ -1797,15 +1796,15 @@ Use these on the appropriate DC; no replication partners can be normal for a sin
 - [ ] **🎯 DO THIS — 12.5 IIS, FTP and File and Storage Services recovery**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Secure required published content and file access while preserving application identities.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Server-wide IIS edits affect all sites. Share and NTFS ACLs jointly control network access. TLS without a usable certificate/client can stop a required service.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record site bindings, certificates, application pool identities, content paths, FTP users/data ports and share ACLs. Back up IIS configuration:
 
 ```powershell
@@ -1841,7 +1840,7 @@ Only disable browsing if directory listing is not required. Preserve the intende
 **✅ Check it worked:** Test the actual hostname/port from an authorized client, including required login, static/dynamic pages, upload and database-backed behavior. For FTP, test both authentication and a data transfer; passive data ports must match firewall/server configuration. For shares, test read/write under an ordinary authorized user, not only an admin.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the exact site setting or, if needed and after reviewing other sites' changes:
 
 ```powershell
@@ -1851,7 +1850,7 @@ Only disable browsing if directory listing is not required. Preserve the intende
 This affects the saved IIS server configuration. Restore content/database/ACL changes separately from their specific backups.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Do not disable TLS protocols until required clients have been checked and patches/certificates are ready. Hide-version settings do not substitute for updates. A web shell investigation must preserve evidence and compare files with trusted application sources before deletion.
 
 #### 12.6 Remote management, firewall, updates and audit completion
@@ -1859,15 +1858,15 @@ This affects the saved IIS server configuration. Restore content/database/ACL ch
 - [ ] **🎯 DO THIS — 12.6 Remote management, firewall, updates and audit completion**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Preserve secure remote administration, installed roles and useful logs through updates.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Broad firewall blocks can break RPC-dependent AD/management even when obvious ports are open. A workstation port list is insufficient for a DC.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Export firewall/audit policy using **WS.19.1 below**. Record required management source networks and installed antivirus/WSUS configuration. Keep console access.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Server Manager → Local Server → Remote management / Remote Desktop**. Use NLA and authorized RDP membership. `wf.msc` → inspect built-in **role-specific** rules and their scopes; keep required AD/DNS/DHCP/SMB/RPC traffic. **Settings → Update & Security / Windows Update** varies by version; on Core use supported `sconfig` update options. In Event Viewer inspect **Security**, **System**, **Directory Service**, **DNS Server** and **DFS Replication** as applicable.
@@ -1893,11 +1892,11 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 **✅ Check it worked:** From an authorized management host test `Test-WSMan server-name`, an authorized RDP login if required, role-specific client transactions, then DC health commands from 12.4. Confirm new audit events and no relevant new service errors. Use selective advanced audit subcategories as described in **WS.19.4 below**.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the exact changed listener/authentication/rule scope from its record, using the console. For an update regression use the supported recovery method for that exact update; do not disable all updates or the firewall.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Never remove role-required ports based solely on a short generic list. Do not clear server logs, forcibly stop package installation, or automatically reboot while database/AD recovery is unresolved.
 
 
@@ -1965,15 +1964,15 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 - [ ] **🎯 DO THIS — WS.1.2 Manual security baseline (no hardening script)**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
@@ -1989,11 +1988,11 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 **✅ Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
@@ -2016,7 +2015,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 - [ ] **🎯 DO THIS (only if authorized) — WS.2.2 Delete users who are not in the README**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Extra accounts are how attackers get back in.
 
 **⭐ EASIEST WAY — Click through the GUI:** In `lusrmgr.msc` → **Users**, right-click the user → **Delete**.
@@ -2048,7 +2047,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 - [ ] **🎯 DO THIS — WS.2.4 Fix the Administrators group**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Only the README's admins should be in **Administrators**.
 
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → **Groups** → double-click **Administrators** → remove the wrong people / **Add…** the right ones.
@@ -2095,7 +2094,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 - [ ] **🎯 DO THIS — WS.2.7 Fix weak password settings on accounts**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** No account should have **Password never expires**, **User cannot change password**, or *no password required*.
 
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → double-click each user → untick **Password never expires** and **User cannot change password**.
@@ -2182,7 +2181,7 @@ net accounts                     # check everything
 - [ ] **🎯 DO THIS — WS.4.1 Audit Policy (record security events)**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Without auditing there's no record of logins, account changes, or policy changes.
 
 **⭐ EASIEST WAY — Click through the GUI:** `secpol.msc` → **Local Policies → Audit Policy**. Inspect the scenario-required categories. Prefer **Advanced Audit Policy Configuration → System Audit Policies**, selecting useful subcategories deliberately as described in [19.4](#194-audit-selectively-and-investigate-windows-events). Do not enable all high-volume auditing blindly.
@@ -2291,10 +2290,10 @@ Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0 | Format-List
 - [ ] **🎯 DO THIS — WS.4.4 PowerShell logging**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Windows records every PowerShell script and command that runs.
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Attackers love PowerShell. With logging on, their commands end up in the event log.
 
 **⭐ EASIEST WAY — Click through the GUI:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows PowerShell**:
@@ -2329,7 +2328,7 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 - [ ] **🎯 DO THIS (only if authorized) — WS.5.2 Remove planted exclusions**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Attackers tell Defender to ignore their folder.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Manage settings → Exclusions → Add or remove exclusions**. Remove anything you didn't add.
@@ -2475,15 +2474,15 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 - [ ] **🎯 DO THIS — WS.8.1.1 Remote Registry**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Allows remote registry administration. Actual service name(s): `RemoteRegistry`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if remote registry administration is not required.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2529,7 +2528,7 @@ Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Format-Table 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2540,7 +2539,7 @@ Start-Service -Name 'RemoteRegistry'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Remote administrators may depend on this; do not alter RPC. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2549,15 +2548,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.2 Telnet**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Provides unencrypted remote terminal access on older Windows versions. Actual service name(s): `TlntSvr`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable an installed server unless the scenario explicitly requires Telnet; prefer SSH where permitted.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2603,7 +2602,7 @@ Get-Service -Name 'TlntSvr' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2614,7 +2613,7 @@ Start-Service -Name 'TlntSvr'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Telnet Client is a separate optional feature. A missing TlntSvr is normal on modern Windows. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2623,15 +2622,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.3 SNMP and SNMP Trap**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** SNMP exposes monitoring data; the trap service receives monitoring notifications. Actual service name(s): `SNMP`, `SNMPTRAP`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable each installed service unless monitoring is required.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2677,7 +2676,7 @@ Get-Service -Name 'SNMP','SNMPTRAP' -ErrorAction SilentlyContinue | Format-Table
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2688,7 +2687,7 @@ Start-Service -Name 'SNMP'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Retained SNMP needs restricted managers, firewall sources and nondefault community strings; traps and polling have different dependencies. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2697,15 +2696,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.4 SSDP Discovery**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Discovers devices using SSDP multicast. Actual service name(s): `SSDPSRV`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if network device discovery is not required.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2751,7 +2750,7 @@ Get-Service -Name 'SSDPSRV' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2762,7 +2761,7 @@ Start-Service -Name 'SSDPSRV'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Media and device discovery may stop; inspect DependentServices first. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2771,15 +2770,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.5 UPnP Device Host**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Hosts Universal Plug and Play devices. Actual service name(s): `upnphost`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if UPnP hosting is not required.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2825,7 +2824,7 @@ Get-Service -Name 'upnphost' -ErrorAction SilentlyContinue | Format-Table Name,S
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2836,7 +2835,7 @@ Start-Service -Name 'upnphost'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** UPnP-dependent applications can fail; do not disable unrelated networking services. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2845,15 +2844,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.6 FTP**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Runs the Microsoft IIS FTP transfer service. Actual service name(s): `FTPSVC`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden a required FTP server; otherwise disable.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2899,7 +2898,7 @@ Get-Service -Name 'FTPSVC' -ErrorAction SilentlyContinue | Format-Table Name,Sta
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2910,7 +2909,7 @@ Start-Service -Name 'FTPSVC'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** FTP authentication, TLS certificates and passive data ports must remain usable; see the Server FTP procedure. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2919,15 +2918,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.7 World Wide Web Publishing**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Serves IIS websites. Actual service name(s): `W3SVC`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep if the README requires a website; otherwise disable after checking sites.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2973,7 +2972,7 @@ Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue | Format-Table Name,Stat
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2984,7 +2983,7 @@ Start-Service -Name 'W3SVC'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Inspect IIS bindings and application pools; do not mistake an intentionally installed website for malware. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -2993,15 +2992,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.8 Remote Desktop Services**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Provides Remote Desktop sessions. Actual service name(s): `TermService`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and secure if RDP is required; otherwise turn Remote Desktop off before considering disabling the service.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3047,7 +3046,7 @@ Get-Service -Name 'TermService' -ErrorAction SilentlyContinue | Format-Table Nam
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3058,7 +3057,7 @@ Start-Service -Name 'TermService'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Never stop it from your only RDP connection. Use the VM console and test NLA and authorized users. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3067,15 +3066,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.9 Routing and Remote Access**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Provides routing and VPN functions. Actual service name(s): `RemoteAccess`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only on a machine that is not a required router or VPN server.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3121,7 +3120,7 @@ Get-Service -Name 'RemoteAccess' -ErrorAction SilentlyContinue | Format-Table Na
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3132,7 +3131,7 @@ Start-Service -Name 'RemoteAccess'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Record routes and VPN requirements first; disabling can disconnect entire subnets. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3141,15 +3140,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.10 Internet Connection Sharing**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Provides shared network access and NAT functions. Actual service name(s): `SharedAccess`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only if ICS, hosted networking and dependent virtualization features are not needed.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3195,7 +3194,7 @@ Get-Service -Name 'SharedAccess' -ErrorAction SilentlyContinue | Format-Table Na
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3206,7 +3205,7 @@ Start-Service -Name 'SharedAccess'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Inspect VM networking dependencies; never disable the Windows Firewall service mpssvc in its place. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3215,15 +3214,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.11 Print Spooler**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Queues printing jobs and loads printer drivers. Actual service name(s): `Spooler`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable when no printing is required; otherwise patch and restrict driver installation.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3269,7 +3268,7 @@ Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3280,7 +3279,7 @@ Start-Service -Name 'Spooler'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Printing and some PDF workflows may stop. Keep required print-server roles; follow section 8.3. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3289,15 +3288,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.12 Xbox services**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Supports Xbox authentication, saved games and networking. Actual service name(s): `XblAuthManager`, `XblGameSave`, `XboxNetApiSvc`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable installed members when gaming is not required.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3343,7 +3342,7 @@ Get-Service -Name 'XblAuthManager','XblGameSave','XboxNetApiSvc' -ErrorAction Si
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3354,7 +3353,7 @@ Start-Service -Name 'XblAuthManager'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Some builds omit these services. Do not use a wildcard to disable unrelated services. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3363,15 +3362,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.13 Simple TCP/IP Services**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Hosts legacy echo, discard, daytime, quote and character-generator protocols. Actual service name(s): `simptcp`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless explicitly required for a lab task.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3417,7 +3416,7 @@ Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3428,7 +3427,7 @@ Start-Service -Name 'simptcp'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** The optional component may be absent. Removing it and disabling it are separate changes. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3437,15 +3436,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.14 WebClient**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Lets applications access WebDAV resources. Actual service name(s): `WebClient`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless required WebDAV workflows need it.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3491,7 +3490,7 @@ Get-Service -Name 'WebClient' -ErrorAction SilentlyContinue | Format-Table Name,
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3502,7 +3501,7 @@ Start-Service -Name 'WebClient'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Mapped WebDAV drives and document workflows may fail; normal SMB shares are a different protocol. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3511,15 +3510,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.15 Windows Media Player Network Sharing**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Shares media libraries over the network. Actual service name(s): `WMPNetworkSvc`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless media sharing is explicitly required.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3565,7 +3564,7 @@ Get-Service -Name 'WMPNetworkSvc' -ErrorAction SilentlyContinue | Format-Table N
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3576,7 +3575,7 @@ Start-Service -Name 'WMPNetworkSvc'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Local playback and network sharing are different functions; do not remove required media files. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3585,15 +3584,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.16 OpenSSH SSH Server**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Provides encrypted SSH and SFTP access. Actual service name(s): `sshd`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden when required; otherwise disable the installed server.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3639,7 +3638,7 @@ Get-Service -Name 'sshd' -ErrorAction SilentlyContinue | Format-Table Name,Statu
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3650,7 +3649,7 @@ Start-Service -Name 'sshd'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Back up C:\ProgramData\ssh\sshd_config, run sshd.exe -t if available, and test a second authorized connection before closing the first. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3659,15 +3658,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.17 WinRM**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Supports Windows Remote Management, PowerShell remoting and server administration. Actual service name(s): `WinRM`.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep when required by management tools; restrict authentication and firewall sources.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -3713,7 +3712,7 @@ Get-Service -Name 'WinRM' -ErrorAction SilentlyContinue | Format-Table Name,Stat
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -3724,7 +3723,7 @@ Start-Service -Name 'WinRM'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Server Manager often depends on WinRM. Check winrm get winrm/config/service; Basic and AllowUnencrypted should normally be false. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
 
 
@@ -3733,15 +3732,15 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 - [ ] **🎯 DO THIS — WS.8.1.18 Remote-control applications**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** TeamViewer, AnyDesk, VNC and RustDesk install vendor-specific services; no universal service name exists. Common names include `TeamViewer`, `AnyDesk`, `uvnc_service` and `tvnserver`, but verify the installed executable.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Unauthorized unattended access bypasses the expected administration path.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Preserve the executable path, signature, configuration and relevant logs for forensics. Keep a README-required remote-control application.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open `services.msc`; double-click the vendor service and record **Path to executable**, startup type and status. Open **Settings → Apps → Installed apps**; identify the same publisher. Stop and disable only a confirmed unauthorized entry, then use the vendor's uninstall option after evidence is saved.
@@ -3766,11 +3765,11 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **✅ Check it worked:** Repeat the inventory and verify the entry is stopped/disabled or gone after uninstall. Inspect the original listening port and startup entry too; portable tools may have no service.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Before uninstalling, preserve an authorized installer and license/configuration details privately. Restore the recorded service type and status if merely disabled; reinstall from the trusted vendor only if removal was mistaken.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Names and paths are clues, not proof. Do not run `sc.exe delete` as a substitute for an application uninstaller or remove a tool supporting your only access path.
 
 ##### WS.8.2 Make sure the security services are running
@@ -3786,10 +3785,10 @@ Get-Service WinDefend, mpssvc, EventLog, wuauserv, wscsvc -ErrorAction SilentlyC
 - [ ] **🎯 DO THIS — WS.8.3 Printer drivers: PrintNightmare fixes**
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Only administrators may install printer drivers, and "Point and Print" must always show a warning and ask for an admin password.
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM, the most powerful account. An image can plant the old, unsafe setting even when Windows is updated.
 
 **⭐ EASIEST WAY — Click through the GUI:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Printers**:
@@ -3845,7 +3844,7 @@ On Home, or if the first policy isn't in the list, use the Typing commands.
 - [ ] **🎯 DO THIS — WS.9.2 Optional features (OpenSSH Server, SNMP)**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Some extras are "optional features" instead of Windows features: **OpenSSH Server** and **SNMP** are the risky ones.
 **⭐ EASIEST WAY — Click through the GUI:** **Settings → System → Optional features** (older versions: **Settings → Apps → Optional features**) → click the feature → **Remove**. Keep it if the README needs it.
 
@@ -4028,7 +4027,7 @@ sc.exe delete BadService            # only for a service you are sure is malware
 - [ ] **🎯 DO THIS — WS.14.4 Sticky Keys / Utility Manager backdoor**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** Replacing `sethc.exe` (press Shift 5 times) or `utilman.exe` (the accessibility button) with `cmd.exe` gives anyone a SYSTEM command prompt **at the login screen**.
 
 ```powershell
@@ -4103,7 +4102,7 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 - [ ] **🎯 DO THIS — WS.15.6 WDigest off (no plain-text passwords in memory)**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
@@ -4118,7 +4117,7 @@ Get-ItemProperty $k | Select-Object UseLogonCredential   # must be 0
 - [ ] **🎯 DO THIS — WS.15.7 NetBIOS over TCP/IP off**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Like LLMNR (15.4), attackers answer NetBIOS name lookups to steal password hashes.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `ncpa.cpl` → right-click the network adapter → **Properties** → **Internet Protocol Version 4 (TCP/IPv4)** → **Properties** → **Advanced…** → **WINS** → **Disable NetBIOS over TCP/IP** → **OK**.
@@ -4178,15 +4177,15 @@ If the README says this server runs a website, FTP or file shares, harden those 
 - [ ] **🎯 DO THIS — WS.19.1 Record a recoverable Windows baseline**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Save the original configuration before changing a table of settings.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** A screenshot of a target value is not a backup of the old value. Account deletion, password resets and registry merges have different recovery limits.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Use an authorized administrator at the VM console. Follow round rules on snapshots. Backups can contain sensitive policy and account information; keep them local and private.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open File Explorer, create `C:\CP-Backups`, then use **Properties → Security → Advanced** to restrict access to Administrators and SYSTEM. Do not remove access from your current administrator. Open `secpol.msc` and use **Action → Export Policy**; in `wf.msc`, right-click the root and choose **Export Policy**.
@@ -4231,7 +4230,7 @@ Get-CimInstance Win32_Service | Select-Object Name,StartMode,State,PathName | Ex
 **✅ Check it worked:** Open each export as text where applicable and verify it is nonempty. Do not assume a CSV can recreate a deleted user with its old SID.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Prefer the individual setting's recorded value. A whole security-policy restore affects many settings:
 
 ```powershell
@@ -4245,7 +4244,7 @@ auditpol /restore /file:C:\CP-Backups\audit-before.csv
 ```
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Domain policy can override local changes. Password resets cannot recover the previous password and may make EFS files or stored credentials inaccessible. Preserve evidence before resets.
 
 ##### WS.19.2 Apply account and privileged-group table entries safely
@@ -4253,15 +4252,15 @@ auditpol /restore /file:C:\CP-Backups\audit-before.csv
 - [ ] **🎯 DO THIS — WS.19.2 Apply account and privileged-group table entries safely**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Reconcile each account and each powerful group with the README.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Names alone do not reveal service-account dependencies, nested memberships or renamed built-in accounts.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Run `whoami /user` and keep a second tested administrator. Review the account's home directory, running services and scheduled tasks. On a Domain Controller use the Server AD procedure, not local-user commands.
 
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → **Users** → double-click the exact account → **Member Of**. Compare every membership with section 2.5. For a confirmed unauthorized account, first tick **Account is disabled**. In **Groups**, open each powerful group individually, select the incorrect member and click **Remove → Apply**.
@@ -4295,11 +4294,11 @@ Remove-LocalGroupMember -Group 'Backup Operators' -Member mallory
 **✅ Check it worked:** Repeat `Get-LocalUser` or `Get-LocalGroupMember 'Backup Operators'`. The disabled account shows `Enabled : False`; a removed member no longer appears. Test an authorized user's ordinary and administrator workflows.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** `Enable-LocalUser -Name mallory` restores a mistakenly disabled account. `Add-LocalGroupMember -Group 'Backup Operators' -Member mallory` restores only a recorded membership. Deleted accounts need proper account/data recovery; creating the same name generates a different SID.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Do not disable every built-in account without checking its purpose. `PasswordExpires` from `Get-LocalUser` is a date or empty value, not simply a true/false policy flag. Service identities may have managed password behavior.
 
 ##### WS.19.3 Work through password, rights and security-option tables
@@ -4307,15 +4306,15 @@ Remove-LocalGroupMember -Group 'Backup Operators' -Member mallory
 - [ ] **🎯 DO THIS — WS.19.3 Work through password, rights and security-option tables**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Change each table row deliberately and check the effective policy.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** User rights are privileges, not ordinary group memberships. A **Deny** entry takes precedence over an allow entry. Compatibility-sensitive policies can break file sharing or authentication.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Export policy using 19.1. On domain members inspect policy precedence first:
 
 ```powershell
@@ -4355,11 +4354,11 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 **✅ Check it worked:** Repeat `net accounts`, export the policy again, and test one noncritical authorized account from a separate session. Confirm legitimate network access still works. Do not intentionally lock out your administrator to test the threshold.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the individual row's recorded principals/value. Use the reviewed policy backup only when necessary. A refresh that reverses your edit means the owning GPO needs correction by its authorized administrator.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** The tables are workstation starting points, not universal server baselines. Preserve service SIDs and required operators. Mandatory signing, NTLM restrictions, cached-logon settings and anonymous-access restrictions require client compatibility checks. Do not add your own admin account to a deny right.
 
 ##### WS.19.4 Audit selectively and investigate Windows events
@@ -4367,15 +4366,15 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 - [ ] **🎯 DO THIS — WS.19.4 Audit selectively and investigate Windows events**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Record useful authentication, account and policy changes without blindly enabling every audit category.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** High-volume object/process auditing can fill logs quickly. A missing event does not establish that an action never occurred; the policy may not have recorded it.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Back up audit policy and export relevant logs before remediation. Do not clear logs or disable Windows Event Log.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → eventvwr.msc → Windows Logs → Security → Filter Current Log**. Enter `4624,4625,4720,4732,1102`. Use **Save All Events As** for an EVTX copy. In `secpol.msc` use **Advanced Audit Policy Configuration → System Audit Policies** to configure the required subcategory, not both competing legacy and advanced settings.
@@ -4404,11 +4403,11 @@ Use `auditpol /list /subcategory:*` to find localized names. Process creation ev
 **✅ Check it worked:** `auditpol /get /subcategory:"Logon"` should show Success and Failure. Test a normal permitted login and inspect its event. Confirm log retention and maximum size in **Security → Properties**.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the original subcategory or the audit CSV from 19.1. Preserve existing events; reverting policy does not require deleting logs.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Timestamp display follows local time. Correlate with timezone and system clock before inferring event order.
 
 ##### WS.19.5 Firewall rule inspection and required ports
@@ -4416,15 +4415,15 @@ Use `auditpol /list /subcategory:*` to find localized names. Process creation ev
 - [ ] **🎯 DO THIS — WS.19.5 Firewall rule inspection and required ports**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Enable host firewall profiles and permit only the required application traffic.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** An enabled firewall can still allow an unwanted inbound rule. A listener on localhost is different from a listener on every address.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Export the firewall, identify the current profile, service executable, protocol, local port and authorized source networks. Never reset the firewall as a first step.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → wf.msc**. Open **Windows Defender Firewall Properties**; enable the appropriate Domain, Private and Public profiles, normally block unmatched inbound and allow outbound. Under **Inbound Rules**, double-click a candidate rule and inspect **Programs and Services**, **Protocols and Ports**, **Scope**, **Advanced** and **General**. Disable only a confirmed unauthorized rule. For a required service, **New Rule → Custom**, scope it to the program/port and authorized remote IPs, choose the appropriate profiles, and give it a descriptive name.
@@ -4464,11 +4463,11 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 **✅ Check it worked:** Repeat the profile query. From an authorized second machine run `Test-NetConnection server-name -Port 443` in PowerShell, then open the actual HTTPS site. `TcpTestSucceeded : True` proves TCP establishment, not application correctness. Test an unauthorized path only in the permitted lab.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Remove only the rule you created with `Remove-NetFirewallRule -Name 'CP-Required-HTTPS'`, or restore a disabled rule by its recorded Name. Whole-policy import (`netsh advfirewall import ...`) replaces policy and can remove later valid changes; review first and use the console.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Group Policy rules can override local behavior. Avoid broad `Any` source/port exceptions and disabling the whole firewall to troubleshoot one service.
 
 ##### WS.19.6 Defender, updates and application health
@@ -4476,15 +4475,15 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 - [ ] **🎯 DO THIS — WS.19.6 Defender, updates and application health**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Check protection state, pending security updates and required applications.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** An installed antivirus product may be passive or have exclusions that defeat protection. Scan/remediation can modify evidence.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Answer relevant forensics questions. Record third-party antivirus, exclusions, update policy and required application versions. Windows 10's ordinary support ended in October 2025; check the image's edition/support arrangement instead of assuming all versions receive regular updates.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Windows Security → Virus & threat protection → Manage settings**; inspect real-time/cloud protection, exclusions and **Protection history**. Do not remove an exclusion merely because it exists; verify its purpose. Open **Settings → Windows Update → Update history** and each required application's **Help → About** page. On this Server, use the Server Manager, Server Core/sconfig or organizational update tool procedure in **5.3** above.
@@ -4520,11 +4519,11 @@ Use the GUI to install offered OS updates and trusted vendor updates; do not ins
 **✅ Check it worked:** Recheck signature time, Protection history and the update page. Open each required application and test the README function. Reboot only at an appropriate checkpoint after installers finish.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore only a wrongly changed preference using its recorded value. Do not restore quarantined malware to the live image merely to recover points. If an update breaks a required function, investigate the exact update and supported recovery option; do not disable future updates wholesale.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Tamper Protection or organizational policy may reject PowerShell edits. Do not weaken those controls to force a setting. Updates can require more than one restart; do not interrupt an in-progress update to follow a rigid one-reboot rule.
 
 ##### WS.19.7 SMB share permissions and NTFS permissions
@@ -4532,15 +4531,15 @@ Use the GUI to install offered OS updates and trusted vendor updates; do not ins
 - [ ] **🎯 DO THIS — WS.19.7 SMB share permissions and NTFS permissions**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Validate both the network share ACL and the underlying NTFS ACL.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Effective network access is limited by both layers; denying a broad group can unintentionally block administrators too.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record share name, path, description and authorized readers/writers. Preserve forensic files and original ACLs. Do not remove system shares or use recursive permission resets on Windows directories.
 
 **⭐ EASIEST WAY — Click through the GUI:** `fsmgmt.msc` → **Shares** → required share **Properties → Share Permissions**. Then open its folder **Properties → Security → Advanced**; inspect inheritance and **Effective Access** for a representative user. Remove only the unintended grant; keep application identities.
@@ -4571,11 +4570,11 @@ Then use the Security GUI to grant the matching folder read access and remove on
 **✅ Check it worked:** Test reading and, where required, writing from a second machine as an ordinary authorized user. Test an unauthorized user separately. Administrator success does not prove ordinary users can connect.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Restore the recorded share grants individually. For the saved ACL above use `icacls C:\Shares /restore C:\CP-Backups\public-acl.txt` after confirming the parent path. Do not recreate a deleted share from memory.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Share permissions do not protect local file access. Removing Everyone without providing the required replacement can break a legitimate share.
 
 ##### WS.19.8 Scheduled tasks, startup, registry and suspicious executables
@@ -4583,15 +4582,15 @@ Then use the Security GUI to grant the matching folder read access and remove on
 - [ ] **🎯 DO THIS — WS.19.8 Scheduled tasks, startup, registry and suspicious executables**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Trace each suspicious process back to the mechanism that launches it.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Killing a process without addressing persistence lets it return. Encoded PowerShell, Python and unusual paths are leads, not proof of malware.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record the task action, trigger, account, executable path, command line, signature and hash. Export the task/registry key. Never launch a suspicious executable to identify it.
 
 **⭐ EASIEST WAY — Click through the GUI:** `taskschd.msc` → **Task Scheduler Library** → task → inspect **Actions**, **Triggers**, **General**, **History**; right-click **Export** to save XML, then **Disable** for reversible containment after evidence collection. **Task Manager → Startup apps → Disable** applies only to that entry. For registry changes, open `regedit`, select the exact key, choose **File → Export → Selected branch**.
@@ -4634,11 +4633,11 @@ Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' 
 **✅ Check it worked:** Query the task state again (expected `Disabled`), inspect the precise registry value, and check whether the process/listener returns after an authorized restart or login. Verify required updater/backup tasks still work.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** Re-enable the task with `Enable-ScheduledTask -TaskName 'BadTask'` only if it was misidentified. Restore a deleted task from its XML using Task Scheduler **Import Task**, checking the principal and credentials. A registry import merges values; restore the specific value when possible.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** Stop at evidence collection if a forensic question remains unresolved. `sc.exe delete`, `Unregister-ScheduledTask` and `Remove-Item` are destructive; use them only after positive identification and recovery planning. Preserve suspicious scripts as text, never execute decoded payloads.
 
 ##### WS.19.9 Final troubleshooting decision path
@@ -4646,15 +4645,15 @@ Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' 
 - [ ] **🎯 DO THIS — WS.19.9 Final troubleshooting decision path**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Verify authentication, networking, security state and required functions after changes.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** Scoring can lag or fail to update when DNS, time, networking or a required service breaks.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record the last successful test and last change. Use the VM console if remote access fails.
 
 **⭐ EASIEST WAY — Click through the GUI:** Check the Scoring Report timestamp, Services, Event Viewer **System/Application**, and the application's own error page. Do not change the scoring agent or its files.
@@ -4680,11 +4679,11 @@ Replace the DNS target with the README-required internal hostname; internet DNS 
 **✅ Check it worked:** Test an ordinary user login, admin elevation, required website/share/remote session, and report freshness. Check pending restarts and save final forensics answers.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:** If a proposed repair fails, return that repair to its recorded starting state before trying another theory.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** An error message is evidence. Record it exactly and investigate its source rather than hiding it with broad `-ErrorAction SilentlyContinue`.
 
 
@@ -4777,15 +4776,15 @@ Press **Windows key + R**, type one of these, press Enter:
 - [ ] **🎯 DO THIS — Practice objects, paths and reversible changes**
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🎯 What:** Learn how to inspect PowerShell output and edit a harmless file before modifying security settings.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why it matters:** PowerShell pipelines pass objects, not just printed text. Formatting is for display; it should normally come last in a pipeline.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🛑 Before changing anything:** Use ordinary Windows PowerShell for this exercise; administrator rights are not needed. Most handbook examples target Windows PowerShell 5.1 on Windows. A module absent from PowerShell 7 is not proof the Windows role is missing.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Start → Windows PowerShell**. Use File Explorer to view your personal profile folder. Run as administrator only for procedures that require it; do not approve an unknown script merely because it requests elevation.
@@ -4833,7 +4832,7 @@ Test-Path -LiteralPath "$practiceFile.before"
 Expected: your changed text and `True`. For cmdlets inspect the full red error and `$Error[0]`; for native programs inspect `$LASTEXITCODE` immediately after that program. ErrorAction SilentlyContinue hides errors and can make incomplete searches look empty.
 
 > [!WARNING]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **↩️ Undo:**
 
 ```powershell
@@ -4844,7 +4843,7 @@ Get-Content -LiteralPath $practiceFile
 Expected: `original value`. This file restore does not model account/password recovery; those have different limits.
 
 > [!CAUTION]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **⚠️ Warnings:** `-WhatIf` exists only on commands that support it, and its preview does not test downstream dependencies. Use `Get-Help COMMAND -Full` to check support. Use `sc.exe` for Service Control; `sc` in Windows PowerShell is an alias for Set-Content. Never use `Invoke-Expression` to inspect a suspicious string.
 
 
@@ -4862,7 +4861,7 @@ This supplement draws topic ideas from public CyberPatriot checklists and verifi
 - [ ] **🎯 DO THIS —** Reviewed effective configuration and policy source.
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **💡 Why:** A value changed in \`secpol.msc\` or the registry can be replaced by a domain Group Policy. On a Domain Controller, editing an arbitrary local policy is not a substitute for checking domain-level policy.
 
 **⭐ EASIEST WAY — Click through the GUI:** Press **Win + R** → \`rsop.msc\` (if available); review **Computer Configuration**. On domain-joined systems use **Group Policy Management** (\`gpmc.msc\`) **only if installed and authorized**. Do not disable a linked GPO merely to fix one setting.
@@ -4884,7 +4883,7 @@ Start-Process "$env:TEMP\cp-rsop.html"
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpretation:** \`PartOfDomain = True\` means domain policies may apply. The report's **Applied Group Policy Objects** and **Denied GPOs** help explain conflicts; a local-only or unconfigured policy may show less information. \`gpresult\` can report no RSoP data for the target scope—investigate context rather than assume a missing policy is a security failure.
 
 **✅ Verification:** Compare the effective policy with the README and with the relevant **Local Security Policy** or **Group Policy** editor. If a setting changes after refresh, identify its **winning policy** before editing it.
@@ -4915,7 +4914,7 @@ Get-CimInstance Win32_Service -Filter "Name='RemoteRegistry'" |
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **What to look for:** Unexpected user-profile or temporary-directory paths, impersonated names, newly introduced binaries, unusual service accounts, or services inconsistent with the README. Some legitimate software uses nonstandard locations; **a strange path is a clue, not proof**.
 
 > [!NOTE]
@@ -4971,7 +4970,7 @@ Get-WinEvent -FilterHashtable @{
 | 7045 | Service installed, shown in System |
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpretation:** Errors such as **No events were found** do not prove an action never happened. Logging, retention, permissions, and audit policy affect visibility. To check the present policy:
 
 ~~~powershell
@@ -5011,7 +5010,7 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpretation:** A task with an obscure name or PowerShell arguments warrants inspection, but scheduled updates and enterprise management agents are legitimate too. Record the exact executable and arguments before taking action.
 
 **✅ Verification:** Correlate task path, binary signature and Event Viewer findings. Do not run the task to see what happens.
@@ -5040,7 +5039,7 @@ Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpretation:** Share permissions and NTFS permissions both matter. Hidden administrative shares (for example \`C$\`) are not by themselves proof of malware. A broad \`Everyone\` share right may be constrained by NTFS, but it still needs review.
 
 **✅ Verification:** Test with a **legitimate non-admin** account that should read or write, and a separate account that should be denied. Protect required shared folders and server roles.
@@ -5073,7 +5072,7 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 ~~~
 
 > [!NOTE]
-> **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
+> **ℹ️ Note:**
 > **🧠 Interpretation:** An allowed rule is not necessarily reachable: scope, profile, address filters, enabled state, underlying service and other policy conditions matter. A listening port may serve an explicitly required role.
 
 **✅ Verification:** From an authorized client, test required application connectivity after any **narrow** firewall change. Avoid blanket removal of inbound rules.
