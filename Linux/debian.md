@@ -2057,95 +2057,12 @@ Also check:
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed Apache web server (`apache2`) without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** These reduce version disclosure and disable TRACE; they do not replace patching. Check each enabled site for Options Indexes and remove only Indexes if browsing is not required.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status apache2 --no-pager` (use actual installed unit). `sudo cp -a /etc/apache2/conf-available/security.conf /etc/apache2/conf-available/security.conf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo apache2ctl configtest` → `sudo systemctl reload apache2`; `curl -I http://127.0.0.1/` and an authorized real-site test. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/apache2/conf-available/security.conf.before-cp /etc/apache2/conf-available/security.conf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' apache2
-systemctl status apache2 --no-pager
-systemctl cat apache2
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Open the required site in Firefox. There is no standard desktop GUI for Apache configuration; use the editor commands below.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/apache2/conf-available/security.conf /etc/apache2/conf-available/security.conf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/apache2/conf-available/security.conf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-ServerTokens Prod
-ServerSignature Off
-TraceEnable Off
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo apache2ctl configtest
-```
-
-Expected: Syntax OK. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload apache2
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status apache2 --no-pager
-sudo journalctl -u apache2 -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-curl -I http://127.0.0.1/
-```
-
-Expected: An expected HTTP status and working required page; a redirect or authenticated response can be legitimate. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/apache2/conf-available/security.conf.before-cp /etc/apache2/conf-available/security.conf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Only change `Options Indexes` where directory listing is prohibited; preserve required sites, upload permissions and other included configs.
 
 #### Nginx web server
 
@@ -2166,93 +2083,12 @@ sudo systemctl reload nginx
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed Nginx web server without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Place server_tokens inside the existing http block. In the actual site block inspect autoindex off; and avoid changing proxy_pass or document roots blindly.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status nginx --no-pager` (use actual installed unit). `sudo cp -a /etc/nginx/nginx.conf /etc/nginx/nginx.conf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo nginx -t` → `sudo systemctl reload nginx`; `curl -I http://127.0.0.1/` and authorized site routes. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/nginx/nginx.conf.before-cp /etc/nginx/nginx.conf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' nginx
-systemctl status nginx --no-pager
-systemctl cat nginx
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Open the required site in a browser and compare with the baseline. Use a terminal editor for server settings.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/nginx/nginx.conf /etc/nginx/nginx.conf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/nginx/nginx.conf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-server_tokens off;
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo nginx -t
-```
-
-Expected: syntax is ok and test is successful. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload nginx
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status nginx --no-pager
-sudo journalctl -u nginx -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-curl -I http://127.0.0.1/
-```
-
-Expected: The required site still loads. For a virtual host, repeat with its real hostname; localhost alone can select the wrong site. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/nginx/nginx.conf.before-cp /etc/nginx/nginx.conf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Set `server_tokens` within the existing `http` block; preserve `proxy_pass`, server blocks and document roots.
 
 #### PHP (used by the website)
 
@@ -2276,98 +2112,12 @@ Then `sudo systemctl reload apache2` (or `php8.1-fpm` etc.).
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed PHP (used by the website) without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Identify the active version and SAPI before editing: php --ini shows CLI settings, not necessarily Apache or FPM. Typical web files are /etc/php/8.2/apache2/php.ini or /etc/php/8.2/fpm/php.ini; discover the actual path. Do not add these lines to a directory.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status apache2 --no-pager` (use actual installed unit). `sudo cp -a /etc/php /etc/php.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** Validate edited PHP settings and application with the **active web SAPI**; `php -l PATH_TO_REAL_TEST_PHP` checks syntax only; reload the actual Apache/FPM unit and test the webpage. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/php.before-cp/. /etc/php/`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' php-common
-systemctl status apache2 --no-pager
-systemctl cat apache2
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Use the web application in a browser. Do not expose phpinfo publicly to inspect settings.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/php /etc/php.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo find /etc/php -maxdepth 3 -name php.ini -print
-> # Open the discovered web SAPI file, for example:
-> sudo nano /etc/php/8.2/apache2/php.ini
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-display_errors = Off
-log_errors = On
-expose_php = Off
-allow_url_include = Off
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-php -l /var/www/html/index.php
-```
-
-Expected: No syntax errors detected (this checks that PHP source file, not web php.ini). If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload apache2
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status apache2 --no-pager
-sudo journalctl -u apache2 -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-curl -I http://127.0.0.1/
-```
-
-Expected: The application still signs in and performs a normal permitted operation; check its error log. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/php.before-cp/. /etc/php/
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> `php --ini` checks CLI, not necessarily PHP-FPM/Apache. Discover the installed PHP version and its actual `php.ini`; do not paste directives into a directory.
 
 #### MySQL / MariaDB
 
@@ -2405,95 +2155,12 @@ Accounts that aren't needed, or that have `ALL PRIVILEGES` without needing them,
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed MySQL / MariaDB without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Edit the existing mysqld section rather than creating duplicates. Loopback binding is appropriate only for local clients. MySQL uses mysql-server, unit mysql and usually /etc/mysql/mysql.conf.d/mysqld.cnf; substitute all three if that is installed. Preserve Unix-socket root authentication.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status mariadb --no-pager` (use actual installed unit). `sudo cp -a /etc/mysql/mariadb.conf.d/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** Restart only the installed `mariadb` or `mysql` unit when required, inspect `journalctl -u UNIT -n 30 --no-pager`, and test approved local/application DB access. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/mysql/mariadb.conf.d/50-server.cnf.before-cp /etc/mysql/mariadb.conf.d/50-server.cnf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' mariadb-server
-systemctl status mariadb --no-pager
-systemctl cat mariadb
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** If a trusted database client is already installed, inspect user/grant screens without deleting accounts. No generic desktop control panel exists.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/mysql/mariadb.conf.d/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-[mysqld]
-bind-address = 127.0.0.1
-local_infile = 0
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo mariadbd --help --verbose > /dev/null
-```
-
-Expected: Exit status 0; this is a preliminary option parse, not a complete live validation. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl restart mariadb
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status mariadb --no-pager
-sudo journalctl -u mariadb -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-sudo mariadb -e "SELECT VERSION(); SHOW VARIABLES LIKE 'bind_address'; SHOW VARIABLES LIKE 'local_infile';"
-```
-
-Expected: Version output and expected variable values; also test the application with its own database credentials. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/mysql/mariadb.conf.d/50-server.cnf.before-cp /etc/mysql/mariadb.conf.d/50-server.cnf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Use the actual `mysqld` section/config file; binding to loopback breaks required remote clients. Preserve socket-based root access, authorized users and grants.
 
 #### vsftpd (FTP server)
 
@@ -2517,188 +2184,22 @@ sudo systemctl restart vsftpd && systemctl status vsftpd
 ```
 Also check `/etc/ftpusers` (users **not** allowed to use FTP; `root` should be in it) and the `userlist_*` settings.
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed vsftpd (FTP server) without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Retain anonymous read access only if required. If chroot_local_user=YES, use a root-owned, non-writable jail root and a separate user-writable upload directory. Enable TLS only with an installed valid certificate and compatible required clients.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status vsftpd --no-pager` (use actual installed unit). `sudo cp -a /etc/vsftpd.conf /etc/vsftpd.conf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo systemctl restart vsftpd` when appropriate; verify port, an authorized login, upload/download and passive-mode data transfer. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/vsftpd.conf.before-cp /etc/vsftpd.conf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' vsftpd
-systemctl status vsftpd --no-pager
-systemctl cat vsftpd
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Use a trusted FTP client if installed; test the actual server name, authentication and TLS behavior.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/vsftpd.conf /etc/vsftpd.conf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/vsftpd.conf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-anonymous_enable=NO
-anon_upload_enable=NO
-xferlog_enable=YES
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo grep -nE "anonymous_enable|anon_upload_enable|chroot|ssl_enable|rsa_cert|pasv_" /etc/vsftpd.conf
-```
-
-Expected: Review each setting manually; vsftpd has no portable standalone syntax-test flag. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl restart vsftpd
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status vsftpd --no-pager
-sudo journalctl -u vsftpd -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-sudo ss -ltnp | grep ":21 "
-```
-
-Expected: An FTP listener on the intended address; then log in and transfer an allowed test file with the required client. Port 21 alone does not verify passive data transfers. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/vsftpd.conf.before-cp /etc/vsftpd.conf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> `chroot_local_user=YES` needs a safe non-writable jail root and separate writable area; do not disable anonymous access when explicitly required or break TLS clients.
 
 #### ProFTPD
 In `/etc/proftpd/proftpd.conf`: `DefaultRoot ~`, `RootLogin off`, `ServerIdent off`, and comment out (`#`) the whole `<Anonymous ~ftp> ... </Anonymous>` block. Test with `sudo proftpd -t`.
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed ProFTPD without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Disable only an unauthorized Anonymous block and review Include files. DefaultRoot confines users to their home directory; verify necessary shared directories remain accessible.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status proftpd --no-pager` (use actual installed unit). `sudo cp -a /etc/proftpd/proftpd.conf /etc/proftpd/proftpd.conf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo proftpd -t` → `sudo systemctl reload proftpd`; verify authorized login, shared-directory access and file transfer. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/proftpd/proftpd.conf.before-cp /etc/proftpd/proftpd.conf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' proftpd-core
-systemctl status proftpd --no-pager
-systemctl cat proftpd
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Use the required FTP client and inspect the connection log for TLS or permission errors.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/proftpd/proftpd.conf /etc/proftpd/proftpd.conf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/proftpd/proftpd.conf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-DefaultRoot ~
-RootLogin off
-ServerIdent off
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo proftpd -t
-```
-
-Expected: Syntax check complete. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload proftpd
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status proftpd --no-pager
-sudo journalctl -u proftpd -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-sudo ss -ltnp | grep ":21 "
-```
-
-Expected: Listener remains and an authorized client can list and transfer in its intended directory. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/proftpd/proftpd.conf.before-cp /etc/proftpd/proftpd.conf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Review included files, `Anonymous` blocks and `DefaultRoot`; remove anonymous access only if unauthorized.
 
 #### Pure-FTPd
 ```bash
@@ -2709,95 +2210,12 @@ sudo systemctl restart pure-ftpd
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed Pure-FTPd without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** These are separate filename/value pairs, not lines for one configuration file: edit /etc/pure-ftpd/conf/NoAnonymous and /etc/pure-ftpd/conf/ChrootEveryone to contain yes. Preserve anonymous access when explicitly required.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status pure-ftpd --no-pager` (use actual installed unit). `sudo cp -a /etc/pure-ftpd/conf /etc/pure-ftpd/conf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** Restart the installed Pure-FTPd unit if needed; verify FTP listener plus authorized login and data transfer. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/pure-ftpd/conf.before-cp/. /etc/pure-ftpd/conf/`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' pure-ftpd
-systemctl status pure-ftpd --no-pager
-systemctl cat pure-ftpd
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Use the required FTP client; no standard desktop GUI edits the Debian wrapper files.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/pure-ftpd/conf /etc/pure-ftpd/conf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/pure-ftpd/conf/NoAnonymous
-> sudo nano /etc/pure-ftpd/conf/ChrootEveryone
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-NoAnonymous: yes
-ChrootEveryone: yes
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo pure-ftpd-wrapper --show-options
-```
-
-Expected: Inspect generated options; this does not start a server or guarantee runtime validity. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl restart pure-ftpd
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status pure-ftpd --no-pager
-sudo journalctl -u pure-ftpd -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-sudo ss -ltnp | grep ":21 "
-```
-
-Expected: Listener present and authorized FTP login and data transfer work. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/pure-ftpd/conf.before-cp/. /etc/pure-ftpd/conf/
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> `NoAnonymous` and `ChrootEveryone` are **separate files** in `/etc/pure-ftpd/conf/`; do not merge both settings or disable required anonymous access.
 
 #### Samba (Windows file sharing)
 
@@ -2822,96 +2240,12 @@ sudo smbpasswd -x mallory
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed Samba (Windows file sharing) without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Edit the existing global section. In each required share inspect guest ok, valid users, read only and path. Guest access can be an explicit scenario requirement. Preserve directory ownership and Unix group permissions.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status smbd --no-pager` (use actual installed unit). `sudo cp -a /etc/samba/smb.conf /etc/samba/smb.conf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo testparm -s` → `sudo systemctl reload smbd`; verify `smbclient -L localhost -U AUTHORIZED_USER` or a real Windows client. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/samba/smb.conf.before-cp /etc/samba/smb.conf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' samba
-systemctl status smbd --no-pager
-systemctl cat smbd
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** On Windows use File Explorer with \\server\share, or Linux Files → Other Locations → smb://server/share. Test read/write as the required ordinary user.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/samba/smb.conf /etc/samba/smb.conf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/samba/smb.conf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-[global]
-   map to guest = never
-   usershare allow guests = no
-   server min protocol = SMB2
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo testparm -s
-```
-
-Expected: Loaded services file OK; warnings still need review. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload smbd
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status smbd --no-pager
-sudo journalctl -u smbd -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-sudo smbclient -L localhost -U alice
-```
-
-Expected: Authorized share list; supply the password interactively and use a real authorized Samba account. smbclient may not be installed; use an existing Windows client instead. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/samba/smb.conf.before-cp /etc/samba/smb.conf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Preserve required share names/paths, `valid users`, write access, Linux file permissions and intentionally allowed guest access.
 
 #### BIND DNS server
 
@@ -2928,96 +2262,12 @@ Also look in `/etc/bind/named.conf.local` for zones with `allow-transfer { any; 
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed BIND DNS server without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** Merge into the existing options block; do not create a second block. Replace localnets with explicit approved networks where practical. Required secondary DNS servers need an explicit allow-transfer ACL, preferably TSIG; none would break transfers. Inspect zone-level overrides.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status bind9 --no-pager` (use actual installed unit). `sudo cp -a /etc/bind/named.conf.options /etc/bind/named.conf.options.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo named-checkconf` and `sudo named-checkzone ZONE FILE` for changed zones → reload the installed BIND unit; verify `dig @127.0.0.1 REAL_ZONE`. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/bind/named.conf.options.before-cp /etc/bind/named.conf.options`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' bind9
-systemctl status named --no-pager
-systemctl cat named
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Use client network settings to confirm the expected DNS server; edit BIND through the terminal.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/bind/named.conf.options /etc/bind/named.conf.options.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/bind/named.conf.options
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-options {
-    allow-recursion { localhost; localnets; };
-    allow-transfer { none; };
-};
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo named-checkconf
-```
-
-Expected: No output and exit 0; separately run named-checkzone for every edited zone. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload named
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status named --no-pager
-sudo journalctl -u named -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-dig @127.0.0.1 example.org
-```
-
-Expected: Expected answer/status for a real required zone; also test an authorized remote client and any required secondary server. An authoritative-only server may correctly refuse unrelated recursion. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/bind/named.conf.options.before-cp /etc/bind/named.conf.options
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Edit existing `options` blocks and check zone overrides; required secondary servers may need restricted/TSIG-protected zone transfers.
 
 #### Postfix mail server
 
@@ -3031,94 +2281,12 @@ sudo postfix check && sudo systemctl reload postfix
 
 ---
 
-##### Manual procedure: inspect, change, verify and recover
-
-- [ ] **🎯 DO THIS — Manual procedure: inspect, change, verify and recover**
-
-> [!NOTE]
-> **🎯 What:** Configure the installed Postfix mail server without removing the required service.
-
-> [!NOTE]
-> **💡 Why it matters:** These reduce user enumeration and require a proper SMTP greeting. Inspect mynetworks and smtpd_relay_restrictions: never trust 0.0.0.0/0 or ::/0. Preserve approved relay networks, local destinations and authenticated submission.
-
+**✅ Service-specific verify and rollback (only if README-required):**
+- [ ] **Inspect and back up:** `systemctl status postfix --no-pager` (use actual installed unit). `sudo cp -a /etc/postfix/main.cf /etc/postfix/main.cf.before-cp` (choose a fresh backup name if one already exists).
+- **Validate / apply / verify:** `sudo postfix check` → `sudo systemctl reload postfix`; inspect `journalctl -u postfix -n 30 --no-pager` and test authorized SMTP delivery. Test a real required client, not just the daemon status.
+- **↩️ Undo:** `sudo cp -a /etc/postfix/main.cf.before-cp /etc/postfix/main.cf`; repeat validation, apply and required-client test. If service is unavailable, inspect `journalctl -u UNIT -n 50 --no-pager` before reverting.
 > [!CAUTION]
-> **🛑 Before changing anything:** Identify the required clients and test one working transaction. Check package and service in a terminal:
-
-```bash
-dpkg-query -W -f='${binary:Package} ${Status} ${Version}\n' postfix
-systemctl status postfix --no-pager
-systemctl cat postfix
-```
-
-`install ok installed` establishes package installation; `active (running)` normally means the daemon is running. Some wrapper/oneshot units show `active (exited)`; inspect the actual daemon too. A missing unit requires checking package documentation, not guessing another service to stop.
-
-**⭐ EASIEST WAY — GUI (when available):** Use an already configured local mail client if permitted; no general desktop GUI safely edits relay policy.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo cp -a /etc/postfix/main.cf /etc/postfix/main.cf.before-cp
-> ```
->
-Inspect includes and record the current relevant values. If the backup already exists, choose a new suffix. A backup directory copy must be checked before relying on it.
-
-> [!NOTE]
-> **🔁 Alternate (optional) — Terminal:**
->
->
-> ```bash
-> sudo nano /etc/postfix/main.cf
-> ```
->
-Inspect these directives in their appropriate context (configuration text, not shell commands):
-
-```text
-disable_vrfy_command = yes
-smtpd_helo_required = yes
-```
-
-Do not replace the whole file with this excerpt. Validate before applying:
-
-```bash
-sudo postfix check
-```
-
-Expected: No diagnostics; warnings require review. If the validation fails, do not continue. When correct:
-
-```bash
-sudo systemctl reload postfix
-```
-
-A reload generally preserves existing connections; a restart interrupts them. Confirm a service-specific reload is supported before substituting it.
-
-**✅ Check it worked:**
-
-```bash
-systemctl status postfix --no-pager
-sudo journalctl -u postfix -n 30 --no-pager
-```
-
-Then perform a protocol-level check:
-
-```bash
-sudo postconf mynetworks smtpd_relay_restrictions mydestination
-```
-
-Expected: Only expected trusted networks/destinations; perform an authorized local delivery test and inspect mail logs. Do not send test messages to real third parties. If the client utility is absent, use an existing authorized client rather than installing a new server. Check firewall source/port allowances as well as local configuration.
-
-> [!WARNING]
-> **↩️ Undo:** Restore only the files changed in this procedure from the recorded backup:
-
-```bash
-sudo cp -a /etc/postfix/main.cf.before-cp /etc/postfix/main.cf
-```
-
-Repeat the same validation, apply command and client test. For a directory backup, copying back does not remove newly added files: remove only the specific new file you created after reviewing its contents. Database account/grant changes and web application data require their own backups; configuration restoration does not reverse them.
-
-> [!CAUTION]
-> **Warnings and troubleshooting:** Inspect the first error in the unit journal. Check permissions, included configuration, address conflicts and required credentials. Never disable the firewall, drop a database, remove all shares or reinstall the service to hide one error.
+> Check `mynetworks`, relay restrictions and required submission before editing; never trust all source networks or break legitimate mail destinations.
 
 #### SSH
 See section 9 of the Linux Mint checklist.
