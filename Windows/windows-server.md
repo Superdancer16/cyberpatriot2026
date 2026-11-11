@@ -1,4 +1,12 @@
-# Windows Server 2016 / 2019 / 2022 — Complete Standalone CyberPatriot Hardening Handbook
+# 🪟 Windows Server 2016 / 2019 / 2022 — Complete Standalone CyberPatriot Hardening Handbook
+
+> [!TIP]
+> **🧭 Jump to a stage:** [📘 Basics](#stage-1) · [🚀 First steps](#stage-2) · [🛡️ Priority checks](#stage-3) · [⚙️ Services](#stage-4) · [🧰 Advanced](#stage-5) · [✅ Final checks](#stage-6)
+> **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** — commands are for manual, scenario-aware use.
+
+> [!CAUTION]
+> **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
+
 
 Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competition's actual image README and official round materials. **Version and support (November 2026):** Server 2016 extended support ends in January 2027, Server 2019 in January 2029, and Server 2022 in October 2031. Confirm the exact lifecycle date for the installed edition in Microsoft's current lifecycle documentation. Server 2022 moved to extended support in October 2026 but still receives monthly security updates. Never perform a release upgrade to earn speculative points. See [Microsoft's Windows Server release information](https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info).
 
@@ -34,13 +42,20 @@ Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competi
 > [!NOTE]
 > **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
 
+---
+
+<a id="stage-1"></a>
 ## Part 1 — Basics / Information Needed
+
+> [!TIP]
+> 📘 **Foundation:** Review the key terms and available tools before making changes.
+
 
 ### Identify what kind of Windows Server this is
 
 A Windows Server can be standalone, a domain member, or a Domain Controller. **Domain Controller services and directory/GPO policies must not be treated like optional workstation services.**
 
-**Clicking:** Open **Server Manager → Local Server**; inspect **Manage → Add Roles and Features** without making changes. ADUC, DNS, DHCP, IIS and Group Policy consoles are available only when the relevant roles/tools exist.
+**🖱️ Clicking:** Open **Server Manager → Local Server**; inspect **Manage → Add Roles and Features** without making changes. ADUC, DNS, DHCP, IIS and Group Policy consoles are available only when the relevant roles/tools exist.
 
 **Typing (check, elevated PowerShell):**
 
@@ -52,7 +67,14 @@ Get-WindowsFeature | Where-Object InstallState -eq Installed | Select-Object Nam
 
 DomainRole 4 or 5 indicates a domain controller. Domain role and README requirements take precedence over the embedded workstation appendix. Keep console access before changing RDP/WinRM/firewall.
 
+---
+
+<a id="stage-2"></a>
 ## Part 2 — First Things to Do
+
+> [!IMPORTANT]
+> 🚀 **Start here:** Follow the image README, preserve forensics, and confirm administrative recovery.
+
 
 Read the README, preserve forensics and determine the server's exact domain role before any account or firewall changes.
 
@@ -88,7 +110,7 @@ Never run suspicious executables or clear event logs to investigate them. Record
 
 **Where to click:** Server Manager → Local Server; Tools → Computer Management / Event Viewer; Server Manager → File and Storage Services for shares. Actual tools depend on installed roles.
 
-**Check it worked:** You can still log on as an authorized administrator, know the original roles/services/score, and have saved forensic answers. After each later change, verify both the changed setting **and** a required application or domain function. Use the recorded baseline for undo.
+**✅ Check it worked:** You can still log on as an authorized administrator, know the original roles/services/score, and have saved forensic answers. After each later change, verify both the changed setting **and** a required application or domain function. Use the recorded baseline for undo.
 
 ### 0.1 Learn the Server GUI, Core and PowerShell conventions
 
@@ -113,13 +135,13 @@ Never run suspicious executables or clear event logs to investigate them. Record
 
 - [ ] Done
 
-**What:** Distinguish standalone/member server from a promoted Domain Controller **before** using account or Group Policy commands.
+**🎯 What:** Distinguish standalone/member server from a promoted Domain Controller **before** using account or Group Policy commands.
 
-**Why:** Simply seeing the **AD DS** role installed does not prove the machine was promoted to a Domain Controller. Likewise, being **domain-joined** does not make a server a Domain Controller.
+**💡 Why:** Simply seeing the **AD DS** role installed does not prove the machine was promoted to a Domain Controller. Likewise, being **domain-joined** does not make a server a Domain Controller.
 
 **Clicking (Desktop Experience):** Open Server Manager → **Local Server** (look at Domain and roles). On an actual Domain Controller, Server Manager → Tools may offer **Active Directory Users and Computers (dsa.msc)**, **Group Policy Management (gpmc.msc)**, **DNS** and other management consoles. The presence of a management console alone is not proof the local machine is a DC.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 (Get-CimInstance Win32_OperatingSystem).ProductType
@@ -137,9 +159,9 @@ Get-Service NTDS -ErrorAction SilentlyContinue
 
 A server's exact DomainRole, installed role, and running NTDS service are complementary evidence. Treat all domain tools as optional on non-DCs.
 
-**Check:** Record domain name, primary services and whether this machine must provide AD, DNS, DHCP, IIS or file shares.
+**🔎 Check:** Record domain name, primary services and whether this machine must provide AD, DNS, DHCP, IIS or file shares.
 
-**Undo:** No changes occur in this step. If a role is not active, do not install/promote it as a quick fix without an explicit task.
+**↩️ Undo:** No changes occur in this step. If a role is not active, do not install/promote it as a quick fix without an explicit task.
 
 #### 1.2 Make a manual baseline (no hardening scripts)
 
@@ -156,17 +178,24 @@ Get-CimInstance Win32_Service | Select-Object Name,State,StartMode,StartName | S
 Get-ScheduledTask | Select-Object TaskName,TaskPath,State
 ~~~
 
-**Action:** For each task below, note **original value → requested README value → action → verification → rollback**. Do **not** download a generic Windows hardening script or skip steps because a copied checklist contains a "script completed" label.
+**🛠️ Action:** For each task below, note **original value → requested README value → action → verification → rollback**. Do **not** download a generic Windows hardening script or skip steps because a copied checklist contains a "script completed" label.
 
-**Check:** Verify with the corresponding Get-* command, role/client functional test and fresh scoring report.
+**🔎 Check:** Verify with the corresponding Get-* command, role/client functional test and fresh scoring report.
 
-**Undo:** Restore the single prior policy/group membership/firewall or service setting from your notes; do not reset or reinstall the entire server to undo one step.
+**↩️ Undo:** Restore the single prior policy/group membership/firewall or service setting from your notes; do not reset or reinstall the entire server to undo one step.
 
-**Warnings:** A server role may have dependencies not explicitly listed in the README (e.g. AD uses DNS and time). Ask what the server is actually serving before changing listener or startup state.
+**⚠️ Warnings:** A server role may have dependencies not explicitly listed in the README (e.g. AD uses DNS and time). Ask what the server is actually serving before changing listener or startup state.
 
 ---
 
+---
+
+<a id="stage-3"></a>
 ## Part 3 — Commonly Assessed High-Priority Checks
+
+> [!IMPORTANT]
+> 🛡️ **Priority checks:** Inspect the most common security categories first; actual scoring remains image-specific.
+
 
 Prioritize authorized users, domain/local privilege, passwords, Defender/firewall and applicable audit policy without breaking domain authentication.
 
@@ -176,9 +205,9 @@ Prioritize authorized users, domain/local privilege, passwords, Defender/firewal
 
 - [ ] Done
 
-**What:** Reconcile the *local* accounts and Administrators group on a standalone/member server. Domain accounts are still administered in Active Directory at the proper domain scope.
+**🎯 What:** Reconcile the *local* accounts and Administrators group on a standalone/member server. Domain accounts are still administered in Active Directory at the proper domain scope.
 
-**Clicking:** Win + R → **lusrmgr.msc** (or Computer Management → Local Users and Groups → Users/Groups). Review **Users** and then double-click **Administrators**, **Remote Desktop Users**, **Backup Operators** and any other privileged groups.
+**🖱️ Clicking:** Win + R → **lusrmgr.msc** (or Computer Management → Local Users and Groups → Users/Groups). Review **Users** and then double-click **Administrators**, **Remote Desktop Users**, **Backup Operators** and any other privileged groups.
 
 **Typing (check, elevated PowerShell; NOT for a Domain Controller):**
 
@@ -229,17 +258,17 @@ Only when the README specifically requires resetting an authorized local user's 
 Set-LocalUser -Name 'exampleuser' -Password (Read-Host -AsSecureString 'New local password')
 ~~~
 
-**Check it worked:** Repeat Get-LocalUser and Get-LocalGroupMember; test a new permitted admin login and required local software or file sharing.
+**✅ Check it worked:** Repeat Get-LocalUser and Get-LocalGroupMember; test a new permitted admin login and required local software or file sharing.
 
-**Undo:** Use Enable-LocalUser, Add-LocalGroupMember or Remove-LocalGroupMember to reverse only the original exact account/group change; a deleted account or home directory is not reliably restored by simply creating a new user.
+**↩️ Undo:** Use Enable-LocalUser, Add-LocalGroupMember or Remove-LocalGroupMember to reverse only the original exact account/group change; a deleted account or home directory is not reliably restored by simply creating a new user.
 
-**Caution:** Never delete Administrator, Guest, DefaultAccount, or other built-in identities. Disable the Guest account unless the actual README requires it; built-in Administrator may be needed for recovery and should not be disabled blindly. Do not remove domain service accounts or domain groups based on local-only naming assumptions. Account deletion is irreversible without suitable backups.
+**⚠️ Caution:** Never delete Administrator, Guest, DefaultAccount, or other built-in identities. Disable the Guest account unless the actual README requires it; built-in Administrator may be needed for recovery and should not be disabled blindly. Do not remove domain service accounts or domain groups based on local-only naming assumptions. Account deletion is irreversible without suitable backups.
 
 #### 2.2 Domain Controller — domain users and authorized accounts
 
 - [ ] Done
 
-**Clicking:** Win + R → **dsa.msc** → Active Directory Users and Computers. Enable **View → Advanced Features**, expand every OU and Users container, and examine users, service identities, computers and group membership. Right-click the exact user → **Properties → Account / Member Of**; prefer **Disable Account** before irreversible removal for an unauthorized account.
+**🖱️ Clicking:** Win + R → **dsa.msc** → Active Directory Users and Computers. Enable **View → Advanced Features**, expand every OU and Users container, and examine users, service identities, computers and group membership. Right-click the exact user → **Properties → Account / Member Of**; prefer **Disable Account** before irreversible removal for an unauthorized account.
 
 **Typing (check, only if AD tools and permissions exist):**
 
@@ -272,9 +301,9 @@ Before running create, ensure the user doesn't already exist and choose the **ex
 Set-ADAccountPassword -Identity 'exampleuser' -Reset -NewPassword (Read-Host -AsSecureString 'New password')
 ~~~
 
-**Check:** Query the exact user again and confirm a fresh authorized login. Password changes to service identities can break scheduled tasks, IIS pools, databases and other services.
+**🔎 Check:** Query the exact user again and confirm a fresh authorized login. Password changes to service identities can break scheduled tasks, IIS pools, databases and other services.
 
-**Undo:** Enable-ADAccount restores a mistakenly disabled account when permitted; deleted AD objects require AD-aware backup/recycle-bin restoration and are **not** equivalent to creating another user with the same name.
+**↩️ Undo:** Enable-ADAccount restores a mistakenly disabled account when permitted; deleted AD objects require AD-aware backup/recycle-bin restoration and are **not** equivalent to creating another user with the same name.
 
 **Never:** Blindly run Remove-ADUser, clear user profiles, change krbtgt, delete computer objects or rotate a service credential without explicit justification and recovery.
 
@@ -296,7 +325,7 @@ Check the members of each group. Remove anyone the README doesn't say should be 
 | **DnsAdmins** | Can make the DNS server run any program (easy path to domain admin) |
 | **Group Policy Creator Owners** | Create Group Policies |
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 foreach ($g in 'Domain Admins','Enterprise Admins','Schema Admins','Administrators','Account Operators','Backup Operators','Server Operators','Print Operators','DnsAdmins','Group Policy Creator Owners') {
   "--- $g"; (Get-ADGroupMember $g -ErrorAction SilentlyContinue).SamAccountName }
@@ -311,13 +340,13 @@ Get-ADGroupMember 'Domain Admins' -Recursive | Select-Object SamAccountName   # 
 #### 2.4 Domain Controller: risky account settings
 - [ ] Done
 
-**Clicking:** in `dsa.msc`, double-click a user → **Account** tab → **Account options**. These should all be **unticked**:
+**🖱️ Clicking:** in `dsa.msc`, double-click a user → **Account** tab → **Account options**. These should all be **unticked**:
 - Password never expires
 - Store password using reversible encryption
 - Do not require Kerberos preauthentication (lets attackers crack the password offline)
 - Password not required (not shown here; use PowerShell)
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-ADUser -Filter 'Enabled -eq $true' -Properties PasswordNeverExpires, PasswordNotRequired, AllowReversiblePasswordEncryption, DoesNotRequirePreAuth |
   Where-Object { $_.PasswordNeverExpires -or $_.PasswordNotRequired -or $_.AllowReversiblePasswordEncryption -or $_.DoesNotRequirePreAuth } |
@@ -343,7 +372,7 @@ Set-ADAccountPassword -Identity bob -Reset -NewPassword (Read-Host -AsSecureStri
 
 - [ ] Done
 
-**Clicking:** Win + R → **secpol.msc** → **Account Policies → Password Policy**, then **Account Lockout Policy**. For a member server, also inspect effective domain Group Policy: a domain account's password policy is not controlled by this local setting.
+**🖱️ Clicking:** Win + R → **secpol.msc** → **Account Policies → Password Policy**, then **Account Lockout Policy**. For a member server, also inspect effective domain Group Policy: a domain account's password policy is not controlled by this local setting.
 
 **Typing (check, elevated PowerShell):**
 
@@ -375,15 +404,15 @@ net accounts /lockoutthreshold:5 /lockoutduration:30 /lockoutwindow:30
 
 Complexity and reversible encryption are **not set by net accounts**. Use **secpol.msc → Password Policy** or the effective organizational policy. Never import a complete secedit template that overwrites unrelated rights merely to adjust complexity.
 
-**Check it worked:** Rerun net accounts, inspect the corresponding effective security setting, test a noncritical authorized local login, and refresh the score.
+**✅ Check it worked:** Rerun net accounts, inspect the corresponding effective security setting, test a noncritical authorized local login, and refresh the score.
 
-**Undo:** Restore the individual documented starting policy values using secpol.msc/net accounts. A configured threshold of 0 disables lockout; a lockout duration of 0 means administrative unlock is required on many systems—do not choose them accidentally. Domain account rules belong in the actual domain policy section below.
+**↩️ Undo:** Restore the individual documented starting policy values using secpol.msc/net accounts. A configured threshold of 0 disables lockout; a lockout duration of 0 means administrative unlock is required on many systems—do not choose them accidentally. Domain account rules belong in the actual domain policy section below.
 
 #### 3.2 Domain Controller — domain default policy and fine-grained policies
 
 - [ ] Done
 
-**What:** Apply account policy to the **domain**, not a nonexistent DC local account database. The domain-root-linked account policy GPO (commonly **Default Domain Policy**) controls domain default account policy; **fine-grained password policies (FGPP)** can provide different effective settings for chosen users/groups.
+**🎯 What:** Apply account policy to the **domain**, not a nonexistent DC local account database. The domain-root-linked account policy GPO (commonly **Default Domain Policy**) controls domain default account policy; **fine-grained password policies (FGPP)** can provide different effective settings for chosen users/groups.
 
 **Clicking, step by step:**
 1. Win + R → **gpmc.msc** → Forest → Domains → **actual domain**.
@@ -411,9 +440,9 @@ Set-ADDefaultDomainPasswordPolicy -Identity 'example.test' -MinPasswordLength 12
 
 This illustrative command does **not** set maximum/minimum password age; verify those separately and don't assume a partial update satisfied the entire rubric. Replace the domain and all values with the actual required settings.
 
-**Check:** Repeat the default and resultant policies; inspect RSoP/Group Policy results and test an authorized fresh domain login. Password policy changes generally affect future password changes, not automatically the strength of every existing password.
+**🔎 Check:** Repeat the default and resultant policies; inspect RSoP/Group Policy results and test an authorized fresh domain login. Password policy changes generally affect future password changes, not automatically the strength of every existing password.
 
-**Undo:** Restore the individual recorded setting or a specific GPO backup after reviewing its intended scope. Do not delete the Default Domain Policy to correct one entry. Domain account lockout may be influenced by FGPP; investigate before editing default values.
+**↩️ Undo:** Restore the individual recorded setting or a specific GPO backup after reviewing its intended scope. Do not delete the Default Domain Policy to correct one entry. Domain account lockout may be influenced by FGPP; investigate before editing default values.
 
 ### 5. Defender, firewall and updates
 
@@ -421,9 +450,9 @@ This illustrative command does **not** set maximum/minimum password age; verify 
 
 - [ ] Done
 
-**Why:** Servers 2016, 2019 and 2022 have Windows Defender Antivirus capabilities, but feature availability, security UI, other antivirus modes and management policies differ. The absence of a Windows 11-style GUI on **Server Core** is not proof antivirus protection is missing.
+**💡 Why:** Servers 2016, 2019 and 2022 have Windows Defender Antivirus capabilities, but feature availability, security UI, other antivirus modes and management policies differ. The absence of a Windows 11-style GUI on **Server Core** is not proof antivirus protection is missing.
 
-**Clicking:** On Desktop Experience, use **Windows Security → Virus & threat protection** when available (on Server 2016 the Defender GUI may need a separate feature). In Server Manager inspect **Add Roles and Features → Features → Microsoft Defender Antivirus** without installing anything yet.
+**🖱️ Clicking:** On Desktop Experience, use **Windows Security → Virus & threat protection** when available (on Server 2016 the Defender GUI may need a separate feature). In Server Manager inspect **Add Roles and Features → Features → Microsoft Defender Antivirus** without installing anything yet.
 
 **Typing (check, elevated PowerShell):**
 
@@ -434,7 +463,7 @@ Get-MpPreference | Select-Object ExclusionPath,ExclusionExtension,ExclusionProce
 Get-Service WinDefend -ErrorAction SilentlyContinue
 ~~~
 
-**Interpret:** Another enterprise antivirus may put Defender in a passive mode. Existing exclusions may be required for IIS, SQL, AD, backup or other approved workloads; investigate each before removing. A service not continuously running can be normal for some protective components; confirm effective provider and policies.
+**🧠 Interpret:** Another enterprise antivirus may put Defender in a passive mode. Existing exclusions may be required for IIS, SQL, AD, backup or other approved workloads; investigate each before removing. A service not continuously running can be normal for some protective components; confirm effective provider and policies.
 
 **Typing (change, only if approved and relevant):** When Defender signatures are genuinely stale and the configured update source permits it:
 
@@ -450,9 +479,9 @@ Install-WindowsFeature -Name Windows-Defender
 
 The above changes server features and may require a reboot; do **not** run solely because a GUI page is missing. Windows Server 2016 Defender GUI can be an optional feature separate from the actual engine. On Server Core use PowerShell/enterprise management.
 
-**Verify:** Repeat Get-MpComputerStatus, review protection/error events and required workloads, and refresh the score.
+**✅ Verify:** Repeat Get-MpComputerStatus, review protection/error events and required workloads, and refresh the score.
 
-**Undo:** Restore only a changed antivirus setting/exclusion/feature from its approved baseline. Never disable antivirus broadly to work around one application error.
+**↩️ Undo:** Restore only a changed antivirus setting/exclusion/feature from its approved baseline. Never disable antivirus broadly to work around one application error.
 
 **Vendor reference:** [Microsoft Defender Antivirus on Windows Server](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure).
 
@@ -460,9 +489,9 @@ The above changes server features and may require a reboot; do **not** run solel
 
 - [ ] Done
 
-**What:** Keep the host firewall enabled on all required profiles while allowing **only the necessary authorized sources** to reach Active Directory, DNS, DHCP, IIS, SMB, remote management and other installed roles.
+**🎯 What:** Keep the host firewall enabled on all required profiles while allowing **only the necessary authorized sources** to reach Active Directory, DNS, DHCP, IIS, SMB, remote management and other installed roles.
 
-**Clicking:** Win + R → **wf.msc** → Windows Defender Firewall with Advanced Security. Review **Properties → Domain, Private and Public Profile**, then **Inbound Rules** and the existing built-in role-specific groups. On Server Core use the PowerShell method below.
+**🖱️ Clicking:** Win + R → **wf.msc** → Windows Defender Firewall with Advanced Security. Review **Properties → Domain, Private and Public Profile**, then **Inbound Rules** and the existing built-in role-specific groups. On Server Core use the PowerShell method below.
 
 **Typing (check; elevated PowerShell):**
 
@@ -494,9 +523,9 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 
 Never run a blanket disable command for all role-specific rules. For a specific suspicious inbound rule, inspect exact name, filters, group, owner and authorized clients **before** disabling it via the GUI.
 
-**Check it worked:** Repeat profile/rule inspections and test approved DNS, AD logon, DHCP lease, IIS page, share and remote admin from a proper client. Preserve at least one management recovery path.
+**✅ Check it worked:** Repeat profile/rule inspections and test approved DNS, AD logon, DHCP lease, IIS page, share and remote admin from a proper client. Preserve at least one management recovery path.
 
-**Undo:** Revert only the explicitly changed profile or rule to its original documented state and retest. Restoring a firewall profile blindly to Disabled can expose the server; investigate the original intended policy and actual failure.
+**↩️ Undo:** Revert only the explicitly changed profile or rule to its original documented state and retest. Restoring a firewall profile blindly to Disabled can expose the server; investigate the original intended policy and actual failure.
 
 #### 5.3 Windows Server updates and security maintenance
 
@@ -504,7 +533,7 @@ Never run a blanket disable command for all role-specific rules. For a specific 
 
 **Clicking (Desktop Experience):** Server Manager → Local Server → Windows Update (or **Settings → Update & Security**, depending on version). On Server Core use **sconfig** and its update workflow. Check whether the machine uses a legitimate **WSUS** or domain-managed update policy first.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-Service wuauserv,BITS,EventLog -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -516,7 +545,7 @@ gpresult /r /scope computer
 
 **Change:** Install only the approved security/role updates via the system's supported UI/sconfig/WSUS. Don't force a release upgrade, remove update policy keys, disable WSUS or reboot a required Domain Controller or database server without checking the image's instructions and application health.
 
-**Verify:** Review Windows Update history, failures, pending reboot, service functionality and the scoring report. If a specific patch causes a regression, follow the supported recovery for that exact update; do not broadly disable updates.
+**✅ Verify:** Review Windows Update history, failures, pending reboot, service functionality and the scoring report. If a specific patch causes a regression, follow the supported recovery for that exact update; do not broadly disable updates.
 
 #### 5.4 Internet Explorer Enhanced Security Configuration (IE ESC)
 
@@ -524,9 +553,9 @@ gpresult /r /scope computer
 
 **Clicking (Desktop Experience):** Server Manager → Local Server → **IE Enhanced Security Configuration**. Inspect Administrators and Users. On legacy Server installations it is a protective setting; leave it enabled unless the scenario or a required application expressly needs a different setting. **Server Core may not have the UI**.
 
-**Check:** Record the actual intended role of IE/legacy components; don't enable an obsolete browser or disable modern protections for scoring. No configuration change is required if the setting is already compliant.
+**🔎 Check:** Record the actual intended role of IE/legacy components; don't enable an obsolete browser or disable modern protections for scoring. No configuration change is required if the setting is already compliant.
 
-**Undo:** Restore the recorded original setting using Server Manager if the change breaks a required legacy application.
+**↩️ Undo:** Restore the recorded original setting using Server Manager if the change breaks a required legacy application.
 
 ---
 
@@ -536,9 +565,9 @@ gpresult /r /scope computer
 
 - [ ] Done
 
-**Clicking:** Win + R → **secpol.msc → Local Policies → Audit Policy**, **User Rights Assignment** and **Security Options**. For newer systems also inspect **Advanced Audit Policy Configuration → System Audit Policies**. If domain-joined, use **gpresult /h** or Group Policy Results to find policy source—local edits can be overridden.
+**🖱️ Clicking:** Win + R → **secpol.msc → Local Policies → Audit Policy**, **User Rights Assignment** and **Security Options**. For newer systems also inspect **Advanced Audit Policy Configuration → System Audit Policies**. If domain-joined, use **gpresult /h** or Group Policy Results to find policy source—local edits can be overridden.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 auditpol /get /category:*
@@ -565,9 +594,9 @@ gpresult /r /scope computer
 
 **How to change:** Open the single identified item in secpol.msc/GPO and record old/new values; do not paste a generic all-settings secedit template that overwrites unrelated privileges.
 
-**Verify:** Re-export the relevant security policy, run auditpol /get, inspect effective GPO, perform an authorized login, test required file/network access, and check fresh Security log events.
+**✅ Verify:** Re-export the relevant security policy, run auditpol /get, inspect effective GPO, perform an authorized login, test required file/network access, and check fresh Security log events.
 
-**Undo:** Restore the precise original right/audit/option from notes or a valid scoped backup; do not remove NT SERVICE, LOCAL SERVICE or NETWORK SERVICE principals as a blanket restriction.
+**↩️ Undo:** Restore the precise original right/audit/option from notes or a valid scoped backup; do not remove NT SERVICE, LOCAL SERVICE or NETWORK SERVICE principals as a blanket restriction.
 
 #### 4.2 Domain Controller — DC-specific Group Policy, auditing and user rights
 
@@ -575,7 +604,7 @@ gpresult /r /scope computer
 
 **Critical distinction:** The **Default Domain Policy** or domain-root-linked policy ordinarily controls **domain password/account policy**. The **Default Domain Controllers Policy** or another GPO linked to the **Domain Controllers OU** commonly controls DC-specific security rights, audit and options. GPO links and precedence matter: never assume a particular GPO wins without checking.
 
-**Clicking:**
+**🖱️ Clicking:**
 1. Win + R → **gpmc.msc** → Forest → Domains → **your domain**.
 2. Open the **Domain Controllers OU** and inspect linked GPOs, enforcement/inheritance and the winning DC policy.
 3. Right-click the specific GPO → **Back Up** before making any changes.
@@ -606,7 +635,7 @@ Use the **GPMC Backup** command to save only the actual GPO(s) you intend to cha
 
 **DC user rights require extra caution:** **Access this computer from the network** includes principals needed for member computers/AD functionality; blindly removing Authenticated Users or Enterprise Domain Controllers can break the domain. **Allow log on locally**, **Deny log on** and **Remote Desktop Services** rights are not identical to workstation defaults. Do not add Domain Users to local DC console access or deny an entire service group.
 
-**Check:** Use the Group Policy Results wizard or:
+**🔎 Check:** Use the Group Policy Results wizard or:
 
 ~~~powershell
 gpresult /r /scope computer
@@ -615,16 +644,16 @@ auditpol /get /category:*
 
 Review actual DC audit events and test fresh domain user logon, DC DNS, SYSVOL/NETLOGON access and any other README-required role.
 
-**Undo:** Restore the **specific** GPO backup/setting after verifying the affected scope, not every GPO. Re-run policy and required-client tests; never delete the Default Domain Controllers Policy to undo one change.
+**↩️ Undo:** Restore the **specific** GPO backup/setting after verifying the affected scope, not every GPO. Re-run policy and required-client tests; never delete the Default Domain Controllers Policy to undo one change.
 
 #### 4.3 Look for planted bad Group Policies
 - [ ] Done
 
-**Why:** An attacker can create or change a GPO to turn off the firewall, add an admin, or run a script on every computer.
+**💡 Why:** An attacker can create or change a GPO to turn off the firewall, add an admin, or run a script on every computer.
 
-**Clicking:** In `gpmc.msc`, click each GPO → **Settings** tab (it shows a report). Look for anything that weakens security. Check the **Scope** tab to see where it's linked.
+**🖱️ Clicking:** In `gpmc.msc`, click each GPO → **Settings** tab (it shows a report). Look for anything that weakens security. Check the **Scope** tab to see where it's linked.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-GPO -All | Sort-Object ModificationTime -Descending | Format-Table DisplayName, ModificationTime
 Get-GPOReport -All -ReportType Html -Path C:\gpo-report.html; Start-Process C:\gpo-report.html
@@ -633,20 +662,21 @@ Get-GPOReport -All -ReportType Html -Path C:\gpo-report.html; Start-Process C:\g
 #### 4.4 Domain Controller: Zerologon protection
 - [ ] Done
 
-**Why it matters:** Zerologon (CVE-2020-1472) lets anyone on the network take over a Domain Controller without a password. Windows updates since February 2021 always block it, but a planted policy can let chosen accounts use the weak connection again, and an un-updated image is wide open.
+**💡 Why it matters:** Zerologon (CVE-2020-1472) lets anyone on the network take over a Domain Controller without a password. Windows updates since February 2021 always block it, but a planted policy can let chosen accounts use the weak connection again, and an un-updated image is wide open.
 
-**Clicking:** In the **Default Domain Controllers Policy** (4.2) → **Security Options** → **Domain controller: Allow vulnerable Netlogon secure channel connections** must be **Not Defined** (no accounts listed). Install updates too (5.3).
+**🖱️ Clicking:** In the **Default Domain Controllers Policy** (4.2) → **Security Options** → **Domain controller: Allow vulnerable Netlogon secure channel connections** must be **Not Defined** (no accounts listed). Install updates too (5.3).
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters' -Name FullSecureChannelProtection -Value 1 -PropertyType DWord -Force
 Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters' | Format-List FullSecureChannelProtection, RequireSignOrSeal, RequireStrongKey
 ```
-**Check it worked:** `FullSecureChannelProtection` shows `1`. `RequireSignOrSeal` and `RequireStrongKey` are normally `1` too; if one of them is missing, that is fine, it follows the policy default.
+**✅ Check it worked:** `FullSecureChannelProtection` shows `1`. `RequireSignOrSeal` and `RequireStrongKey` are normally `1` too; if one of them is missing, that is fine, it follows the policy default.
 
 ---
 
-### Research expansion: check directory, DNS, time and replication safely
+<a id="research-expansion-check-directory-dns-time-and-replication-safely"></a>
+### 🧰 check directory, DNS, time and replication safely
 
 - [ ] Confirmed whether AD DS, DNS, DHCP or other required server roles are installed and functioning.
 
@@ -675,15 +705,16 @@ Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires | Select-Object Sa
 **Safety:** Do not disable necessary built-in principals, domain service identities or krbtgt. These commands require appropriate domain privileges and management modules. Confirm effective GPO scope and role dependencies before changing policy.
 
 
-### Research report expansion WS-R1 — AD privileged groups, service accounts and safe reversibility
+<a id="research-report-expansion-ws-r1--ad-privileged-groups-service-accounts-and-safe-reversibility"></a>
+### 🔐 AD privileged groups, service accounts and safe reversibility
 
 - [ ] Done
 
-**Evidence:** Community/training categories with vendor-backed Active Directory management commands. Not a guarantee of actual scoring.
+**📚 Evidence:** Community/training categories with vendor-backed Active Directory management commands. Not a guarantee of actual scoring.
 
-**Why:** Domain Admins, Enterprise Admins, Schema Admins and nested membership can confer privileges beyond a user's visible OU. Service identities and computer objects may be required.
+**💡 Why:** Domain Admins, Enterprise Admins, Schema Admins and nested membership can confer privileges beyond a user's visible OU. Service identities and computer objects may be required.
 
-**GUI:** **Win + R → dsa.msc → View → Advanced Features**. Examine all OUs, the group **Members** and each user's **Member Of / Account** tabs; identify built-in, managed service and computer accounts.
+**🖱️ GUI:** **Win + R → dsa.msc → View → Advanced Features**. Examine all OUs, the group **Members** and each user's **Member Of / Account** tabs; identify built-in, managed service and computer accounts.
 
 **Typing (check on a DC or approved domain management host with ActiveDirectory module):**
 
@@ -710,19 +741,20 @@ For confirmed unauthorized domain login containment, after preserving evidence:
 Disable-ADAccount -Identity 'EXAMPLE_USER'
 ~~~
 
-**Verification:** Re-run both direct and recursive group queries; verify a new legitimate domain logon and required IIS/task/service identity functions. Existing sessions may retain old group tokens until reauthentication.
+**✅ Verification:** Re-run both direct and recursive group queries; verify a new legitimate domain logon and required IIS/task/service identity functions. Existing sessions may retain old group tokens until reauthentication.
 
-**Undo:** Restore **only** the mistakenly removed direct membership with **Add-ADGroupMember** or re-enable a mistakenly disabled account using **Enable-ADAccount**. Never delete or reset **krbtgt**, domain built-in Administrator, computer objects or required service accounts during routine checklist hardening.
+**↩️ Undo:** Restore **only** the mistakenly removed direct membership with **Add-ADGroupMember** or re-enable a mistakenly disabled account using **Enable-ADAccount**. Never delete or reset **krbtgt**, domain built-in Administrator, computer objects or required service accounts during routine checklist hardening.
 
-### Research report expansion WS-R2 — Domain password policy, FGPP and resultant policy
+<a id="research-report-expansion-ws-r2--domain-password-policy-fgpp-and-resultant-policy"></a>
+### 🔐 Domain password policy, FGPP and resultant policy
 
 - [ ] Done
 
-**Evidence:** Community/vendor-backed. Domain password and lockout settings are not interchangeable with member-server local policy.
+**📚 Evidence:** Community/vendor-backed. Domain password and lockout settings are not interchangeable with member-server local policy.
 
-**GUI:** **Win + R → gpmc.msc → Forest → Domains → your domain**. Inspect the **domain-root-linked** account policy GPO (often Default Domain Policy) → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies. Check OU links and GPO precedence, and back up the specific GPO before editing.
+**🖱️ GUI:** **Win + R → gpmc.msc → Forest → Domains → your domain**. Inspect the **domain-root-linked** account policy GPO (often Default Domain Policy) → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies. Check OU links and GPO precedence, and back up the specific GPO before editing.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-ADDefaultDomainPasswordPolicy | Format-List *
@@ -741,21 +773,22 @@ Set-ADDefaultDomainPasswordPolicy -Identity 'example.test' -MinPasswordLength 12
 
 Replace example.test and numbers; this is a *partial illustrative* change and doesn't set every account-policy field. Use GPMC for the exact complete policy or the appropriate FGPP tool if a specific user policy is at fault.
 
-**Verify:** Re-query domain default/resultant policy for affected users and test a normal authorized login. Test required applications that depend on service credentials before considering a password reset.
+**✅ Verify:** Re-query domain default/resultant policy for affected users and test a normal authorized login. Test required applications that depend on service credentials before considering a password reset.
 
-**Undo:** Restore exact old values or scoped GPO backup; account password resets are not reversed by restoring policy. Never delete Default Domain Policy or change the entire forest password policy for one misunderstood workstation issue.
+**↩️ Undo:** Restore exact old values or scoped GPO backup; account password resets are not reversed by restoring policy. Never delete Default Domain Policy or change the entire forest password policy for one misunderstood workstation issue.
 
-### Research report expansion WS-R3 — LDAP signing/channel binding with compatibility checks
+<a id="research-report-expansion-ws-r3--ldap-signingchannel-binding-with-compatibility-checks"></a>
+### 🧰 LDAP signing/channel binding with compatibility checks
 
 - [ ] Done
 
-**Evidence:** Community/vendor-backed; Microsoft has dedicated guidance. Strict enforcement can break old required applications.
+**📚 Evidence:** Community/vendor-backed; Microsoft has dedicated guidance. Strict enforcement can break old required applications.
 
-**Why:** Unsigned LDAP binds and absent channel-binding protections can permit credential-relay and downgrade risks. However, a required application may have legacy LDAP behavior; you must identify clients before enforcing stricter settings.
+**💡 Why:** Unsigned LDAP binds and absent channel-binding protections can permit credential-relay and downgrade risks. However, a required application may have legacy LDAP behavior; you must identify clients before enforcing stricter settings.
 
 **GUI (DC):** **Event Viewer → Applications and Services Logs → Directory Service** (or **Windows Logs** when the platform uses that provider) and **gpmc.msc → appropriate DC-linked GPO → Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options**.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-WinEvent -FilterHashtable @{LogName='Directory Service';Id=2887,2888,2889} -MaxEvents 40 -ErrorAction SilentlyContinue |
@@ -764,21 +797,22 @@ gpresult /r /scope computer
 Get-Service NTDS,Netlogon,Kdc -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
 ~~~
 
-**Interpretation:** Event 2887 can summarize unsigned LDAP binds when logging is configured. Individual client events such as 2889 may require extra diagnostic logging; **absence of events does not demonstrate that all clients support enforcement**. Channel-binding diagnostics may include other Directory Service event IDs depending on OS and policy.
+**🧠 Interpretation:** Event 2887 can summarize unsigned LDAP binds when logging is configured. Individual client events such as 2889 may require extra diagnostic logging; **absence of events does not demonstrate that all clients support enforcement**. Channel-binding diagnostics may include other Directory Service event IDs depending on OS and policy.
 
 **Fix only when clients have been inventoried and requirements permit:** Under **Domain controller: LDAP server signing requirements**, choose **Require signing** when compatible. Review the separately configured LDAP channel binding policy according to the installed Server release and client capabilities rather than setting **Always** blindly.
 
-**Verification:** Confirm effective GPO; test LDAP/LDAPS from every required client/application and inspect new Directory Service events. Check normal domain logon and DNS SRV resolution.
+**✅ Verification:** Confirm effective GPO; test LDAP/LDAPS from every required client/application and inspect new Directory Service events. Check normal domain logon and DNS SRV resolution.
 
-**Undo:** Restore only the documented policy value from the prior GPO backup if a required legacy client fails. Do not disable LDAP signing globally as a reflexive repair or alter domain-wide NTLM settings blindly.
+**↩️ Undo:** Restore only the documented policy value from the prior GPO backup if a required legacy client fails. Do not disable LDAP signing globally as a reflexive repair or alter domain-wide NTLM settings blindly.
 
 **Vendor reference:** [Microsoft LDAP signing guidance](https://learn.microsoft.com/en-us/troubleshoot/windows-server/active-directory/ldap-signing) and current Windows Server security baselines.
 
-### Research report expansion WS-R4 — SMB1, signing and domain-critical shares
+<a id="research-report-expansion-ws-r4--smb1-signing-and-domain-critical-shares"></a>
+### 🧰 SMB1, signing and domain-critical shares
 
 - [ ] Done
 
-**Evidence:** Community/vendor-backed; SMB signing and SMB1 support are separately configurable.
+**📚 Evidence:** Community/vendor-backed; SMB signing and SMB1 support are separately configurable.
 
 **Typing (check on Server):**
 
@@ -790,7 +824,7 @@ Get-SmbShare | Select-Object Name,Path,Special,Description
 
 **What to look for:** Unauthorized SMB1 compatibility, weak signing if the role requires it, unapproved custom shares and overly broad share rights. **SYSVOL, NETLOGON, administrative shares, and required data shares must not be removed indiscriminately.**
 
-**GUI:** Server Manager → **File and Storage Services → Shares**, then the backing folder's **Properties → Security → Advanced**; inspect **both** share permissions and NTFS ACLs.
+**🖱️ GUI:** Server Manager → **File and Storage Services → Shares**, then the backing folder's **Properties → Security → Advanced**; inspect **both** share permissions and NTFS ACLs.
 
 **Change only when legacy compatibility is ruled out:**
 
@@ -806,13 +840,20 @@ Set-SmbServerConfiguration -EnableSMB1Protocol $false
 
 These changes can affect active sessions, GPO and older clients; retain a console path and test clients. Avoid copying a **-Confirm:$false** variant that hides an important safety prompt.
 
-**Verification:** Repeat Get-SmbServerConfiguration, check Get-SmbShareAccess for actual required shares and test SMB read/write from an authorized ordinary user plus an explicitly denied user.
+**✅ Verification:** Repeat Get-SmbServerConfiguration, check Get-SmbShareAccess for actual required shares and test SMB read/write from an authorized ordinary user plus an explicitly denied user.
 
-**Undo:** Restore only the known old protocol/signing value if the README explicitly requires legacy compatibility. Do not re-enable SMB1 simply to chase points; address compatible client migration where permitted. A removed share must be restored with both the correct share and original NTFS permissions.
+**↩️ Undo:** Restore only the known old protocol/signing value if the README explicitly requires legacy compatibility. Do not re-enable SMB1 simply to chase points; address compatible client migration where permitted. A removed share must be restored with both the correct share and original NTFS permissions.
 
 **Sources:** [Microsoft SMB signing](https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-signing-overview) and [SMB server cmdlets](https://learn.microsoft.com/en-us/powershell/module/smbshare/set-smbserverconfiguration).
 
+---
+
+<a id="stage-4"></a>
 ## Part 4 — Required Server Roles and Remote Access
+
+> [!TIP]
+> ⚙️ **Service-aware work:** Check required applications and dependencies before adjusting settings.
+
 
 Prove required web, directory, DNS, DHCP, SMB and management functions work before hardening them.
 
@@ -821,7 +862,7 @@ Prove required web, directory, DNS, DHCP, SMB and management functions work befo
 #### 9.1 IIS web server
 - [ ] Done
 
-**Clicking:** **Win + R** → `inetmgr` (IIS Manager). For the server **and each site**:
+**🖱️ Clicking:** **Win + R** → `inetmgr` (IIS Manager). For the server **and each site**:
 - **Directory Browsing** → **Disable** (Actions pane).
 - **HTTP Response Headers** → remove **X-Powered-By**.
 - **Request Filtering** → check nothing dangerous is allowed. **Edit Feature Settings** → untick **Allow unlisted file name extensions** only if the site still works afterwards.
@@ -859,13 +900,13 @@ Set-ItemProperty 'IIS:\Sites\Default FTP Site' -Name ftpServer.security.authenti
 #### 9.3 DNS server
 - [ ] Done
 
-**Clicking:** **Win + R** → `dnsmgmt.msc`. For each **Forward Lookup Zone**, right-click → **Properties**:
+**🖱️ Clicking:** **Win + R** → `dnsmgmt.msc`. For each **Forward Lookup Zone**, right-click → **Properties**:
 - **General → Dynamic updates:** **Secure only** (for AD-integrated zones).
 - **Zone Transfers:** untick **Allow zone transfers**, or choose **Only to the following servers** if the README mentions a secondary DNS server.
 
 Look through the records for anything suspicious, e.g. a record for `update.microsoft.com` or `www.bank.com` pointing to a strange IP.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-DnsServerZone | Format-Table ZoneName, ZoneType, DynamicUpdate, SecureSecondaries, IsDsIntegrated
 Set-DnsServerPrimaryZone -Name corp.local -SecureSecondaries NoTransfer -DynamicUpdate Secure   # change corp.local to your zone name
@@ -899,7 +940,7 @@ Get-DhcpServerAuditLog
 #### 9.6 File server shares
 - [ ] Done
 
-**Clicking:** `fsmgmt.msc` → **Shares**. For each share the README needs: **Properties → Share Permissions** shouldn't give **Everyone: Full Control**, and on the **Security** tab (NTFS), only the right groups should have **Modify / Full control**.
+**🖱️ Clicking:** `fsmgmt.msc` → **Shares**. For each share the README needs: **Properties → Share Permissions** shouldn't give **Everyone: Full Control**, and on the **Security** tab (NTFS), only the right groups should have **Modify / Full control**.
 
 ```powershell
 Get-SmbShare | ForEach-Object { "--- $($_.Name) $($_.Path)"; Get-SmbShareAccess $_.Name | Format-Table AccountName, AccessRight }
@@ -914,9 +955,9 @@ On a Domain Controller, leave **NETLOGON** and **SYSVOL** alone.
 **Compatibility preflight:** Record protocol settings and export the exact SCHANNEL key before editing. Check required clients, application/.NET versions, certificates and patches support modern TLS. Apply changes at a recoverable checkpoint; some need service/system restart. Use [12.5](#125-iis-ftp-and-file-and-storage-services-recovery) for backup/client tests. If a legacy required client fails, restore the recorded per-protocol values, including absence of values that did not previously exist, and investigate a supported compatibility path rather than applying a blanket protocol template.
 - [ ] Done
 
-**Why it matters:** These old encryption versions have known breaks. Websites (IIS), FTP over SSL, Remote Desktop and LDAPS should all use TLS 1.2 or newer. Server 2016-2022 still allow TLS 1.0 and 1.1 unless you turn them off.
+**💡 Why it matters:** These old encryption versions have known breaks. Websites (IIS), FTP over SSL, Remote Desktop and LDAPS should all use TLS 1.2 or newer. Server 2016-2022 still allow TLS 1.0 and 1.1 unless you turn them off.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 foreach ($p in 'SSL 2.0', 'SSL 3.0', 'TLS 1.0', 'TLS 1.1') {
   $k = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\$p\Server"
@@ -926,7 +967,7 @@ foreach ($p in 'SSL 2.0', 'SSL 3.0', 'TLS 1.0', 'TLS 1.1') {
 ```
 This changes only what the server *accepts* (the `Server` keys), not how the server connects out, so programs on it that talk to the internet keep working. Restart the server once (near the end, after saving your work) so every service picks it up.
 
-**Check it worked:** `Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server'` shows `Enabled : 0`. Then open the website / connect with RDP to make sure the critical services still work, and refresh the Scoring Report: if it stops updating, undo this step.
+**✅ Check it worked:** `Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server'` shows `Enabled : 0`. Then open the website / connect with RDP to make sure the critical services still work, and refresh the Scoring Report: if it stops updating, undo this step.
 
 > [!CAUTION]
 > Very old programs (for example an old SQL Server or FTP server) may only speak TLS 1.0. If a README service stops working after the restart, set `Enabled` back to `1` for the version it needs and restart again.
@@ -941,9 +982,9 @@ This changes only what the server *accepts* (the `Server` keys), not how the ser
 
 - [ ] Done
 
-**What:** Review services by their **real Windows service name**, executable path and dependencies. This section contains the Server-specific service table directly; no workstation checklist is necessary.
+**🎯 What:** Review services by their **real Windows service name**, executable path and dependencies. This section contains the Server-specific service table directly; no workstation checklist is necessary.
 
-**GUI:** Win + R → services.msc → select the exact service → Properties. Record **Service name, Display name, Service status, Startup type, Log On As, Dependencies, Path to executable**. If Server Core lacks services.msc, use PowerShell below.
+**🖱️ GUI:** Win + R → services.msc → select the exact service → Properties. Record **Service name, Display name, Service status, Startup type, Log On As, Dependencies, Path to executable**. If Server Core lacks services.msc, use PowerShell below.
 
 **Typing (check, elevated PowerShell):**
 
@@ -991,13 +1032,13 @@ Stop-Service -Name 'RemoteRegistry' -ErrorAction Stop
 Set-Service -Name 'RemoteRegistry' -StartupType Disabled
 ~~~
 
-**Verification:**
+**✅ Verification:**
 
 ~~~powershell
 Get-Service -Name 'RemoteRegistry' | Format-Table Name,Status,StartType
 ~~~
 
-**Undo:** Restore the *recorded original* startup type using Set-Service; start the service only if it had been running and is required. A stopped service can be appropriate even when startup is Manual. Do not apply blanket Stop-Service -Force, bulk disable lists or mass uninstalls to required roles.
+**↩️ Undo:** Restore the *recorded original* startup type using Set-Service; start the service only if it had been running and is required. A stopped service can be appropriate even when startup is Manual. Do not apply blanket Stop-Service -Force, bulk disable lists or mass uninstalls to required roles.
 
 **Warn:** Services may depend on each other; disabling a listed generic desktop service on a server may break printing, IIS FTP, remote management, backups or an app. Confirm dependencies via the GUI or Get-Service -DependentServices and actual required-client test.
 
@@ -1024,9 +1065,9 @@ Get-Service NTDS, DNS, Kdc, Netlogon, DFSR, W32Time, ADWS, IsmServ | Format-Tabl
 
 - [ ] Done
 
-**Why:** Print Spooler has been involved in serious privilege-escalation/remote-code-execution vulnerabilities. Whether it should be disabled depends on whether this machine is a required print server and the installed update/policy state.
+**💡 Why:** Print Spooler has been involved in serious privilege-escalation/remote-code-execution vulnerabilities. Whether it should be disabled depends on whether this machine is a required print server and the installed update/policy state.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-Service Spooler -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -1034,7 +1075,7 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAnd
   Select-Object RestrictDriverInstallationToAdministrators,NoWarningNoElevationOnInstall,UpdatePromptSettings
 ~~~
 
-**GUI:** Server Manager → Local Server → identify **Print and Document Services** if installed. Win + R → services.msc → Print Spooler. For GPO, open the correct linked GPO in gpmc.msc (DC) or local gpedit.msc (standalone/member) → Computer Configuration → Administrative Templates → Printers and inspect Point and Print Restrictions / Limits print driver installation to Administrators.
+**🖱️ GUI:** Server Manager → Local Server → identify **Print and Document Services** if installed. Win + R → services.msc → Print Spooler. For GPO, open the correct linked GPO in gpmc.msc (DC) or local gpedit.msc (standalone/member) → Computer Configuration → Administrative Templates → Printers and inspect Point and Print Restrictions / Limits print driver installation to Administrators.
 
 **Server-specific decision:**
 1. If **no printing is required** and the README permits it, consider disabling only Spooler after identifying dependencies and recording its original startup state.
@@ -1044,9 +1085,9 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAnd
 
 **Change (ONLY when policy and role require the restriction):** In the applicable Printers policy enable **Limits print driver installation to Administrators**; inspect user elevation prompts. Avoid blindly creating several registry values in one command because the effective GPO can override them.
 
-**Verify:** Confirm expected policy, installed update status and required printer client functionality. Test from an authorized printer/client context if this is a print server.
+**✅ Verify:** Confirm expected policy, installed update status and required printer client functionality. Test from an authorized printer/client context if this is a print server.
 
-**Undo:** Restore exactly the prior documented service state or policy if a needed printer application breaks, while maintaining the strongest feasible protective controls.
+**↩️ Undo:** Restore exactly the prior documented service state or policy if a needed printer application breaks, while maintaining the strongest feasible protective controls.
 
 ### 7. Roles and features
 
@@ -1054,7 +1095,7 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAnd
 
 - [ ] Done
 
-**Why:** An unauthorized feature can expose attack surface, but deleting a role may break domain authentication, a required website/share or application data. Removing role binaries often does **not** restore required configuration if later reinstalled.
+**💡 Why:** An unauthorized feature can expose attack surface, but deleting a role may break domain authentication, a required website/share or application data. Removing role binaries often does **not** restore required configuration if later reinstalled.
 
 **GUI (read-only first):** Server Manager → **Manage → Add Roles and Features** to review installed roles/features, or **Remove Roles and Features** to inspect candidates/dependencies **without confirming removal**. Note installed AD DS, DNS, DHCP, IIS, file services and Windows Defender.
 
@@ -1086,9 +1127,9 @@ This is only an example if Telnet Client is **installed and prohibited**. Do not
 
 **Change only if justified:** Through the wizard or a targeted Uninstall-WindowsFeature -Name 'ACTUAL-FEATURE' command **after** reviewing the role's services, installed dependencies and necessary data. Never remove AD DS or DNS on a required DC; never strip IIS/FTP/SMB/DHCP from a server whose README needs it.
 
-**Verify:** Repeat feature inspection and test the exact required role functions from an authorized client. Review pending reboot requirements.
+**✅ Verify:** Repeat feature inspection and test the exact required role functions from an authorized client. Review pending reboot requirements.
 
-**Undo:** Reinstalling a role's binaries may not restore its prior data and configuration. Use a valid role-specific backup and supported recovery procedure, not blanket reinstallation.
+**↩️ Undo:** Reinstalling a role's binaries may not restore its prior data and configuration. Use a valid role-specific backup and supported recovery procedure, not blanket reinstallation.
 
 ---
 
@@ -1098,9 +1139,9 @@ This is only an example if Telnet Client is **installed and prohibited**. Do not
 
 - [ ] Done
 
-**What:** Determine whether RDP, Remote Assistance or an RDS role is required. Do **not** turn off RDP if it is an approved management path or the system is an RDS Session Host.
+**🎯 What:** Determine whether RDP, Remote Assistance or an RDS role is required. Do **not** turn off RDP if it is an approved management path or the system is an RDS Session Host.
 
-**GUI:** Server Manager → Local Server → **Remote Desktop**. If enabled, require **Network Level Authentication (NLA)** when compatible with the authorized clients. Inspect **Select Users** / Remote Desktop Users group and effective GPO. On a DC, members and logon rights come from **domain groups and domain policy**, not local Get-LocalGroupMember.
+**🖱️ GUI:** Server Manager → Local Server → **Remote Desktop**. If enabled, require **Network Level Authentication (NLA)** when compatible with the authorized clients. Inspect **Select Users** / Remote Desktop Users group and effective GPO. On a DC, members and logon rights come from **domain groups and domain policy**, not local Get-LocalGroupMember.
 
 **Typing (check, elevated PowerShell):**
 
@@ -1122,9 +1163,9 @@ fDenyTSConnections = 0 usually permits incoming RDP subject to other controls; 1
 
 **Remote Assistance:** Inspect the installed policy in system remote settings or applicable GPO; disable unsolicited/unapproved invitations only if the scenario does not require it. Do not confuse Remote Assistance with RDP.
 
-**Verify:** Check effective GPO, firewall profile/rules, NLA/login restrictions, authorized RDP connection (if required), and other required service functions. For disabled RDP, verify it is not listening or reachable from an unauthorized client **without** breaking the VM console.
+**✅ Verify:** Check effective GPO, firewall profile/rules, NLA/login restrictions, authorized RDP connection (if required), and other required service functions. For disabled RDP, verify it is not listening or reachable from an unauthorized client **without** breaking the VM console.
 
-**Undo:** Restore only the original documented Remote Desktop/Assistance value, group membership, GPO or firewall scope using console access. Avoid blindly editing multiple registry values, which can be overridden by policy.
+**↩️ Undo:** Restore only the original documented Remote Desktop/Assistance value, group membership, GPO or firewall scope using console access. Avoid blindly editing multiple registry values, which can be overridden by policy.
 
 #### 8.2 Lock down WinRM
 - [ ] Done
@@ -1166,13 +1207,14 @@ Get-FileHash -LiteralPath 'C:\Users\Example\Documents\suspect.exe' -Algorithm SH
 Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' | Select-Object Status,SignerCertificate
 ~~~
 
-**Interpret:** A suspicious name/signature/listener is only an investigation lead. Required service accounts, scheduled backup jobs and remote-management tools can be legitimate. On a Domain Controller, preserve NTDS/AD/DNS/Kerberos, authorized SYSVOL content, event logs and necessary service identities.
+**🧠 Interpret:** A suspicious name/signature/listener is only an investigation lead. Required service accounts, scheduled backup jobs and remote-management tools can be legitimate. On a Domain Controller, preserve NTDS/AD/DNS/Kerberos, authorized SYSVOL content, event logs and necessary service identities.
 
 **Verify/undo:** After any narrowly approved remediation, test ordinary login and all required IIS/FTP/SMB/DNS/DHCP/AD functions, check system/service events, and restore only the changed item from its baseline.
 
 ---
 
-### Research expansion: required server-role dependency checklist
+<a id="research-expansion-required-server-role-dependency-checklist"></a>
+### 🧰 required server-role dependency checklist
 
 | Role | Inspection tool | Verify with an authorized client |
 |---|---|---|
@@ -1193,13 +1235,14 @@ Get-NetFirewallProfile
 **Do not** install missing roles merely to run checklist commands. Review any zone transfer, DHCP scope, IIS authentication, file ACL or remote-management change against required functionality. Preserve original configuration and test application login/shares/website after modifications.
 
 
-### Research report expansion WS-R5 — DNS zone transfers, updates and AD-integrated records
+<a id="research-report-expansion-ws-r5--dns-zone-transfers-updates-and-ad-integrated-records"></a>
+### 📦 DNS zone transfers, updates and AD-integrated records
 
 - [ ] Done
 
-**Evidence:** Community/vendor-backed DNS hardening; depends on whether this server actually hosts DNS.
+**📚 Evidence:** Community/vendor-backed DNS hardening; depends on whether this server actually hosts DNS.
 
-**GUI:** **Win + R → dnsmgmt.msc → Forward Lookup Zones → actual zone → Properties**. Inspect **General → Dynamic Updates** and **Zone Transfers**. AD-integrated zones can support **Secure only** dynamic updates when appropriate; a secondary DNS server may require tightly restricted zone transfers.
+**🖱️ GUI:** **Win + R → dnsmgmt.msc → Forward Lookup Zones → actual zone → Properties**. Inspect **General → Dynamic Updates** and **Zone Transfers**. AD-integrated zones can support **Secure only** dynamic updates when appropriate; a secondary DNS server may require tightly restricted zone transfers.
 
 **Typing (check only if DnsServer module/role is installed):**
 
@@ -1209,21 +1252,22 @@ Get-DnsServerForwarder
 Get-DnsServerResourceRecord -ZoneName 'example.test' -RRType SRV -ErrorAction SilentlyContinue
 ~~~
 
-**Before changing anything:** Record the original zone type, AD replication scope, allowed secondaries, clients and SRV records. **Do not delete unfamiliar SRV records** or redirect domain DNS to a public resolver.
+**🛑 Before changing anything:** Record the original zone type, AD replication scope, allowed secondaries, clients and SRV records. **Do not delete unfamiliar SRV records** or redirect domain DNS to a public resolver.
 
-**Fix:** On the exact zone, use its GUI to restrict unwanted zone transfers to approved secondary servers, and set dynamic updates to the appropriate secure mode only for an AD-integrated zone whose clients support it. Do not use a blanket change across all zones.
+**🛠️ Fix:** On the exact zone, use its GUI to restrict unwanted zone transfers to approved secondary servers, and set dynamic updates to the appropriate secure mode only for an AD-integrated zone whose clients support it. Do not use a blanket change across all zones.
 
-**Verification:** Test client A/AAAA and required SRV records, DC name resolution, and authorized dynamic updates. If an approved secondary exists, verify its transfer still succeeds.
+**✅ Verification:** Test client A/AAAA and required SRV records, DC name resolution, and authorized dynamic updates. If an approved secondary exists, verify its transfer still succeeds.
 
-**Undo:** Restore the recorded per-zone setting or role-aware DNS backup. A DNS zone deletion is not fixed by simply adding one A record.
+**↩️ Undo:** Restore the recorded per-zone setting or role-aware DNS backup. A DNS zone deletion is not fixed by simply adding one A record.
 
-### Research report expansion WS-R6 — DHCP scopes, reservations, authorization and auditing
+<a id="research-report-expansion-ws-r6--dhcp-scopes-reservations-authorization-and-auditing"></a>
+### 🔎 DHCP scopes, reservations, authorization and auditing
 
 - [ ] Done
 
-**Evidence:** Community; vendor-supported DHCP configuration inventory.
+**📚 Evidence:** Community; vendor-supported DHCP configuration inventory.
 
-**GUI:** **Win + R → dhcpmgmt.msc → Server → IPv4 → Scope**. Review address ranges, exclusions, **Reservations**, **Address Leases**, and **Scope Options** (003 Router, 006 DNS Servers, 015 Domain Name). Check server authorization and any configured failover pair.
+**🖱️ GUI:** **Win + R → dhcpmgmt.msc → Server → IPv4 → Scope**. Review address ranges, exclusions, **Reservations**, **Address Leases**, and **Scope Options** (003 Router, 006 DNS Servers, 015 Domain Name). Check server authorization and any configured failover pair.
 
 **Typing (check only if DHCP role/module is installed):**
 
@@ -1241,19 +1285,20 @@ Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
 
 **Before change:** Record the correct subnet, default gateway, DNS server and reserved/static addresses. Where supported, back up the DHCP server configuration to a private folder using **Backup-DhcpServer -Path** after verifying the path exists and is protected.
 
-**Fix:** Correct one unauthorized option, reservation or scope through the GUI only after the README and required-client topology are verified. Enabling auditing is an appropriate policy step **only if the logging path/disk budget permits**.
+**🛠️ Fix:** Correct one unauthorized option, reservation or scope through the GUI only after the README and required-client topology are verified. Enabling auditing is an appropriate policy step **only if the logging path/disk budget permits**.
 
-**Verification:** On an approved test client, renew or inspect the lease, confirm actual gateway/DNS/domain suffix and reach required services. Then re-run DHCP scope/option queries and check relevant audit records.
+**✅ Verification:** On an approved test client, renew or inspect the lease, confirm actual gateway/DNS/domain suffix and reach required services. Then re-run DHCP scope/option queries and check relevant audit records.
 
-**Undo:** Restore the one altered option/reservation, or use a reviewed DHCP-specific backup procedure for larger changes. Never delete a scope or reauthorize arbitrary servers to silence one lease error.
+**↩️ Undo:** Restore the one altered option/reservation, or use a reviewed DHCP-specific backup procedure for larger changes. Never delete a scope or reauthorize arbitrary servers to silence one lease error.
 
-### Research report expansion WS-R7 — IIS directory browsing, WebDAV, app pools and web-shell triage
+<a id="research-report-expansion-ws-r7--iis-directory-browsing-webdav-app-pools-and-web-shell-triage"></a>
+### 🧰 IIS directory browsing, WebDAV, app pools and web-shell triage
 
 - [ ] Done
 
-**Evidence:** Community/vendor-backed, applies only to an installed/required IIS web/FTP role.
+**📚 Evidence:** Community/vendor-backed, applies only to an installed/required IIS web/FTP role.
 
-**GUI:** **Win + R → inetmgr → Sites → required site**. Review **Basic Settings → Physical path**, **Bindings**, **Directory Browsing**, **Authentication**, **Request Filtering**, **Modules**, **WebDAV Authoring Rules** (if installed), **Logging** and **Application Pools → Identity**.
+**🖱️ GUI:** **Win + R → inetmgr → Sites → required site**. Review **Basic Settings → Physical path**, **Bindings**, **Directory Browsing**, **Authentication**, **Request Filtering**, **Modules**, **WebDAV Authoring Rules** (if installed), **Logging** and **Application Pools → Identity**.
 
 **Typing (check; WebAdministration must be installed):**
 
@@ -1264,7 +1309,7 @@ Get-WebBinding | Select-Object protocol,bindingInformation
 Get-ChildItem IIS:\AppPools | Select-Object Name,State
 ~~~
 
-**Before edits:** Export/back up the effective IIS configuration, bindings and relevant content; record any application pool identity and required login/upload/database operations. An IIS configuration backup alone does not save its content/database.
+**🛑 Before edits:** Export/back up the effective IIS configuration, bindings and relevant content; record any application pool identity and required login/upload/database operations. An IIS configuration backup alone does not save its content/database.
 
 **Fix only if the required site must forbid directory listings:**
 
@@ -1281,17 +1326,18 @@ Get-ChildItem 'C:\inetpub\wwwroot' -Recurse -File -Include *.asp,*.aspx,*.php,*.
  Select-Object FullName,LastWriteTime,Length
 ~~~
 
-**Interpret:** Script files may be legitimate; unknown scripts need metadata, publisher/source comparison and forensic preservation. Do not execute or delete files purely because of their extension.
+**🧠 Interpret:** Script files may be legitimate; unknown scripts need metadata, publisher/source comparison and forensic preservation. Do not execute or delete files purely because of their extension.
 
-**Verification:** Load the actual hostname/HTTPS binding from an authorized client, test required login/upload/API/database behavior, and check IIS error/request logs. A successful local homepage does not prove the required virtual host works.
+**✅ Verification:** Load the actual hostname/HTTPS binding from an authorized client, test required login/upload/API/database behavior, and check IIS error/request logs. A successful local homepage does not prove the required virtual host works.
 
-**Undo:** Restore the one site setting/permission from the recorded original or a reviewed IIS backup; restore file content and DB separately if removed.
+**↩️ Undo:** Restore the one site setting/permission from the recorded original or a reviewed IIS backup; restore file content and DB separately if removed.
 
-### Research report expansion WS-R8 — Required service recovery before removing any role
+<a id="research-report-expansion-ws-r8--required-service-recovery-before-removing-any-role"></a>
+### 🧰 Required service recovery before removing any role
 
 - [ ] Done
 
-**Evidence:** Official scenario/service-preservation principle; role-specific command behavior is vendor-backed.
+**📚 Evidence:** Official scenario/service-preservation principle; role-specific command behavior is vendor-backed.
 
 **Typing (check, role-dependent):**
 
@@ -1310,11 +1356,18 @@ Set-Service -Name 'EXAMPLE_REQUIRED_SERVICE' -StartupType Automatic
 Start-Service -Name 'EXAMPLE_REQUIRED_SERVICE'
 ~~~
 
-**Verification:** Recheck status and the application-level operation: domain login, required DNS SRV query, DHCP lease, IIS page, authorized SMB file access or other README-specified transaction. On a DC also verify directory, time and replication health as relevant.
+**✅ Verification:** Recheck status and the application-level operation: domain login, required DNS SRV query, DHCP lease, IIS page, authorized SMB file access or other README-specified transaction. On a DC also verify directory, time and replication health as relevant.
 
-**Undo:** Restore the original recorded service startup and running state if a change was incorrect. Do not disable a role only because a generic checklist labels it risky; do not re-create a deleted directory/database with a blank role installation.
+**↩️ Undo:** Restore the original recorded service startup and running state if a change was incorrect. Do not disable a role only because a generic checklist labels it risky; do not re-create a deleted directory/database with a blank role installation.
 
+---
+
+<a id="stage-5"></a>
 ## Part 5 — Advanced Server Investigation and Embedded Windows Reference
+
+> [!NOTE]
+> 🧰 **Advanced reference:** Use these targeted procedures when the scenario calls for deeper investigation.
+
 
 Use role-specific recovery first. The in-file Windows security reference covers common settings, but **the earlier Server roles and domain-specific instructions override generic workstation defaults**.
 
@@ -1326,15 +1379,15 @@ Use **Windows PowerShell as Administrator on the server**, not a workstation, fo
 
 - [ ] Done
 
-**What:** Determine whether this is a Domain Controller, member server or standalone server, and identify installed roles.
+**🎯 What:** Determine whether this is a Domain Controller, member server or standalone server, and identify installed roles.
 
-**Why it matters:** A DC stores domain identities and requires DNS, Kerberos, replication and time services. Removing a role is much more disruptive than stopping a workstation application.
+**💡 Why it matters:** A DC stores domain identities and requires DNS, Kerberos, replication and time services. Removing a role is much more disruptive than stopping a workstation application.
 
-**Before changing anything:** Record required services and client tests from the README. Keep VM console access and an authorized administrator. A practice VM snapshot is not an AD-aware production backup; follow round rules and do not casually revert a replicated DC.
+**🛑 Before changing anything:** Record required services and client tests from the README. Keep VM console access and an authorized administrator. A practice VM snapshot is not an AD-aware production backup; follow round rules and do not casually revert a replicated DC.
 
-**Clicking (GUI):** **Start → Server Manager → Local Server** shows domain membership, remote management and version. **Manage → Remove Roles and Features** can display installed roles; cancel after inspection. Do not click Remove merely because a role was not named explicitly in a short README.
+**🖱️ Clicking (GUI):** **Start → Server Manager → Local Server** shows domain membership, remote management and version. **Manage → Remove Roles and Features** can display installed roles; cancel after inspection. Do not click Remove merely because a role was not named explicitly in a short README.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,ProductType
@@ -1351,27 +1404,27 @@ ProductType 2 means DC; 3 means another server. A **member server has local acco
 | Server 2022 | Newer defaults/features; client compatibility and installed role remain more important than copying a 2016 baseline |
 | Server Core | No full desktop; use PowerShell, `sconfig` where available, and authorized remote management |
 
-**Typing (fix, only when appropriate):** Update and harden the installed required role using its procedure below. If a role is confirmed prohibited, first record its dependencies and data. Preview removal with `Uninstall-WindowsFeature -Name ROLE -WhatIf`, replacing ROLE with the actual installed feature name. Prefer the Server Manager wizard's dependency review before carrying out approved removal.
+**🛠️ Typing (fix, only when appropriate):** Update and harden the installed required role using its procedure below. If a role is confirmed prohibited, first record its dependencies and data. Preview removal with `Uninstall-WindowsFeature -Name ROLE -WhatIf`, replacing ROLE with the actual installed feature name. Prefer the Server Manager wizard's dependency review before carrying out approved removal.
 
-**Check it worked:** Compare the role list and test each required client function after each change. Keep AD DS, DNS, Netlogon, KDC, time and replication functions operational where required.
+**✅ Check it worked:** Compare the role list and test each required client function after each change. Keep AD DS, DNS, Netlogon, KDC, time and replication functions operational where required.
 
-**Undo:** Restore a mistakenly removed role only with its recorded configuration, data and supported recovery method; installing binaries alone does not restore a deleted directory/database. Use a pre-change role-specific backup.
+**↩️ Undo:** Restore a mistakenly removed role only with its recorded configuration, data and supported recovery method; installing binaries alone does not restore a deleted directory/database. Use a pre-change role-specific backup.
 
-**Warnings:** Server Manager itself relies on remote management features. Disabling WinRM on a server because it is often disabled on workstations can break management.
+**⚠️ Warnings:** Server Manager itself relies on remote management features. Disabling WinRM on a server because it is often disabled on workstations can break management.
 
 #### 12.2 AD users, nested groups and service identities
 
 - [ ] Done
 
-**What:** Reconcile domain users and privileged group membership with the README.
+**🎯 What:** Reconcile domain users and privileged group membership with the README.
 
-**Why it matters:** A nested group can confer Domain Admin access even when a user is not a direct member. Service accounts may run databases, scheduled tasks and IIS pools.
+**💡 Why it matters:** A nested group can confer Domain Admin access even when a user is not a direct member. Service accounts may run databases, scheduled tasks and IIS pools.
 
-**Before changing anything:** Preserve forensics and record distinguished names, SIDs, group memberships and service dependencies. Never use local-user cmdlets as an AD substitute.
+**🛑 Before changing anything:** Preserve forensics and record distinguished names, SIDs, group memberships and service dependencies. Never use local-user cmdlets as an AD substitute.
 
-**Clicking (GUI):** **Server Manager → Tools → Active Directory Users and Computers** (`dsa.msc`). Enable **View → Advanced Features**. Find the exact account/OU, open **Properties → Member Of / Account** and inspect privileges, expiration, delegation and password options. Open each group from the earlier powerful-group table and inspect **Members**; nested groups require inspection too. Prefer **Disable Account** before irreversible deletion of a confirmed unauthorized user.
+**🖱️ Clicking (GUI):** **Server Manager → Tools → Active Directory Users and Computers** (`dsa.msc`). Enable **View → Advanced Features**. Find the exact account/OU, open **Properties → Member Of / Account** and inspect privileges, expiration, delegation and password options. Open each group from the earlier powerful-group table and inspect **Members**; nested groups require inspection too. Prefer **Disable Account** before irreversible deletion of a confirmed unauthorized user.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Import-Module ActiveDirectory
@@ -1388,7 +1441,7 @@ Get-CimInstance Win32_Service | Select-Object Name,StartName,State
 Get-ScheduledTask | Select-Object TaskName,TaskPath,Principal
 ```
 
-**Typing (fix, only when appropriate):** Remove the specific unauthorized direct member, preserving legitimate nested structure:
+**🛠️ Typing (fix, only when appropriate):** Remove the specific unauthorized direct member, preserving legitimate nested structure:
 
 ```powershell
 Remove-ADGroupMember -Identity 'Domain Admins' -Members bob -Confirm
@@ -1402,25 +1455,25 @@ Disable-ADAccount -Identity mallory
 
 Do not rotate a required service account password without coordinating each dependent service/application. Managed service accounts have separate lifecycle and password management.
 
-**Check it worked:** Repeat direct/recursive queries, test a new permitted login and verify dependent services. Existing tokens can retain privileges until a new logon; disabling an account does not terminate every existing session automatically.
+**✅ Check it worked:** Repeat direct/recursive queries, test a new permitted login and verify dependent services. Existing tokens can retain privileges until a new logon; disabling an account does not terminate every existing session automatically.
 
-**Undo:** `Add-ADGroupMember -Identity 'Domain Admins' -Members bob` or `Enable-ADAccount -Identity mallory` restores only a mistakenly changed original state. Deleted AD objects need a supported AD recovery method, not name recreation.
+**↩️ Undo:** `Add-ADGroupMember -Identity 'Domain Admins' -Members bob` or `Enable-ADAccount -Identity mallory` restores only a mistakenly changed original state. Deleted AD objects need a supported AD recovery method, not name recreation.
 
-**Warnings:** Do not remove all operator/service identities from a DC using a workstation rights table. Do not change your only working administrator or krbtgt credentials as a routine checklist step.
+**⚠️ Warnings:** Do not remove all operator/service identities from a DC using a workstation rights table. Do not change your only working administrator or krbtgt credentials as a routine checklist step.
 
 #### 12.3 Domain password policy and Group Policy precedence
 
 - [ ] Done
 
-**What:** Apply account policy at the scope that actually governs the account, and inspect the winning GPO.
+**🎯 What:** Apply account policy at the scope that actually governs the account, and inspect the winning GPO.
 
-**Why it matters:** A local policy does not control domain user passwords. Fine-grained password policies can override the default for selected users/groups. A deny user right can block logon despite an allow grant.
+**💡 Why it matters:** A local policy does not control domain user passwords. Fine-grained password policies can override the default for selected users/groups. A deny user right can block logon despite an allow grant.
 
-**Before changing anything:** Record the current default/resultant policy and back up the specific GPO before editing it. Keep the Default Domain Policy and Default Domain Controllers Policy roles distinct.
+**🛑 Before changing anything:** Record the current default/resultant policy and back up the specific GPO before editing it. Keep the Default Domain Policy and Default Domain Controllers Policy roles distinct.
 
-**Clicking (GUI):** `gpmc.msc` → **Forest → Domains → actual domain**. Select the GPO, inspect **Scope**, links, security filtering and **Settings**; right-click **Back Up** to a private folder. Edit domain account policy in the domain-root-linked account-policy GPO, commonly **Default Domain Policy → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies**. For DC-specific audit/rights/options inspect the GPO linked to the **Domain Controllers OU**, not the workstation baseline. Use **Group Policy Results** for a specific machine/user.
+**🖱️ Clicking (GUI):** `gpmc.msc` → **Forest → Domains → actual domain**. Select the GPO, inspect **Scope**, links, security filtering and **Settings**; right-click **Back Up** to a private folder. Edit domain account policy in the domain-root-linked account-policy GPO, commonly **Default Domain Policy → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies**. For DC-specific audit/rights/options inspect the GPO linked to the **Domain Controllers OU**, not the workstation baseline. Use **Group Policy Results** for a specific machine/user.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-ADDefaultDomainPasswordPolicy | Format-List
@@ -1436,7 +1489,7 @@ gpresult /h C:\CP-Backups\server-gpresult.html
 
 Create and restrict that backup folder using the **WS.19.1 baseline procedure below** first. A GPO report can contain sensitive infrastructure details.
 
-**Typing (fix, only when appropriate):** Use the policy GUI row-by-row, or, for a confirmed domain and README values:
+**🛠️ Typing (fix, only when appropriate):** Use the policy GUI row-by-row, or, for a confirmed domain and README values:
 
 ```powershell
 Set-ADDefaultDomainPasswordPolicy -Identity 'example.test' -MinPasswordLength 12 -PasswordHistoryCount 24 -ComplexityEnabled $true -ReversibleEncryptionEnabled $false -LockoutThreshold 5 -LockoutDuration (New-TimeSpan -Minutes 30) -LockoutObservationWindow (New-TimeSpan -Minutes 30)
@@ -1444,25 +1497,25 @@ Set-ADDefaultDomainPasswordPolicy -Identity 'example.test' -MinPasswordLength 12
 
 Replace the domain and all policy values. Length/complexity affect future password changes; lockout threshold counts invalid attempts within the observation window. Do not infer that updating a policy fixed all existing passwords.
 
-**Check it worked:** Re-query default and resultant policies; inspect Group Policy Results for the affected computer. If appropriate, run `gpupdate /target:computer /force` and read its errors; some settings require logoff/restart. Test ordinary authorized access without deliberately locking the active admin.
+**✅ Check it worked:** Re-query default and resultant policies; inspect Group Policy Results for the affected computer. If appropriate, run `gpupdate /target:computer /force` and read its errors; some settings require logoff/restart. Test ordinary authorized access without deliberately locking the active admin.
 
-**Undo:** Restore the individual recorded setting or specific GPO backup via GPMC **Manage Backups → Restore** after reviewing scope. GPO deletion is not a normal way to undo one planted setting. Changing a domain policy does not undo a password reset.
+**↩️ Undo:** Restore the individual recorded setting or specific GPO backup via GPMC **Manage Backups → Restore** after reviewing scope. GPO deletion is not a normal way to undo one planted setting. Changing a domain policy does not undo a password reset.
 
-**Warnings:** Requiring LDAP signing/channel binding, restricting NTLM, or removing network-logon principals can break older required clients. Stage compatibility inspection and consult the applicable Microsoft policy documentation; do not apply `Always` blindly to every environment.
+**⚠️ Warnings:** Requiring LDAP signing/channel binding, restricting NTLM, or removing network-logon principals can break older required clients. Stage compatibility inspection and consult the applicable Microsoft policy documentation; do not apply `Always` blindly to every environment.
 
 #### 12.4 DNS, DHCP and DC health
 
 - [ ] Done
 
-**What:** Validate required name resolution, leases, replication and time after hardening.
+**🎯 What:** Validate required name resolution, leases, replication and time after hardening.
 
-**Why it matters:** AD relies on internal DNS SRV records and reasonably synchronized time. Using a public resolver as the DC's primary DNS can break domain discovery.
+**💡 Why it matters:** AD relies on internal DNS SRV records and reasonably synchronized time. Using a public resolver as the DC's primary DNS can break domain discovery.
 
-**Before changing anything:** Record DNS zones/forwarders, DHCP scopes/options/reservations, authorized servers and expected DC topology. Back up the affected role, not just a screenshot.
+**🛑 Before changing anything:** Record DNS zones/forwarders, DHCP scopes/options/reservations, authorized servers and expected DC topology. Back up the affected role, not just a screenshot.
 
-**Clicking (GUI):** **Server Manager → Tools → DNS**; open the server and each zone **Properties → Zone Transfers**. Permit transfers only to required secondary servers rather than blindly disallowing required replication. For AD-integrated zones inspect the appropriate secure dynamic-update setting. **Tools → DHCP → IPv4 → scope** shows range, exclusions, reservations, leases and **Scope Options** (003 Router, 006 DNS Servers, 015 DNS Domain Name). Record each before editing.
+**🖱️ Clicking (GUI):** **Server Manager → Tools → DNS**; open the server and each zone **Properties → Zone Transfers**. Permit transfers only to required secondary servers rather than blindly disallowing required replication. For AD-integrated zones inspect the appropriate secure dynamic-update setting. **Tools → DHCP → IPv4 → scope** shows range, exclusions, reservations, leases and **Scope Options** (003 Router, 006 DNS Servers, 015 DNS Domain Name). Record each before editing.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-DnsServerZone
@@ -1482,7 +1535,7 @@ Backup-DhcpServer -Path C:\CP-Backups\DHCP
 
 Use the GUI to correct the exact wrong scope option, unauthorized transfer destination or dynamic-update setting. Do not delete a working zone/scope to rebuild it from memory. Do not change NIC DNS to a public resolver to bypass internal-DNS errors.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 dcdiag /test:dns
@@ -1492,19 +1545,19 @@ w32tm /query /status
 
 Use these on the appropriate DC; no replication partners can be normal for a single-DC lab. Investigate errors rather than assuming they are all scoring issues. Renew a noncritical authorized client's DHCP lease and test internal hostname lookup and domain login.
 
-**Undo:** Restore the recorded specific zone/scope option or use the role's reviewed backup procedure. Restore AD-integrated data with AD-aware recovery; arbitrary file copying into DNS/NTDS directories is unsafe.
+**↩️ Undo:** Restore the recorded specific zone/scope option or use the role's reviewed backup procedure. Restore AD-integrated data with AD-aware recovery; arbitrary file copying into DNS/NTDS directories is unsafe.
 
-**Warnings:** Never disable DNS, Kdc, NTDS, Netlogon, DFSR or W32Time on a required DC. DHCP failover and approved secondary DNS servers may be implicit dependencies even if the README does not enumerate every service name.
+**⚠️ Warnings:** Never disable DNS, Kdc, NTDS, Netlogon, DFSR or W32Time on a required DC. DHCP failover and approved secondary DNS servers may be implicit dependencies even if the README does not enumerate every service name.
 
 #### 12.5 IIS, FTP and File and Storage Services recovery
 
 - [ ] Done
 
-**What:** Secure required published content and file access while preserving application identities.
+**🎯 What:** Secure required published content and file access while preserving application identities.
 
-**Why it matters:** Server-wide IIS edits affect all sites. Share and NTFS ACLs jointly control network access. TLS without a usable certificate/client can stop a required service.
+**💡 Why it matters:** Server-wide IIS edits affect all sites. Share and NTFS ACLs jointly control network access. TLS without a usable certificate/client can stop a required service.
 
-**Before changing anything:** Record site bindings, certificates, application pool identities, content paths, FTP users/data ports and share ACLs. Back up IIS configuration:
+**🛑 Before changing anything:** Record site bindings, certificates, application pool identities, content paths, FTP users/data ports and share ACLs. Back up IIS configuration:
 
 ```powershell
 & "$env:windir\system32\inetsrv\appcmd.exe" add backup BeforeCP
@@ -1512,9 +1565,9 @@ Use these on the appropriate DC; no replication partners can be normal for a sin
 
 Choose a unique name on subsequent runs. Separately back up content and databases; IIS config backup does not preserve them.
 
-**Clicking (GUI):** `inetmgr` → site → **Bindings**, **Authentication**, **Directory Browsing**, **Logging** and **Application Pools → Advanced Settings → Identity**. Apply the earlier section's settings at the intended site, considering inheritance. For FTP inspect **FTP Authentication**, **Authorization Rules**, **SSL Settings**, **User Isolation** and **Firewall Support**. In **Server Manager → File and Storage Services → Shares**, inspect required shares; then inspect each folder's NTFS Security tab as described in **WS.19.7 below**.
+**🖱️ Clicking (GUI):** `inetmgr` → site → **Bindings**, **Authentication**, **Directory Browsing**, **Logging** and **Application Pools → Advanced Settings → Identity**. Apply the earlier section's settings at the intended site, considering inheritance. For FTP inspect **FTP Authentication**, **Authorization Rules**, **SSL Settings**, **User Isolation** and **Firewall Support**. In **Server Manager → File and Storage Services → Shares**, inspect required shares; then inspect each folder's NTFS Security tab as described in **WS.19.7 below**.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Import-Module WebAdministration
@@ -1524,7 +1577,7 @@ Get-ChildItem IIS:\AppPools | Select-Object Name,State,processModel
 Get-SmbShare | Format-Table Name,Path,Description
 ```
 
-**Typing (fix, only when appropriate):** Prefer a scoped site change; for an actual site named `Company`:
+**🛠️ Typing (fix, only when appropriate):** Prefer a scoped site change; for an actual site named `Company`:
 
 ```powershell
 Set-WebConfigurationProperty -PSPath 'IIS:\Sites\Company' -Filter system.webServer/directoryBrowse -Name enabled -Value $false
@@ -1532,9 +1585,9 @@ Set-WebConfigurationProperty -PSPath 'IIS:\Sites\Company' -Filter system.webServ
 
 Only disable browsing if directory listing is not required. Preserve the intended site authentication; public anonymous access is normal for many websites. Apply least privilege to an app pool without breaking access to its content/database/certificates. Do not deny all unlisted extensions without an application inventory.
 
-**Check it worked:** Test the actual hostname/port from an authorized client, including required login, static/dynamic pages, upload and database-backed behavior. For FTP, test both authentication and a data transfer; passive data ports must match firewall/server configuration. For shares, test read/write under an ordinary authorized user, not only an admin.
+**✅ Check it worked:** Test the actual hostname/port from an authorized client, including required login, static/dynamic pages, upload and database-backed behavior. For FTP, test both authentication and a data transfer; passive data ports must match firewall/server configuration. For shares, test read/write under an ordinary authorized user, not only an admin.
 
-**Undo:** Restore the exact site setting or, if needed and after reviewing other sites' changes:
+**↩️ Undo:** Restore the exact site setting or, if needed and after reviewing other sites' changes:
 
 ```powershell
 & "$env:windir\system32\inetsrv\appcmd.exe" restore backup BeforeCP
@@ -1542,21 +1595,21 @@ Only disable browsing if directory listing is not required. Preserve the intende
 
 This affects the saved IIS server configuration. Restore content/database/ACL changes separately from their specific backups.
 
-**Warnings:** Do not disable TLS protocols until required clients have been checked and patches/certificates are ready. Hide-version settings do not substitute for updates. A web shell investigation must preserve evidence and compare files with trusted application sources before deletion.
+**⚠️ Warnings:** Do not disable TLS protocols until required clients have been checked and patches/certificates are ready. Hide-version settings do not substitute for updates. A web shell investigation must preserve evidence and compare files with trusted application sources before deletion.
 
 #### 12.6 Remote management, firewall, updates and audit completion
 
 - [ ] Done
 
-**What:** Preserve secure remote administration, installed roles and useful logs through updates.
+**🎯 What:** Preserve secure remote administration, installed roles and useful logs through updates.
 
-**Why it matters:** Broad firewall blocks can break RPC-dependent AD/management even when obvious ports are open. A workstation port list is insufficient for a DC.
+**💡 Why it matters:** Broad firewall blocks can break RPC-dependent AD/management even when obvious ports are open. A workstation port list is insufficient for a DC.
 
-**Before changing anything:** Export firewall/audit policy using **WS.19.1 below**. Record required management source networks and installed antivirus/WSUS configuration. Keep console access.
+**🛑 Before changing anything:** Export firewall/audit policy using **WS.19.1 below**. Record required management source networks and installed antivirus/WSUS configuration. Keep console access.
 
-**Clicking (GUI):** **Server Manager → Local Server → Remote management / Remote Desktop**. Use NLA and authorized RDP membership. `wf.msc` → inspect built-in **role-specific** rules and their scopes; keep required AD/DNS/DHCP/SMB/RPC traffic. **Settings → Update & Security / Windows Update** varies by version; on Core use supported `sconfig` update options. In Event Viewer inspect **Security**, **System**, **Directory Service**, **DNS Server** and **DFS Replication** as applicable.
+**🖱️ Clicking (GUI):** **Server Manager → Local Server → Remote management / Remote Desktop**. Use NLA and authorized RDP membership. `wf.msc` → inspect built-in **role-specific** rules and their scopes; keep required AD/DNS/DHCP/SMB/RPC traffic. **Settings → Update & Security / Windows Update** varies by version; on Core use supported `sconfig` update options. In Event Viewer inspect **Security**, **System**, **Directory Service**, **DNS Server** and **DFS Replication** as applicable.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 winrm get winrm/config/service
@@ -1568,13 +1621,13 @@ Get-MpComputerStatus | Select-Object AMRunningMode,AntivirusEnabled,RealTimeProt
 
 WinRM should normally reject Basic authentication and unencrypted traffic. HTTP transport with Kerberos can still encrypt messages; do not equate every port-5985 session with plaintext. Do not expand TrustedHosts to `*` to bypass name/authentication problems.
 
-**Typing (fix, only when appropriate):** In the WinRM policy GUI disable Basic and unencrypted traffic at the correct scope. Restrict the corresponding built-in firewall rules to authorized management sources after confirming the management connection will remain allowed. Apply approved security/role updates, preserving a legitimate organizational WSUS configuration.
+**🛠️ Typing (fix, only when appropriate):** In the WinRM policy GUI disable Basic and unencrypted traffic at the correct scope. Restrict the corresponding built-in firewall rules to authorized management sources after confirming the management connection will remain allowed. Apply approved security/role updates, preserving a legitimate organizational WSUS configuration.
 
-**Check it worked:** From an authorized management host test `Test-WSMan server-name`, an authorized RDP login if required, role-specific client transactions, then DC health commands from 12.4. Confirm new audit events and no relevant new service errors. Use selective advanced audit subcategories as described in **WS.19.4 below**.
+**✅ Check it worked:** From an authorized management host test `Test-WSMan server-name`, an authorized RDP login if required, role-specific client transactions, then DC health commands from 12.4. Confirm new audit events and no relevant new service errors. Use selective advanced audit subcategories as described in **WS.19.4 below**.
 
-**Undo:** Restore the exact changed listener/authentication/rule scope from its record, using the console. For an update regression use the supported recovery method for that exact update; do not disable all updates or the firewall.
+**↩️ Undo:** Restore the exact changed listener/authentication/rule scope from its record, using the console. For an update regression use the supported recovery method for that exact update; do not disable all updates or the firewall.
 
-**Warnings:** Never remove role-required ports based solely on a short generic list. Do not clear server logs, forcibly stop package installation, or automatically reboot while database/AD recovery is unresolved.
+**⚠️ Warnings:** Never remove role-required ports based solely on a short generic list. Do not clear server logs, forcibly stop package installation, or automatically reboot while database/AD recovery is unresolved.
 
 
 ---
@@ -1641,23 +1694,23 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 ##### WS.1.2 Manual security baseline (no hardening script)
 - [ ] Done
 
-**What:** Prepare a manual baseline. The upstream automation is not included in this repository.
+**🎯 What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
-**Why it matters:** A status label cannot establish that a setting is correct on this particular image.
+**💡 Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
-**Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
+**🛑 Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
-**Clicking (GUI):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
+**🖱️ Clicking (GUI):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
 
-**Typing (check):** Use the read-only inventory commands in the next section of this checklist. Save their output in a private working folder; do not publish passwords or password hashes.
+**🔎 Typing (check):** Use the read-only inventory commands in the next section of this checklist. Save their output in a private working folder; do not publish passwords or password hashes.
 
-**Typing (fix, only when appropriate):** Work through one manual item at a time below. Read every command before entering it. There is no script to download from this repository.
+**🛠️ Typing (fix, only when appropriate):** Work through one manual item at a time below. Read every command before entering it. There is no script to download from this repository.
 
-**Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
+**✅ Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
 
-**Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
+**↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
+**⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -1666,9 +1719,9 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 ##### WS.2.1 List every user
 - [ ] Done
 
-**Clicking:** **Win + R** → `lusrmgr.msc` → **Users**. (Or **Settings → Accounts → Other users**.)
+**🖱️ Clicking:** **Win + R** → `lusrmgr.msc` → **Users**. (Or **Settings → Accounts → Other users**.)
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, LastLogon
 ```
@@ -1676,11 +1729,11 @@ Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, L
 ##### WS.2.2 Delete users who are not in the README
 - [ ] Done
 
-**Why it matters:** Extra accounts are how attackers get back in.
+**💡 Why it matters:** Extra accounts are how attackers get back in.
 
-**Clicking:** In `lusrmgr.msc` → **Users**, right-click the user → **Delete**.
+**🖱️ Clicking:** In `lusrmgr.msc` → **Users**, right-click the user → **Delete**.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Remove-LocalUser -Name mallory
 ```
@@ -1691,9 +1744,9 @@ Remove-LocalUser -Name mallory
 ##### WS.2.3 Create users the README says should exist
 - [ ] Done
 
-**Clicking:** `lusrmgr.msc` → **Users** → **Action → New User…** → untick "User must change password" only if the README says so.
+**🖱️ Clicking:** `lusrmgr.msc` → **Users** → **Action → New User…** → untick "User must change password" only if the README says so.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 New-LocalUser -Name erin -Password (Read-Host -AsSecureString "Password for erin")
 Add-LocalGroupMember -Group Users -Member erin
@@ -1702,11 +1755,11 @@ Add-LocalGroupMember -Group Users -Member erin
 ##### WS.2.4 Fix the Administrators group
 - [ ] Done
 
-**What:** Only the README's admins should be in **Administrators**.
+**🎯 What:** Only the README's admins should be in **Administrators**.
 
-**Clicking:** `lusrmgr.msc` → **Groups** → double-click **Administrators** → remove the wrong people / **Add…** the right ones.
+**🖱️ Clicking:** `lusrmgr.msc` → **Groups** → double-click **Administrators** → remove the wrong people / **Add…** the right ones.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-LocalGroupMember Administrators
 Remove-LocalGroupMember -Group Administrators -Member bob
@@ -1731,9 +1784,9 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 ##### WS.2.6 Disable the Guest account (and the other built-ins)
 - [ ] Done
 
-**Clicking:** `lusrmgr.msc` → **Users** → right-click **Guest** → **Properties** → tick **Account is disabled**.
+**🖱️ Clicking:** `lusrmgr.msc` → **Users** → right-click **Guest** → **Properties** → tick **Account is disabled**.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Disable-LocalUser -Name Guest
 Get-LocalUser | Where-Object { $_.SID -match '-50[0134]$' } | Format-Table Name, Enabled, SID   # finds them even if renamed
@@ -1743,11 +1796,11 @@ The built-in **Administrator** should usually be disabled too, **unless you're l
 ##### WS.2.7 Fix weak password settings on accounts
 - [ ] Done
 
-**What:** No account should have **Password never expires**, **User cannot change password**, or *no password required*.
+**🎯 What:** No account should have **Password never expires**, **User cannot change password**, or *no password required*.
 
-**Clicking:** `lusrmgr.msc` → double-click each user → untick **Password never expires** and **User cannot change password**.
+**🖱️ Clicking:** `lusrmgr.msc` → double-click each user → untick **Password never expires** and **User cannot change password**.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-LocalUser | Where-Object { $_.Enabled } | Format-Table Name, PasswordExpires, UserMayChangePassword, PasswordRequired
 Set-LocalUser -Name bob -PasswordNeverExpires $false
@@ -1758,9 +1811,9 @@ net user bob /passwordreq:yes
 ##### WS.2.8 Give users strong passwords
 - [ ] Done
 
-**Clicking:** `lusrmgr.msc` → right-click the user → **Set Password…**
+**🖱️ Clicking:** `lusrmgr.msc` → right-click the user → **Set Password…**
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Set-LocalUser -Name bob -Password (Read-Host -AsSecureString "New password for bob")
 ```
@@ -1770,7 +1823,7 @@ Use 12+ characters with upper case, lower case, a number and a symbol. **Don't c
 
 #### WS.3. Account policies (passwords and lockout)
 
-**Clicking:** **Win + R** → `secpol.msc` → **Account Policies**.
+**🖱️ Clicking:** **Win + R** → `secpol.msc` → **Account Policies**.
 
 ##### WS.3.1 Password Policy
 - [ ] Done
@@ -1797,7 +1850,7 @@ secedit /configure /db $env:TEMP\secpol.sdb /cfg $env:TEMP\secpol.inf /areas SEC
 secedit /export /cfg $env:TEMP\check.inf /areas SECURITYPOLICY; Select-String 'PasswordComplexity|ClearTextPassword' $env:TEMP\check.inf
 ```
 
-**Check it worked:** `net accounts` shows the numbers, and the last line above shows `PasswordComplexity = 1` and `ClearTextPassword = 0`.
+**✅ Check it worked:** `net accounts` shows the numbers, and the last line above shows `PasswordComplexity = 1` and `ClearTextPassword = 0`.
 
 ##### WS.3.2 Account Lockout Policy
 - [ ] Done
@@ -1824,11 +1877,11 @@ net accounts                     # check everything
 ##### WS.4.1 Audit Policy (record security events)
 - [ ] Done
 
-**Why:** Without auditing there's no record of logins, account changes, or policy changes.
+**💡 Why:** Without auditing there's no record of logins, account changes, or policy changes.
 
-**Clicking:** `secpol.msc` → **Local Policies → Audit Policy**. Inspect the scenario-required categories. Prefer **Advanced Audit Policy Configuration → System Audit Policies**, selecting useful subcategories deliberately as described in [19.4](#194-audit-selectively-and-investigate-windows-events). Do not enable all high-volume auditing blindly.
+**🖱️ Clicking:** `secpol.msc` → **Local Policies → Audit Policy**. Inspect the scenario-required categories. Prefer **Advanced Audit Policy Configuration → System Audit Policies**, selecting useful subcategories deliberately as described in [19.4](#194-audit-selectively-and-investigate-windows-events). Do not enable all high-volume auditing blindly.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 auditpol /set /subcategory:"Logon" /success:enable /failure:enable
 auditpol /get /category:*
@@ -1838,7 +1891,7 @@ Also: **Security Options → Audit: Force audit policy subcategory settings… t
 ##### WS.4.2 User Rights Assignment
 - [ ] Done
 
-**Clicking:** `secpol.msc` → **Local Policies → User Rights Assignment**. Double-click a right to see who has it.
+**🖱️ Clicking:** `secpol.msc` → **Local Policies → User Rights Assignment**. Double-click a right to see who has it.
 
 | Right | Should be |
 |---|---|
@@ -1877,7 +1930,7 @@ Accounts show as SIDs: `*S-1-1-0` = Everyone, `*S-1-5-32-545` = Users, `*S-1-5-3
 ##### WS.4.3 Security Options
 - [ ] Done
 
-**Clicking:** `secpol.msc` → **Local Policies → Security Options**.
+**🖱️ Clicking:** `secpol.msc` → **Local Policies → Security Options**.
 
 | Setting | Set to |
 |---|---|
@@ -1927,14 +1980,14 @@ Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0 | Format-List
 ##### WS.4.4 PowerShell logging
 - [ ] Done
 
-**What:** Windows records every PowerShell script and command that runs.
-**Why it matters:** Attackers love PowerShell. With logging on, their commands end up in the event log.
+**🎯 What:** Windows records every PowerShell script and command that runs.
+**💡 Why it matters:** Attackers love PowerShell. With logging on, their commands end up in the event log.
 
-**Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows PowerShell**:
+**🖱️ Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows PowerShell**:
 - **Turn on PowerShell Script Block Logging** → **Enabled**
 - **Turn on Module Logging** → **Enabled** → **Show…** → add `*` as a module name
 
-**Check it worked:**
+**✅ Check it worked:**
 ```powershell
 Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging -ErrorAction SilentlyContinue   # EnableScriptBlockLogging : 1
 Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging -ErrorAction SilentlyContinue        # EnableModuleLogging : 1
@@ -1947,23 +2000,23 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 ##### WS.5.1 Turn every protection on
 - [ ] Done
 
-**Clicking:** **Start → Windows Security → Virus & threat protection → Manage settings**. Turn **on**: Real-time protection, Cloud-delivered protection, Automatic sample submission, **Tamper Protection**.
+**🖱️ Clicking:** **Start → Windows Security → Virus & threat protection → Manage settings**. Turn **on**: Real-time protection, Cloud-delivered protection, Automatic sample submission, **Tamper Protection**.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-MpComputerStatus | Format-List AntivirusEnabled, RealTimeProtectionEnabled, IsTamperProtected, AntivirusSignatureAge
 Set-MpPreference -DisableRealtimeMonitoring $false -PUAProtection Enabled -MAPSReporting Advanced -SubmitSamplesConsent SendSafeSamples
 ```
-**Check it worked:** `RealTimeProtectionEnabled` and `IsTamperProtected` say `True`.
+**✅ Check it worked:** `RealTimeProtectionEnabled` and `IsTamperProtected` say `True`.
 
 ##### WS.5.2 Remove planted exclusions
 - [ ] Done
 
-**Why:** Attackers tell Defender to ignore their folder.
+**💡 Why:** Attackers tell Defender to ignore their folder.
 
-**Clicking:** **Manage settings → Exclusions → Add or remove exclusions**. Remove anything you didn't add.
+**🖱️ Clicking:** **Manage settings → Exclusions → Add or remove exclusions**. Remove anything you didn't add.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-MpPreference | Format-List ExclusionPath, ExclusionExtension, ExclusionProcess
 Remove-MpPreference -ExclusionPath "C:\Users\Public\tools"
@@ -1972,9 +2025,9 @@ Remove-MpPreference -ExclusionPath "C:\Users\Public\tools"
 ##### WS.5.3 No policy that turns Defender off
 - [ ] Done
 
-**Clicking:** **Win + R** → `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Microsoft Defender Antivirus** → **Turn off Microsoft Defender Antivirus** must be **Not configured** (or Disabled). Check **Real-time Protection** in the same place.
+**🖱️ Clicking:** **Win + R** → `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Microsoft Defender Antivirus** → **Turn off Microsoft Defender Antivirus** must be **Not configured** (or Disabled). Check **Real-time Protection** in the same place.
 
-**Typing (check):**
+**🔎 Typing (check):**
 ```powershell
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -ErrorAction SilentlyContinue                          # DisableAntiSpyware : 1 is bad
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection' -ErrorAction SilentlyContinue     # any Disable value of 1 is bad
@@ -1996,22 +2049,22 @@ Get-MpThreatDetection           # anything found
 ##### WS.6.1 Firewall on for every network type
 - [ ] Done
 
-**Clicking:** **Windows Security → Firewall & network protection**. **Domain**, **Private** and **Public** must all say *Firewall is on*.
+**🖱️ Clicking:** **Windows Security → Firewall & network protection**. **Domain**, **Private** and **Public** must all say *Firewall is on*.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True -DefaultInboundAction Block -DefaultOutboundAction Allow
 Get-NetFirewallProfile | Format-Table Name, Enabled, DefaultInboundAction, DefaultOutboundAction
 ```
 
-**Check it worked:** every profile shows `Enabled True`, `DefaultInboundAction Block`, and `DefaultOutboundAction` **Allow** or **NotConfigured**. **Block** there stops updates and can stop the Scoring Report updating; set it back with the first command unless the README asks for it.
+**✅ Check it worked:** every profile shows `Enabled True`, `DefaultInboundAction Block`, and `DefaultOutboundAction` **Allow** or **NotConfigured**. **Block** there stops updates and can stop the Scoring Report updating; set it back with the first command unless the README asks for it.
 
 ##### WS.6.2 Check the inbound rules
 - [ ] Done
 
-**Clicking:** **Win + R** → `wf.msc` → **Inbound Rules**. Sort by **Enabled**. Look for **allow** rules for strange programs (in `C:\Users\`, `C:\Temp`), strange ports (4444, 1337), or rules called something like "Windows Update Helper" that point at an odd program.
+**🖱️ Clicking:** **Win + R** → `wf.msc` → **Inbound Rules**. Sort by **Enabled**. Look for **allow** rules for strange programs (in `C:\Users\`, `C:\Temp`), strange ports (4444, 1337), or rules called something like "Windows Update Helper" that point at an odd program.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-NetFirewallRule -Direction Inbound -Action Allow -Enabled True | Where-Object { -not $_.DisplayGroup } |
   ForEach-Object { "{0} -> {1}" -f $_.DisplayName, ($_ | Get-NetFirewallApplicationFilter).Program }
@@ -2025,14 +2078,14 @@ Disable-NetFirewallRule -DisplayName "Evil Rule"
 ##### WS.7.1 Install all updates
 - [ ] Done
 
-**Clicking:** **Settings → Windows Update → Check for updates** → install everything. If updates are **paused**, click **Resume updates**.
+**🖱️ Clicking:** **Settings → Windows Update → Check for updates** → install everything. If updates are **paused**, click **Resume updates**.
 
 ##### WS.7.2 Automatic updates on
 - [ ] Done
 
-**Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows Update** (on Windows 11 it is inside **Manage end user experience**; look there if you don't see it) → **Configure Automatic Updates** → **Enabled**, option **4 – Auto download and schedule the install**.
+**🖱️ Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows Update** (on Windows 11 it is inside **Manage end user experience**; look there if you don't see it) → **Configure Automatic Updates** → **Enabled**, option **4 – Auto download and schedule the install**.
 
-**Typing (check):**
+**🔎 Typing (check):**
 ```powershell
 Get-Service wuauserv | Format-Table Name, Status, StartType        # StartType must not be Disabled
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -ErrorAction SilentlyContinue
@@ -2052,9 +2105,9 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 
 #### WS.8. Services
 
-**Clicking:** **Win + R** → `services.msc`. To turn a service off: double-click it → **Startup type: Disabled** → **Stop** → **OK**.
+**🖱️ Clicking:** **Win + R** → `services.msc`. To turn a service off: double-click it → **Startup type: Disabled** → **Stop** → **OK**.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Stop-Service -Name RemoteRegistry
 Set-Service -Name RemoteRegistry -StartupType Disabled
@@ -2091,20 +2144,20 @@ Set-Service -Name RemoteRegistry -StartupType Disabled
 
 - [ ] Done
 
-**What:** Allows remote registry administration. Actual service name(s): `RemoteRegistry`.
+**🎯 What:** Allows remote registry administration. Actual service name(s): `RemoteRegistry`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if remote registry administration is not required.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if remote registry administration is not required.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Remote Registry** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2113,7 +2166,7 @@ Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Select-Object
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `RemoteRegistry` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `RemoteRegistry` only:
 
 ```powershell
 Stop-Service -Name 'RemoteRegistry'
@@ -2127,7 +2180,7 @@ Set-Service -Name 'RemoteRegistry' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2135,7 +2188,7 @@ Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Format-Table 
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'RemoteRegistry' -StartupType Manual
@@ -2151,20 +2204,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Provides unencrypted remote terminal access on older Windows versions. Actual service name(s): `TlntSvr`.
+**🎯 What:** Provides unencrypted remote terminal access on older Windows versions. Actual service name(s): `TlntSvr`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable an installed server unless the scenario explicitly requires Telnet; prefer SSH where permitted.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable an installed server unless the scenario explicitly requires Telnet; prefer SSH where permitted.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Telnet** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'TlntSvr' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2173,7 +2226,7 @@ Get-Service -Name 'TlntSvr' -ErrorAction SilentlyContinue | Select-Object Name,D
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `TlntSvr` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `TlntSvr` only:
 
 ```powershell
 Stop-Service -Name 'TlntSvr'
@@ -2187,7 +2240,7 @@ Set-Service -Name 'TlntSvr' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'TlntSvr' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2195,7 +2248,7 @@ Get-Service -Name 'TlntSvr' -ErrorAction SilentlyContinue | Format-Table Name,St
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'TlntSvr' -StartupType Manual
@@ -2211,20 +2264,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** SNMP exposes monitoring data; the trap service receives monitoring notifications. Actual service name(s): `SNMP`, `SNMPTRAP`.
+**🎯 What:** SNMP exposes monitoring data; the trap service receives monitoring notifications. Actual service name(s): `SNMP`, `SNMPTRAP`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable each installed service unless monitoring is required.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable each installed service unless monitoring is required.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **SNMP and SNMP Trap** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'SNMP','SNMPTRAP' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2233,7 +2286,7 @@ Get-Service -Name 'SNMP','SNMPTRAP' -ErrorAction SilentlyContinue | Select-Objec
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `SNMP` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `SNMP` only:
 
 ```powershell
 Stop-Service -Name 'SNMP'
@@ -2247,7 +2300,7 @@ Set-Service -Name 'SNMP' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'SNMP','SNMPTRAP' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2255,7 +2308,7 @@ Get-Service -Name 'SNMP','SNMPTRAP' -ErrorAction SilentlyContinue | Format-Table
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'SNMP' -StartupType Manual
@@ -2271,20 +2324,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Discovers devices using SSDP multicast. Actual service name(s): `SSDPSRV`.
+**🎯 What:** Discovers devices using SSDP multicast. Actual service name(s): `SSDPSRV`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if network device discovery is not required.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if network device discovery is not required.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **SSDP Discovery** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'SSDPSRV' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2293,7 +2346,7 @@ Get-Service -Name 'SSDPSRV' -ErrorAction SilentlyContinue | Select-Object Name,D
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `SSDPSRV` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `SSDPSRV` only:
 
 ```powershell
 Stop-Service -Name 'SSDPSRV'
@@ -2307,7 +2360,7 @@ Set-Service -Name 'SSDPSRV' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'SSDPSRV' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2315,7 +2368,7 @@ Get-Service -Name 'SSDPSRV' -ErrorAction SilentlyContinue | Format-Table Name,St
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'SSDPSRV' -StartupType Manual
@@ -2331,20 +2384,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Hosts Universal Plug and Play devices. Actual service name(s): `upnphost`.
+**🎯 What:** Hosts Universal Plug and Play devices. Actual service name(s): `upnphost`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if UPnP hosting is not required.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if UPnP hosting is not required.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **UPnP Device Host** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'upnphost' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2353,7 +2406,7 @@ Get-Service -Name 'upnphost' -ErrorAction SilentlyContinue | Select-Object Name,
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `upnphost` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `upnphost` only:
 
 ```powershell
 Stop-Service -Name 'upnphost'
@@ -2367,7 +2420,7 @@ Set-Service -Name 'upnphost' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'upnphost' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2375,7 +2428,7 @@ Get-Service -Name 'upnphost' -ErrorAction SilentlyContinue | Format-Table Name,S
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'upnphost' -StartupType Manual
@@ -2391,20 +2444,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Runs the Microsoft IIS FTP transfer service. Actual service name(s): `FTPSVC`.
+**🎯 What:** Runs the Microsoft IIS FTP transfer service. Actual service name(s): `FTPSVC`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden a required FTP server; otherwise disable.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden a required FTP server; otherwise disable.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **FTP** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'FTPSVC' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2413,7 +2466,7 @@ Get-Service -Name 'FTPSVC' -ErrorAction SilentlyContinue | Select-Object Name,De
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `FTPSVC` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `FTPSVC` only:
 
 ```powershell
 Stop-Service -Name 'FTPSVC'
@@ -2427,7 +2480,7 @@ Set-Service -Name 'FTPSVC' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'FTPSVC' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2435,7 +2488,7 @@ Get-Service -Name 'FTPSVC' -ErrorAction SilentlyContinue | Format-Table Name,Sta
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'FTPSVC' -StartupType Manual
@@ -2451,20 +2504,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Serves IIS websites. Actual service name(s): `W3SVC`.
+**🎯 What:** Serves IIS websites. Actual service name(s): `W3SVC`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep if the README requires a website; otherwise disable after checking sites.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep if the README requires a website; otherwise disable after checking sites.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **World Wide Web Publishing** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2473,7 +2526,7 @@ Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue | Select-Object Name,Dep
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `W3SVC` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `W3SVC` only:
 
 ```powershell
 Stop-Service -Name 'W3SVC'
@@ -2487,7 +2540,7 @@ Set-Service -Name 'W3SVC' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2495,7 +2548,7 @@ Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue | Format-Table Name,Stat
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'W3SVC' -StartupType Manual
@@ -2511,20 +2564,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Provides Remote Desktop sessions. Actual service name(s): `TermService`.
+**🎯 What:** Provides Remote Desktop sessions. Actual service name(s): `TermService`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and secure if RDP is required; otherwise turn Remote Desktop off before considering disabling the service.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and secure if RDP is required; otherwise turn Remote Desktop off before considering disabling the service.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Remote Desktop Services** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'TermService' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2533,7 +2586,7 @@ Get-Service -Name 'TermService' -ErrorAction SilentlyContinue | Select-Object Na
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `TermService` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `TermService` only:
 
 ```powershell
 Stop-Service -Name 'TermService'
@@ -2547,7 +2600,7 @@ Set-Service -Name 'TermService' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'TermService' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2555,7 +2608,7 @@ Get-Service -Name 'TermService' -ErrorAction SilentlyContinue | Format-Table Nam
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'TermService' -StartupType Manual
@@ -2571,20 +2624,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Provides routing and VPN functions. Actual service name(s): `RemoteAccess`.
+**🎯 What:** Provides routing and VPN functions. Actual service name(s): `RemoteAccess`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only on a machine that is not a required router or VPN server.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only on a machine that is not a required router or VPN server.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Routing and Remote Access** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'RemoteAccess' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2593,7 +2646,7 @@ Get-Service -Name 'RemoteAccess' -ErrorAction SilentlyContinue | Select-Object N
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `RemoteAccess` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `RemoteAccess` only:
 
 ```powershell
 Stop-Service -Name 'RemoteAccess'
@@ -2607,7 +2660,7 @@ Set-Service -Name 'RemoteAccess' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'RemoteAccess' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2615,7 +2668,7 @@ Get-Service -Name 'RemoteAccess' -ErrorAction SilentlyContinue | Format-Table Na
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'RemoteAccess' -StartupType Manual
@@ -2631,20 +2684,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Provides shared network access and NAT functions. Actual service name(s): `SharedAccess`.
+**🎯 What:** Provides shared network access and NAT functions. Actual service name(s): `SharedAccess`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only if ICS, hosted networking and dependent virtualization features are not needed.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only if ICS, hosted networking and dependent virtualization features are not needed.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Internet Connection Sharing** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'SharedAccess' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2653,7 +2706,7 @@ Get-Service -Name 'SharedAccess' -ErrorAction SilentlyContinue | Select-Object N
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `SharedAccess` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `SharedAccess` only:
 
 ```powershell
 Stop-Service -Name 'SharedAccess'
@@ -2667,7 +2720,7 @@ Set-Service -Name 'SharedAccess' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'SharedAccess' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2675,7 +2728,7 @@ Get-Service -Name 'SharedAccess' -ErrorAction SilentlyContinue | Format-Table Na
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'SharedAccess' -StartupType Manual
@@ -2691,20 +2744,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Queues printing jobs and loads printer drivers. Actual service name(s): `Spooler`.
+**🎯 What:** Queues printing jobs and loads printer drivers. Actual service name(s): `Spooler`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable when no printing is required; otherwise patch and restrict driver installation.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable when no printing is required; otherwise patch and restrict driver installation.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Print Spooler** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2713,7 +2766,7 @@ Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue | Select-Object Name,D
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `Spooler` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `Spooler` only:
 
 ```powershell
 Stop-Service -Name 'Spooler'
@@ -2727,7 +2780,7 @@ Set-Service -Name 'Spooler' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2735,7 +2788,7 @@ Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue | Format-Table Name,St
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'Spooler' -StartupType Manual
@@ -2751,20 +2804,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Supports Xbox authentication, saved games and networking. Actual service name(s): `XblAuthManager`, `XblGameSave`, `XboxNetApiSvc`.
+**🎯 What:** Supports Xbox authentication, saved games and networking. Actual service name(s): `XblAuthManager`, `XblGameSave`, `XboxNetApiSvc`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable installed members when gaming is not required.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable installed members when gaming is not required.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Xbox services** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'XblAuthManager','XblGameSave','XboxNetApiSvc' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2773,7 +2826,7 @@ Get-Service -Name 'XblAuthManager','XblGameSave','XboxNetApiSvc' -ErrorAction Si
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `XblAuthManager` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `XblAuthManager` only:
 
 ```powershell
 Stop-Service -Name 'XblAuthManager'
@@ -2787,7 +2840,7 @@ Set-Service -Name 'XblAuthManager' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'XblAuthManager','XblGameSave','XboxNetApiSvc' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2795,7 +2848,7 @@ Get-Service -Name 'XblAuthManager','XblGameSave','XboxNetApiSvc' -ErrorAction Si
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'XblAuthManager' -StartupType Manual
@@ -2811,20 +2864,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Hosts legacy echo, discard, daytime, quote and character-generator protocols. Actual service name(s): `simptcp`.
+**🎯 What:** Hosts legacy echo, discard, daytime, quote and character-generator protocols. Actual service name(s): `simptcp`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless explicitly required for a lab task.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless explicitly required for a lab task.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Simple TCP/IP Services** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2833,7 +2886,7 @@ Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue | Select-Object Name,D
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `simptcp` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `simptcp` only:
 
 ```powershell
 Stop-Service -Name 'simptcp'
@@ -2847,7 +2900,7 @@ Set-Service -Name 'simptcp' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2855,7 +2908,7 @@ Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue | Format-Table Name,St
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'simptcp' -StartupType Manual
@@ -2871,20 +2924,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Lets applications access WebDAV resources. Actual service name(s): `WebClient`.
+**🎯 What:** Lets applications access WebDAV resources. Actual service name(s): `WebClient`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless required WebDAV workflows need it.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless required WebDAV workflows need it.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **WebClient** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'WebClient' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2893,7 +2946,7 @@ Get-Service -Name 'WebClient' -ErrorAction SilentlyContinue | Select-Object Name
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `WebClient` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `WebClient` only:
 
 ```powershell
 Stop-Service -Name 'WebClient'
@@ -2907,7 +2960,7 @@ Set-Service -Name 'WebClient' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'WebClient' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2915,7 +2968,7 @@ Get-Service -Name 'WebClient' -ErrorAction SilentlyContinue | Format-Table Name,
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'WebClient' -StartupType Manual
@@ -2931,20 +2984,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Shares media libraries over the network. Actual service name(s): `WMPNetworkSvc`.
+**🎯 What:** Shares media libraries over the network. Actual service name(s): `WMPNetworkSvc`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless media sharing is explicitly required.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless media sharing is explicitly required.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **Windows Media Player Network Sharing** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'WMPNetworkSvc' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2953,7 +3006,7 @@ Get-Service -Name 'WMPNetworkSvc' -ErrorAction SilentlyContinue | Select-Object 
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `WMPNetworkSvc` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `WMPNetworkSvc` only:
 
 ```powershell
 Stop-Service -Name 'WMPNetworkSvc'
@@ -2967,7 +3020,7 @@ Set-Service -Name 'WMPNetworkSvc' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'WMPNetworkSvc' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -2975,7 +3028,7 @@ Get-Service -Name 'WMPNetworkSvc' -ErrorAction SilentlyContinue | Format-Table N
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'WMPNetworkSvc' -StartupType Manual
@@ -2991,20 +3044,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Provides encrypted SSH and SFTP access. Actual service name(s): `sshd`.
+**🎯 What:** Provides encrypted SSH and SFTP access. Actual service name(s): `sshd`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden when required; otherwise disable the installed server.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden when required; otherwise disable the installed server.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **OpenSSH SSH Server** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'sshd' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -3013,7 +3066,7 @@ Get-Service -Name 'sshd' -ErrorAction SilentlyContinue | Select-Object Name,Depe
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `sshd` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `sshd` only:
 
 ```powershell
 Stop-Service -Name 'sshd'
@@ -3027,7 +3080,7 @@ Set-Service -Name 'sshd' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'sshd' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -3035,7 +3088,7 @@ Get-Service -Name 'sshd' -ErrorAction SilentlyContinue | Format-Table Name,Statu
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'sshd' -StartupType Manual
@@ -3051,20 +3104,20 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** Supports Windows Remote Management, PowerShell remoting and server administration. Actual service name(s): `WinRM`.
+**🎯 What:** Supports Windows Remote Management, PowerShell remoting and server administration. Actual service name(s): `WinRM`.
 
-**Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep when required by management tools; restrict authentication and firewall sources.
+**💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep when required by management tools; restrict authentication and firewall sources.
 
-**Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
+**🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
-**Clicking (GUI):**
+**🖱️ Clicking (GUI):**
 
 1. Press **Win + R**, enter `services.msc`, and press **Enter**.
 2. Find **WinRM** (use the service names above if the display name differs). Double-click each installed entry.
 3. Record **Service name**, **Startup type**, **Service status**, and the **Dependencies** tab.
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
-**Typing (check):** Open **Windows PowerShell as Administrator**:
+**🔎 Typing (check):** Open **Windows PowerShell as Administrator**:
 
 ```powershell
 Get-Service -Name 'WinRM' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -3073,7 +3126,7 @@ Get-Service -Name 'WinRM' -ErrorAction SilentlyContinue | Select-Object Name,Dep
 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
-**Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `WinRM` only:
+**🛠️ Typing (fix, only when appropriate):** For each confirmed unnecessary service, use its exact installed name. The example below targets `WinRM` only:
 
 ```powershell
 Stop-Service -Name 'WinRM'
@@ -3087,7 +3140,7 @@ Set-Service -Name 'WinRM' -StartupType Disabled
 
 Prevents normal future starts. Repeat individually for other installed names only after the same decision.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Service -Name 'WinRM' -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -3095,7 +3148,7 @@ Get-Service -Name 'WinRM' -ErrorAction SilentlyContinue | Format-Table Name,Stat
 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
-**Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
+**↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
 Set-Service -Name 'WinRM' -StartupType Manual
@@ -3111,32 +3164,32 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 
 - [ ] Done
 
-**What:** TeamViewer, AnyDesk, VNC and RustDesk install vendor-specific services; no universal service name exists. Common names include `TeamViewer`, `AnyDesk`, `uvnc_service` and `tvnserver`, but verify the installed executable.
+**🎯 What:** TeamViewer, AnyDesk, VNC and RustDesk install vendor-specific services; no universal service name exists. Common names include `TeamViewer`, `AnyDesk`, `uvnc_service` and `tvnserver`, but verify the installed executable.
 
-**Why it matters:** Unauthorized unattended access bypasses the expected administration path.
+**💡 Why it matters:** Unauthorized unattended access bypasses the expected administration path.
 
-**Before changing anything:** Preserve the executable path, signature, configuration and relevant logs for forensics. Keep a README-required remote-control application.
+**🛑 Before changing anything:** Preserve the executable path, signature, configuration and relevant logs for forensics. Keep a README-required remote-control application.
 
-**Clicking (GUI):** Open `services.msc`; double-click the vendor service and record **Path to executable**, startup type and status. Open **Settings → Apps → Installed apps**; identify the same publisher. Stop and disable only a confirmed unauthorized entry, then use the vendor's uninstall option after evidence is saved.
+**🖱️ Clicking (GUI):** Open `services.msc`; double-click the vendor service and record **Path to executable**, startup type and status. Open **Settings → Apps → Installed apps**; identify the same publisher. Stop and disable only a confirmed unauthorized entry, then use the vendor's uninstall option after evidence is saved.
 
-**Typing (check):** Administrator PowerShell:
+**🔎 Typing (check):** Administrator PowerShell:
 
 ```powershell
 Get-CimInstance Win32_Service | Where-Object { $_.Name -match 'TeamViewer|AnyDesk|VNC|RustDesk' -or $_.PathName -match 'TeamViewer|AnyDesk|VNC|RustDesk' } | Format-List Name,DisplayName,State,StartMode,PathName
 ```
 
-**Typing (fix, only when appropriate):** If the actual recorded name is `AnyDesk` and it is unauthorized:
+**🛠️ Typing (fix, only when appropriate):** If the actual recorded name is `AnyDesk` and it is unauthorized:
 
 ```powershell
 Stop-Service -Name AnyDesk
 Set-Service -Name AnyDesk -StartupType Disabled
 ```
 
-**Check it worked:** Repeat the inventory and verify the entry is stopped/disabled or gone after uninstall. Inspect the original listening port and startup entry too; portable tools may have no service.
+**✅ Check it worked:** Repeat the inventory and verify the entry is stopped/disabled or gone after uninstall. Inspect the original listening port and startup entry too; portable tools may have no service.
 
-**Undo:** Before uninstalling, preserve an authorized installer and license/configuration details privately. Restore the recorded service type and status if merely disabled; reinstall from the trusted vendor only if removal was mistaken.
+**↩️ Undo:** Before uninstalling, preserve an authorized installer and license/configuration details privately. Restore the recorded service type and status if merely disabled; reinstall from the trusted vendor only if removal was mistaken.
 
-**Warnings:** Names and paths are clues, not proof. Do not run `sc.exe delete` as a substitute for an application uninstaller or remove a tool supporting your only access path.
+**⚠️ Warnings:** Names and paths are clues, not proof. Do not run `sc.exe delete` as a substitute for an application uninstaller or remove a tool supporting your only access path.
 
 ##### WS.8.2 Make sure the security services are running
 - [ ] Done
@@ -3150,16 +3203,16 @@ Get-Service WinDefend, mpssvc, EventLog, wuauserv, wscsvc -ErrorAction SilentlyC
 ##### WS.8.3 Printer drivers: PrintNightmare fixes
 - [ ] Done
 
-**What:** Only administrators may install printer drivers, and "Point and Print" must always show a warning and ask for an admin password.
-**Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM, the most powerful account. An image can plant the old, unsafe setting even when Windows is updated.
+**🎯 What:** Only administrators may install printer drivers, and "Point and Print" must always show a warning and ask for an admin password.
+**💡 Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM, the most powerful account. An image can plant the old, unsafe setting even when Windows is updated.
 
-**Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Printers**:
+**🖱️ Clicking:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Printers**:
 - **Limits print driver installation to Administrators**: **Enabled** (only on images updated since October 2021; skip it if it isn't in the list).
 - **Point and Print Restrictions**: **Enabled**, and both "When installing drivers for a new connection" and "When updating drivers for an existing connection" set to **Show warning and elevation prompt**.
 
 On Home, or if the first policy isn't in the list, use the Typing commands.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 $pp = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'
 if (-not (Test-Path $pp)) { New-Item -Path $pp -Force | Out-Null }
@@ -3168,7 +3221,7 @@ New-ItemProperty -Path $pp -Name NoWarningNoElevationOnInstall -Value 0 -Propert
 New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWord -Force
 ```
 
-**Check it worked:** `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'` shows `RestrictDriverInstallationToAdministrators : 1` and the other two `0`. If the README doesn't need printing, also turn off the Print Spooler (8.1).
+**✅ Check it worked:** `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'` shows `RestrictDriverInstallationToAdministrators : 1` and the other two `0`. If the README doesn't need printing, also turn off the Print Spooler (8.1).
 
 ---
 
@@ -3177,7 +3230,7 @@ New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWo
 ##### WS.9.1 Turn off old, insecure features
 - [ ] Done
 
-**Clicking:** **Win + R** → `optionalfeatures` → **untick**:
+**🖱️ Clicking:** **Win + R** → `optionalfeatures` → **untick**:
 - **SMB 1.0/CIFS File Sharing Support** (the WannaCry hole)
 - **Telnet Client**
 - **TFTP Client**
@@ -3185,7 +3238,7 @@ New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWo
 - **Internet Information Services** (only if the README doesn't need a website/FTP)
 - **Internet Explorer 11** (Windows 10)
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
 Disable-WindowsOptionalFeature -Online -FeatureName TelnetClient -NoRestart
@@ -3196,21 +3249,21 @@ Get-WindowsOptionalFeature -Online | Where-Object State -eq Enabled | Select-Obj
 ```
 An error saying a feature is unknown just means it isn't on this version (PowerShell 2.0 is gone from up-to-date Windows 11 24H2). Turning a feature off finishes at the next restart, so restart once near the end (see Final checks).
 
-**Check it worked:** `Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol` says `False`, and the features above are not in the Enabled list.
+**✅ Check it worked:** `Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol` says `False`, and the features above are not in the Enabled list.
 
 ##### WS.9.2 Optional features (OpenSSH Server, SNMP)
 - [ ] Done
 
-**What:** Some extras are "optional features" instead of Windows features: **OpenSSH Server** and **SNMP** are the risky ones.
-**Clicking:** **Settings → System → Optional features** (older versions: **Settings → Apps → Optional features**) → click the feature → **Remove**. Keep it if the README needs it.
+**🎯 What:** Some extras are "optional features" instead of Windows features: **OpenSSH Server** and **SNMP** are the risky ones.
+**🖱️ Clicking:** **Settings → System → Optional features** (older versions: **Settings → Apps → Optional features**) → click the feature → **Remove**. Keep it if the README needs it.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-WindowsCapability -Online | Where-Object State -eq Installed | Select-Object Name
 Remove-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0   # skip if the README needs SSH
 Remove-WindowsCapability -Online -Name SNMP.Client~~~~0.0.1.0       # skip if the README needs SNMP
 ```
-**Check it worked:** run the first line again: the removed names are gone.
+**✅ Check it worked:** run the first line again: the removed names are gone.
 
 ---
 
@@ -3219,9 +3272,9 @@ Remove-WindowsCapability -Online -Name SNMP.Client~~~~0.0.1.0       # skip if th
 ##### WS.10.1 Remote Assistance off
 - [ ] Done
 
-**Clicking:** **Win + R** → `SystemPropertiesRemote` → untick **Allow Remote Assistance connections to this computer**.
+**🖱️ Clicking:** **Win + R** → `SystemPropertiesRemote` → untick **Allow Remote Assistance connections to this computer**.
 
-**Check it worked:**
+**✅ Check it worked:**
 ```powershell
 Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance' | Select-Object fAllowToGetHelp   # 0 = off
 ```
@@ -3232,7 +3285,7 @@ Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance' | Se
 > [!CAUTION]
 > If the README lists Remote Desktop as a critical service, **don't turn it off**: you lose points for breaking it.
 
-**Check:**
+**🔎 Check:**
 ```powershell
 Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' | Select-Object fDenyTSConnections   # 1 = off, 0 = on
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services' -ErrorAction SilentlyContinue | Select-Object fDenyTSConnections, UserAuthentication
@@ -3256,9 +3309,9 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStat
 ##### WS.11.1 Remove shares that aren't needed
 - [ ] Done
 
-**Clicking:** **Win + R** → `fsmgmt.msc` → **Shares**. Right-click a share → **Stop Sharing**.
+**🖱️ Clicking:** **Win + R** → `fsmgmt.msc` → **Shares**. Right-click a share → **Stop Sharing**.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-SmbShare
 Remove-SmbShare -Name Secret -Force
@@ -3275,7 +3328,7 @@ Revoke-SmbShareAccess -Name Public -AccountName Everyone -Force   # take Everyon
 ##### WS.12.1 Uninstall hacking tools, games, torrent and remote-control programs
 - [ ] Done
 
-**Clicking:** **Settings → Apps → Installed apps** (or **Win + R → appwiz.cpl**). Sort by name and read the **whole** list.
+**🖱️ Clicking:** **Settings → Apps → Installed apps** (or **Win + R → appwiz.cpl**). Sort by name and read the **whole** list.
 
 Look for:
 - **Hacking:** Wireshark, Npcap/WinPcap, Nmap, Cain & Abel, John the Ripper, Hashcat, Cheat Engine, keyloggers, "password recovery" tools
@@ -3338,9 +3391,9 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 ##### WS.14.1 Programs that start at logon
 - [ ] Done
 
-**Clicking:** **Task Manager (Ctrl+Shift+Esc) → Startup apps**. Also open these folders with **Win + R**: `shell:startup` and `shell:common startup`.
+**🖱️ Clicking:** **Task Manager (Ctrl+Shift+Esc) → Startup apps**. Also open these folders with **Win + R**: `shell:startup` and `shell:common startup`.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-CimInstance Win32_StartupCommand | Format-Table Name, Command, Location -AutoSize
 Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Run, HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run, HKCU:\Software\Microsoft\Windows\CurrentVersion\Run -ErrorAction SilentlyContinue
@@ -3351,9 +3404,9 @@ Red flags: `powershell -enc` followed by a long string, `-WindowStyle Hidden`, `
 ##### WS.14.2 Scheduled tasks
 - [ ] Done
 
-**Clicking:** **Win + R** → `taskschd.msc` → **Task Scheduler Library**. Check each task's **Actions** tab. Non-Microsoft tasks are usually in the top folder.
+**🖱️ Clicking:** **Win + R** → `taskschd.msc` → **Task Scheduler Library**. Check each task's **Actions** tab. Non-Microsoft tasks are usually in the top folder.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 Get-ScheduledTask | Where-Object TaskPath -notlike '\Microsoft\*' |
   ForEach-Object { "{0}{1} -> {2} {3}" -f $_.TaskPath, $_.TaskName, $_.Actions.Execute, $_.Actions.Arguments }
@@ -3372,14 +3425,14 @@ sc.exe delete BadService            # only for a service you are sure is malware
 ##### WS.14.4 Sticky Keys / Utility Manager backdoor
 - [ ] Done
 
-**Why:** Replacing `sethc.exe` (press Shift 5 times) or `utilman.exe` (the accessibility button) with `cmd.exe` gives anyone a SYSTEM command prompt **at the login screen**.
+**💡 Why:** Replacing `sethc.exe` (press Shift 5 times) or `utilman.exe` (the accessibility button) with `cmd.exe` gives anyone a SYSTEM command prompt **at the login screen**.
 
 ```powershell
 Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options' |
   Where-Object { $_.GetValue('Debugger') } | ForEach-Object { "$($_.PSChildName) -> $($_.GetValue('Debugger'))" }
 foreach ($f in 'sethc','utilman','osk','Magnify','Narrator') { "$f -> " + (Get-Item "C:\Windows\System32\$f.exe").VersionInfo.OriginalFilename }   # each must show its own name (.mui is fine), not Cmd.Exe
 ```
-**Fix:** delete the `Debugger` value. If the file itself was replaced, run `sfc /scanfile=C:\Windows\System32\sethc.exe`.
+**🛠️ Fix:** delete the `Debugger` value. If the file itself was replaced, run `sfc /scanfile=C:\Windows\System32\sethc.exe`.
 
 ##### WS.14.5 The hosts file
 - [ ] Done
@@ -3406,7 +3459,7 @@ Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess, @{n
 
 **Start** → type **Change User Account Control settings** → move the slider to the **top** (**Always notify**).
 
-**Check it worked:**
+**✅ Check it worked:**
 ```powershell
 Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System | Format-List EnableLUA, ConsentPromptBehaviorAdmin, PromptOnSecureDesktop
 ```
@@ -3429,7 +3482,7 @@ Wanted: `1`, `2`, `1`. If `EnableLUA` was `0`, UAC only comes back after a resta
 
 `gpedit.msc` → **Computer Configuration → Administrative Templates → Network → DNS Client → Turn off multicast name resolution → Enabled**.
 
-**Check it worked:**
+**✅ Check it worked:**
 ```powershell
 Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Select-Object EnableMulticast   # must be 0
 ```
@@ -3445,9 +3498,9 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 ##### WS.15.6 WDigest off (no plain-text passwords in memory)
 - [ ] Done
 
-**Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
+**💡 Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
 
-**Typing:**
+**⌨️ Typing:**
 ```powershell
 $k = 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest'
 if (-not (Test-Path $k)) { New-Item -Path $k | Out-Null }
@@ -3458,11 +3511,11 @@ Get-ItemProperty $k | Select-Object UseLogonCredential   # must be 0
 ##### WS.15.7 NetBIOS over TCP/IP off
 - [ ] Done
 
-**Why it matters:** Like LLMNR (15.4), attackers answer NetBIOS name lookups to steal password hashes.
+**💡 Why it matters:** Like LLMNR (15.4), attackers answer NetBIOS name lookups to steal password hashes.
 
-**Clicking:** **Win + R** → `ncpa.cpl` → right-click the network adapter → **Properties** → **Internet Protocol Version 4 (TCP/IPv4)** → **Properties** → **Advanced…** → **WINS** → **Disable NetBIOS over TCP/IP** → **OK**.
+**🖱️ Clicking:** **Win + R** → `ncpa.cpl` → right-click the network adapter → **Properties** → **Internet Protocol Version 4 (TCP/IPv4)** → **Properties** → **Advanced…** → **WINS** → **Disable NetBIOS over TCP/IP** → **OK**.
 
-**Check it worked:**
+**✅ Check it worked:**
 ```powershell
 Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled=TRUE" | Select-Object Description, TcpipNetbiosOptions   # 2 = off
 ```
@@ -3516,13 +3569,13 @@ If the README says this server runs a website, FTP or file shares, harden those 
 
 - [ ] Done
 
-**What:** Save the original configuration before changing a table of settings.
+**🎯 What:** Save the original configuration before changing a table of settings.
 
-**Why it matters:** A screenshot of a target value is not a backup of the old value. Account deletion, password resets and registry merges have different recovery limits.
+**💡 Why it matters:** A screenshot of a target value is not a backup of the old value. Account deletion, password resets and registry merges have different recovery limits.
 
-**Before changing anything:** Use an authorized administrator at the VM console. Follow round rules on snapshots. Backups can contain sensitive policy and account information; keep them local and private.
+**🛑 Before changing anything:** Use an authorized administrator at the VM console. Follow round rules on snapshots. Backups can contain sensitive policy and account information; keep them local and private.
 
-**Clicking (GUI):** Open File Explorer, create `C:\CP-Backups`, then use **Properties → Security → Advanced** to restrict access to Administrators and SYSTEM. Do not remove access from your current administrator. Open `secpol.msc` and use **Action → Export Policy**; in `wf.msc`, right-click the root and choose **Export Policy**.
+**🖱️ Clicking (GUI):** Open File Explorer, create `C:\CP-Backups`, then use **Properties → Security → Advanced** to restrict access to Administrators and SYSTEM. Do not remove access from your current administrator. Open `secpol.msc` and use **Action → Export Policy**; in `wf.msc`, right-click the root and choose **Export Policy**.
 
 **Typing (check and backup):** In elevated Windows PowerShell:
 
@@ -3555,11 +3608,11 @@ Get-LocalUser | Select-Object Name,Enabled,SID | Export-Csv C:\CP-Backups\users-
 Get-CimInstance Win32_Service | Select-Object Name,StartMode,State,PathName | Export-Csv C:\CP-Backups\services-before.csv -NoTypeInformation
 ```
 
-**Typing (fix, only when appropriate):** No security change occurs here. Add an entry to a private change log with time, setting, old value, new value and README reason before the next procedure.
+**🛠️ Typing (fix, only when appropriate):** No security change occurs here. Add an entry to a private change log with time, setting, old value, new value and README reason before the next procedure.
 
-**Check it worked:** Open each export as text where applicable and verify it is nonempty. Do not assume a CSV can recreate a deleted user with its old SID.
+**✅ Check it worked:** Open each export as text where applicable and verify it is nonempty. Do not assume a CSV can recreate a deleted user with its old SID.
 
-**Undo:** Prefer the individual setting's recorded value. A whole security-policy restore affects many settings:
+**↩️ Undo:** Prefer the individual setting's recorded value. A whole security-policy restore affects many settings:
 
 ```powershell
 secedit /configure /db C:\CP-Backups\restore.sdb /cfg C:\CP-Backups\security-before.inf /areas SECURITYPOLICY USER_RIGHTS
@@ -3571,21 +3624,21 @@ Only use this after reviewing the backup and scope. For an audit-only restore:
 auditpol /restore /file:C:\CP-Backups\audit-before.csv
 ```
 
-**Warnings:** Domain policy can override local changes. Password resets cannot recover the previous password and may make EFS files or stored credentials inaccessible. Preserve evidence before resets.
+**⚠️ Warnings:** Domain policy can override local changes. Password resets cannot recover the previous password and may make EFS files or stored credentials inaccessible. Preserve evidence before resets.
 
 ##### WS.19.2 Apply account and privileged-group table entries safely
 
 - [ ] Done
 
-**What:** Reconcile each account and each powerful group with the README.
+**🎯 What:** Reconcile each account and each powerful group with the README.
 
-**Why it matters:** Names alone do not reveal service-account dependencies, nested memberships or renamed built-in accounts.
+**💡 Why it matters:** Names alone do not reveal service-account dependencies, nested memberships or renamed built-in accounts.
 
-**Before changing anything:** Run `whoami /user` and keep a second tested administrator. Review the account's home directory, running services and scheduled tasks. On a Domain Controller use the Server AD procedure, not local-user commands.
+**🛑 Before changing anything:** Run `whoami /user` and keep a second tested administrator. Review the account's home directory, running services and scheduled tasks. On a Domain Controller use the Server AD procedure, not local-user commands.
 
-**Clicking (GUI):** `lusrmgr.msc` → **Users** → double-click the exact account → **Member Of**. Compare every membership with section 2.5. For a confirmed unauthorized account, first tick **Account is disabled**. In **Groups**, open each powerful group individually, select the incorrect member and click **Remove → Apply**.
+**🖱️ Clicking (GUI):** `lusrmgr.msc` → **Users** → double-click the exact account → **Member Of**. Compare every membership with section 2.5. For a confirmed unauthorized account, first tick **Account is disabled**. In **Groups**, open each powerful group individually, select the incorrect member and click **Remove → Apply**.
 
-**Typing (check):** Elevated PowerShell; replace `mallory` with the actual account:
+**🔎 Typing (check):** Elevated PowerShell; replace `mallory` with the actual account:
 
 ```powershell
 Get-LocalUser -Name mallory | Format-List Name,Enabled,SID,Description,LastLogon
@@ -3595,7 +3648,7 @@ Get-ScheduledTask | Where-Object { $_.Principal.UserId -match 'mallory' } | Sele
 
 No task/service results only means these queries found none; inspect application configuration too.
 
-**Typing (fix, only when appropriate):** Prefer reversible containment after saving evidence:
+**🛠️ Typing (fix, only when appropriate):** Prefer reversible containment after saving evidence:
 
 ```powershell
 Disable-LocalUser -Name mallory
@@ -3607,21 +3660,21 @@ For an unauthorized membership, remove that membership rather than the whole acc
 Remove-LocalGroupMember -Group 'Backup Operators' -Member mallory
 ```
 
-**Check it worked:** Repeat `Get-LocalUser` or `Get-LocalGroupMember 'Backup Operators'`. The disabled account shows `Enabled : False`; a removed member no longer appears. Test an authorized user's ordinary and administrator workflows.
+**✅ Check it worked:** Repeat `Get-LocalUser` or `Get-LocalGroupMember 'Backup Operators'`. The disabled account shows `Enabled : False`; a removed member no longer appears. Test an authorized user's ordinary and administrator workflows.
 
-**Undo:** `Enable-LocalUser -Name mallory` restores a mistakenly disabled account. `Add-LocalGroupMember -Group 'Backup Operators' -Member mallory` restores only a recorded membership. Deleted accounts need proper account/data recovery; creating the same name generates a different SID.
+**↩️ Undo:** `Enable-LocalUser -Name mallory` restores a mistakenly disabled account. `Add-LocalGroupMember -Group 'Backup Operators' -Member mallory` restores only a recorded membership. Deleted accounts need proper account/data recovery; creating the same name generates a different SID.
 
-**Warnings:** Do not disable every built-in account without checking its purpose. `PasswordExpires` from `Get-LocalUser` is a date or empty value, not simply a true/false policy flag. Service identities may have managed password behavior.
+**⚠️ Warnings:** Do not disable every built-in account without checking its purpose. `PasswordExpires` from `Get-LocalUser` is a date or empty value, not simply a true/false policy flag. Service identities may have managed password behavior.
 
 ##### WS.19.3 Work through password, rights and security-option tables
 
 - [ ] Done
 
-**What:** Change each table row deliberately and check the effective policy.
+**🎯 What:** Change each table row deliberately and check the effective policy.
 
-**Why it matters:** User rights are privileges, not ordinary group memberships. A **Deny** entry takes precedence over an allow entry. Compatibility-sensitive policies can break file sharing or authentication.
+**💡 Why it matters:** User rights are privileges, not ordinary group memberships. A **Deny** entry takes precedence over an allow entry. Compatibility-sensitive policies can break file sharing or authentication.
 
-**Before changing anything:** Export policy using 19.1. On domain members inspect policy precedence first:
+**🛑 Before changing anything:** Export policy using 19.1. On domain members inspect policy precedence first:
 
 ```powershell
 gpresult /h C:\CP-Backups\gpresult-before.html
@@ -3630,9 +3683,9 @@ net accounts
 
 Open the HTML locally; note the winning GPO. `net accounts` reports local account limits; domain account policy is separate.
 
-**Clicking (GUI):** Press **Win + R → secpol.msc**. For each password/lockout row open **Account Policies → Password Policy / Account Lockout Policy**; double-click the exact row, record its current value, enter the README value, and click **Apply → OK**. Set lockout threshold first, then its duration/window. Under **Local Policies → User Rights Assignment**, open one right, record every principal, and use **Add User or Group / Remove** only for that right. Under **Security Options**, open each named setting and choose its explicit option. Record units such as seconds, minutes or days.
+**🖱️ Clicking (GUI):** Press **Win + R → secpol.msc**. For each password/lockout row open **Account Policies → Password Policy / Account Lockout Policy**; double-click the exact row, record its current value, enter the README value, and click **Apply → OK**. Set lockout threshold first, then its duration/window. Under **Local Policies → User Rights Assignment**, open one right, record every principal, and use **Add User or Group / Remove** only for that right. Under **Security Options**, open each named setting and choose its explicit option. Record units such as seconds, minutes or days.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 secedit /export /cfg C:\CP-Backups\security-after.inf /areas SECURITYPOLICY USER_RIGHTS
@@ -3645,7 +3698,7 @@ Compare the before/after files. `SeDebugPrivilege` corresponds to **Debug progra
 ([System.Security.Principal.SecurityIdentifier]'S-1-5-32-544').Translate([System.Security.Principal.NTAccount]).Value
 ```
 
-**Typing (fix, only when appropriate):** Prefer the per-row GUI for rights and options; there is no safe universal command that rewrites every right for every role. On a standalone workstation, if the README calls for the section 3 values:
+**🛠️ Typing (fix, only when appropriate):** Prefer the per-row GUI for rights and options; there is no safe universal command that rewrites every right for every role. On a standalone workstation, if the README calls for the section 3 values:
 
 ```powershell
 net accounts /uniquepw:24 /maxpwage:90 /minpwage:1 /minpwlen:12
@@ -3653,25 +3706,25 @@ net accounts /uniquepw:24 /maxpwage:90 /minpwage:1 /minpwlen:12
 
 History prevents immediate reuse, maximum age requires periodic changes, minimum age limits rapid cycling and minimum length rejects short future passwords. These settings do not retroactively strengthen existing passwords.
 
-**Check it worked:** Repeat `net accounts`, export the policy again, and test one noncritical authorized account from a separate session. Confirm legitimate network access still works. Do not intentionally lock out your administrator to test the threshold.
+**✅ Check it worked:** Repeat `net accounts`, export the policy again, and test one noncritical authorized account from a separate session. Confirm legitimate network access still works. Do not intentionally lock out your administrator to test the threshold.
 
-**Undo:** Restore the individual row's recorded principals/value. Use the reviewed policy backup only when necessary. A refresh that reverses your edit means the owning GPO needs correction by its authorized administrator.
+**↩️ Undo:** Restore the individual row's recorded principals/value. Use the reviewed policy backup only when necessary. A refresh that reverses your edit means the owning GPO needs correction by its authorized administrator.
 
-**Warnings:** The tables are workstation starting points, not universal server baselines. Preserve service SIDs and required operators. Mandatory signing, NTLM restrictions, cached-logon settings and anonymous-access restrictions require client compatibility checks. Do not add your own admin account to a deny right.
+**⚠️ Warnings:** The tables are workstation starting points, not universal server baselines. Preserve service SIDs and required operators. Mandatory signing, NTLM restrictions, cached-logon settings and anonymous-access restrictions require client compatibility checks. Do not add your own admin account to a deny right.
 
 ##### WS.19.4 Audit selectively and investigate Windows events
 
 - [ ] Done
 
-**What:** Record useful authentication, account and policy changes without blindly enabling every audit category.
+**🎯 What:** Record useful authentication, account and policy changes without blindly enabling every audit category.
 
-**Why it matters:** High-volume object/process auditing can fill logs quickly. A missing event does not establish that an action never occurred; the policy may not have recorded it.
+**💡 Why it matters:** High-volume object/process auditing can fill logs quickly. A missing event does not establish that an action never occurred; the policy may not have recorded it.
 
-**Before changing anything:** Back up audit policy and export relevant logs before remediation. Do not clear logs or disable Windows Event Log.
+**🛑 Before changing anything:** Back up audit policy and export relevant logs before remediation. Do not clear logs or disable Windows Event Log.
 
-**Clicking (GUI):** **Win + R → eventvwr.msc → Windows Logs → Security → Filter Current Log**. Enter `4624,4625,4720,4732,1102`. Use **Save All Events As** for an EVTX copy. In `secpol.msc` use **Advanced Audit Policy Configuration → System Audit Policies** to configure the required subcategory, not both competing legacy and advanced settings.
+**🖱️ Clicking (GUI):** **Win + R → eventvwr.msc → Windows Logs → Security → Filter Current Log**. Enter `4624,4625,4720,4732,1102`. Use **Save All Events As** for an EVTX copy. In `secpol.msc` use **Advanced Audit Policy Configuration → System Audit Policies** to configure the required subcategory, not both competing legacy and advanced settings.
 
-**Typing (check):** Elevated PowerShell:
+**🔎 Typing (check):** Elevated PowerShell:
 
 ```powershell
 auditpol /get /category:*
@@ -3680,7 +3733,7 @@ Get-WinEvent -FilterHashtable @{LogName='Security';Id=4624,4625,4720,4732,1102;S
 
 4624 is a successful logon; 4625 is failure; 4720 creates a user; 4732 adds a member to a local security group; 1102 records clearing the Security audit log. Read the target account, source address and logon type, not just the event ID.
 
-**Typing (fix, only when appropriate):** On an English installation, enable a selected useful subcategory:
+**🛠️ Typing (fix, only when appropriate):** On an English installation, enable a selected useful subcategory:
 
 ```powershell
 auditpol /set /subcategory:"Logon" /success:enable /failure:enable
@@ -3688,25 +3741,25 @@ auditpol /set /subcategory:"Logon" /success:enable /failure:enable
 
 Use `auditpol /list /subcategory:*` to find localized names. Process creation events need their own policy; command-line capture may expose secrets.
 
-**Check it worked:** `auditpol /get /subcategory:"Logon"` should show Success and Failure. Test a normal permitted login and inspect its event. Confirm log retention and maximum size in **Security → Properties**.
+**✅ Check it worked:** `auditpol /get /subcategory:"Logon"` should show Success and Failure. Test a normal permitted login and inspect its event. Confirm log retention and maximum size in **Security → Properties**.
 
-**Undo:** Restore the original subcategory or the audit CSV from 19.1. Preserve existing events; reverting policy does not require deleting logs.
+**↩️ Undo:** Restore the original subcategory or the audit CSV from 19.1. Preserve existing events; reverting policy does not require deleting logs.
 
-**Warnings:** Timestamp display follows local time. Correlate with timezone and system clock before inferring event order.
+**⚠️ Warnings:** Timestamp display follows local time. Correlate with timezone and system clock before inferring event order.
 
 ##### WS.19.5 Firewall rule inspection and required ports
 
 - [ ] Done
 
-**What:** Enable host firewall profiles and permit only the required application traffic.
+**🎯 What:** Enable host firewall profiles and permit only the required application traffic.
 
-**Why it matters:** An enabled firewall can still allow an unwanted inbound rule. A listener on localhost is different from a listener on every address.
+**💡 Why it matters:** An enabled firewall can still allow an unwanted inbound rule. A listener on localhost is different from a listener on every address.
 
-**Before changing anything:** Export the firewall, identify the current profile, service executable, protocol, local port and authorized source networks. Never reset the firewall as a first step.
+**🛑 Before changing anything:** Export the firewall, identify the current profile, service executable, protocol, local port and authorized source networks. Never reset the firewall as a first step.
 
-**Clicking (GUI):** **Win + R → wf.msc**. Open **Windows Defender Firewall Properties**; enable the appropriate Domain, Private and Public profiles, normally block unmatched inbound and allow outbound. Under **Inbound Rules**, double-click a candidate rule and inspect **Programs and Services**, **Protocols and Ports**, **Scope**, **Advanced** and **General**. Disable only a confirmed unauthorized rule. For a required service, **New Rule → Custom**, scope it to the program/port and authorized remote IPs, choose the appropriate profiles, and give it a descriptive name.
+**🖱️ Clicking (GUI):** **Win + R → wf.msc**. Open **Windows Defender Firewall Properties**; enable the appropriate Domain, Private and Public profiles, normally block unmatched inbound and allow outbound. Under **Inbound Rules**, double-click a candidate rule and inspect **Programs and Services**, **Protocols and Ports**, **Scope**, **Advanced** and **General**. Disable only a confirmed unauthorized rule. For a required service, **New Rule → Custom**, scope it to the program/port and authorized remote IPs, choose the appropriate profiles, and give it a descriptive name.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-NetConnectionProfile
@@ -3722,7 +3775,7 @@ Get-NetUDPEndpoint | Select-Object LocalAddress,LocalPort,OwningProcess
 Get-NetFirewallRule -Name 'CP-Required-HTTPS' -ErrorAction SilentlyContinue | Get-NetFirewallPortFilter
 ```
 
-**Typing (fix, only when appropriate):** This example allows required HTTPS from the example lab network; replace the subnet and profile before use:
+**🛠️ Typing (fix, only when appropriate):** This example allows required HTTPS from the example lab network; replace the subnet and profile before use:
 
 ```powershell
 New-NetFirewallRule -Name 'CP-Required-HTTPS' -DisplayName 'CP Required HTTPS from lab' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 443 -RemoteAddress 192.168.10.0/24 -Profile Private
@@ -3734,25 +3787,25 @@ Create and verify required exceptions before enabling a previously disabled prof
 Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 ```
 
-**Check it worked:** Repeat the profile query. From an authorized second machine run `Test-NetConnection server-name -Port 443` in PowerShell, then open the actual HTTPS site. `TcpTestSucceeded : True` proves TCP establishment, not application correctness. Test an unauthorized path only in the permitted lab.
+**✅ Check it worked:** Repeat the profile query. From an authorized second machine run `Test-NetConnection server-name -Port 443` in PowerShell, then open the actual HTTPS site. `TcpTestSucceeded : True` proves TCP establishment, not application correctness. Test an unauthorized path only in the permitted lab.
 
-**Undo:** Remove only the rule you created with `Remove-NetFirewallRule -Name 'CP-Required-HTTPS'`, or restore a disabled rule by its recorded Name. Whole-policy import (`netsh advfirewall import ...`) replaces policy and can remove later valid changes; review first and use the console.
+**↩️ Undo:** Remove only the rule you created with `Remove-NetFirewallRule -Name 'CP-Required-HTTPS'`, or restore a disabled rule by its recorded Name. Whole-policy import (`netsh advfirewall import ...`) replaces policy and can remove later valid changes; review first and use the console.
 
-**Warnings:** Group Policy rules can override local behavior. Avoid broad `Any` source/port exceptions and disabling the whole firewall to troubleshoot one service.
+**⚠️ Warnings:** Group Policy rules can override local behavior. Avoid broad `Any` source/port exceptions and disabling the whole firewall to troubleshoot one service.
 
 ##### WS.19.6 Defender, updates and application health
 
 - [ ] Done
 
-**What:** Check protection state, pending security updates and required applications.
+**🎯 What:** Check protection state, pending security updates and required applications.
 
-**Why it matters:** An installed antivirus product may be passive or have exclusions that defeat protection. Scan/remediation can modify evidence.
+**💡 Why it matters:** An installed antivirus product may be passive or have exclusions that defeat protection. Scan/remediation can modify evidence.
 
-**Before changing anything:** Answer relevant forensics questions. Record third-party antivirus, exclusions, update policy and required application versions. Windows 10's ordinary support ended in October 2025; check the image's edition/support arrangement instead of assuming all versions receive regular updates.
+**🛑 Before changing anything:** Answer relevant forensics questions. Record third-party antivirus, exclusions, update policy and required application versions. Windows 10's ordinary support ended in October 2025; check the image's edition/support arrangement instead of assuming all versions receive regular updates.
 
-**Clicking (GUI):** **Windows Security → Virus & threat protection → Manage settings**; inspect real-time/cloud protection, exclusions and **Protection history**. Do not remove an exclusion merely because it exists; verify its purpose. Open **Settings → Windows Update → Update history** and each required application's **Help → About** page. On this Server, use the Server Manager, Server Core/sconfig or organizational update tool procedure in **5.3** above.
+**🖱️ Clicking (GUI):** **Windows Security → Virus & threat protection → Manage settings**; inspect real-time/cloud protection, exclusions and **Protection history**. Do not remove an exclusion merely because it exists; verify its purpose. Open **Settings → Windows Update → Update history** and each required application's **Help → About** page. On this Server, use the Server Manager, Server Core/sconfig or organizational update tool procedure in **5.3** above.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-MpComputerStatus | Select-Object AMRunningMode,AntivirusEnabled,RealTimeProtectionEnabled,AntivirusSignatureLastUpdated
@@ -3762,7 +3815,7 @@ Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 10
 
 Passive mode may be intentional with another antivirus. `Get-HotFix` is not a complete update inventory; Windows Update remains the main pending-update check.
 
-**Typing (fix, only when appropriate):** When Defender is the required active antivirus:
+**🛠️ Typing (fix, only when appropriate):** When Defender is the required active antivirus:
 
 ```powershell
 Update-MpSignature
@@ -3776,23 +3829,23 @@ Start-MpScan -ScanType QuickScan
 
 Use the GUI to install offered OS updates and trusted vendor updates; do not install an unreviewed PowerShell module just to update Windows.
 
-**Check it worked:** Recheck signature time, Protection history and the update page. Open each required application and test the README function. Reboot only at an appropriate checkpoint after installers finish.
+**✅ Check it worked:** Recheck signature time, Protection history and the update page. Open each required application and test the README function. Reboot only at an appropriate checkpoint after installers finish.
 
-**Undo:** Restore only a wrongly changed preference using its recorded value. Do not restore quarantined malware to the live image merely to recover points. If an update breaks a required function, investigate the exact update and supported recovery option; do not disable future updates wholesale.
+**↩️ Undo:** Restore only a wrongly changed preference using its recorded value. Do not restore quarantined malware to the live image merely to recover points. If an update breaks a required function, investigate the exact update and supported recovery option; do not disable future updates wholesale.
 
-**Warnings:** Tamper Protection or organizational policy may reject PowerShell edits. Do not weaken those controls to force a setting. Updates can require more than one restart; do not interrupt an in-progress update to follow a rigid one-reboot rule.
+**⚠️ Warnings:** Tamper Protection or organizational policy may reject PowerShell edits. Do not weaken those controls to force a setting. Updates can require more than one restart; do not interrupt an in-progress update to follow a rigid one-reboot rule.
 
 ##### WS.19.7 SMB share permissions and NTFS permissions
 
 - [ ] Done
 
-**What:** Validate both the network share ACL and the underlying NTFS ACL.
+**🎯 What:** Validate both the network share ACL and the underlying NTFS ACL.
 
-**Why it matters:** Effective network access is limited by both layers; denying a broad group can unintentionally block administrators too.
+**💡 Why it matters:** Effective network access is limited by both layers; denying a broad group can unintentionally block administrators too.
 
-**Before changing anything:** Record share name, path, description and authorized readers/writers. Preserve forensic files and original ACLs. Do not remove system shares or use recursive permission resets on Windows directories.
+**🛑 Before changing anything:** Record share name, path, description and authorized readers/writers. Preserve forensic files and original ACLs. Do not remove system shares or use recursive permission resets on Windows directories.
 
-**Clicking (GUI):** `fsmgmt.msc` → **Shares** → required share **Properties → Share Permissions**. Then open its folder **Properties → Security → Advanced**; inspect inheritance and **Effective Access** for a representative user. Remove only the unintended grant; keep application identities.
+**🖱️ Clicking (GUI):** `fsmgmt.msc` → **Shares** → required share **Properties → Share Permissions**. Then open its folder **Properties → Security → Advanced**; inspect inheritance and **Effective Access** for a representative user. Remove only the unintended grant; keep application identities.
 
 **Typing (check and backup):** Administrator PowerShell, using the real share/folder:
 
@@ -3805,7 +3858,7 @@ icacls C:\Shares\Public /save C:\CP-Backups\public-acl.txt /t /c
 
 `F` means Full control, `M` Modify, `RX` Read/execute, and `(I)` inherited. Errors during the recursive backup mean some ACLs were not saved; investigate before relying on it.
 
-**Typing (fix, only when appropriate):** For an actual authorized local group `StaffReaders`:
+**🛠️ Typing (fix, only when appropriate):** For an actual authorized local group `StaffReaders`:
 
 ```powershell
 Grant-SmbShareAccess -Name Public -AccountName StaffReaders -AccessRight Read -Force
@@ -3813,25 +3866,25 @@ Grant-SmbShareAccess -Name Public -AccountName StaffReaders -AccessRight Read -F
 
 Then use the Security GUI to grant the matching folder read access and remove only confirmed excess write access. Grant authorized access before revoking an existing broad entry.
 
-**Check it worked:** Test reading and, where required, writing from a second machine as an ordinary authorized user. Test an unauthorized user separately. Administrator success does not prove ordinary users can connect.
+**✅ Check it worked:** Test reading and, where required, writing from a second machine as an ordinary authorized user. Test an unauthorized user separately. Administrator success does not prove ordinary users can connect.
 
-**Undo:** Restore the recorded share grants individually. For the saved ACL above use `icacls C:\Shares /restore C:\CP-Backups\public-acl.txt` after confirming the parent path. Do not recreate a deleted share from memory.
+**↩️ Undo:** Restore the recorded share grants individually. For the saved ACL above use `icacls C:\Shares /restore C:\CP-Backups\public-acl.txt` after confirming the parent path. Do not recreate a deleted share from memory.
 
-**Warnings:** Share permissions do not protect local file access. Removing Everyone without providing the required replacement can break a legitimate share.
+**⚠️ Warnings:** Share permissions do not protect local file access. Removing Everyone without providing the required replacement can break a legitimate share.
 
 ##### WS.19.8 Scheduled tasks, startup, registry and suspicious executables
 
 - [ ] Done
 
-**What:** Trace each suspicious process back to the mechanism that launches it.
+**🎯 What:** Trace each suspicious process back to the mechanism that launches it.
 
-**Why it matters:** Killing a process without addressing persistence lets it return. Encoded PowerShell, Python and unusual paths are leads, not proof of malware.
+**💡 Why it matters:** Killing a process without addressing persistence lets it return. Encoded PowerShell, Python and unusual paths are leads, not proof of malware.
 
-**Before changing anything:** Record the task action, trigger, account, executable path, command line, signature and hash. Export the task/registry key. Never launch a suspicious executable to identify it.
+**🛑 Before changing anything:** Record the task action, trigger, account, executable path, command line, signature and hash. Export the task/registry key. Never launch a suspicious executable to identify it.
 
-**Clicking (GUI):** `taskschd.msc` → **Task Scheduler Library** → task → inspect **Actions**, **Triggers**, **General**, **History**; right-click **Export** to save XML, then **Disable** for reversible containment after evidence collection. **Task Manager → Startup apps → Disable** applies only to that entry. For registry changes, open `regedit`, select the exact key, choose **File → Export → Selected branch**.
+**🖱️ Clicking (GUI):** `taskschd.msc` → **Task Scheduler Library** → task → inspect **Actions**, **Triggers**, **General**, **History**; right-click **Export** to save XML, then **Disable** for reversible containment after evidence collection. **Task Manager → Startup apps → Disable** applies only to that entry. For registry changes, open `regedit`, select the exact key, choose **File → Export → Selected branch**.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,ExecutablePath,CommandLine
@@ -3846,7 +3899,7 @@ Get-FileHash -LiteralPath 'C:\Users\Public\suspect.exe' -Algorithm SHA256
 Get-AuthenticodeSignature -LiteralPath 'C:\Users\Public\suspect.exe'
 ```
 
-**Typing (fix, only when appropriate):** Disable a confirmed unauthorized task:
+**🛠️ Typing (fix, only when appropriate):** Disable a confirmed unauthorized task:
 
 ```powershell
 Disable-ScheduledTask -TaskName 'BadTask'
@@ -3862,25 +3915,25 @@ reg.exe export 'HKCU\Software\Microsoft\Windows\CurrentVersion\Run' C:\CP-Backup
 Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'Updater'
 ```
 
-**Check it worked:** Query the task state again (expected `Disabled`), inspect the precise registry value, and check whether the process/listener returns after an authorized restart or login. Verify required updater/backup tasks still work.
+**✅ Check it worked:** Query the task state again (expected `Disabled`), inspect the precise registry value, and check whether the process/listener returns after an authorized restart or login. Verify required updater/backup tasks still work.
 
-**Undo:** Re-enable the task with `Enable-ScheduledTask -TaskName 'BadTask'` only if it was misidentified. Restore a deleted task from its XML using Task Scheduler **Import Task**, checking the principal and credentials. A registry import merges values; restore the specific value when possible.
+**↩️ Undo:** Re-enable the task with `Enable-ScheduledTask -TaskName 'BadTask'` only if it was misidentified. Restore a deleted task from its XML using Task Scheduler **Import Task**, checking the principal and credentials. A registry import merges values; restore the specific value when possible.
 
-**Warnings:** Stop at evidence collection if a forensic question remains unresolved. `sc.exe delete`, `Unregister-ScheduledTask` and `Remove-Item` are destructive; use them only after positive identification and recovery planning. Preserve suspicious scripts as text, never execute decoded payloads.
+**⚠️ Warnings:** Stop at evidence collection if a forensic question remains unresolved. `sc.exe delete`, `Unregister-ScheduledTask` and `Remove-Item` are destructive; use them only after positive identification and recovery planning. Preserve suspicious scripts as text, never execute decoded payloads.
 
 ##### WS.19.9 Final troubleshooting decision path
 
 - [ ] Done
 
-**What:** Verify authentication, networking, security state and required functions after changes.
+**🎯 What:** Verify authentication, networking, security state and required functions after changes.
 
-**Why it matters:** Scoring can lag or fail to update when DNS, time, networking or a required service breaks.
+**💡 Why it matters:** Scoring can lag or fail to update when DNS, time, networking or a required service breaks.
 
-**Before changing anything:** Record the last successful test and last change. Use the VM console if remote access fails.
+**🛑 Before changing anything:** Record the last successful test and last change. Use the VM console if remote access fails.
 
-**Clicking (GUI):** Check the Scoring Report timestamp, Services, Event Viewer **System/Application**, and the application's own error page. Do not change the scoring agent or its files.
+**🖱️ Clicking (GUI):** Check the Scoring Report timestamp, Services, Event Viewer **System/Application**, and the application's own error page. Do not change the scoring agent or its files.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 Get-NetIPConfiguration
@@ -3892,13 +3945,13 @@ Get-WinEvent -FilterHashtable @{LogName='System';Level=2;StartTime=(Get-Date).Ad
 
 Replace the DNS target with the README-required internal hostname; internet DNS failure on an offline lab is not automatically a fault. An update service can be stopped while idle, but should not be Disabled.
 
-**Typing (fix, only when appropriate):** Restore the most recent specific setting if tests failed immediately after it. Follow the relevant section's rollback; do not reset all networking, uninstall security tools or repeatedly reboot.
+**🛠️ Typing (fix, only when appropriate):** Restore the most recent specific setting if tests failed immediately after it. Follow the relevant section's rollback; do not reset all networking, uninstall security tools or repeatedly reboot.
 
-**Check it worked:** Test an ordinary user login, admin elevation, required website/share/remote session, and report freshness. Check pending restarts and save final forensics answers.
+**✅ Check it worked:** Test an ordinary user login, admin elevation, required website/share/remote session, and report freshness. Check pending restarts and save final forensics answers.
 
-**Undo:** If a proposed repair fails, return that repair to its recorded starting state before trying another theory.
+**↩️ Undo:** If a proposed repair fails, return that repair to its recorded starting state before trying another theory.
 
-**Warnings:** An error message is evidence. Record it exactly and investigate its source rather than hiding it with broad `-ErrorAction SilentlyContinue`.
+**⚠️ Warnings:** An error message is evidence. Record it exactly and investigate its source rather than hiding it with broad `-ErrorAction SilentlyContinue`.
 
 
 ---
@@ -3989,15 +4042,15 @@ Press **Windows key + R**, type one of these, press Enter:
 
 - [ ] Done
 
-**What:** Learn how to inspect PowerShell output and edit a harmless file before modifying security settings.
+**🎯 What:** Learn how to inspect PowerShell output and edit a harmless file before modifying security settings.
 
-**Why it matters:** PowerShell pipelines pass objects, not just printed text. Formatting is for display; it should normally come last in a pipeline.
+**💡 Why it matters:** PowerShell pipelines pass objects, not just printed text. Formatting is for display; it should normally come last in a pipeline.
 
-**Before changing anything:** Use ordinary Windows PowerShell for this exercise; administrator rights are not needed. Most handbook examples target Windows PowerShell 5.1 on Windows. A module absent from PowerShell 7 is not proof the Windows role is missing.
+**🛑 Before changing anything:** Use ordinary Windows PowerShell for this exercise; administrator rights are not needed. Most handbook examples target Windows PowerShell 5.1 on Windows. A module absent from PowerShell 7 is not proof the Windows role is missing.
 
-**Clicking (GUI):** **Start → Windows PowerShell**. Use File Explorer to view your personal profile folder. Run as administrator only for procedures that require it; do not approve an unknown script merely because it requests elevation.
+**🖱️ Clicking (GUI):** **Start → Windows PowerShell**. Use File Explorer to view your personal profile folder. Run as administrator only for procedures that require it; do not approve an unknown script merely because it requests elevation.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ```powershell
 $PSVersionTable.PSVersion
@@ -4026,7 +4079,7 @@ notepad.exe $practiceFile
 
 Edit and save the file. `-LiteralPath` treats wildcard characters literally; quote paths containing spaces. A backtick is PowerShell's escape/continuation character; copying a broken continuation can change a command.
 
-**Check it worked:**
+**✅ Check it worked:**
 
 ```powershell
 Get-Content -LiteralPath $practiceFile
@@ -4035,7 +4088,7 @@ Test-Path -LiteralPath "$practiceFile.before"
 
 Expected: your changed text and `True`. For cmdlets inspect the full red error and `$Error[0]`; for native programs inspect `$LASTEXITCODE` immediately after that program. ErrorAction SilentlyContinue hides errors and can make incomplete searches look empty.
 
-**Undo:**
+**↩️ Undo:**
 
 ```powershell
 Copy-Item -LiteralPath "$practiceFile.before" -Destination $practiceFile
@@ -4044,7 +4097,7 @@ Get-Content -LiteralPath $practiceFile
 
 Expected: `original value`. This file restore does not model account/password recovery; those have different limits.
 
-**Warnings:** `-WhatIf` exists only on commands that support it, and its preview does not test downstream dependencies. Use `Get-Help COMMAND -Full` to check support. Use `sc.exe` for Service Control; `sc` in Windows PowerShell is an alias for Set-Content. Never use `Invoke-Expression` to inspect a suspicious string.
+**⚠️ Warnings:** `-WhatIf` exists only on commands that support it, and its preview does not test downstream dependencies. Use `Get-Help COMMAND -Full` to check support. Use `sc.exe` for Service Control; `sc` in Windows PowerShell is an alias for Set-Content. Never use `Invoke-Expression` to inspect a suspicious string.
 
 
 ---
@@ -4061,9 +4114,9 @@ This supplement draws topic ideas from public CyberPatriot checklists and verifi
 
 - [ ] Reviewed effective configuration and policy source.
 
-**Why:** A value changed in \`secpol.msc\` or the registry can be replaced by a domain Group Policy. On a Domain Controller, editing an arbitrary local policy is not a substitute for checking domain-level policy.
+**💡 Why:** A value changed in \`secpol.msc\` or the registry can be replaced by a domain Group Policy. On a Domain Controller, editing an arbitrary local policy is not a substitute for checking domain-level policy.
 
-**Clicking:** Press **Win + R** → \`rsop.msc\` (if available); review **Computer Configuration**. On domain-joined systems use **Group Policy Management** (\`gpmc.msc\`) **only if installed and authorized**. Do not disable a linked GPO merely to fix one setting.
+**🖱️ Clicking:** Press **Win + R** → \`rsop.msc\` (if available); review **Computer Configuration**. On domain-joined systems use **Group Policy Management** (\`gpmc.msc\`) **only if installed and authorized**. Do not disable a linked GPO merely to fix one setting.
 
 **Typing (check, elevated Command Prompt or PowerShell):**
 
@@ -4079,9 +4132,9 @@ gpresult /h "$env:TEMP\cp-rsop.html" /f
 Start-Process "$env:TEMP\cp-rsop.html"
 ~~~
 
-**Interpretation:** \`PartOfDomain = True\` means domain policies may apply. The report's **Applied Group Policy Objects** and **Denied GPOs** help explain conflicts; a local-only or unconfigured policy may show less information. \`gpresult\` can report no RSoP data for the target scope—investigate context rather than assume a missing policy is a security failure.
+**🧠 Interpretation:** \`PartOfDomain = True\` means domain policies may apply. The report's **Applied Group Policy Objects** and **Denied GPOs** help explain conflicts; a local-only or unconfigured policy may show less information. \`gpresult\` can report no RSoP data for the target scope—investigate context rather than assume a missing policy is a security failure.
 
-**Verification:** Compare the effective policy with the README and with the relevant **Local Security Policy** or **Group Policy** editor. If a setting changes after refresh, identify its **winning policy** before editing it.
+**✅ Verification:** Compare the effective policy with the README and with the relevant **Local Security Policy** or **Group Policy** editor. If a setting changes after refresh, identify its **winning policy** before editing it.
 
 **Recovery:** Revert the *specific* policy change at its actual policy source. Keep an export/screenshot of the original setting. Changing a domain GPO can affect many machines.
 
@@ -4089,7 +4142,7 @@ Start-Process "$env:TEMP\cp-rsop.html"
 
 - [ ] Compared service names, binary paths, and required roles.
 
-**Clicking:** **Win + R → services.msc** → double-click a service → note **Service name**, **Path to executable**, **Log On**, **Dependencies**. Do not stop it yet.
+**🖱️ Clicking:** **Win + R → services.msc** → double-click a service → note **Service name**, **Path to executable**, **Log On**, **Dependencies**. Do not stop it yet.
 
 **Typing (check, elevated PowerShell):**
 
@@ -4118,7 +4171,7 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Path\To\Suspect.exe' |
   Format-List Status,SignerCertificate
 ~~~
 
-**Verification:** Compare publisher, path, hash, and service need against trusted vendor information and the README. A missing signature does not automatically prove malware.
+**✅ Verification:** Compare publisher, path, hash, and service need against trusted vendor information and the README. A missing signature does not automatically prove malware.
 
 **Recovery:** If a change is authorized, document the original \`StartMode\`, stop/disabling only that confirmed unwanted service using the existing checklist, and recheck required applications and the score. Never delete the executable before recording relevant forensic answers.
 
@@ -4126,9 +4179,9 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Path\To\Suspect.exe' |
 
 - [ ] Checked available logs without clearing them.
 
-**Clicking:** **Win + R → eventvwr.msc** → **Windows Logs → System** or **Security** → **Filter Current Log**. Record timestamps with timezone, event IDs, provider, and the full message.
+**🖱️ Clicking:** **Win + R → eventvwr.msc** → **Windows Logs → System** or **Security** → **Filter Current Log**. Record timestamps with timezone, event IDs, provider, and the full message.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-WinEvent -FilterHashtable @{
@@ -4156,13 +4209,13 @@ Get-WinEvent -FilterHashtable @{
 | 4697 | Service installation recorded in Security if configured |
 | 7045 | Service installed, shown in System |
 
-**Interpretation:** Errors such as **No events were found** do not prove an action never happened. Logging, retention, permissions, and audit policy affect visibility. To check the present policy:
+**🧠 Interpretation:** Errors such as **No events were found** do not prove an action never happened. Logging, retention, permissions, and audit policy affect visibility. To check the present policy:
 
 ~~~powershell
 auditpol /get /category:*
 ~~~
 
-**Verification:** Tie a suspicious event to an account, timestamp, executable and known system change. Avoid relying on one isolated log entry.
+**✅ Verification:** Tie a suspicious event to an account, timestamp, executable and known system change. Avoid relying on one isolated log entry.
 
 **Recovery:** If auditing was intentionally changed, restore only its original documented configuration; **never clear logs** to “clean” the machine.
 
@@ -4170,9 +4223,9 @@ auditpol /get /category:*
 
 - [ ] Reviewed login-start items and task actions.
 
-**GUI:** **Win + R → taskschd.msc** → **Task Scheduler Library**; inspect **Triggers**, **Actions**, **Author** and **History**. Open **Task Manager → Startup apps** for login items.
+**🖱️ GUI:** **Win + R → taskschd.msc** → **Task Scheduler Library**; inspect **Triggers**, **Actions**, **Author** and **History**. Open **Task Manager → Startup apps** for login items.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-CimInstance Win32_StartupCommand |
@@ -4192,9 +4245,9 @@ Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
 ~~~
 
-**Interpretation:** A task with an obscure name or PowerShell arguments warrants inspection, but scheduled updates and enterprise management agents are legitimate too. Record the exact executable and arguments before taking action.
+**🧠 Interpretation:** A task with an obscure name or PowerShell arguments warrants inspection, but scheduled updates and enterprise management agents are legitimate too. Record the exact executable and arguments before taking action.
 
-**Verification:** Correlate task path, binary signature and Event Viewer findings. Do not run the task to see what happens.
+**✅ Verification:** Correlate task path, binary signature and Event Viewer findings. Do not run the task to see what happens.
 
 **Recovery:** For a confirmed unauthorized task, prefer **Disable** before **Delete** (after preserving evidence). Record the original trigger and action; test whether required applications still work.
 
@@ -4202,9 +4255,9 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 
 - [ ] Checked authorized shares and effective paths.
 
-**GUI:** **Win + R → fsmgmt.msc** (when available) → **Shares**. Review share name, local path and active sessions. In File Explorer: folder → **Properties → Sharing / Security**.
+**🖱️ GUI:** **Win + R → fsmgmt.msc** (when available) → **Shares**. Review share name, local path and active sessions. In File Explorer: folder → **Properties → Sharing / Security**.
 
-**Typing (check):**
+**🔎 Typing (check):**
 
 ~~~powershell
 Get-SmbShare | Select-Object Name,Path,Description,Special
@@ -4217,9 +4270,9 @@ Get-SmbShareAccess -Name 'ExampleShare'
 Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
 ~~~
 
-**Interpretation:** Share permissions and NTFS permissions both matter. Hidden administrative shares (for example \`C$\`) are not by themselves proof of malware. A broad \`Everyone\` share right may be constrained by NTFS, but it still needs review.
+**🧠 Interpretation:** Share permissions and NTFS permissions both matter. Hidden administrative shares (for example \`C$\`) are not by themselves proof of malware. A broad \`Everyone\` share right may be constrained by NTFS, but it still needs review.
 
-**Verification:** Test with a **legitimate non-admin** account that should read or write, and a separate account that should be denied. Protect required shared folders and server roles.
+**✅ Verification:** Test with a **legitimate non-admin** account that should read or write, and a separate account that should be denied. Protect required shared folders and server roles.
 
 **Recovery:** Save both ACL layers before changing. Reverse only the particular group entry or share configuration changed; never recursively reset \`C:\Windows\` permissions.
 
@@ -4248,9 +4301,9 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
   Format-Table -AutoSize
 ~~~
 
-**Interpretation:** An allowed rule is not necessarily reachable: scope, profile, address filters, enabled state, underlying service and other policy conditions matter. A listening port may serve an explicitly required role.
+**🧠 Interpretation:** An allowed rule is not necessarily reachable: scope, profile, address filters, enabled state, underlying service and other policy conditions matter. A listening port may serve an explicitly required role.
 
-**Verification:** From an authorized client, test required application connectivity after any **narrow** firewall change. Avoid blanket removal of inbound rules.
+**✅ Verification:** From an authorized client, test required application connectivity after any **narrow** firewall change. Avoid blanket removal of inbound rules.
 
 ##### WS.21.7 Final verification checklist
 
@@ -4270,7 +4323,14 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 - [Microsoft: Event 4697 (service installation)](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4697)
 - Topic cross-checks: [chessischess CyberPatriot checklists](https://github.com/chessischess/cyberpatriot-checklist), [Minagera Windows checklist](https://github.com/Minagera/CyberPatriot/blob/main/CyberPatriot/Checklists/Windows/README.md).
 
+---
+
+<a id="stage-6"></a>
 ## Part 6 — Final Verification
+
+> [!TIP]
+> ✅ **Finish strong:** Verify the final configuration, required functionality, and saved evidence.
+
 
 Retest authorized domain/local login, critical role transactions, management access and scoring status.
 
