@@ -43,10 +43,10 @@
 
 ### Windows terms and tools to understand first
 
-- [ ] Identify the version/edition, local versus domain accounts, Administrators group, services and network profile.
-- [ ] Know **Win+R → powershell**, **services.msc**, **lusrmgr.msc**, **secpol.msc**, **eventvwr.msc**, **taskschd.msc**, and **wf.msc**. Some tools are unavailable on Home editions.
-- [ ] Understand read-only Get commands versus modifying Set, Remove and Disable commands.
-- [ ] Keep authorized administrator access and a record of every original setting.
+- [ ] **🎯 DO THIS —** Identify the version/edition, local versus domain accounts, Administrators group, services and network profile.
+- [ ] **🎯 DO THIS —** Know **Win+R → powershell**, **services.msc**, **lusrmgr.msc**, **secpol.msc**, **eventvwr.msc**, **taskschd.msc**, and **wf.msc**. Some tools are unavailable on Home editions.
+- [ ] **🎯 DO THIS —** Understand read-only Get commands versus modifying Set, Remove and Disable commands.
+- [ ] **🎯 DO THIS —** Keep authorized administrator access and a record of every original setting.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
 
@@ -1105,7 +1105,7 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 <a id="research-expansion-defender-exclusions-effective-firewall-and-smb-versions"></a>
 ### 🛡️ Defender exclusions, effective firewall and SMB versions
 
-- [ ] Compare each finding to the README before changing it.
+- [ ] **🎯 DO THIS —** Compare each finding to the README before changing it.
 
 **⭐ EASIEST WAY — Click through the GUI:** Start → **Windows Security → Virus & threat protection**, verify protection provider and signature freshness; then **Firewall & network protection**. If settings are managed, inspect the applicable policy source rather than forcing the registry.
 
@@ -3109,7 +3109,7 @@ If the README says this computer runs a website, FTP or file shares, harden them
 <a id="research-expansion-startup-persistence-and-active-network-listeners"></a>
 ### 🛡️ startup persistence and active network listeners
 
-- [ ] Check installed software, remote-access tools, services, tasks and ports without executing unknown files.
+- [ ] **🎯 DO THIS —** Check installed software, remote-access tools, services, tasks and ports without executing unknown files.
 
 ~~~powershell
 Get-CimInstance Win32_StartupCommand | Select-Object Name,Command,Location,User
@@ -3989,7 +3989,7 @@ This supplement draws topic ideas from public CyberPatriot checklists and verifi
 
 #### 21.1 Find the setting that actually applies (GPO versus local policy)
 
-- [ ] Reviewed effective configuration and policy source.
+- [ ] **🎯 DO THIS —** Reviewed effective configuration and policy source.
 
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
@@ -4023,7 +4023,7 @@ Start-Process "$env:TEMP\cp-rsop.html"
 
 #### 21.2 Correlate suspicious services with their executable files
 
-- [ ] Compared service names, binary paths, and required roles.
+- [ ] **🎯 DO THIS —** Compared service names, binary paths, and required roles.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → services.msc** → double-click a service → note **Service name**, **Path to executable**, **Log On**, **Dependencies**. Do not stop it yet.
 
@@ -4066,7 +4066,7 @@ Get-CimInstance Win32_Service -Filter "Name='RemoteRegistry'" |
 
 #### 21.3 Investigate events: service installation, login attempts and process creation
 
-- [ ] Checked available logs without clearing them.
+- [ ] **🎯 DO THIS —** Checked available logs without clearing them.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → eventvwr.msc** → **Windows Logs → System** or **Security** → **Filter Current Log**. Record timestamps with timezone, event IDs, provider, and the full message.
 
@@ -4114,7 +4114,7 @@ auditpol /get /category:*
 
 #### 21.4 Inspect persistence without executing unknown files
 
-- [ ] Reviewed login-start items and task actions.
+- [ ] **🎯 DO THIS —** Reviewed login-start items and task actions.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → taskschd.msc** → **Task Scheduler Library**; inspect **Triggers**, **Actions**, **Author** and **History**. Open **Task Manager → Startup apps** for login items.
 
@@ -4150,7 +4150,7 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 
 #### 21.5 SMB share + NTFS access: check both layers
 
-- [ ] Checked authorized shares and effective paths.
+- [ ] **🎯 DO THIS —** Checked authorized shares and effective paths.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → fsmgmt.msc** (when available) → **Shares**. Review share name, local path and active sessions. In File Explorer: folder → **Properties → Sharing / Security**.
 
@@ -4179,7 +4179,7 @@ Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
 
 #### 21.6 Firewall rules that look open—but aren't applicable
 
-- [ ] Checked effective profiles, rules, ports, and service ownership.
+- [ ] **🎯 DO THIS —** Checked effective profiles, rules, ports, and service ownership.
 
 ~~~powershell
 Get-NetFirewallProfile | Format-Table Name,Enabled,DefaultInboundAction,DefaultOutboundAction
@@ -4210,13 +4210,13 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 
 #### 21.7 Final verification checklist
 
-- [ ] Read and preserved forensic questions.
-- [ ] Confirmed whether the machine is standalone, domain-joined or a Domain Controller.
-- [ ] Found the **effective** source for changed policies.
-- [ ] Correlated unknown services with executable paths and relevant logs.
-- [ ] Reviewed scheduled tasks/startup entries without executing unknown payloads.
-- [ ] Confirmed required shares, services and firewall connectivity remain operational.
-- [ ] Recorded any modification, verification result and rollback information.
+- [ ] **🎯 DO THIS —** Read and preserved forensic questions.
+- [ ] **🎯 DO THIS —** Confirmed whether the machine is standalone, domain-joined or a Domain Controller.
+- [ ] **🎯 DO THIS —** Found the **effective** source for changed policies.
+- [ ] **🎯 DO THIS —** Correlated unknown services with executable paths and relevant logs.
+- [ ] **🎯 DO THIS —** Reviewed scheduled tasks/startup entries without executing unknown payloads.
+- [ ] **🎯 DO THIS —** Confirmed required shares, services and firewall connectivity remain operational.
+- [ ] **🎯 DO THIS —** Recorded any modification, verification result and rollback information.
 
 #### 21.8 Sources and further reading
 
@@ -4239,10 +4239,10 @@ Retest authorized login, required applications, services and the scoring report 
 
 ### 18. Final checks
 
-- [ ] Critical services still running (`services.msc`)
-- [ ] You can still log in and open an admin PowerShell
-- [ ] Scoring Report shows **no penalties**
-- [ ] Forensics answers saved
-- [ ] Final snapshot
-- [ ] Reboot **once** at the end only if updates or Windows features (9.1) need it, then check the Scoring Report again
+- [ ] **🎯 DO THIS —** Critical services still running (`services.msc`)
+- [ ] **🎯 DO THIS —** You can still log in and open an admin PowerShell
+- [ ] **🎯 DO THIS —** Scoring Report shows **no penalties**
+- [ ] **🎯 DO THIS —** Forensics answers saved
+- [ ] **🎯 DO THIS —** Final snapshot
+- [ ] **🎯 DO THIS —** Reboot **once** at the end only if updates or Windows features (9.1) need it, then check the Scoring Report again
 

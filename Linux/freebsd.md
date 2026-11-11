@@ -55,10 +55,10 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 ## 0. Before you start
 
-- [ ] Read the README; write down admins, users, critical services.
-- [ ] Take a VMware snapshot.
-- [ ] Become root: `su -` (or `sudo -i` / `doas -s` if those are installed), then type `sh` (see the box above).
-- [ ] Answer the forensics questions ([guide](../General/All/forensics-questions.md)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
+- [ ] **🎯 DO THIS —** Read the README; write down admins, users, critical services.
+- [ ] **🎯 DO THIS —** Take a VMware snapshot.
+- [ ] **🎯 DO THIS —** Become root: `su -` (or `sudo -i` / `doas -s` if those are installed), then type `sh` (see the box above).
+- [ ] **🎯 DO THIS —** Answer the forensics questions ([guide](../General/All/forensics-questions.md)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
 
 ### 0.1 Fast path: run the hardening script
 - [ ] **🎯 DO THIS — 0.1 Fast path: run the hardening script**
@@ -487,10 +487,10 @@ grep ^flags /etc/security/audit_control       # e.g. flags:lo,aa,ad
 ---
 
 ## 12. Final checks
-- [ ] Critical services still running (`service <name> status`)
-- [ ] `pfctl -s info` → Status: Enabled
-- [ ] You can still `su -`
-- [ ] Scoring Report: no penalties
+- [ ] **🎯 DO THIS —** Critical services still running (`service <name> status`)
+- [ ] **🎯 DO THIS —** `pfctl -s info` → Status: Enabled
+- [ ] **🎯 DO THIS —** You can still `su -`
+- [ ] **🎯 DO THIS —** Scoring Report: no penalties
 
 ## 13. FreeBSD-specific recovery and service workflow
 

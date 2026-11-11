@@ -32,11 +32,11 @@
 
 ### Cisco basics you need before using the Packet Tracer CLI
 
-- [ ] Understand a **PC/host**, switch, router, gateway, interface/port, MAC address, IPv4 subnet, VLAN and trunk.
-- [ ] Know **User EXEC (>)**, **Privileged EXEC (#)**, **Global config ((config)#)**, and **interface config ((config-if)#)**.
-- [ ] Know that **show** commands inspect state while **configure terminal** changes the device. **end** returns to privileged EXEC, and a **no** command generally reverses a specific setting.
-- [ ] Understand saving: **copy running-config startup-config** saves active IOS changes; a Packet Tracer activity file must be saved/submitted separately.
-- [ ] Identify the activity's **required interfaces, addressing, passwords, VLANs and services** before making any change.
+- [ ] **🎯 DO THIS —** Understand a **PC/host**, switch, router, gateway, interface/port, MAC address, IPv4 subnet, VLAN and trunk.
+- [ ] **🎯 DO THIS —** Know **User EXEC (>)**, **Privileged EXEC (#)**, **Global config ((config)#)**, and **interface config ((config-if)#)**.
+- [ ] **🎯 DO THIS —** Know that **show** commands inspect state while **configure terminal** changes the device. **end** returns to privileged EXEC, and a **no** command generally reverses a specific setting.
+- [ ] **🎯 DO THIS —** Understand saving: **copy running-config startup-config** saves active IOS changes; a Packet Tracer activity file must be saved/submitted separately.
+- [ ] **🎯 DO THIS —** Identify the activity's **required interfaces, addressing, passwords, VLANs and services** before making any change.
 
 **⭐ EASIEST WAY — Cisco IOS CLI (device configuration):**
 
@@ -114,7 +114,7 @@ This is **Packet Tracer practice**, not a substitute for the separate [Cisco qui
 
 ### 0. Before you configure anything
 
-- [ ] Read the complete activity instructions and save the required files.
+- [ ] **🎯 DO THIS —** Read the complete activity instructions and save the required files.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:**
 1. Open **Cisco Packet Tracer**, using a compatible installation from the official [Getting Started with Packet Tracer](https://www.netacad.com/courses/getting-started-cisco-packet-tracer/1000) course.
@@ -133,7 +133,7 @@ This is **Packet Tracer practice**, not a substitute for the separate [Cisco qui
 
 ### 1. Inventory the topology
 
-- [ ] Completed a device/interface/address table before changing configuration.
+- [ ] **🎯 DO THIS —** Completed a device/interface/address table before changing configuration.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:** Select each router, switch, PC, server, AP and wireless router in the logical workspace. On routers/switches choose **CLI**, on PCs choose **Desktop → IP Configuration** and **Command Prompt**, and on Packet Tracer servers choose **Config / Services / Desktop** according to available tabs. Use **Physical** view when port modules or actual cabling must be inspected.
 
@@ -159,7 +159,7 @@ This is **Packet Tracer practice**, not a substitute for the separate [Cisco qui
 
 ### 2. IOS CLI and baseline inspection
 
-- [ ] Can identify each mode and collect a safe read-only baseline.
+- [ ] **🎯 DO THIS —** Can identify each mode and collect a safe read-only baseline.
 
 | CLI prompt | Mode | What it allows |
 |---|---|---|
@@ -248,7 +248,7 @@ Interfaces, addressing, VLANs, trunks and routing form the foundation for many o
 
 ### 3. Physical interfaces and links
 
-- [ ] Identified down interfaces and configured only those that the task needs enabled.
+- [ ] **🎯 DO THIS —** Identified down interfaces and configured only those that the task needs enabled.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:** Inspect the cable by hovering or using the physical links. End-device **Desktop → Command Prompt** can test connectivity once the link comes up. Choose the correct copper/fiber cable for the ports; automatic cable choice works in many Packet Tracer scenarios.
 
@@ -287,7 +287,7 @@ show interfaces gigabitEthernet 0/0
 
 ### 4. PCs, servers and IP addressing
 
-- [ ] Checked IP, subnet mask, default gateway and DNS of every required end device.
+- [ ] **🎯 DO THIS —** Checked IP, subnet mask, default gateway and DNS of every required end device.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:** PC → **Desktop → IP Configuration** → choose **Static** or **DHCP** exactly as instructed. For static IPv4 enter its IP, subnet mask, default gateway and DNS server. For IPv6 use the IPv6 section. Save/close the window; Packet Tracer generally persists settings within the activity file.
 
@@ -315,7 +315,7 @@ Replace the example gateway with the actual same-subnet router interface.
 
 ### 5. VLANs, access ports and trunks
 
-- [ ] Created the requested VLANs and verified each access port/uplink.
+- [ ] **🎯 DO THIS —** Created the requested VLANs and verified each access port/uplink.
 
 > [!NOTE]
 > **ℹ️ EXTRA INFO — not a second configuration task**
@@ -386,7 +386,7 @@ If supported, inspect a specific port using **show interfaces fastEthernet 0/5 s
 
 ### 6. Inter-VLAN routing
 
-- [ ] Selected the correct router-on-a-stick or Layer 3 switch design.
+- [ ] **🎯 DO THIS —** Selected the correct router-on-a-stick or Layer 3 switch design.
 
 #### 6.1 Router-on-a-stick
 
@@ -462,7 +462,7 @@ A VLAN SVI can be down because the VLAN lacks an active Layer 2 port. On a **Lay
 
 ### 7. Static and default routing
 
-- [ ] Verified forward **and return** routes before modifying topology.
+- [ ] **🎯 DO THIS —** Verified forward **and return** routes before modifying topology.
 
 **⭐ EASIEST WAY — Cisco IOS CLI (device configuration):**
 
@@ -509,7 +509,7 @@ traceroute 192.168.30.10
 
 ### 9. DHCP pools and relay
 
-- [ ] Identified the DHCP server/relay, lease scope, excluded addresses, gateway and DNS.
+- [ ] **🎯 DO THIS —** Identified the DHCP server/relay, lease scope, excluded addresses, gateway and DNS.
 
 #### 9.1 Router as DHCP server
 
@@ -566,7 +566,7 @@ If the actual DHCP server is a Packet Tracer **Server**, the router's **show ip 
 <a id="research-expansion-fast-reachability-and-configuration-inspection"></a>
 ### 🧩 fast reachability and configuration inspection
 
-- [ ] Check **one task at a time** and retain working neighboring VLANs/routes.
+- [ ] **🎯 DO THIS —** Check **one task at a time** and retain working neighboring VLANs/routes.
 
 | Task category often seen in learning exercises | Check first | Verify end-to-end |
 |---|---|---|
@@ -597,7 +597,7 @@ Apply security requirements only after verifying the network path and keeping re
 
 ### 10. Server and application services
 
-- [ ] Verified that each required service works at **application level**, not just with ping.
+- [ ] **🎯 DO THIS —** Verified that each required service works at **application level**, not just with ping.
 
 **Packet Tracer server GUI:** Select **Server → Services**. The available tabs depend on model and simulator version: typically **DNS, DHCP, HTTP, FTP, EMAIL, TFTP**. Use the name/address and user credentials provided by the activity.
 
@@ -628,7 +628,7 @@ Apply security requirements only after verifying the network path and keeping re
 
 ### 11. Port security and switch edge protections
 
-- [ ] Identified **true end-host ports** and required number of endpoint MACs.
+- [ ] **🎯 DO THIS —** Identified **true end-host ports** and required number of endpoint MACs.
 
 **⭐ EASIEST WAY — Cisco IOS CLI (device configuration):**
 
@@ -665,7 +665,7 @@ end
 
 ### 12. STP, EtherChannel and trunk security
 
-- [ ] Distinguished switch uplinks from edge ports and recorded the working spanning tree.
+- [ ] **🎯 DO THIS —** Distinguished switch uplinks from edge ports and recorded the working spanning tree.
 
 #### 12.1 STP and BPDU Guard
 
@@ -729,7 +729,7 @@ show interfaces trunk
 
 ### 13. IPv4 ACLs and filtering
 
-- [ ] Wrote the required **source, destination, protocol, port and direction** in plain English.
+- [ ] **🎯 DO THIS —** Wrote the required **source, destination, protocol, port and direction** in plain English.
 
 **Key ideas:** Standard IPv4 ACLs mainly match **source address**; extended ACLs can match source, destination, protocol and TCP/UDP ports. ACL entries run **top to bottom**, first match applies, and an **implicit deny** is present if no rule permits traffic. The wildcard mask **0** bits must match while **1** bits are ignored.
 
@@ -805,7 +805,7 @@ Do not delete a named ACL that other interfaces or systems still use. ACL direct
 
 ### 17. Secure device management
 
-- [ ] Checked access to console/VTY and required SSH **before** changing authentication.
+- [ ] **🎯 DO THIS —** Checked access to console/VTY and required SSH **before** changing authentication.
 
 > [!NOTE]
 > **ℹ️ EXTRA INFO — not a second configuration task**
@@ -855,11 +855,11 @@ end
 <a id="research-expansion-cisco-command-safety-and-compatibility"></a>
 ### 🧩 Cisco command safety and compatibility
 
-- [ ] Confirm the switch/router model before copying an IOS block: FastEthernet and GigabitEthernet port numbering varies.
-- [ ] Check interfaces and VLANs at **both ends**; one enabled trunk cannot compensate for an incorrect far-end allowed VLAN list.
-- [ ] On packet-filtering activities, document source, destination, transport, port and **direction** before applying a standard/extended ACL.
-- [ ] On SSH tasks, preserve console/authorized access first; don't replace provided passwords/keys with a public sample.
-- [ ] Test required server/client functions and save only after validation.
+- [ ] **🎯 DO THIS —** Confirm the switch/router model before copying an IOS block: FastEthernet and GigabitEthernet port numbering varies.
+- [ ] **🎯 DO THIS —** Check interfaces and VLANs at **both ends**; one enabled trunk cannot compensate for an incorrect far-end allowed VLAN list.
+- [ ] **🎯 DO THIS —** On packet-filtering activities, document source, destination, transport, port and **direction** before applying a standard/extended ACL.
+- [ ] **🎯 DO THIS —** On SSH tasks, preserve console/authorized access first; don't replace provided passwords/keys with a public sample.
+- [ ] **🎯 DO THIS —** Test required server/client functions and save only after validation.
 
 **⭐ EASIEST WAY — Cisco IOS CLI (device configuration):**
 
@@ -886,7 +886,7 @@ Dynamic routing, NAT/PAT, Wi-Fi, IPv6, simulation and full command references fo
 
 ### 8. Dynamic routing: OSPF, EIGRP and RIP
 
-- [ ] Confirmed the activity's exact routing protocol, area/AS, networks and router IDs.
+- [ ] **🎯 DO THIS —** Confirmed the activity's exact routing protocol, area/AS, networks and router IDs.
 
 #### 8.1 OSPF (Open Shortest Path First)
 
@@ -956,7 +956,7 @@ This example is **illustrative**: RIP network statements are historically classf
 
 ### 14. NAT and PAT
 
-- [ ] Confirmed NAT is **explicitly required** and identified inside/outside interfaces.
+- [ ] **🎯 DO THIS —** Confirmed NAT is **explicitly required** and identified inside/outside interfaces.
 
 > [!NOTE]
 > **ℹ️ EXTRA INFO — not a second configuration task**
@@ -1008,7 +1008,7 @@ An empty translation table without matching traffic doesn't necessarily mean a b
 
 ### 15. Wireless configuration
 
-- [ ] Confirmed required SSID, access point/router model, client adapters, security type and IP plan.
+- [ ] **🎯 DO THIS —** Confirmed required SSID, access point/router model, client adapters, security type and IP plan.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:**
 1. Select the **Wireless Router** or **Access Point** device; use **GUI**, **Config**, or **Wireless** tab as available. These tabs differ across device models.
@@ -1032,7 +1032,7 @@ An empty translation table without matching traffic doesn't necessarily mean a b
 
 ### 16. IPv6 addressing and routing
 
-- [ ] Verified actual IPv6 prefixes, gateway and router feature support.
+- [ ] **🎯 DO THIS —** Verified actual IPv6 prefixes, gateway and router feature support.
 
 **⭐ EASIEST WAY — Cisco IOS CLI (device configuration):**
 
@@ -1079,7 +1079,7 @@ end
 
 ### 18. Logging and management visibility
 
-- [ ] Inspected time, logging, neighbors and active sessions.
+- [ ] **🎯 DO THIS —** Inspected time, logging, neighbors and active sessions.
 
 **⭐ EASIEST WAY — Cisco IOS CLI (device configuration):**
 
@@ -1110,7 +1110,7 @@ end
 
 ### 19. Packet Tracer Simulation and activity checks
 
-- [ ] Used Packet Tracer diagnostics appropriately without altering the grader.
+- [ ] **🎯 DO THIS —** Used Packet Tracer diagnostics appropriately without altering the grader.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:** In the lower-right Packet Tracer UI, switch between **Realtime** and **Simulation**. In Simulation use **Edit Filters** to show only relevant protocols (ARP, ICMP, DHCP, DNS, HTTP, etc. if available). Click **Capture/Forward** or **Auto Capture/Play** to observe packet progression.
 
@@ -2008,7 +2008,7 @@ Use alongside the [main Cisco guide](packet-tracer.md). These are **manual examp
 
 #### 1. Begin with a baseline
 
-- [ ] Recorded interfaces, version, routes, VLANs and configuration.
+- [ ] **🎯 DO THIS —** Recorded interfaces, version, routes, VLANs and configuration.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:** Select router or switch → **CLI**. Press Enter to reach the prompt. Enter privileged EXEC mode.
 
@@ -2027,7 +2027,7 @@ show ip interface brief
 
 #### 2. PC cannot reach its gateway: check access VLAN and trunk
 
-- [ ] Checked PC IP/mask/gateway and correct switch port VLAN.
+- [ ] **🎯 DO THIS —** Checked PC IP/mask/gateway and correct switch port VLAN.
 
 **⭐ EASIEST WAY — Packet Tracer GUI / device selection:** PC → **Desktop → IP Configuration**. Record IP address, mask, gateway. Switch → **CLI**.
 
@@ -2068,7 +2068,7 @@ Test the correct gateway from PC → **Desktop → Command Prompt** using ping. 
 
 #### 3. Trunk missing a VLAN
 
-- [ ] Confirmed exact VLANs required on both ends before changing allowed lists.
+- [ ] **🎯 DO THIS —** Confirmed exact VLANs required on both ends before changing allowed lists.
 
 ~~~text
 show interfaces trunk
@@ -2093,7 +2093,7 @@ end
 
 #### 4. Inter-VLAN routing via router-on-a-stick
 
-- [ ] Checked router's physical interface, subinterfaces, switch trunk, and PC gateway.
+- [ ] **🎯 DO THIS —** Checked router's physical interface, subinterfaces, switch trunk, and PC gateway.
 
 ~~~text
 show ip interface brief
@@ -2119,7 +2119,7 @@ The switch uplink must permit VLAN 20 and the client gateway must match the rout
 
 #### 5. Port security: identify a legitimate edge port first
 
-- [ ] Recorded existing port-security state and authorized MAC count.
+- [ ] **🎯 DO THIS —** Recorded existing port-security state and authorized MAC count.
 
 ~~~text
 show port-security
@@ -2151,7 +2151,7 @@ Maximum 1 is inappropriate for some phone-plus-PC ports. Violation shutdown can 
 
 #### 6. STP / BPDU Guard: edge ports are not uplinks
 
-- [ ] Identified the physical topology and switch-to-switch ports.
+- [ ] **🎯 DO THIS —** Identified the physical topology and switch-to-switch ports.
 
 ~~~text
 show spanning-tree
@@ -2175,7 +2175,7 @@ end
 
 #### 7. Extended ACLs: direction and wildcard mask
 
-- [ ] Listed required allowed/blocked flows before applying an ACL.
+- [ ] **🎯 DO THIS —** Listed required allowed/blocked flows before applying an ACL.
 
 ~~~text
 show access-lists
@@ -2218,7 +2218,7 @@ Do not delete a shared ACL before checking other interface bindings.
 
 #### 8. DHCP, DHCP snooping and DAI
 
-- [ ] Checked service location, DHCP pool, relay address and trust boundaries.
+- [ ] **🎯 DO THIS —** Checked service location, DHCP pool, relay address and trust boundaries.
 
 ~~~text
 show ip dhcp pool
@@ -2246,7 +2246,7 @@ Not all commands work on every Packet Tracer device.
 
 #### 9. SSH management and save procedure
 
-- [ ] Confirmed approved access, remote management authentication and final connections.
+- [ ] **🎯 DO THIS —** Confirmed approved access, remote management authentication and final connections.
 
 ~~~text
 show ip ssh
@@ -2299,7 +2299,7 @@ Troubleshoot from physical/link to routing and application before saving and sub
 
 ### 20. Symptom-first troubleshooting
 
-- [ ] Diagnosed from lower layers upward; fixed one cause at a time.
+- [ ] **🎯 DO THIS —** Diagnosed from lower layers upward; fixed one cause at a time.
 
 | Symptom | First investigation | Then check |
 |---|---|---|
@@ -2317,15 +2317,15 @@ Troubleshoot from physical/link to routing and application before saving and sub
 | Wireless client gets no connection | SSID and security/passphrase | Adapter, signal, DHCP, gateway |
 
 **Before final submission:**
-- [ ] Every explicitly required router/switch/PC/server interface has correct **status, address and subnet**.
-- [ ] VLAN membership, trunks and management VLAN are checked from both ends.
-- [ ] Routes **and return routes** are present; dynamic neighbors behave as expected.
-- [ ] DHCP leases and DNS/HTTP/FTP/mail reachability are tested if required.
-- [ ] Each ACL is tested with a **denied** and an **allowed** flow.
-- [ ] Switch port-security, STP, EtherChannel and wireless settings meet the actual exercise.
-- [ ] Remote management works as required without accidentally exposing Telnet/weak access.
-- [ ] Changes are saved with **copy running-config startup-config** after verifying; activity file saved/submitted as instructed.
-- [ ] No unsupported commands were guessed, no assessment metadata modified, no unrelated settings deleted.
+- [ ] **🎯 DO THIS —** Every explicitly required router/switch/PC/server interface has correct **status, address and subnet**.
+- [ ] **🎯 DO THIS —** VLAN membership, trunks and management VLAN are checked from both ends.
+- [ ] **🎯 DO THIS —** Routes **and return routes** are present; dynamic neighbors behave as expected.
+- [ ] **🎯 DO THIS —** DHCP leases and DNS/HTTP/FTP/mail reachability are tested if required.
+- [ ] **🎯 DO THIS —** Each ACL is tested with a **denied** and an **allowed** flow.
+- [ ] **🎯 DO THIS —** Switch port-security, STP, EtherChannel and wireless settings meet the actual exercise.
+- [ ] **🎯 DO THIS —** Remote management works as required without accidentally exposing Telnet/weak access.
+- [ ] **🎯 DO THIS —** Changes are saved with **copy running-config startup-config** after verifying; activity file saved/submitted as instructed.
+- [ ] **🎯 DO THIS —** No unsupported commands were guessed, no assessment metadata modified, no unrelated settings deleted.
 
 **Save only after successful verification:**
 
@@ -2360,11 +2360,11 @@ Some tasks grade running configuration directly; use the actual submission instr
 
 ### Final Packet Tracer handoff checklist
 
-- [ ] Every task-required link and router interface state verified.
-- [ ] Client IP/mask, gateway, DNS, VLAN, trunk, subinterface and route checked.
-- [ ] Required application-level transactions (web, DNS, DHCP, FTP, email, SSH) tested.
-- [ ] ACLs tested with a permitted and prohibited flow.
-- [ ] No authorized client was accidentally blocked by port-security, STP or trunk changes.
-- [ ] Saved working IOS running configuration and the **correct activity file** following instructions.
-- [ ] No activity grading assets, password placeholders or unrelated configurations modified.
-- [ ] Any issue not resolved is documented specifically, not hidden by broad resets.
+- [ ] **🎯 DO THIS —** Every task-required link and router interface state verified.
+- [ ] **🎯 DO THIS —** Client IP/mask, gateway, DNS, VLAN, trunk, subinterface and route checked.
+- [ ] **🎯 DO THIS —** Required application-level transactions (web, DNS, DHCP, FTP, email, SSH) tested.
+- [ ] **🎯 DO THIS —** ACLs tested with a permitted and prohibited flow.
+- [ ] **🎯 DO THIS —** No authorized client was accidentally blocked by port-security, STP or trunk changes.
+- [ ] **🎯 DO THIS —** Saved working IOS running configuration and the **correct activity file** following instructions.
+- [ ] **🎯 DO THIS —** No activity grading assets, password placeholders or unrelated configurations modified.
+- [ ] **🎯 DO THIS —** Any issue not resolved is documented specifically, not hidden by broad resets.

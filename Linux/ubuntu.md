@@ -33,11 +33,11 @@
 
 ### 1.1 Ubuntu terms, differences and useful GUIs
 
-- [ ] Understand **sudo** (an authorized privilege elevation), **APT** (Debian/Ubuntu package manager), **Snap** (separate package distribution), **systemd services/timers/sockets**, **UFW**, **AppArmor**, **PAM**, **Netplan** and **NetworkManager**.
-- [ ] Know the desktop-versus-server difference. GNOME users can open **Settings → Users**, **Privacy / Screen Lock**, **Sharing**, and **Software & Updates** if installed. A headless Ubuntu Server often has no desktop.
-- [ ] Keep a working authorized sudo/console session while changing accounts, SSH, network configuration, firewall or PAM.
-- [ ] Check actual installed version and architecture. Ubuntu 24.04 and 22.04 differ in OpenSSH activation, package versions and some GNOME settings.
-- [ ] Use individual copyable commands; **do not run a downloaded one-line hardening script**.
+- [ ] **🎯 DO THIS —** Understand **sudo** (an authorized privilege elevation), **APT** (Debian/Ubuntu package manager), **Snap** (separate package distribution), **systemd services/timers/sockets**, **UFW**, **AppArmor**, **PAM**, **Netplan** and **NetworkManager**.
+- [ ] **🎯 DO THIS —** Know the desktop-versus-server difference. GNOME users can open **Settings → Users**, **Privacy / Screen Lock**, **Sharing**, and **Software & Updates** if installed. A headless Ubuntu Server often has no desktop.
+- [ ] **🎯 DO THIS —** Keep a working authorized sudo/console session while changing accounts, SSH, network configuration, firewall or PAM.
+- [ ] **🎯 DO THIS —** Check actual installed version and architecture. Ubuntu 24.04 and 22.04 differ in OpenSSH activation, package versions and some GNOME settings.
+- [ ] **🎯 DO THIS —** Use individual copyable commands; **do not run a downloaded one-line hardening script**.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -82,10 +82,10 @@ This is **only an example when OpenSSH Server is installed**. Choose a new backu
 
 ### 2.1 Read the competition image README and scoring report
 
-- [ ] Open the README on the desktop, record **authorized administrators**, **normal users**, **required software**, **prohibited files/apps**, **critical services/ports**, and **forensics question locations**.
-- [ ] Read it again before disabling any service. The same program (SSH, FTP, web server, database, Samba, printing, DNS) can be prohibited on one image and critical on another.
-- [ ] Open the scoring report and record the starting value. Refresh after individually verified changes; do not modify scoring-engine files.
-- [ ] Take a VM snapshot only if permitted; rollback may discard subsequent fixes.
+- [ ] **🎯 DO THIS —** Open the README on the desktop, record **authorized administrators**, **normal users**, **required software**, **prohibited files/apps**, **critical services/ports**, and **forensics question locations**.
+- [ ] **🎯 DO THIS —** Read it again before disabling any service. The same program (SSH, FTP, web server, database, Samba, printing, DNS) can be prohibited on one image and critical on another.
+- [ ] **🎯 DO THIS —** Open the scoring report and record the starting value. Refresh after individually verified changes; do not modify scoring-engine files.
+- [ ] **🎯 DO THIS —** Take a VM snapshot only if permitted; rollback may discard subsequent fixes.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -102,7 +102,7 @@ Compare the output with the README. Ordinary service accounts are often expected
 
 ### 2.2 Answer forensic questions before deleting or changing evidence
 
-- [ ] Read each question word for word, identify the specific requested evidence, save exact answers in the original provided format, then proceed with remediation.
+- [ ] **🎯 DO THIS —** Read each question word for word, identify the specific requested evidence, save exact answers in the original provided format, then proceed with remediation.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -135,7 +135,7 @@ last -a | head -25
 
 ### 2.3 Establish an administrative recovery route
 
-- [ ] Confirm the authorized admin can elevate; keep the VM console available before SSH/firewall/network edits.
+- [ ] **🎯 DO THIS —** Confirm the authorized admin can elevate; keep the VM console available before SSH/firewall/network edits.
 
 ~~~bash
 sudo -v
@@ -158,7 +158,7 @@ These are **frequently appearing concepts in public checklists**, not a guarante
 
 ### 3.1 Users, groups, UID 0 and sudo rights
 
-- [ ] Compare every real human account and privileged group against the image README.
+- [ ] **🎯 DO THIS —** Compare every real human account and privileged group against the image README.
 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
@@ -205,7 +205,7 @@ getent group sudo
 
 ### 3.2 Strong passwords, aging, PAM and lockout
 
-- [ ] Know the README's exact password policy; inspect actual PAM modules before editing.
+- [ ] **🎯 DO THIS —** Know the README's exact password policy; inspect actual PAM modules before editing.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -246,7 +246,7 @@ sudo visudo -c
 
 ### 3.3 Firewall rules and required ports
 
-- [ ] Discover actual firewall owner and **required service ports** before enabling deny-by-default.
+- [ ] **🎯 DO THIS —** Discover actual firewall owner and **required service ports** before enabling deny-by-default.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -280,7 +280,7 @@ sudo ufw status verbose
 
 ### 3.4 Signed APT repositories and security updates
 
-- [ ] Verify installed Ubuntu version and repository source integrity. Some releases use deb822 .sources files.
+- [ ] **🎯 DO THIS —** Verify installed Ubuntu version and repository source integrity. Some releases use deb822 .sources files.
 
 ~~~bash
 cat /etc/os-release
@@ -311,7 +311,7 @@ sudo apt upgrade
 
 ### 3.5 Snap packages and Firefox (Ubuntu-specific)
 
-- [ ] Know that Ubuntu's Firefox on many supported desktop versions is delivered as a **Snap**, not simply a Debian package.
+- [ ] **🎯 DO THIS —** Know that Ubuntu's Firefox on many supported desktop versions is delivered as a **Snap**, not simply a Debian package.
 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
@@ -331,7 +331,7 @@ sudo apt upgrade
 
 ### 3.6 Required-service preservation
 
-- [ ] Before turning off any daemons, identify dependency and required-client test.
+- [ ] **🎯 DO THIS —** Before turning off any daemons, identify dependency and required-client test.
 
 ~~~bash
 systemctl list-units --type=service --state=running
@@ -530,7 +530,7 @@ sudo systemctl reload ssh
 
 ### 4.1 SSH service and socket activation (critical Ubuntu difference)
 
-- [ ] Confirm whether SSH is installed/required and whether **ssh.service** or **ssh.socket** controls the listener.
+- [ ] **🎯 DO THIS —** Confirm whether SSH is installed/required and whether **ssh.service** or **ssh.socket** controls the listener.
 
 ~~~bash
 dpkg-query -W openssh-server 2>/dev/null
@@ -561,7 +561,7 @@ Inspect each identified file's owner/mode, keys and README need; never delete al
 
 ### 4.2 GNOME, GDM, automatic login and screen locking
 
-- [ ] Identify actual display manager and desktop. Do not apply these GNOME-specific settings to Ubuntu Server, KDE or Xfce images.
+- [ ] **🎯 DO THIS —** Identify actual display manager and desktop. Do not apply these GNOME-specific settings to Ubuntu Server, KDE or Xfce images.
 
 **⭐ EASIEST WAY — GUI (when available):** GNOME **Settings → Users → Unlock** to inspect automatic login; **Settings → Privacy & Security / Screen Lock** to require a password after inactivity; **Settings → Sharing / Remote Desktop** to review required/unneeded remote features. Exact labels vary with GNOME release.
 
@@ -588,7 +588,7 @@ If editing a real GNOME/GDM configuration, back up the specific file and use the
 
 ### 4.3 Prohibited packages, Flatpak and suspicious media
 
-- [ ] Check the README's prohibited software list before removing packages or media.
+- [ ] **🎯 DO THIS —** Check the README's prohibited software list before removing packages or media.
 
 ~~~bash
 dpkg -l | grep -Ei 'steam|transmission|qbittorrent|john|hydra|nmap|wireshark|vnc|telnet|netcat'
@@ -614,7 +614,7 @@ Only then consider an authorized targeted removal. **Never run a pasted bulk apt
 
 ### 4.4 Cron, systemd timers, shell startup and backdoors
 
-- [ ] Inspect scheduling and persistence before disabling anything.
+- [ ] **🎯 DO THIS —** Inspect scheduling and persistence before disabling anything.
 
 ~~~bash
 sudo cat /etc/crontab
@@ -638,7 +638,7 @@ sudo journalctl -u example.service -n 50 --no-pager
 
 ### 4.5 File ownership, SUID/capabilities and sensitive configuration
 
-- [ ] Inspect permissions and owners on password-related files and writable directories.
+- [ ] **🎯 DO THIS —** Inspect permissions and owners on password-related files and writable directories.
 
 ~~~bash
 stat -c '%A %a %U:%G %n' /etc/passwd /etc/group /etc/shadow /etc/gshadow
@@ -827,7 +827,7 @@ Then test its real authorized client transaction (for example SSH login, HTTPS r
 
 ### 5.1 Netplan versus NetworkManager
 
-- [ ] Before network configuration changes, identify which renderer actually owns the interface.
+- [ ] **🎯 DO THIS —** Before network configuration changes, identify which renderer actually owns the interface.
 
 ~~~bash
 ip -br address
@@ -1190,17 +1190,17 @@ A missing socket unit is normal on some installations; do not install one merely
 > ✅ **Finish strong:** Verify the final configuration, required functionality, and saved evidence.
 
 
-- [ ] Every forensic question has an evidence-supported answer and was saved in the required format.
-- [ ] Authorized users and sudo privileges match the image README; a second authorized login works.
-- [ ] Password aging/PAM changes (if any) have been tested without locking out users.
-- [ ] Firewall/UFW/native rules permit every required inbound service, no more than needed.
-- [ ] APT and Snap updates are checked and packages come from legitimate signed sources.
-- [ ] Firefox/required browsers, GNOME lock, login screen and remote access match the scenario.
-- [ ] SSH, database, web, DNS, DHCP, Samba, FTP/mail and other explicitly required services work from authorized clients.
-- [ ] Suspicious cron, systemd, file permissions, new services, prohibited packages and media were reviewed without evidence destruction.
-- [ ] Logs and AppArmor state are understood; no unrelated broad scripts or destructive commands were run.
-- [ ] Changes are recorded with old state, final state, verification and a specific rollback plan.
-- [ ] Final score refreshed; no unexpected reboot or last-minute mass cleanup.
+- [ ] **🎯 DO THIS —** Every forensic question has an evidence-supported answer and was saved in the required format.
+- [ ] **🎯 DO THIS —** Authorized users and sudo privileges match the image README; a second authorized login works.
+- [ ] **🎯 DO THIS —** Password aging/PAM changes (if any) have been tested without locking out users.
+- [ ] **🎯 DO THIS —** Firewall/UFW/native rules permit every required inbound service, no more than needed.
+- [ ] **🎯 DO THIS —** APT and Snap updates are checked and packages come from legitimate signed sources.
+- [ ] **🎯 DO THIS —** Firefox/required browsers, GNOME lock, login screen and remote access match the scenario.
+- [ ] **🎯 DO THIS —** SSH, database, web, DNS, DHCP, Samba, FTP/mail and other explicitly required services work from authorized clients.
+- [ ] **🎯 DO THIS —** Suspicious cron, systemd, file permissions, new services, prohibited packages and media were reviewed without evidence destruction.
+- [ ] **🎯 DO THIS —** Logs and AppArmor state are understood; no unrelated broad scripts or destructive commands were run.
+- [ ] **🎯 DO THIS —** Changes are recorded with old state, final state, verification and a specific rollback plan.
+- [ ] **🎯 DO THIS —** Final score refreshed; no unexpected reboot or last-minute mass cleanup.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 

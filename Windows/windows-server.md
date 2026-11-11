@@ -85,11 +85,11 @@ Read the README, preserve forensics and determine the server's exact domain role
 
 ### 0. Before you touch anything
 
-- [ ] Done — Read the image README fully; record authorized **domain/local users**, administrators, required roles, hostnames, shares, web sites, DNS zones, DHCP scopes, service accounts, and prohibited items.
-- [ ] Done — Open the scoring report and note initial score/time. Do not modify scoring-engine files.
-- [ ] Done — Open **Windows PowerShell as Administrator** through Start → type PowerShell → right-click → Run as administrator. On Server Core, use the console or supported sconfig/PowerShell.
-- [ ] Done — Preserve the evidence and answer **all forensics questions** before user deletion, malware cleanup, log changes, or installation.
-- [ ] Done — Record a recovery/VM-console path and create a snapshot only if competition rules permit. A rollback loses later changes.
+- [ ] **🎯 DO THIS —** Done — Read the image README fully; record authorized **domain/local users**, administrators, required roles, hostnames, shares, web sites, DNS zones, DHCP scopes, service accounts, and prohibited items.
+- [ ] **🎯 DO THIS —** Done — Open the scoring report and note initial score/time. Do not modify scoring-engine files.
+- [ ] **🎯 DO THIS —** Done — Open **Windows PowerShell as Administrator** through Start → type PowerShell → right-click → Run as administrator. On Server Core, use the console or supported sconfig/PowerShell.
+- [ ] **🎯 DO THIS —** Done — Preserve the evidence and answer **all forensics questions** before user deletion, malware cleanup, log changes, or installation.
+- [ ] **🎯 DO THIS —** Done — Record a recovery/VM-console path and create a snapshot only if competition rules permit. A rollback loses later changes.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
 
@@ -761,7 +761,7 @@ Review actual DC audit events and test fresh domain user logon, DC DNS, SYSVOL/N
 <a id="research-expansion-check-directory-dns-time-and-replication-safely"></a>
 ### 🧰 check directory, DNS, time and replication safely
 
-- [ ] Confirmed whether AD DS, DNS, DHCP or other required server roles are installed and functioning.
+- [ ] **🎯 DO THIS —** Confirmed whether AD DS, DNS, DHCP or other required server roles are installed and functioning.
 
 ~~~powershell
 Get-Service NTDS,DNS,Netlogon,DFSR,W32Time -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
@@ -1336,11 +1336,11 @@ Or with `gpedit.msc` → **Administrative Templates → Windows Components → W
 
 These tasks are **fully supported here** by the role-aware commands below and the complete Server OS security reference in Part 5 (**WS.12 through WS.21**). No separate Windows guide is needed.
 
-- [ ] Done — Compare installed applications and portable binaries to the README's prohibited list; preserve evidence before uninstall.
-- [ ] Done — Check suspicious desktop files and media in the named user profiles; do not mass-delete user data.
-- [ ] Done — Inspect startup entries, Run/RunOnce keys, scheduled tasks, services, network listeners and file hashes.
-- [ ] Done — Check browsers used by required IIS/app management tools and their approved updates/extension policies.
-- [ ] Done — Review role-compatible UAC, SMB signing, anonymous access, NTLM/LM, auditing, PowerShell logging, screen locking and removable-media policies.
+- [ ] **🎯 DO THIS —** Done — Compare installed applications and portable binaries to the README's prohibited list; preserve evidence before uninstall.
+- [ ] **🎯 DO THIS —** Done — Check suspicious desktop files and media in the named user profiles; do not mass-delete user data.
+- [ ] **🎯 DO THIS —** Done — Inspect startup entries, Run/RunOnce keys, scheduled tasks, services, network listeners and file hashes.
+- [ ] **🎯 DO THIS —** Done — Check browsers used by required IIS/app management tools and their approved updates/extension policies.
+- [ ] **🎯 DO THIS —** Done — Review role-compatible UAC, SMB signing, anonymous access, NTLM/LM, auditing, PowerShell logging, screen locking and removable-media policies.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
 
@@ -4164,12 +4164,12 @@ If the README says this server runs a website, FTP or file shares, harden those 
 
 #### WS.18. Final checks
 
-- [ ] Critical services still running (`services.msc`)
-- [ ] You can still log in and open an admin PowerShell
-- [ ] Scoring Report shows **no penalties**
-- [ ] Forensics answers saved
-- [ ] Final snapshot
-- [ ] Reboot **once** at the end only if updates or Windows features (9.1) need it, then check the Scoring Report again
+- [ ] **🎯 DO THIS —** Critical services still running (`services.msc`)
+- [ ] **🎯 DO THIS —** You can still log in and open an admin PowerShell
+- [ ] **🎯 DO THIS —** Scoring Report shows **no penalties**
+- [ ] **🎯 DO THIS —** Forensics answers saved
+- [ ] **🎯 DO THIS —** Final snapshot
+- [ ] **🎯 DO THIS —** Reboot **once** at the end only if updates or Windows features (9.1) need it, then check the Scoring Report again
 
 #### WS.19. Manual verification, recovery and missing investigation steps
 
@@ -4859,7 +4859,7 @@ This supplement draws topic ideas from public CyberPatriot checklists and verifi
 
 ##### WS.21.1 Find the setting that actually applies (GPO versus local policy)
 
-- [ ] Reviewed effective configuration and policy source.
+- [ ] **🎯 DO THIS —** Reviewed effective configuration and policy source.
 
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
@@ -4893,7 +4893,7 @@ Start-Process "$env:TEMP\cp-rsop.html"
 
 ##### WS.21.2 Correlate suspicious services with their executable files
 
-- [ ] Compared service names, binary paths, and required roles.
+- [ ] **🎯 DO THIS —** Compared service names, binary paths, and required roles.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → services.msc** → double-click a service → note **Service name**, **Path to executable**, **Log On**, **Dependencies**. Do not stop it yet.
 
@@ -4936,7 +4936,7 @@ Get-CimInstance Win32_Service -Filter "Name='RemoteRegistry'" |
 
 ##### WS.21.3 Investigate events: service installation, login attempts and process creation
 
-- [ ] Checked available logs without clearing them.
+- [ ] **🎯 DO THIS —** Checked available logs without clearing them.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → eventvwr.msc** → **Windows Logs → System** or **Security** → **Filter Current Log**. Record timestamps with timezone, event IDs, provider, and the full message.
 
@@ -4984,7 +4984,7 @@ auditpol /get /category:*
 
 ##### WS.21.4 Inspect persistence without executing unknown files
 
-- [ ] Reviewed login-start items and task actions.
+- [ ] **🎯 DO THIS —** Reviewed login-start items and task actions.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → taskschd.msc** → **Task Scheduler Library**; inspect **Triggers**, **Actions**, **Author** and **History**. Open **Task Manager → Startup apps** for login items.
 
@@ -5020,7 +5020,7 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 
 ##### WS.21.5 SMB share + NTFS access: check both layers
 
-- [ ] Checked authorized shares and effective paths.
+- [ ] **🎯 DO THIS —** Checked authorized shares and effective paths.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → fsmgmt.msc** (when available) → **Shares**. Review share name, local path and active sessions. In File Explorer: folder → **Properties → Sharing / Security**.
 
@@ -5049,7 +5049,7 @@ Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
 
 ##### WS.21.6 Firewall rules that look open—but aren't applicable
 
-- [ ] Checked effective profiles, rules, ports, and service ownership.
+- [ ] **🎯 DO THIS —** Checked effective profiles, rules, ports, and service ownership.
 
 ~~~powershell
 Get-NetFirewallProfile | Format-Table Name,Enabled,DefaultInboundAction,DefaultOutboundAction
@@ -5080,13 +5080,13 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 
 ##### WS.21.7 Final verification checklist
 
-- [ ] Read and preserved forensic questions.
-- [ ] Confirmed whether the machine is standalone, domain-joined or a Domain Controller.
-- [ ] Found the **effective** source for changed policies.
-- [ ] Correlated unknown services with executable paths and relevant logs.
-- [ ] Reviewed scheduled tasks/startup entries without executing unknown payloads.
-- [ ] Confirmed required shares, services and firewall connectivity remain operational.
-- [ ] Recorded any modification, verification result and rollback information.
+- [ ] **🎯 DO THIS —** Read and preserved forensic questions.
+- [ ] **🎯 DO THIS —** Confirmed whether the machine is standalone, domain-joined or a Domain Controller.
+- [ ] **🎯 DO THIS —** Found the **effective** source for changed policies.
+- [ ] **🎯 DO THIS —** Correlated unknown services with executable paths and relevant logs.
+- [ ] **🎯 DO THIS —** Reviewed scheduled tasks/startup entries without executing unknown payloads.
+- [ ] **🎯 DO THIS —** Confirmed required shares, services and firewall connectivity remain operational.
+- [ ] **🎯 DO THIS —** Recorded any modification, verification result and rollback information.
 
 ##### WS.21.8 Sources and further reading
 
@@ -5109,9 +5109,9 @@ Retest authorized domain/local login, critical role transactions, management acc
 
 ### 11. Final checks
 
-- [ ] Every critical role still works (e.g. `nslookup corp.local` with your domain name for DNS, open the website for IIS)
-- [ ] On a DC: `dcdiag /q` prints no errors (no output = good)
-- [ ] Scoring Report shows **no penalties**
-- [ ] Forensics answers saved
-- [ ] Final snapshot
+- [ ] **🎯 DO THIS —** Every critical role still works (e.g. `nslookup corp.local` with your domain name for DNS, open the website for IIS)
+- [ ] **🎯 DO THIS —** On a DC: `dcdiag /q` prints no errors (no output = good)
+- [ ] **🎯 DO THIS —** Scoring Report shows **no penalties**
+- [ ] **🎯 DO THIS —** Forensics answers saved
+- [ ] **🎯 DO THIS —** Final snapshot
 

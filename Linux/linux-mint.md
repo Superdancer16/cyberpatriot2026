@@ -40,10 +40,10 @@ Linux Mint is in **Round 1, the State round, and the Semifinals** this season. I
 
 ### Linux Mint information to know before starting
 
-- [ ] Identify Mint version, Ubuntu base, **Cinnamon/MATE/Xfce** desktop, display manager and available login recovery.
-- [ ] Understand sudo, APT packages, Flatpak apps, systemd, UFW, SSH, desktop lock and LightDM-specific settings.
-- [ ] Know that Linux Mint GUI paths differ from Ubuntu GNOME, especially **Users and Groups**, **Update Manager** and **Login Window**.
-- [ ] Read the image README for authorized users, required services and prohibited software before changes.
+- [ ] **🎯 DO THIS —** Identify Mint version, Ubuntu base, **Cinnamon/MATE/Xfce** desktop, display manager and available login recovery.
+- [ ] **🎯 DO THIS —** Understand sudo, APT packages, Flatpak apps, systemd, UFW, SSH, desktop lock and LightDM-specific settings.
+- [ ] **🎯 DO THIS —** Know that Linux Mint GUI paths differ from Ubuntu GNOME, especially **Users and Groups**, **Update Manager** and **Login Window**.
+- [ ] **🎯 DO THIS —** Read the image README for authorized users, required services and prohibited software before changes.
 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
@@ -602,7 +602,7 @@ If Update Manager never offers an update for a program, open **Update Manager �
 <a id="research-expansion-flatpak-desktop-login-and-cinnamon-security"></a>
 ### 🧰 Flatpak, desktop login and Cinnamon security
 
-- [ ] Review installed software through **both APT and Flatpak** when applicable.
+- [ ] **🎯 DO THIS —** Review installed software through **both APT and Flatpak** when applicable.
 
 ~~~bash
 dpkg -l | grep -Ei 'firefox|ssh|vnc|steam|torrent|remote'
@@ -618,7 +618,7 @@ flatpak remotes --show-details
 
 Do not uninstall apps because they have unusual names. Compare each with required/prohibited software and preserve forensic evidence. Preview dependencies before removing a Debian package.
 
-- [ ] Verify the actual login manager and allowed autologin/guest settings.
+- [ ] **🎯 DO THIS —** Verify the actual login manager and allowed autologin/guest settings.
 
 ~~~bash
 systemctl status display-manager --no-pager
@@ -3586,7 +3586,7 @@ These are individually copyable terminal commands. **Inspection is not the same 
 
 ##### L1. Verify user identities and sudo privileges—don't guess from names
 
-- [ ] Matched every privileged identity to the competition README.
+- [ ] **🎯 DO THIS —** Matched every privileged identity to the competition README.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -3630,7 +3630,7 @@ sudo visudo -c
 
 ##### L2. SSH: inspect *effective* settings and socket activation
 
-- [ ] Confirmed whether SSH is required, listening and correctly configured.
+- [ ] **🎯 DO THIS —** Confirmed whether SSH is required, listening and correctly configured.
 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
@@ -3678,7 +3678,7 @@ sudo systemctl reload ssh
 
 ##### L3. PAM policy: inspect order before adding modules
 
-- [ ] Inspected current PAM stack and package availability.
+- [ ] **🎯 DO THIS —** Inspected current PAM stack and package availability.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -3710,7 +3710,7 @@ If changing aging is required, consult the policy specified in the README and th
 
 ##### L4. Check scheduled persistence in cron and systemd
 
-- [ ] Investigated scheduler entries before deleting anything.
+- [ ] **🎯 DO THIS —** Investigated scheduler entries before deleting anything.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -3751,7 +3751,7 @@ systemctl show example.service -p FragmentPath -p ExecStart -p User -p WantedBy
 
 ##### L5. Firewall: preserve required access before enabling UFW
 
-- [ ] Identified real listeners, rule owner and permitted clients.
+- [ ] **🎯 DO THIS —** Identified real listeners, rule owner and permitted clients.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -3792,7 +3792,7 @@ sudo ufw status verbose
 
 ##### L6. Narrow file and package investigations
 
-- [ ] Inspected evidence, not deleted files by extension alone.
+- [ ] **🎯 DO THIS —** Inspected evidence, not deleted files by extension alone.
 
 ~~~bash
 sudo find /home /root /tmp /var/tmp -type f -mtime -2 -printf '%TY-%Tm-%Td %TH:%TM %u %m %p\n' 2>/dev/null
@@ -3993,10 +3993,10 @@ Check required functions, users, services, firewall, score and forensic evidence
 
 ### 18. Final checks
 
-- [ ] Every critical service is running: `systemctl status ssh` (repeat with each service the README lists)
-- [ ] You can still use `sudo`
-- [ ] The Scoring Report shows **no penalties**
-- [ ] All forensics answers are saved
-- [ ] Take a final snapshot
-- [ ] **Don't reboot** unless you need to. If you must, reboot once and check everything still works.
+- [ ] **🎯 DO THIS —** Every critical service is running: `systemctl status ssh` (repeat with each service the README lists)
+- [ ] **🎯 DO THIS —** You can still use `sudo`
+- [ ] **🎯 DO THIS —** The Scoring Report shows **no penalties**
+- [ ] **🎯 DO THIS —** All forensics answers are saved
+- [ ] **🎯 DO THIS —** Take a final snapshot
+- [ ] **🎯 DO THIS —** **Don't reboot** unless you need to. If you must, reboot once and check everything still works.
 

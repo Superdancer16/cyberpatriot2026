@@ -19,7 +19,7 @@
 
 ### How to use this file
 
-- [ ] Read each numbered section from start to finish; mark tasks complete only after checking them.
+- [ ] **🎯 DO THIS —** Read each numbered section from start to finish; mark tasks complete only after checking them.
 - **Typing (check)** commands inspect. **Typing (change, only if authorized)** commands modify.
 - `alice`, `bob`, `exampleuser`, `example.service`, IP addresses and file paths labeled examples **must be replaced**, never pasted blindly.
 - Use **Terminal** on Debian GNOME (Super → Terminal) or the appropriate console. When already logged in as root after `su -`, omit `sudo` from example commands.
@@ -56,10 +56,10 @@
 
 ### Understand Debian before hardening
 
-- [ ] Know that Debian **13 trixie is stable**, Debian **12 bookworm receives LTS security support until June 2028** for eligible packages/architectures, and Debian 11 regular LTS ended August 2026. Never replace the installed release mid-round without explicit instructions.
-- [ ] Know **root/sudo, APT/dpkg, PAM, systemd, SSH, nftables/UFW, AppArmor, journald/rsyslog**.
-- [ ] Recognize a missing sudo or UFW package, GNOME desktop, or auth.log as *potentially normal* for a Debian installation.
-- [ ] Keep a working root or authorized sudo session before account, PAM, firewall or SSH changes.
+- [ ] **🎯 DO THIS —** Know that Debian **13 trixie is stable**, Debian **12 bookworm receives LTS security support until June 2028** for eligible packages/architectures, and Debian 11 regular LTS ended August 2026. Never replace the installed release mid-round without explicit instructions.
+- [ ] **🎯 DO THIS —** Know **root/sudo, APT/dpkg, PAM, systemd, SSH, nftables/UFW, AppArmor, journald/rsyslog**.
+- [ ] **🎯 DO THIS —** Recognize a missing sudo or UFW package, GNOME desktop, or auth.log as *potentially normal* for a Debian installation.
+- [ ] **🎯 DO THIS —** Keep a working root or authorized sudo session before account, PAM, firewall or SSH changes.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -1184,7 +1184,7 @@ apt -s upgrade
 <a id="research-expansion-signed-apt-sources-and-debian-lts-package-coverage"></a>
 ### 📦 signed APT sources and Debian LTS package coverage
 
-- [ ] Verify security support for the installed release **and individual required packages**.
+- [ ] **🎯 DO THIS —** Verify security support for the installed release **and individual required packages**.
 
 ~~~bash
 cat /etc/os-release
@@ -2438,7 +2438,7 @@ sudo grep -RnsE 'net.ipv4|net.ipv6|kernel.randomize_va_space' /etc/sysctl.conf /
 
 ### 16. Critical services: complete manual procedures
 
-- [ ] Checked every service the README explicitly requires.
+- [ ] **🎯 DO THIS —** Checked every service the README explicitly requires.
 
 **This section contains the actual service procedures directly in this file.** Do not automatically install, remove, disable, restart or lock out a server. Identify its package/unit, preserve the working client operation, save its configuration, make only approved changes, validate syntax, reload if supported, and verify again.
 
@@ -3839,7 +3839,7 @@ Unexpected recent or world-writable files need comparison with a trusted package
 
 #### 16.2 Debian-specific installed service packages and access verification
 
-- [ ] Confirmed installed daemon names and actual sockets.
+- [ ] **🎯 DO THIS —** Confirmed installed daemon names and actual sockets.
 
 | Service | Typical Debian package/unit | Debian configuration and test |
 |---|---|---|
@@ -4524,7 +4524,7 @@ These are individually copyable terminal commands. **Inspection is not the same 
 
 #### 18.L1. Verify user identities and sudo privileges—don't guess from names
 
-- [ ] Matched every privileged identity to the competition README.
+- [ ] **🎯 DO THIS —** Matched every privileged identity to the competition README.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -4568,7 +4568,7 @@ sudo visudo -c
 
 #### 18.L2. SSH: inspect *effective* settings and socket activation
 
-- [ ] Confirmed whether SSH is required, listening and correctly configured.
+- [ ] **🎯 DO THIS —** Confirmed whether SSH is required, listening and correctly configured.
 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
@@ -4616,7 +4616,7 @@ sudo systemctl reload ssh
 
 #### 18.L3. PAM policy: inspect order before adding modules
 
-- [ ] Inspected current PAM stack and package availability.
+- [ ] **🎯 DO THIS —** Inspected current PAM stack and package availability.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -4648,7 +4648,7 @@ If changing aging is required, consult the policy specified in the README and th
 
 #### 18.L4. Check scheduled persistence in cron and systemd
 
-- [ ] Investigated scheduler entries before deleting anything.
+- [ ] **🎯 DO THIS —** Investigated scheduler entries before deleting anything.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -4689,7 +4689,7 @@ systemctl show example.service -p FragmentPath -p ExecStart -p User -p WantedBy
 
 #### 18.L5. Firewall: preserve required access before enabling UFW
 
-- [ ] Identified real listeners, rule owner and permitted clients.
+- [ ] **🎯 DO THIS —** Identified real listeners, rule owner and permitted clients.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
@@ -4730,7 +4730,7 @@ sudo ufw status verbose
 
 #### 18.L6. Narrow file and package investigations
 
-- [ ] Inspected evidence, not deleted files by extension alone.
+- [ ] **🎯 DO THIS —** Inspected evidence, not deleted files by extension alone.
 
 ~~~bash
 sudo find /home /root /tmp /var/tmp -type f -mtime -2 -printf '%TY-%Tm-%Td %TH:%TM %u %m %p\n' 2>/dev/null
@@ -4929,19 +4929,19 @@ Verify every required service, account, journal/forensic answer, firewall path a
 
 ### 19. Final checklist
 
-- [ ] Answered and **saved** every forensics question before deleting/modifying evidence.
-- [ ] Recorded all README-authorized normal users, admin users and necessary system/service accounts.
-- [ ] Preserved a working administrator/root recovery session and tested a second authorized login.
-- [ ] Verified password aging, empty passwords, relevant PAM profiles and sudo membership.
-- [ ] Checked installed APT sources match Debian **codename** and have valid signature verification.
-- [ ] Reviewed and applied approved available security updates; inspected held packages and `dpkg --audit`.
-- [ ] Confirmed one appropriate firewall manager and only README-required inbound access.
-- [ ] Confirmed SSH, DNS, web, database, Samba, FTP, DHCP, mail and other **required** services function from authorized clients.
-- [ ] Checked known unwanted daemons, unauthorized packages and unwanted media/files without mass deletion.
-- [ ] Reviewed cron, systemd timers, startup entries, accounts, SUID/capabilities, suspicious ports and file hashes.
-- [ ] Checked AppArmor, journald/rsyslog/auditd, and desktop lock/autologin for this actual Debian image.
-- [ ] Refreshed the Scoring Report and recorded each changed item and verification result.
-- [ ] Saved changes and forensic answers, but **do not reboot** before the rules and outstanding updates permit it.
+- [ ] **🎯 DO THIS —** Answered and **saved** every forensics question before deleting/modifying evidence.
+- [ ] **🎯 DO THIS —** Recorded all README-authorized normal users, admin users and necessary system/service accounts.
+- [ ] **🎯 DO THIS —** Preserved a working administrator/root recovery session and tested a second authorized login.
+- [ ] **🎯 DO THIS —** Verified password aging, empty passwords, relevant PAM profiles and sudo membership.
+- [ ] **🎯 DO THIS —** Checked installed APT sources match Debian **codename** and have valid signature verification.
+- [ ] **🎯 DO THIS —** Reviewed and applied approved available security updates; inspected held packages and `dpkg --audit`.
+- [ ] **🎯 DO THIS —** Confirmed one appropriate firewall manager and only README-required inbound access.
+- [ ] **🎯 DO THIS —** Confirmed SSH, DNS, web, database, Samba, FTP, DHCP, mail and other **required** services function from authorized clients.
+- [ ] **🎯 DO THIS —** Checked known unwanted daemons, unauthorized packages and unwanted media/files without mass deletion.
+- [ ] **🎯 DO THIS —** Reviewed cron, systemd timers, startup entries, accounts, SUID/capabilities, suspicious ports and file hashes.
+- [ ] **🎯 DO THIS —** Checked AppArmor, journald/rsyslog/auditd, and desktop lock/autologin for this actual Debian image.
+- [ ] **🎯 DO THIS —** Refreshed the Scoring Report and recorded each changed item and verification result.
+- [ ] **🎯 DO THIS —** Saved changes and forensic answers, but **do not reboot** before the rules and outstanding updates permit it.
 
 **⭐ EASIEST WAY — Terminal command(s):**
 
