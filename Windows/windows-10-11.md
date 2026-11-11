@@ -7,12 +7,11 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
-
 **Version note (November 2026):** Windows 10 mainstream support ended October 14, 2025; use only the specific security-update/ESU support arrangements available to your image, and never substitute an OS upgrade for an authorized CyberPatriot task. Windows 11 editions, policy behavior, features and installed roles can differ; check `winver` and the actual README.
 
 **How to use this page**
 - Work through the phase order below.
-- Each item has: **What** · **Why it matters** · **Clicking** · **Typing** (PowerShell **as Administrator**) · **Check it worked** · ⚠️ warnings.
+- For each applicable task, use the easiest method and verify the result; alternate commands and deeper explanations are optional.
 - New to PowerShell? Read [PowerShell basics in Section 20](windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist) first.
 - This repository contains documentation only. Follow the manual procedures below; do not skip verification.
 - `alice`, `bob` etc. are examples. **Use the names in your README.**
@@ -22,8 +21,6 @@
 
 **Priority is practical, not a guaranteed score ranking.** The README, forensics questions, permitted tools and actual required services override any generic checklist. Do not remove the only admin, delete evidence, or disable a critical role merely because it appears in a public checklist.
 
-
-> [!NOTE]
 
 ---
 
@@ -37,7 +34,6 @@
 
 > [!TIP]
 > 📘 **Foundation:** Review the key terms and available tools before making changes.
-
 
 ### Windows terms and tools to understand first
 
@@ -66,7 +62,6 @@ If the machine is a Domain Controller, use the Windows Server guide. Enterprise 
 > [!IMPORTANT]
 > 🚀 **Start here:** Follow the image README, preserve forensics, and confirm administrative recovery.
 
-
 Read the image README, preserve answers to forensic questions, confirm the initial score and retain authorized administrator access.
 
 ### 0. Before you touch anything
@@ -93,7 +88,6 @@ Double-click it on the desktop and refresh it as you work.
 
 ---
 
-
 ### 1. Forensics questions (FIRST)
 
 #### 1.1 Answer every forensics question before fixing things
@@ -116,46 +110,39 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 - [ ] **🎯 DO THIS — 1.2 Manual security baseline (no hardening script)**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 **✅ Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
-
 
 <a id="stage-3"></a>
 ## Part 3 — Commonly Assessed High-Priority Checks
 
 > [!IMPORTANT]
 > 🛡️ **Priority checks:** Inspect the most common security categories first; actual scoring remains image-specific.
-
 
 Accounts, password rules, Defender, firewall, updates and audit settings are frequent *topics* in public checklists; actual per-fix points are unknown.
 
@@ -167,7 +154,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `lusrmgr.msc` → **Users**. (Or **Settings → Accounts → Other users**.)
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, LastLogon
@@ -177,13 +164,12 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 - [ ] **🎯 DO THIS (only if authorized) — 2.2 Review and contain unauthorized users**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Extra accounts are how attackers get back in.
 
 **⭐ EASIEST WAY — GUI:** In `lusrmgr.msc` → **Users**, confirm the account against the README → **Properties → Account is disabled**. Delete only if explicitly required and evidence is preserved.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Disable-LocalUser -Name EXAMPLE_UNAUTHORIZED_USER  # reversible; delete only if explicitly required
@@ -192,7 +178,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 > [!CAUTION]
 > Don't delete the built-in accounts (**Administrator, Guest, DefaultAccount, WDAGUtilityAccount**): *disable* them instead (2.6). Never delete yourself or anyone on the README.
 
-- **Safer unauthorized-account workflow:** Compare the README and account SID; disable the confirmed unauthorized login first in `lusrmgr.msc` → **Properties** → **Account is disabled**. Delete only when explicitly required and evidence is preserved. **Verify:** The authorized administrator can still sign in.
+**✅ Verify / undo:** Reopen the account to confirm it is disabled; verify another authorized administrator can sign in and record its previous state for restoration.
 
 #### 2.3 Create users the README says should exist
 - [ ] **🎯 DO THIS — 2.3 Create users the README says should exist**
@@ -200,7 +186,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → **Users** → **Action → New User…** → untick "User must change password" only if the README says so.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > New-LocalUser -Name erin -Password (Read-Host -AsSecureString "Password for erin")
@@ -211,13 +197,12 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 - [ ] **🎯 DO THIS — 2.4 Fix the Administrators group**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Only the README's admins should be in **Administrators**.
 
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → **Groups** → double-click **Administrators** → remove the wrong people / **Add…** the right ones.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-LocalGroupMember Administrators
@@ -250,7 +235,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → **Users** → right-click **Guest** → **Properties** → tick **Account is disabled**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Disable-LocalUser -Name Guest
@@ -262,13 +247,12 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 - [ ] **🎯 DO THIS — 2.7 Fix weak password settings on accounts**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** No account should have **Password never expires**, **User cannot change password**, or *no password required*.
 
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → double-click each user → untick **Password never expires** and **User cannot change password**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-LocalUser | Where-Object { $_.Enabled } | Format-Table Name, PasswordExpires, UserMayChangePassword, PasswordRequired
@@ -283,7 +267,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → right-click the user → **Set Password…**
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Set-LocalUser -Name bob -Password (Read-Host -AsSecureString "New password for bob")
@@ -355,7 +339,7 @@ net accounts                     # check everything
 **⭐ EASIEST WAY — Click through the GUI:** **Start → Windows Security → Virus & threat protection → Manage settings**. Turn **on**: Real-time protection, Cloud-delivered protection, Automatic sample submission, **Tamper Protection**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-MpComputerStatus | Format-List AntivirusEnabled, RealTimeProtectionEnabled, IsTamperProtected, AntivirusSignatureAge
@@ -367,13 +351,12 @@ net accounts                     # check everything
 - [ ] **🎯 DO THIS (only if authorized) — 5.2 Remove planted exclusions**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why:** Attackers tell Defender to ignore their folder.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Manage settings → Exclusions → Add or remove exclusions**. Remove anything you didn't add.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-MpPreference | Format-List ExclusionPath, ExclusionExtension, ExclusionProcess
@@ -386,7 +369,7 @@ net accounts                     # check everything
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Microsoft Defender Antivirus** → **Turn off Microsoft Defender Antivirus** must be **Not configured** (or Disabled). Check **Real-time Protection** in the same place.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -ErrorAction SilentlyContinue                          # DisableAntiSpyware : 1 is bad
@@ -404,7 +387,6 @@ Get-MpThreatDetection           # anything found
 
 ---
 
-
 ### 6. Firewall
 
 #### 6.1 Firewall on for every network type
@@ -413,7 +395,7 @@ Get-MpThreatDetection           # anything found
 **⭐ EASIEST WAY — Click through the GUI:** **Windows Security → Firewall & network protection**. **Domain**, **Private** and **Public** must all say *Firewall is on*.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True -DefaultInboundAction Block -DefaultOutboundAction Allow
@@ -430,7 +412,7 @@ Get-MpThreatDetection           # anything found
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `wf.msc` → **Inbound Rules**. Sort by **Enabled**. Look for **allow** rules for strange programs (in `C:\Users\`, `C:\Temp`), strange ports (4444, 1337), or rules called something like "Windows Update Helper" that point at an odd program.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-NetFirewallRule -Direction Inbound -Action Allow -Enabled True | Where-Object { -not $_.DisplayGroup } |
@@ -439,7 +421,6 @@ Get-MpThreatDetection           # anything found
 > ```
 
 ---
-
 
 ### 7. Windows Update
 
@@ -454,7 +435,7 @@ Get-MpThreatDetection           # anything found
 **⭐ EASIEST WAY — Click through the GUI:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows Update** (on Windows 11 it is inside **Manage end user experience**; look there if you don't see it) → **Configure Automatic Updates** → **Enabled**, option **4 – Auto download and schedule the install**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-Service wuauserv | Format-Table Name, Status, StartType        # StartType must not be Disabled
@@ -483,13 +464,12 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 - [ ] **🎯 DO THIS — 4.1 Audit Policy (record security events)**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why:** Without auditing there's no record of logins, account changes, or policy changes.
 
 **⭐ EASIEST WAY — Click through the GUI:** `secpol.msc` → **Local Policies → Audit Policy**. Inspect the scenario-required categories. Prefer **Advanced Audit Policy Configuration → System Audit Policies**, selecting useful subcategories deliberately as described in [19.4](#194-audit-selectively-and-investigate-windows-events). Do not enable all high-volume auditing blindly.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > auditpol /set /subcategory:"Logon" /success:enable /failure:enable
@@ -528,7 +508,7 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 | Take ownership of files or other objects | Administrators |
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > secedit /export /areas USER_RIGHTS /cfg $env:TEMP\rights.inf
@@ -598,10 +578,8 @@ Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0 | Format-List
 - [ ] **🎯 DO THIS — 4.4 PowerShell logging**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Windows records every PowerShell script and command that runs.
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Attackers love PowerShell. With logging on, their commands end up in the event log.
 
 **⭐ EASIEST WAY — Click through the GUI:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Windows Components → Windows PowerShell**:
@@ -624,7 +602,7 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 **⭐ EASIEST WAY — Click through the GUI:** Start → **Windows Security → Virus & threat protection**, verify protection provider and signature freshness; then **Firewall & network protection**. If settings are managed, inspect the applicable policy source rather than forcing the registry.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -635,7 +613,6 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 > ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why:** Unexpected Defender exclusions and disabled protection can hide threats, but authorized applications may require an exclusion. Do **not** blindly remove all exclusions. The Windows Update service may be stopped while idle; Disabled startup type requires investigation.
 
 **Read-only SMB checks, when available:**
@@ -649,24 +626,21 @@ SMB1 is legacy; do not disable SMB functionality that the scenario explicitly re
 
 **✅ Check it worked:** Re-run the command, test the README-required client/service, and refresh the scoring report. Record how to restore only the affected policy.
 
-
 <a id="research-report-expansion-w-r1--account-inventory-guest-password-flags-and-privilege-reconciliation"></a>
 ### 🔐 Account inventory, Guest, password flags and privilege reconciliation
 
 - [ ] **🎯 DO THIS — 🔐 Account inventory, Guest, password flags and privilege reconciliation**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Community/training categories with vendor-supported commands. **Do not infer an individual scoring point.**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **What / why:** The research report emphasizes unauthorized accounts, built-in Guest, local Administrators/Backup Operators/Remote Desktop Users, and local password flags. Check the **actual image README** before disabling, deleting or rotating any identity.
 
 **⭐ EASIEST WAY — Click through the GUI:** Press **Win + R → lusrmgr.msc → Users**. Select an account → **Properties** to inspect disabled state, password never expires and group memberships. Under **Groups**, open **Administrators**, **Remote Desktop Users**, **Backup Operators** and any README-required group. On Windows Home, local-users GUI may not exist; use the terminal and the installed edition's supported tools.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -677,11 +651,10 @@ SMB1 is legacy; do not disable SMB functionality that the scenario explicitly re
 > ~~~
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **What to look for:** An extra human login, a seemingly unauthorized local admin, enabled Guest, or password-not-required / password-never-expires on an ordinary account. Check service principals, renamed built-ins, and domain membership before changing anything. A renamed built-in account retains its SID; a display name alone is insufficient.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -715,11 +688,9 @@ Get-LocalUser -Name 'EXAMPLE_AUTHORIZED_USER' | Select-Object Name,PasswordNever
 ~~~
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Re-enable an account mistakenly disabled with **Enable-LocalUser -Name 'ACTUAL_USER'**, or add back its recorded group membership with **Add-LocalGroupMember**. Restore a changed never-expiring flag only if documented and required. **Deletion is different from disabling**: a recreated account has a new SID and may lose access to files/permissions; use a permitted backup if an authorized user was deleted.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Never disable your only working administrator, delete README-required service users, or automatically disable domain identities using local-only cmdlets. Preserve forensics questions before account changes.
 
 <a id="research-report-expansion-w-r2--password-history-lockout-and-effective-local-policy"></a>
@@ -728,13 +699,12 @@ Get-LocalUser -Name 'EXAMPLE_AUTHORIZED_USER' | Select-Object Name,PasswordNever
 - [ ] **🎯 DO THIS — 🔐 Password history, lockout and effective local policy**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Training/community categories; vendor-backed Windows account-policy settings. The report lists multiple historical example values (e.g., minimum length 10–14, maximum age 60 or 90, threshold 5 or 10). **These are not universal scoring values.**
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → secpol.msc → Account Policies → Password Policy**, then **Account Lockout Policy**. Record each current number and the README-required value; also inspect complexity and reversible encryption. If domain joined, identify effective domain policy instead of assuming local secpol controls domain credentials.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -749,7 +719,7 @@ secedit /export /cfg "$env:TEMP\cp-local-policy-before.inf"
 ~~~
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~cmd
@@ -770,7 +740,6 @@ net accounts /lockoutwindow:30
 **✅ Verification:** Run **net accounts** again and inspect the policy GUI and resultant policy. Test one authorized user login without intentionally locking out an administrator.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Re-run **net accounts** with the **actual recorded old values**, then restore any separately edited GUI setting. Importing the full secedit export can overwrite unrelated rights and is **not** a normal one-setting rollback.
 
 <a id="research-report-expansion-w-r3--defender-cloudpua-exclusions-signatures-and-safe-scanning"></a>
@@ -779,13 +748,12 @@ net accounts /lockoutwindow:30
 - [ ] **🎯 DO THIS — 🧰 Defender cloud/PUA, exclusions, signatures and safe scanning**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed. Some Windows Server / enterprise environments use another approved endpoint protection product; do not force Defender to active mode without checking.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Start → Windows Security → Virus & threat protection → Manage settings**. Check real-time protection, cloud-delivered protection, PUA protection where available and **Exclusions**. Open **Protection updates**, **Scan options**, and **Protection history**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -794,11 +762,10 @@ net accounts /lockoutwindow:30
 > ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **What to look for:** Real-time monitoring disabled without an approved replacement, unexpectedly broad folder/process exclusions, stale signatures, unauthorized antivirus, or an active threat. An exclusion can be legitimate for a required app—record and verify it first.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -821,7 +788,6 @@ Start-MpScan -ScanType QuickScan
 **✅ Verification:** Re-run **Get-MpComputerStatus** and **Get-MpPreference**, inspect protection/history and verify the README-required applications still function. A tamper-protection or policy-managed rejection is not an invitation to bypass protection.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore only a setting or exclusion mistakenly changed **if the original setting is authorized**. Do not disable antivirus broadly or release quarantined malicious files just to recover a score.
 
 <a id="research-report-expansion-w-r4--firewall-baseline-rule-scope-and-safe-profile-recovery"></a>
@@ -830,13 +796,12 @@ Start-MpScan -ScanType QuickScan
 - [ ] **🎯 DO THIS — 🛡️ Firewall baseline, rule scope and safe profile recovery**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Training/community; vendor-backed firewall settings.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → wf.msc → Windows Defender Firewall Properties**. Inspect Domain, Private and Public profiles. Under **Inbound Rules**, open a specific rule and inspect **Program, Protocol/Port, Scope, Profile, Enabled/Action**; preserve known required remote-admin and application traffic.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -866,7 +831,6 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -DefaultInboundAction Bloc
 **✅ Verification:** Repeat profile/rule queries and connect from an authorized separate client to every required service. A listening port does not prove external reachability; a firewall rule can be limited by profile and remote address.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore the precise prior profile values or a **single** modified rule. Full **netsh advfirewall import** replaces the entire policy and may erase later legitimate changes, so only use it after evaluating the current policy and recovery consequences.
 
 ---
@@ -876,7 +840,6 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -DefaultInboundAction Bloc
 
 > [!TIP]
 > ⚙️ **Service-aware work:** Check required applications and dependencies before adjusting settings.
-
 
 Investigate required services and software before touching their configuration. Large service tables are intentionally below initial priority checks.
 
@@ -927,7 +890,7 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStat
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `fsmgmt.msc` → **Shares**. Right-click a share → **Stop Sharing**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-SmbShare
@@ -956,7 +919,7 @@ Look for:
 - **Remote control:** TeamViewer, AnyDesk, VNC, RustDesk
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*, HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
@@ -982,7 +945,6 @@ Get-ChildItem C:\Users, C:\Temp -Recurse -Force -Include nc.exe,ncat.exe,nmap.ex
 ```
 
 ---
-
 
 ### 13. Prohibited files
 
@@ -1012,7 +974,6 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 
 ---
 
-
 ### 14. Backdoors and malware
 
 #### 14.1 Programs that start at logon
@@ -1021,7 +982,7 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 **⭐ EASIEST WAY — Click through the GUI:** **Task Manager (Ctrl+Shift+Esc) → Startup apps**. Also open these folders with **Win + R**: `shell:startup` and `shell:common startup`.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-CimInstance Win32_StartupCommand | Format-Table Name, Command, Location -AutoSize
@@ -1036,7 +997,7 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `taskschd.msc` → **Task Scheduler Library**. Check each task's **Actions** tab. Non-Microsoft tasks are usually in the top folder.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-ScheduledTask | Where-Object TaskPath -notlike '\Microsoft\*' |
@@ -1057,7 +1018,6 @@ sc.exe delete BadService            # only for a service you are sure is malware
 - [ ] **🎯 DO THIS — 14.4 Sticky Keys / Utility Manager backdoor**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why:** Replacing `sethc.exe` (press Shift 5 times) or `utilman.exe` (the accessibility button) with `cmd.exe` gives anyone a SYSTEM command prompt **at the login screen**.
 
 ```powershell
@@ -1115,7 +1075,6 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 
 ---
 
-
 ### 8. Services
 
 #### 8.1 Turn off risky services (unless the README needs them)
@@ -1150,15 +1109,12 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 - [ ] **🎯 DO THIS — 8.1.1 Remote Registry**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Allows remote registry administration. Actual service name(s): `RemoteRegistry`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if remote registry administration is not required.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1169,7 +1125,7 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1180,7 +1136,7 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1204,7 +1160,6 @@ Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue | Format-Table 
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1215,24 +1170,19 @@ Start-Service -Name 'RemoteRegistry'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Remote administrators may depend on this; do not alter RPC. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.2 Telnet
 
 - [ ] **🎯 DO THIS — 8.1.2 Telnet**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Provides unencrypted remote terminal access on older Windows versions. Actual service name(s): `TlntSvr`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable an installed server unless the scenario explicitly requires Telnet; prefer SSH where permitted.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1243,7 +1193,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1254,7 +1204,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1278,7 +1228,6 @@ Get-Service -Name 'TlntSvr' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1289,24 +1238,19 @@ Start-Service -Name 'TlntSvr'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Telnet Client is a separate optional feature. A missing TlntSvr is normal on modern Windows. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.3 SNMP and SNMP Trap
 
 - [ ] **🎯 DO THIS — 8.1.3 SNMP and SNMP Trap**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** SNMP exposes monitoring data; the trap service receives monitoring notifications. Actual service name(s): `SNMP`, `SNMPTRAP`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable each installed service unless monitoring is required.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1317,7 +1261,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1328,7 +1272,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1352,7 +1296,6 @@ Get-Service -Name 'SNMP','SNMPTRAP' -ErrorAction SilentlyContinue | Format-Table
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1363,24 +1306,19 @@ Start-Service -Name 'SNMP'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Retained SNMP needs restricted managers, firewall sources and nondefault community strings; traps and polling have different dependencies. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.4 SSDP Discovery
 
 - [ ] **🎯 DO THIS — 8.1.4 SSDP Discovery**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Discovers devices using SSDP multicast. Actual service name(s): `SSDPSRV`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if network device discovery is not required.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1391,7 +1329,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1402,7 +1340,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1426,7 +1364,6 @@ Get-Service -Name 'SSDPSRV' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1437,24 +1374,19 @@ Start-Service -Name 'SSDPSRV'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Media and device discovery may stop; inspect DependentServices first. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.5 UPnP Device Host
 
 - [ ] **🎯 DO THIS — 8.1.5 UPnP Device Host**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Hosts Universal Plug and Play devices. Actual service name(s): `upnphost`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable if UPnP hosting is not required.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1465,7 +1397,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1476,7 +1408,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1500,7 +1432,6 @@ Get-Service -Name 'upnphost' -ErrorAction SilentlyContinue | Format-Table Name,S
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1511,24 +1442,19 @@ Start-Service -Name 'upnphost'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** UPnP-dependent applications can fail; do not disable unrelated networking services. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.6 FTP
 
 - [ ] **🎯 DO THIS — 8.1.6 FTP**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Runs the Microsoft IIS FTP transfer service. Actual service name(s): `FTPSVC`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden a required FTP server; otherwise disable.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1539,7 +1465,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1550,7 +1476,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1574,7 +1500,6 @@ Get-Service -Name 'FTPSVC' -ErrorAction SilentlyContinue | Format-Table Name,Sta
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1585,24 +1510,19 @@ Start-Service -Name 'FTPSVC'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** FTP authentication, TLS certificates and passive data ports must remain usable; see the Server FTP procedure. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.7 World Wide Web Publishing
 
 - [ ] **🎯 DO THIS — 8.1.7 World Wide Web Publishing**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Serves IIS websites. Actual service name(s): `W3SVC`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep if the README requires a website; otherwise disable after checking sites.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1613,7 +1533,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1624,7 +1544,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1648,7 +1568,6 @@ Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue | Format-Table Name,Stat
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1659,24 +1578,19 @@ Start-Service -Name 'W3SVC'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Inspect IIS bindings and application pools; do not mistake an intentionally installed website for malware. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.8 Remote Desktop Services
 
 - [ ] **🎯 DO THIS — 8.1.8 Remote Desktop Services**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Provides Remote Desktop sessions. Actual service name(s): `TermService`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and secure if RDP is required; otherwise turn Remote Desktop off before considering disabling the service.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1687,7 +1601,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1698,7 +1612,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1722,7 +1636,6 @@ Get-Service -Name 'TermService' -ErrorAction SilentlyContinue | Format-Table Nam
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1733,24 +1646,19 @@ Start-Service -Name 'TermService'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Never stop it from your only RDP connection. Use the VM console and test NLA and authorized users. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.9 Routing and Remote Access
 
 - [ ] **🎯 DO THIS — 8.1.9 Routing and Remote Access**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Provides routing and VPN functions. Actual service name(s): `RemoteAccess`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only on a machine that is not a required router or VPN server.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1761,7 +1669,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1772,7 +1680,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1796,7 +1704,6 @@ Get-Service -Name 'RemoteAccess' -ErrorAction SilentlyContinue | Format-Table Na
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1807,24 +1714,19 @@ Start-Service -Name 'RemoteAccess'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Record routes and VPN requirements first; disabling can disconnect entire subnets. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.10 Internet Connection Sharing
 
 - [ ] **🎯 DO THIS — 8.1.10 Internet Connection Sharing**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Provides shared network access and NAT functions. Actual service name(s): `SharedAccess`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable only if ICS, hosted networking and dependent virtualization features are not needed.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1835,7 +1737,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1846,7 +1748,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1870,7 +1772,6 @@ Get-Service -Name 'SharedAccess' -ErrorAction SilentlyContinue | Format-Table Na
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1881,24 +1782,19 @@ Start-Service -Name 'SharedAccess'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Inspect VM networking dependencies; never disable the Windows Firewall service mpssvc in its place. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.11 Print Spooler
 
 - [ ] **🎯 DO THIS — 8.1.11 Print Spooler**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Queues printing jobs and loads printer drivers. Actual service name(s): `Spooler`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable when no printing is required; otherwise patch and restrict driver installation.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1909,7 +1805,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1920,7 +1816,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1944,7 +1840,6 @@ Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -1955,24 +1850,19 @@ Start-Service -Name 'Spooler'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Printing and some PDF workflows may stop. Keep required print-server roles; follow section 8.3. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.12 Xbox services
 
 - [ ] **🎯 DO THIS — 8.1.12 Xbox services**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Supports Xbox authentication, saved games and networking. Actual service name(s): `XblAuthManager`, `XblGameSave`, `XboxNetApiSvc`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable installed members when gaming is not required.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -1983,7 +1873,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -1994,7 +1884,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2018,7 +1908,6 @@ Get-Service -Name 'XblAuthManager','XblGameSave','XboxNetApiSvc' -ErrorAction Si
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2029,24 +1918,19 @@ Start-Service -Name 'XblAuthManager'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Some builds omit these services. Do not use a wildcard to disable unrelated services. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.13 Simple TCP/IP Services
 
 - [ ] **🎯 DO THIS — 8.1.13 Simple TCP/IP Services**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Hosts legacy echo, discard, daytime, quote and character-generator protocols. Actual service name(s): `simptcp`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless explicitly required for a lab task.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2057,7 +1941,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2068,7 +1952,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2092,7 +1976,6 @@ Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue | Format-Table Name,St
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2103,24 +1986,19 @@ Start-Service -Name 'simptcp'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** The optional component may be absent. Removing it and disabling it are separate changes. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.14 WebClient
 
 - [ ] **🎯 DO THIS — 8.1.14 WebClient**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Lets applications access WebDAV resources. Actual service name(s): `WebClient`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless required WebDAV workflows need it.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2131,7 +2009,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2142,7 +2020,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2166,7 +2044,6 @@ Get-Service -Name 'WebClient' -ErrorAction SilentlyContinue | Format-Table Name,
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2177,24 +2054,19 @@ Start-Service -Name 'WebClient'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Mapped WebDAV drives and document workflows may fail; normal SMB shares are a different protocol. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.15 Windows Media Player Network Sharing
 
 - [ ] **🎯 DO THIS — 8.1.15 Windows Media Player Network Sharing**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Shares media libraries over the network. Actual service name(s): `WMPNetworkSvc`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Disable unless media sharing is explicitly required.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2205,7 +2077,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2216,7 +2088,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2240,7 +2112,6 @@ Get-Service -Name 'WMPNetworkSvc' -ErrorAction SilentlyContinue | Format-Table N
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2251,24 +2122,19 @@ Start-Service -Name 'WMPNetworkSvc'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Local playback and network sharing are different functions; do not remove required media files. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.16 OpenSSH SSH Server
 
 - [ ] **🎯 DO THIS — 8.1.16 OpenSSH SSH Server**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Provides encrypted SSH and SFTP access. Actual service name(s): `sshd`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep and harden when required; otherwise disable the installed server.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2279,7 +2145,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2290,7 +2156,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2314,7 +2180,6 @@ Get-Service -Name 'sshd' -ErrorAction SilentlyContinue | Format-Table Name,Statu
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2325,24 +2190,19 @@ Start-Service -Name 'sshd'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Back up C:\ProgramData\ssh\sshd_config, run sshd.exe -t if available, and test a second authorized connection before closing the first. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.17 WinRM
 
 - [ ] **🎯 DO THIS — 8.1.17 WinRM**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Supports Windows Remote Management, PowerShell remoting and server administration. Actual service name(s): `WinRM`.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Every enabled network or privileged service increases the available attack surface. **Recommendation:** Keep when required by management tools; restrict authentication and firewall sources.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Check the README for this function, record the original startup type and running status for each installed service, and confirm you have a console session.
 
 **⭐ EASIEST WAY — Click through the GUI:**
@@ -2353,7 +2213,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 4. Only if not required, select **Disabled**, click **Apply**, then **Stop**, then **OK**. If Stop fails, inspect dependencies and the error instead of forcing it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2364,7 +2224,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 `Name` is the stable identifier; `Status` is the current state; `StartType` controls future starts. No row means that name is not installed; confirm in Services rather than installing it to complete the checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2388,7 +2248,6 @@ Get-Service -Name 'WinRM' -ErrorAction SilentlyContinue | Format-Table Name,Stat
 Changed entries should show `Stopped` and `Disabled`. Required entries should retain their recorded type and pass an actual client test. Refresh the Scoring Report.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** In Services restore the recorded startup type and click **Start** only if it was originally running. For an original Manual service:
 
 ```powershell
@@ -2399,30 +2258,25 @@ Start-Service -Name 'WinRM'
 Use `Automatic` instead when that was recorded; restore delayed automatic start through the GUI. Leave an originally stopped service stopped.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **Warnings and troubleshooting:** Server Manager often depends on WinRM. Check winrm get winrm/config/service; Basic and AllowUnencrypted should normally be false. `Access is denied` usually means the shell is not elevated or the service is protected. `Cannot find any service` means the name is absent or mistyped. A policy that restores the setting needs investigation in Group Policy; repeated forced changes are not a fix.
-
 
 ##### 8.1.18 Remote-control applications
 
 - [ ] **🎯 DO THIS — 8.1.18 Remote-control applications**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** TeamViewer, AnyDesk, VNC and RustDesk install vendor-specific services; no universal service name exists. Common names include `TeamViewer`, `AnyDesk`, `uvnc_service` and `tvnserver`, but verify the installed executable.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Unauthorized unattended access bypasses the expected administration path.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Preserve the executable path, signature, configuration and relevant logs for forensics. Keep a README-required remote-control application.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open `services.msc`; double-click the vendor service and record **Path to executable**, startup type and status. Open **Settings → Apps → Installed apps**; identify the same publisher. Stop and disable only a confirmed unauthorized entry, then use the vendor's uninstall option after evidence is saved.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2430,7 +2284,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 > ```
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2441,11 +2295,9 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 **✅ Check it worked:** Repeat the inventory and verify the entry is stopped/disabled or gone after uninstall. Inspect the original listening port and startup entry too; portable tools may have no service.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Before uninstalling, preserve an authorized installer and license/configuration details privately. Restore the recorded service type and status if merely disabled; reinstall from the trusted vendor only if removal was mistaken.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Names and paths are clues, not proof. Do not run `sc.exe delete` as a substitute for an application uninstaller or remove a tool supporting your only access path.
 
 - **Specific service checks:** Inspect **Simple TCP/IP Services** and **Remote Registry** in `services.msc`; disable only when not required, then verify the stopped state. Restore original startup type if required functionality breaks.
@@ -2463,10 +2315,8 @@ Get-Service WinDefend, mpssvc, EventLog, wuauserv, wscsvc -ErrorAction SilentlyC
 - [ ] **🎯 DO THIS — 8.3 Printer drivers: PrintNightmare fixes**
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🎯 What:** Only administrators may install printer drivers, and "Point and Print" must always show a warning and ask for an admin password.
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** PrintNightmare (CVE-2021-34527) lets a normal user install a "printer driver" that runs as SYSTEM, the most powerful account. An image can plant the old, unsafe setting even when Windows is updated.
 
 **⭐ EASIEST WAY — Click through the GUI:** `gpedit.msc` → **Computer Configuration → Administrative Templates → Printers**:
@@ -2476,7 +2326,7 @@ Get-Service WinDefend, mpssvc, EventLog, wuauserv, wscsvc -ErrorAction SilentlyC
 On Home, or if the first policy isn't in the list, use the Typing commands.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > $pp = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'
@@ -2489,7 +2339,6 @@ On Home, or if the first policy isn't in the list, use the Typing commands.
 **✅ Check it worked:** `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint'` shows `RestrictDriverInstallationToAdministrators : 1` and the other two `0`. If the README doesn't need printing, also turn off the Print Spooler (8.1).
 
 ---
-
 
 ### 9. Windows features
 
@@ -2505,7 +2354,7 @@ On Home, or if the first policy isn't in the list, use the Typing commands.
 - **Internet Explorer 11** (Windows 10)
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
@@ -2523,12 +2372,11 @@ On Home, or if the first policy isn't in the list, use the Typing commands.
 - [ ] **🎯 DO THIS — 9.2 Optional features (OpenSSH Server, SNMP)**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Some extras are "optional features" instead of Windows features: **OpenSSH Server** and **SNMP** are the risky ones.
 **⭐ EASIEST WAY — Click through the GUI:** **Settings → System → Optional features** (older versions: **Settings → Apps → Optional features**) → click the feature → **Remove**. Keep it if the README needs it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
 > Get-WindowsCapability -Online | Where-Object State -eq Installed | Select-Object Name
@@ -2538,7 +2386,6 @@ On Home, or if the first policy isn't in the list, use the Typing commands.
 **✅ Check it worked:** run the first line again: the removed names are gone.
 
 ---
-
 
 ### 15. Other settings
 
@@ -2589,7 +2436,6 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 - [ ] **🎯 DO THIS — 15.6 WDigest off (no plain-text passwords in memory)**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
@@ -2604,7 +2450,6 @@ Get-ItemProperty $k | Select-Object UseLogonCredential   # must be 0
 - [ ] **🎯 DO THIS — 15.7 NetBIOS over TCP/IP off**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Like LLMNR (15.4), attackers answer NetBIOS name lookups to steal password hashes.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `ncpa.cpl` → right-click the network adapter → **Properties** → **Internet Protocol Version 4 (TCP/IPv4)** → **Properties** → **Advanced…** → **WINS** → **Disable NetBIOS over TCP/IP** → **OK**.
@@ -2615,7 +2460,6 @@ Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled=TRUE" | Sel
 ```
 
 ---
-
 
 ### 17. Critical services
 
@@ -2636,13 +2480,10 @@ Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,Owning
 ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🧠 Interpretation:** An unusual executable path or listener is an investigation lead, not proof of malware. Compare against signed publisher, files and service dependencies, and permitted software; preserve forensic evidence before removal. Confirm required remote assistance, IIS, SMB, SSH or RDP before changing firewall rules.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore the single authorized task, service startup type, or firewall rule from its recorded starting state. Avoid broad deletions.
-
 
 <a id="research-report-expansion-w-r5--smbv1-required-smb-signing-share-permissions-and-fallback"></a>
 ### 🧰 SMBv1, required SMB signing, share permissions and fallback
@@ -2650,13 +2491,12 @@ Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,Owning
 - [ ] **🎯 DO THIS — 🧰 SMBv1, required SMB signing, share permissions and fallback**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed. SMBv1 is obsolete and SMB signing protects message integrity, but legacy clients and specific file-sharing scenarios can change the safe action.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → optionalfeatures.exe → SMB 1.0/CIFS File Sharing Support** for optional SMB1 components; **secpol.msc → Local Policies → Security Options** for **Microsoft network client/server: Digitally sign communications (always)**; **Win + R → fsmgmt.msc → Shares** for sharing configuration.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -2690,7 +2530,6 @@ Set-SmbClientConfiguration -RequireSecuritySignature $true
 **✅ Verification:** Repeat Get-Smb* commands and test normal share read/write and access denial with authorized sample users. Inspect whether a reboot is pending after SMB1 feature changes.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore **only recorded original** signing and feature settings if a required client breaks. Re-enabling SMB1 is a last-resort legacy compatibility measure, not a routine scoring workaround. For an accidentally deleted share, restore its original name/path, share ACL **and NTFS ACL** from backup; recreating the share alone may not restore access.
 
 **Sources:** [Microsoft SMB signing overview](https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-signing-overview) and [Set-SmbServerConfiguration](https://learn.microsoft.com/en-us/powershell/module/smbshare/set-smbserverconfiguration).
@@ -2701,13 +2540,12 @@ Set-SmbClientConfiguration -RequireSecuritySignature $true
 - [ ] **🎯 DO THIS — 🛡️ RDP, Remote Registry and additional service checks**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed. A remote-management service is not automatically unauthorized; inspect the README and device role first.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Settings → System → Remote Desktop** (Windows 11; similar location on Windows 10); **Win + R → services.msc → Remote Registry**. Use **System Properties → Remote** and **Select Users** to inspect Remote Assistance/RDP access where available.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -2730,7 +2568,6 @@ For RDP, prefer the Remote Desktop GUI to disable an unauthorized listener. Do n
 **✅ Verification:** Repeat the status/registry checks. Test RDP from an approved client **when required**, or confirm that it is unreachable if prohibited.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore the exact recorded Remote Registry startup type and RDP setting/allowed groups/firewall rules using authorized console access. A blanket **Remote Desktop off** recommendation is inappropriate for a required administration session.
 
 <a id="research-report-expansion-w-r7--installed-software-scheduled-tasks-persistence-and-evidence"></a>
@@ -2739,13 +2576,12 @@ For RDP, prefer the Remote Desktop GUI to disable an unauthorized listener. Do n
 - [ ] **🎯 DO THIS — 📦 Installed software, scheduled tasks, persistence and evidence**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Community. Common checks include Run/RunOnce, scheduled tasks, suspect services, executable signatures, installed apps and portable tools.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → appwiz.cpl**, **Task Manager → Startup apps**, **Win + R → taskschd.msc**, and **services.msc**. Inspect the exact executable and task action before disabling.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -2769,7 +2605,6 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' 
 **✅ Verify:** Recheck the same item and required applications. If persistence returns, investigate its owning process and launch mechanism; do not guess at an unrelated service.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Re-enable that exact task/service or restore its recorded registry entry. Uninstalling software can delete app data—restore both product **and configuration** if a required application was accidentally removed.
 
 <a id="research-report-expansion-w-r8--uac-advanced-audit-policy-and-source-evidence"></a>
@@ -2778,13 +2613,12 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' 
 - [ ] **🎯 DO THIS — 🔎 UAC, advanced audit policy and source evidence**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **📚 Evidence:** Community/vendor-backed. These controls affect security event records, privilege prompts and visibility during investigations.
 
 **⭐ EASIEST WAY — Click through the GUI:** Search **Change User Account Control settings**, then **Win + R → secpol.msc → Local Policies → Security Options** for detailed UAC settings. Review **Advanced Audit Policy Configuration** for account logon, account management, logon/logoff, policy change, privilege use and object access. On a domain-joined device inspect effective GPO.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -2802,7 +2636,6 @@ auditpol /set /subcategory:"Logon" /success:enable /failure:enable
 **✅ Verification:** Repeat auditpol and review recent **Event Viewer → Security** entries with correct timestamp/user context. A 4688 process-create event requires process-creation auditing; the absence of an event is not proof nothing ran.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Record original auditpol subcategory status *before* changes and restore the exact previous Success/Failure state, instead of enabling or disabling all categories blindly. UAC changes may require restarting a process/reboot; preserve a rollback path.
 
 ---
@@ -2813,7 +2646,6 @@ auditpol /set /subcategory:"Logon" /success:enable /failure:enable
 > [!NOTE]
 > 🧰 **Advanced reference:** Use these targeted procedures when the scenario calls for deeper investigation.
 
-
 Use for detailed troubleshooting, PowerShell commands, audit events, effective policy and rollback.
 
 ### 19. Manual verification, recovery and missing investigation steps
@@ -2823,21 +2655,18 @@ Use for detailed troubleshooting, PowerShell commands, audit events, effective p
 - [ ] **🎯 DO THIS — 19.1 Record a recoverable Windows baseline**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Save the original configuration before changing a table of settings.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** A screenshot of a target value is not a backup of the old value. Account deletion, password resets and registry merges have different recovery limits.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Use an authorized administrator at the VM console. Follow round rules on snapshots. Backups can contain sensitive policy and account information; keep them local and private.
 
 **⭐ EASIEST WAY — Click through the GUI:** Open File Explorer, create `C:\CP-Backups`, then use **Properties → Security → Advanced** to restrict access to Administrators and SYSTEM. Do not remove access from your current administrator. Open `secpol.msc` and use **Action → Export Policy**; in `wf.msc`, right-click the root and choose **Export Policy**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2870,13 +2699,12 @@ Get-CimInstance Win32_Service | Select-Object Name,StartMode,State,PathName | Ex
 ```
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 **✅ Check it worked:** Open each export as text where applicable and verify it is nonempty. Do not assume a CSV can recreate a deleted user with its old SID.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Prefer the individual setting's recorded value. A whole security-policy restore affects many settings:
 
 ```powershell
@@ -2890,7 +2718,6 @@ auditpol /restore /file:C:\CP-Backups\audit-before.csv
 ```
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Domain policy can override local changes. Password resets cannot recover the previous password and may make EFS files or stored credentials inaccessible. Preserve evidence before resets.
 
 #### 19.2 Apply account and privileged-group table entries safely
@@ -2898,21 +2725,18 @@ auditpol /restore /file:C:\CP-Backups\audit-before.csv
 - [ ] **🎯 DO THIS — 19.2 Apply account and privileged-group table entries safely**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Reconcile each account and each powerful group with the README.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Names alone do not reveal service-account dependencies, nested memberships or renamed built-in accounts.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Run `whoami /user` and keep a second tested administrator. Review the account's home directory, running services and scheduled tasks. On a Domain Controller use the Server AD procedure, not local-user commands.
 
 **⭐ EASIEST WAY — Click through the GUI:** `lusrmgr.msc` → **Users** → double-click the exact account → **Member Of**. Compare every membership with section 2.5. For a confirmed unauthorized account, first tick **Account is disabled**. In **Groups**, open each powerful group individually, select the incorrect member and click **Remove → Apply**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2924,7 +2748,7 @@ auditpol /restore /file:C:\CP-Backups\audit-before.csv
 No task/service results only means these queries found none; inspect application configuration too.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2940,11 +2764,9 @@ Remove-LocalGroupMember -Group 'Backup Operators' -Member mallory
 **✅ Check it worked:** Repeat `Get-LocalUser` or `Get-LocalGroupMember 'Backup Operators'`. The disabled account shows `Enabled : False`; a removed member no longer appears. Test an authorized user's ordinary and administrator workflows.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** `Enable-LocalUser -Name mallory` restores a mistakenly disabled account. `Add-LocalGroupMember -Group 'Backup Operators' -Member mallory` restores only a recorded membership. Deleted accounts need proper account/data recovery; creating the same name generates a different SID.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Do not disable every built-in account without checking its purpose. `PasswordExpires` from `Get-LocalUser` is a date or empty value, not simply a true/false policy flag. Service identities may have managed password behavior.
 
 #### 19.3 Work through password, rights and security-option tables
@@ -2952,15 +2774,12 @@ Remove-LocalGroupMember -Group 'Backup Operators' -Member mallory
 - [ ] **🎯 DO THIS — 19.3 Work through password, rights and security-option tables**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Change each table row deliberately and check the effective policy.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** User rights are privileges, not ordinary group memberships. A **Deny** entry takes precedence over an allow entry. Compatibility-sensitive policies can break file sharing or authentication.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Export policy using 19.1. On domain members inspect policy precedence first:
 
 ```powershell
@@ -2973,7 +2792,7 @@ Open the HTML locally; note the winning GPO. `net accounts` reports local accoun
 **⭐ EASIEST WAY — Click through the GUI:** Press **Win + R → secpol.msc**. For each password/lockout row open **Account Policies → Password Policy / Account Lockout Policy**; double-click the exact row, record its current value, enter the README value, and click **Apply → OK**. Set lockout threshold first, then its duration/window. Under **Local Policies → User Rights Assignment**, open one right, record every principal, and use **Add User or Group / Remove** only for that right. Under **Security Options**, open each named setting and choose its explicit option. Record units such as seconds, minutes or days.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -2988,7 +2807,7 @@ Compare the before/after files. `SeDebugPrivilege` corresponds to **Debug progra
 ```
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3000,11 +2819,9 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 **✅ Check it worked:** Repeat `net accounts`, export the policy again, and test one noncritical authorized account from a separate session. Confirm legitimate network access still works. Do not intentionally lock out your administrator to test the threshold.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore the individual row's recorded principals/value. Use the reviewed policy backup only when necessary. A refresh that reverses your edit means the owning GPO needs correction by its authorized administrator.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** The tables are workstation starting points, not universal server baselines. Preserve service SIDs and required operators. Mandatory signing, NTLM restrictions, cached-logon settings and anonymous-access restrictions require client compatibility checks. Do not add your own admin account to a deny right.
 
 #### 19.4 Audit selectively and investigate Windows events
@@ -3012,21 +2829,18 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 - [ ] **🎯 DO THIS — 19.4 Audit selectively and investigate Windows events**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Record useful authentication, account and policy changes without blindly enabling every audit category.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** High-volume object/process auditing can fill logs quickly. A missing event does not establish that an action never occurred; the policy may not have recorded it.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Back up audit policy and export relevant logs before remediation. Do not clear logs or disable Windows Event Log.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → eventvwr.msc → Windows Logs → Security → Filter Current Log**. Enter `4624,4625,4720,4732,1102`. Use **Save All Events As** for an EVTX copy. In `secpol.msc` use **Advanced Audit Policy Configuration → System Audit Policies** to configure the required subcategory, not both competing legacy and advanced settings.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3037,7 +2851,7 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 4624 is a successful logon; 4625 is failure; 4720 creates a user; 4732 adds a member to a local security group; 1102 records clearing the Security audit log. Read the target account, source address and logon type, not just the event ID.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3049,11 +2863,9 @@ Use `auditpol /list /subcategory:*` to find localized names. Process creation ev
 **✅ Check it worked:** `auditpol /get /subcategory:"Logon"` should show Success and Failure. Test a normal permitted login and inspect its event. Confirm log retention and maximum size in **Security → Properties**.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore the original subcategory or the audit CSV from 19.1. Preserve existing events; reverting policy does not require deleting logs.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Timestamp display follows local time. Correlate with timezone and system clock before inferring event order.
 
 #### 19.5 Firewall rule inspection and required ports
@@ -3061,21 +2873,18 @@ Use `auditpol /list /subcategory:*` to find localized names. Process creation ev
 - [ ] **🎯 DO THIS — 19.5 Firewall rule inspection and required ports**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Enable host firewall profiles and permit only the required application traffic.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** An enabled firewall can still allow an unwanted inbound rule. A listener on localhost is different from a listener on every address.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Export the firewall, identify the current profile, service executable, protocol, local port and authorized source networks. Never reset the firewall as a first step.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → wf.msc**. Open **Windows Defender Firewall Properties**; enable the appropriate Domain, Private and Public profiles, normally block unmatched inbound and allow outbound. Under **Inbound Rules**, double-click a candidate rule and inspect **Programs and Services**, **Protocols and Ports**, **Scope**, **Advanced** and **General**. Disable only a confirmed unauthorized rule. For a required service, **New Rule → Custom**, scope it to the program/port and authorized remote IPs, choose the appropriate profiles, and give it a descriptive name.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3093,7 +2902,7 @@ Get-NetFirewallRule -Name 'CP-Required-HTTPS' -ErrorAction SilentlyContinue | Ge
 ```
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3109,11 +2918,9 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 **✅ Check it worked:** Repeat the profile query. From an authorized second machine run `Test-NetConnection server-name -Port 443` in PowerShell, then open the actual HTTPS site. `TcpTestSucceeded : True` proves TCP establishment, not application correctness. Test an unauthorized path only in the permitted lab.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Remove only the rule you created with `Remove-NetFirewallRule -Name 'CP-Required-HTTPS'`, or restore a disabled rule by its recorded Name. Whole-policy import (`netsh advfirewall import ...`) replaces policy and can remove later valid changes; review first and use the console.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Group Policy rules can override local behavior. Avoid broad `Any` source/port exceptions and disabling the whole firewall to troubleshoot one service.
 
 #### 19.6 Defender, updates and application health
@@ -3121,21 +2928,18 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 - [ ] **🎯 DO THIS — 19.6 Defender, updates and application health**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Check protection state, pending security updates and required applications.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** An installed antivirus product may be passive or have exclusions that defeat protection. Scan/remediation can modify evidence.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Answer relevant forensics questions. Record third-party antivirus, exclusions, update policy and required application versions. Windows 10's ordinary support ended in October 2025; check the image's edition/support arrangement instead of assuming all versions receive regular updates.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Windows Security → Virus & threat protection → Manage settings**; inspect real-time/cloud protection, exclusions and **Protection history**. Do not remove an exclusion merely because it exists; verify its purpose. Open **Settings → Windows Update → Update history** and each required application's **Help → About** page. On Server use its corresponding checklist.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3147,7 +2951,7 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
 Passive mode may be intentional with another antivirus. `Get-HotFix` is not a complete update inventory; Windows Update remains the main pending-update check.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3165,11 +2969,9 @@ Use the GUI to install offered OS updates and trusted vendor updates; do not ins
 **✅ Check it worked:** Recheck signature time, Protection history and the update page. Open each required application and test the README function. Reboot only at an appropriate checkpoint after installers finish.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore only a wrongly changed preference using its recorded value. Do not restore quarantined malware to the live image merely to recover points. If an update breaks a required function, investigate the exact update and supported recovery option; do not disable future updates wholesale.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Tamper Protection or organizational policy may reject PowerShell edits. Do not weaken those controls to force a setting. Updates can require more than one restart; do not interrupt an in-progress update to follow a rigid one-reboot rule.
 
 #### 19.7 SMB share permissions and NTFS permissions
@@ -3177,21 +2979,18 @@ Use the GUI to install offered OS updates and trusted vendor updates; do not ins
 - [ ] **🎯 DO THIS — 19.7 SMB share permissions and NTFS permissions**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Validate both the network share ACL and the underlying NTFS ACL.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Effective network access is limited by both layers; denying a broad group can unintentionally block administrators too.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record share name, path, description and authorized readers/writers. Preserve forensic files and original ACLs. Do not remove system shares or use recursive permission resets on Windows directories.
 
 **⭐ EASIEST WAY — Click through the GUI:** `fsmgmt.msc` → **Shares** → required share **Properties → Share Permissions**. Then open its folder **Properties → Security → Advanced**; inspect inheritance and **Effective Access** for a representative user. Remove only the unintended grant; keep application identities.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3204,7 +3003,7 @@ Use the GUI to install offered OS updates and trusted vendor updates; do not ins
 `F` means Full control, `M` Modify, `RX` Read/execute, and `(I)` inherited. Errors during the recursive backup mean some ACLs were not saved; investigate before relying on it.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3216,11 +3015,9 @@ Then use the Security GUI to grant the matching folder read access and remove on
 **✅ Check it worked:** Test reading and, where required, writing from a second machine as an ordinary authorized user. Test an unauthorized user separately. Administrator success does not prove ordinary users can connect.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Restore the recorded share grants individually. For the saved ACL above use `icacls C:\Shares /restore C:\CP-Backups\public-acl.txt` after confirming the parent path. Do not recreate a deleted share from memory.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Share permissions do not protect local file access. Removing Everyone without providing the required replacement can break a legitimate share.
 
 #### 19.8 Scheduled tasks, startup, registry and suspicious executables
@@ -3228,21 +3025,18 @@ Then use the Security GUI to grant the matching folder read access and remove on
 - [ ] **🎯 DO THIS — 19.8 Scheduled tasks, startup, registry and suspicious executables**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Trace each suspicious process back to the mechanism that launches it.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Killing a process without addressing persistence lets it return. Encoded PowerShell, Python and unusual paths are leads, not proof of malware.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record the task action, trigger, account, executable path, command line, signature and hash. Export the task/registry key. Never launch a suspicious executable to identify it.
 
 **⭐ EASIEST WAY — Click through the GUI:** `taskschd.msc` → **Task Scheduler Library** → task → inspect **Actions**, **Triggers**, **General**, **History**; right-click **Export** to save XML, then **Disable** for reversible containment after evidence collection. **Task Manager → Startup apps → Disable** applies only to that entry. For registry changes, open `regedit`, select the exact key, choose **File → Export → Selected branch**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3259,7 +3053,7 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Users\Public\suspect.exe'
 ```
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3279,11 +3073,9 @@ Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' 
 **✅ Check it worked:** Query the task state again (expected `Disabled`), inspect the precise registry value, and check whether the process/listener returns after an authorized restart or login. Verify required updater/backup tasks still work.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** Re-enable the task with `Enable-ScheduledTask -TaskName 'BadTask'` only if it was misidentified. Restore a deleted task from its XML using Task Scheduler **Import Task**, checking the principal and credentials. A registry import merges values; restore the specific value when possible.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** Stop at evidence collection if a forensic question remains unresolved. `sc.exe delete`, `Unregister-ScheduledTask` and `Remove-Item` are destructive; use them only after positive identification and recovery planning. Preserve suspicious scripts as text, never execute decoded payloads.
 
 #### 19.9 Final troubleshooting decision path
@@ -3291,21 +3083,18 @@ Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' 
 - [ ] **🎯 DO THIS — 19.9 Final troubleshooting decision path**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Verify authentication, networking, security state and required functions after changes.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** Scoring can lag or fail to update when DNS, time, networking or a required service breaks.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Record the last successful test and last change. Use the VM console if remote access fails.
 
 **⭐ EASIEST WAY — Click through the GUI:** Check the Scoring Report timestamp, Services, Event Viewer **System/Application**, and the application's own error page. Do not change the scoring agent or its files.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3319,22 +3108,18 @@ Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' 
 Replace the DNS target with the README-required internal hostname; internet DNS failure on an offline lab is not automatically a fault. An update service can be stopped while idle, but should not be Disabled.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 **✅ Check it worked:** Test an ordinary user login, admin elevation, required website/share/remote session, and report freshness. Check pending restarts and save final forensics answers.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:** If a proposed repair fails, return that repair to its recorded starting state before trying another theory.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** An error message is evidence. Record it exactly and investigate its source rather than hiding it with broad `-ErrorAction SilentlyContinue`.
 
-
 ---
-
 
 ### 20. Complete PowerShell basics — included in this Windows checklist
 
@@ -3423,21 +3208,18 @@ Press **Windows key + R**, type one of these, press Enter:
 - [ ] **🎯 DO THIS — Practice objects, paths and reversible changes**
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🎯 What:** Learn how to inspect PowerShell output and edit a harmless file before modifying security settings.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why it matters:** PowerShell pipelines pass objects, not just printed text. Formatting is for display; it should normally come last in a pipeline.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **🛑 Before changing anything:** Use ordinary Windows PowerShell for this exercise; administrator rights are not needed. Most handbook examples target Windows PowerShell 5.1 on Windows. A module absent from PowerShell 7 is not proof the Windows role is missing.
 
 **⭐ EASIEST WAY — Click through the GUI:** **Start → Windows PowerShell**. Use File Explorer to view your personal profile folder. Run as administrator only for procedures that require it; do not approve an unknown script merely because it requests elevation.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3450,7 +3232,7 @@ Press **Windows key + R**, type one of these, press Enter:
 `Get-Member` describes available properties/methods. `Select-Object` keeps properties; `Format-Table` displays them. For CSV export, select properties then `Export-Csv`, without `Format-Table` in between.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ```powershell
@@ -3479,7 +3261,6 @@ Test-Path -LiteralPath "$practiceFile.before"
 Expected: your changed text and `True`. For cmdlets inspect the full red error and `$Error[0]`; for native programs inspect `$LASTEXITCODE` immediately after that program. ErrorAction SilentlyContinue hides errors and can make incomplete searches look empty.
 
 > [!WARNING]
-> **ℹ️ Note:**
 > **↩️ Undo:**
 
 ```powershell
@@ -3490,15 +3271,11 @@ Get-Content -LiteralPath $practiceFile
 Expected: `original value`. This file restore does not model account/password recovery; those have different limits.
 
 > [!CAUTION]
-> **ℹ️ Note:**
 > **⚠️ Warnings:** `-WhatIf` exists only on commands that support it, and its preview does not test downstream dependencies. Use `Get-Help COMMAND -Full` to check support. Use `sc.exe` for Service Control; `sc` in Windows PowerShell is an alias for Set-Content. Never use `Invoke-Expression` to inspect a suspicious string.
-
 
 ---
 
-
 ### 21. Advanced Windows investigations — included in this checklist
-
 
 > **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
 
@@ -3509,13 +3286,12 @@ This supplement draws topic ideas from public CyberPatriot checklists and verifi
 - [ ] **🎯 DO THIS —** Reviewed effective configuration and policy source.
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **💡 Why:** A value changed in \`secpol.msc\` or the registry can be replaced by a domain Group Policy. On a Domain Controller, editing an arbitrary local policy is not a substitute for checking domain-level policy.
 
 **⭐ EASIEST WAY — Click through the GUI:** Press **Win + R** → \`rsop.msc\` (if available); review **Computer Configuration**. On domain-joined systems use **Group Policy Management** (\`gpmc.msc\`) **only if installed and authorized**. Do not disable a linked GPO merely to fix one setting.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -3531,7 +3307,6 @@ Start-Process "$env:TEMP\cp-rsop.html"
 ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🧠 Interpretation:** \`PartOfDomain = True\` means domain policies may apply. The report's **Applied Group Policy Objects** and **Denied GPOs** help explain conflicts; a local-only or unconfigured policy may show less information. \`gpresult\` can report no RSoP data for the target scope—investigate context rather than assume a missing policy is a security failure.
 
 **✅ Verification:** Compare the effective policy with the README and with the relevant **Local Security Policy** or **Group Policy** editor. If a setting changes after refresh, identify its **winning policy** before editing it.
@@ -3545,7 +3320,7 @@ Start-Process "$env:TEMP\cp-rsop.html"
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → services.msc** → double-click a service → note **Service name**, **Path to executable**, **Log On**, **Dependencies**. Do not stop it yet.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -3562,11 +3337,10 @@ Get-CimInstance Win32_Service -Filter "Name='RemoteRegistry'" |
 ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **What to look for:** Unexpected user-profile or temporary-directory paths, impersonated names, newly introduced binaries, unusual service accounts, or services inconsistent with the README. Some legitimate software uses nonstandard locations; **a strange path is a clue, not proof**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -3588,7 +3362,7 @@ Get-CimInstance Win32_Service -Filter "Name='RemoteRegistry'" |
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → eventvwr.msc** → **Windows Logs → System** or **Security** → **Filter Current Log**. Record timestamps with timezone, event IDs, provider, and the full message.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -3618,7 +3392,6 @@ Get-WinEvent -FilterHashtable @{
 | 7045 | Service installed, shown in System |
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🧠 Interpretation:** Errors such as **No events were found** do not prove an action never happened. Logging, retention, permissions, and audit policy affect visibility. To check the present policy:
 
 ~~~powershell
@@ -3636,7 +3409,7 @@ auditpol /get /category:*
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → taskschd.msc** → **Task Scheduler Library**; inspect **Triggers**, **Actions**, **Author** and **History**. Open **Task Manager → Startup apps** for login items.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -3658,7 +3431,6 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🧠 Interpretation:** A task with an obscure name or PowerShell arguments warrants inspection, but scheduled updates and enterprise management agents are legitimate too. Record the exact executable and arguments before taking action.
 
 **✅ Verification:** Correlate task path, binary signature and Event Viewer findings. Do not run the task to see what happens.
@@ -3672,7 +3444,7 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAct
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R → fsmgmt.msc** (when available) → **Shares**. Review share name, local path and active sessions. In File Explorer: folder → **Properties → Sharing / Security**.
 
 > [!NOTE]
-> **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
+> **🔁 Alternate (optional) — PowerShell:**
 >
 >
 > ~~~powershell
@@ -3687,7 +3459,6 @@ Get-Acl -LiteralPath 'C:\ExampleFolder' | Format-List Path,Owner,Access
 ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🧠 Interpretation:** Share permissions and NTFS permissions both matter. Hidden administrative shares (for example \`C$\`) are not by themselves proof of malware. A broad \`Everyone\` share right may be constrained by NTFS, but it still needs review.
 
 **✅ Verification:** Test with a **legitimate non-admin** account that should read or write, and a separate account that should be denied. Protect required shared folders and server roles.
@@ -3720,7 +3491,6 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 ~~~
 
 > [!NOTE]
-> **ℹ️ Note:**
 > **🧠 Interpretation:** An allowed rule is not necessarily reachable: scope, profile, address filters, enabled state, underlying service and other policy conditions matter. A listening port may serve an explicitly required role.
 
 **✅ Verification:** From an authorized client, test required application connectivity after any **narrow** firewall change. Avoid blanket removal of inbound rules.
@@ -3751,7 +3521,6 @@ Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound |
 > [!TIP]
 > ✅ **Finish strong:** Verify the final configuration, required functionality, and saved evidence.
 
-
 Retest authorized login, required applications, services and the scoring report before finishing.
 
 ### 18. Final checks
@@ -3762,4 +3531,3 @@ Retest authorized login, required applications, services and the scoring report 
 - [ ] **🎯 DO THIS —** Forensics answers saved
 - [ ] **🎯 DO THIS —** Final snapshot
 - [ ] **🎯 DO THIS —** Reboot **once** at the end only if updates or Windows features (9.1) need it, then check the Scoring Report again
-
