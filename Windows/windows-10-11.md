@@ -294,7 +294,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 - [ ] **🎯 ADD GROUP MEMBERS — GUI:** **`lusrmgr.msc` → Groups → double-click the required group → Add…** → type each README-specified username, separated by semicolons if entering multiple → **Check Names → OK → Apply → OK**.
 - **✅ Verify:** Reopen the group and compare its **Members** list against the README **one user at a time**. **↩️ Undo:** Remove only an accidentally added member, not the group or unrelated accounts.
 > [!NOTE]
-> **ℹ️ Example:** If an image requires a group called `SpiderVerse` with four named users, creating `SpiderVerse` and adding those four users are **two different tasks**. Names and memberships always come from the active README.
+> **ℹ️ Example:** If the README specifies group `SpiderVerse` and members `esther;wyatt;turner;tina`, **create** that group and then **add** those four members as separate checked tasks. Names and memberships always come from the active README.
 
 ### 3. Account policies (passwords and lockout)
 
@@ -303,7 +303,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 
 | Setting | Set to |
 |---|---|
-| Enforce password history | **24** passwords remembered |
+| Enforce password history | **Image-required count** (e.g. 5; 24 is one general benchmark) |
 | Maximum password age | **90** days (or what the README says) |
 | Minimum password age | **1** day |
 | Minimum password length | **12** characters |
@@ -312,7 +312,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
 ```powershell
-net accounts /uniquepw:24 /maxpwage:90 /minpwage:1 /minpwlen:12
+net accounts  # inspect current policy; use secpol.msc for the exact README-required values
 ```
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
