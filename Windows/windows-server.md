@@ -30,6 +30,10 @@ Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competi
 
 ---
 
+
+> [!NOTE]
+> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+
 ## Part 1 — Basics / Information Needed
 
 ### Identify what kind of Windows Server this is
@@ -670,6 +674,144 @@ Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires | Select-Object Sa
 
 **Safety:** Do not disable necessary built-in principals, domain service identities or krbtgt. These commands require appropriate domain privileges and management modules. Confirm effective GPO scope and role dependencies before changing policy.
 
+
+### Research report expansion WS-R1 — AD privileged groups, service accounts and safe reversibility
+
+- [ ] Done
+
+**Evidence:** Community/training categories with vendor-backed Active Directory management commands. Not a guarantee of actual scoring.
+
+**Why:** Domain Admins, Enterprise Admins, Schema Admins and nested membership can confer privileges beyond a user's visible OU. Service identities and computer objects may be required.
+
+**GUI:** **Win + R → dsa.msc → View → Advanced Features**. Examine all OUs, the group **Members** and each user's **Member Of / Account** tabs; identify built-in, managed service and computer accounts.
+
+**Typing (check on a DC or approved domain management host with ActiveDirectory module):**
+
+~~~powershell
+Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires,PasswordNotRequired,DoesNotRequirePreAuth |
+ Select-Object SamAccountName,Enabled,PasswordNeverExpires,PasswordNotRequired,DoesNotRequirePreAuth
+Get-ADGroupMember -Identity 'Domain Admins'
+Get-ADGroupMember -Identity 'Domain Admins' -Recursive
+Get-ADGroupMember -Identity 'Enterprise Admins' -ErrorAction SilentlyContinue
+Get-ADGroupMember -Identity 'Schema Admins' -ErrorAction SilentlyContinue
+~~~
+
+Enterprise/Schema Admins groups may not be in the current domain; determine the forest root and effective role rather than treating a missing group as an error.
+
+**Typing (fix only after exact direct membership and README confirmation):**
+
+~~~powershell
+Remove-ADGroupMember -Identity 'Domain Admins' -Members 'EXAMPLE_USER' -Confirm
+~~~
+
+For confirmed unauthorized domain login containment, after preserving evidence:
+
+~~~powershell
+Disable-ADAccount -Identity 'EXAMPLE_USER'
+~~~
+
+**Verification:** Re-run both direct and recursive group queries; verify a new legitimate domain logon and required IIS/task/service identity functions. Existing sessions may retain old group tokens until reauthentication.
+
+**Undo:** Restore **only** the mistakenly removed direct membership with **Add-ADGroupMember** or re-enable a mistakenly disabled account using **Enable-ADAccount**. Never delete or reset **krbtgt**, domain built-in Administrator, computer objects or required service accounts during routine checklist hardening.
+
+### Research report expansion WS-R2 — Domain password policy, FGPP and resultant policy
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed. Domain password and lockout settings are not interchangeable with member-server local policy.
+
+**GUI:** **Win + R → gpmc.msc → Forest → Domains → your domain**. Inspect the **domain-root-linked** account policy GPO (often Default Domain Policy) → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies. Check OU links and GPO precedence, and back up the specific GPO before editing.
+
+**Typing (check):**
+
+~~~powershell
+Get-ADDefaultDomainPasswordPolicy | Format-List *
+Get-ADFineGrainedPasswordPolicy -Filter * | Select-Object Name,Precedence,MinPasswordLength,ComplexityEnabled,LockoutThreshold
+Get-ADUserResultantPasswordPolicy -Identity 'EXAMPLE_USER'
+gpresult /r /scope computer
+~~~
+
+**What to look for:** A weak *effective* policy for a user because of fine-grained precedence, password-not-required flags or missing complexity settings; use exact values from the README. The report records conflicting historical community settings (minimum lengths 10–14; maximum ages 60–90 days). These are **examples, not fixed competition scores**.
+
+**Typing (fix, ONLY if the domain identity and values are actually required):**
+
+~~~powershell
+Set-ADDefaultDomainPasswordPolicy -Identity 'example.test' -MinPasswordLength 12 -PasswordHistoryCount 24 -ComplexityEnabled $true -ReversibleEncryptionEnabled $false
+~~~
+
+Replace example.test and numbers; this is a *partial illustrative* change and doesn't set every account-policy field. Use GPMC for the exact complete policy or the appropriate FGPP tool if a specific user policy is at fault.
+
+**Verify:** Re-query domain default/resultant policy for affected users and test a normal authorized login. Test required applications that depend on service credentials before considering a password reset.
+
+**Undo:** Restore exact old values or scoped GPO backup; account password resets are not reversed by restoring policy. Never delete Default Domain Policy or change the entire forest password policy for one misunderstood workstation issue.
+
+### Research report expansion WS-R3 — LDAP signing/channel binding with compatibility checks
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed; Microsoft has dedicated guidance. Strict enforcement can break old required applications.
+
+**Why:** Unsigned LDAP binds and absent channel-binding protections can permit credential-relay and downgrade risks. However, a required application may have legacy LDAP behavior; you must identify clients before enforcing stricter settings.
+
+**GUI (DC):** **Event Viewer → Applications and Services Logs → Directory Service** (or **Windows Logs** when the platform uses that provider) and **gpmc.msc → appropriate DC-linked GPO → Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options**.
+
+**Typing (check):**
+
+~~~powershell
+Get-WinEvent -FilterHashtable @{LogName='Directory Service';Id=2887,2888,2889} -MaxEvents 40 -ErrorAction SilentlyContinue |
+ Select-Object TimeCreated,Id,Message
+gpresult /r /scope computer
+Get-Service NTDS,Netlogon,Kdc -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
+~~~
+
+**Interpretation:** Event 2887 can summarize unsigned LDAP binds when logging is configured. Individual client events such as 2889 may require extra diagnostic logging; **absence of events does not demonstrate that all clients support enforcement**. Channel-binding diagnostics may include other Directory Service event IDs depending on OS and policy.
+
+**Fix only when clients have been inventoried and requirements permit:** Under **Domain controller: LDAP server signing requirements**, choose **Require signing** when compatible. Review the separately configured LDAP channel binding policy according to the installed Server release and client capabilities rather than setting **Always** blindly.
+
+**Verification:** Confirm effective GPO; test LDAP/LDAPS from every required client/application and inspect new Directory Service events. Check normal domain logon and DNS SRV resolution.
+
+**Undo:** Restore only the documented policy value from the prior GPO backup if a required legacy client fails. Do not disable LDAP signing globally as a reflexive repair or alter domain-wide NTLM settings blindly.
+
+**Vendor reference:** [Microsoft LDAP signing guidance](https://learn.microsoft.com/en-us/troubleshoot/windows-server/active-directory/ldap-signing) and current Windows Server security baselines.
+
+### Research report expansion WS-R4 — SMB1, signing and domain-critical shares
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed; SMB signing and SMB1 support are separately configurable.
+
+**Typing (check on Server):**
+
+~~~powershell
+Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol,EnableSMB2Protocol,RequireSecuritySignature
+Get-SmbClientConfiguration | Select-Object RequireSecuritySignature
+Get-SmbShare | Select-Object Name,Path,Special,Description
+~~~
+
+**What to look for:** Unauthorized SMB1 compatibility, weak signing if the role requires it, unapproved custom shares and overly broad share rights. **SYSVOL, NETLOGON, administrative shares, and required data shares must not be removed indiscriminately.**
+
+**GUI:** Server Manager → **File and Storage Services → Shares**, then the backing folder's **Properties → Security → Advanced**; inspect **both** share permissions and NTFS ACLs.
+
+**Change only when legacy compatibility is ruled out:**
+
+~~~powershell
+Set-SmbServerConfiguration -RequireSecuritySignature $true
+~~~
+
+To disable SMB1 on Server where it is confirmed unnecessary:
+
+~~~powershell
+Set-SmbServerConfiguration -EnableSMB1Protocol $false
+~~~
+
+These changes can affect active sessions, GPO and older clients; retain a console path and test clients. Avoid copying a **-Confirm:$false** variant that hides an important safety prompt.
+
+**Verification:** Repeat Get-SmbServerConfiguration, check Get-SmbShareAccess for actual required shares and test SMB read/write from an authorized ordinary user plus an explicitly denied user.
+
+**Undo:** Restore only the known old protocol/signing value if the README explicitly requires legacy compatibility. Do not re-enable SMB1 simply to chase points; address compatible client migration where permitted. A removed share must be restored with both the correct share and original NTFS permissions.
+
+**Sources:** [Microsoft SMB signing](https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-signing-overview) and [SMB server cmdlets](https://learn.microsoft.com/en-us/powershell/module/smbshare/set-smbserverconfiguration).
+
 ## Part 4 — Required Server Roles and Remote Access
 
 Prove required web, directory, DNS, DHCP, SMB and management functions work before hardening them.
@@ -1049,6 +1191,128 @@ Get-NetFirewallProfile
 ~~~
 
 **Do not** install missing roles merely to run checklist commands. Review any zone transfer, DHCP scope, IIS authentication, file ACL or remote-management change against required functionality. Preserve original configuration and test application login/shares/website after modifications.
+
+
+### Research report expansion WS-R5 — DNS zone transfers, updates and AD-integrated records
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed DNS hardening; depends on whether this server actually hosts DNS.
+
+**GUI:** **Win + R → dnsmgmt.msc → Forward Lookup Zones → actual zone → Properties**. Inspect **General → Dynamic Updates** and **Zone Transfers**. AD-integrated zones can support **Secure only** dynamic updates when appropriate; a secondary DNS server may require tightly restricted zone transfers.
+
+**Typing (check only if DnsServer module/role is installed):**
+
+~~~powershell
+Get-DnsServerZone | Select-Object ZoneName,IsDsIntegrated,DynamicUpdate,IsReverseLookupZone
+Get-DnsServerForwarder
+Get-DnsServerResourceRecord -ZoneName 'example.test' -RRType SRV -ErrorAction SilentlyContinue
+~~~
+
+**Before changing anything:** Record the original zone type, AD replication scope, allowed secondaries, clients and SRV records. **Do not delete unfamiliar SRV records** or redirect domain DNS to a public resolver.
+
+**Fix:** On the exact zone, use its GUI to restrict unwanted zone transfers to approved secondary servers, and set dynamic updates to the appropriate secure mode only for an AD-integrated zone whose clients support it. Do not use a blanket change across all zones.
+
+**Verification:** Test client A/AAAA and required SRV records, DC name resolution, and authorized dynamic updates. If an approved secondary exists, verify its transfer still succeeds.
+
+**Undo:** Restore the recorded per-zone setting or role-aware DNS backup. A DNS zone deletion is not fixed by simply adding one A record.
+
+### Research report expansion WS-R6 — DHCP scopes, reservations, authorization and auditing
+
+- [ ] Done
+
+**Evidence:** Community; vendor-supported DHCP configuration inventory.
+
+**GUI:** **Win + R → dhcpmgmt.msc → Server → IPv4 → Scope**. Review address ranges, exclusions, **Reservations**, **Address Leases**, and **Scope Options** (003 Router, 006 DNS Servers, 015 Domain Name). Check server authorization and any configured failover pair.
+
+**Typing (check only if DHCP role/module is installed):**
+
+~~~powershell
+Get-DhcpServerv4Scope | Select-Object ScopeId,Name,StartRange,EndRange,State
+Get-DhcpServerv4Reservation -ScopeId 192.0.2.0 -ErrorAction SilentlyContinue
+Get-DhcpServerInDC -ErrorAction SilentlyContinue
+~~~
+
+**Replace 192.0.2.0 with the real scope ID**; documentation address is not a universal example scope. For a real scope:
+
+~~~powershell
+Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
+~~~
+
+**Before change:** Record the correct subnet, default gateway, DNS server and reserved/static addresses. Where supported, back up the DHCP server configuration to a private folder using **Backup-DhcpServer -Path** after verifying the path exists and is protected.
+
+**Fix:** Correct one unauthorized option, reservation or scope through the GUI only after the README and required-client topology are verified. Enabling auditing is an appropriate policy step **only if the logging path/disk budget permits**.
+
+**Verification:** On an approved test client, renew or inspect the lease, confirm actual gateway/DNS/domain suffix and reach required services. Then re-run DHCP scope/option queries and check relevant audit records.
+
+**Undo:** Restore the one altered option/reservation, or use a reviewed DHCP-specific backup procedure for larger changes. Never delete a scope or reauthorize arbitrary servers to silence one lease error.
+
+### Research report expansion WS-R7 — IIS directory browsing, WebDAV, app pools and web-shell triage
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed, applies only to an installed/required IIS web/FTP role.
+
+**GUI:** **Win + R → inetmgr → Sites → required site**. Review **Basic Settings → Physical path**, **Bindings**, **Directory Browsing**, **Authentication**, **Request Filtering**, **Modules**, **WebDAV Authoring Rules** (if installed), **Logging** and **Application Pools → Identity**.
+
+**Typing (check; WebAdministration must be installed):**
+
+~~~powershell
+Import-Module WebAdministration
+Get-Website | Select-Object Name,State,PhysicalPath
+Get-WebBinding | Select-Object protocol,bindingInformation
+Get-ChildItem IIS:\AppPools | Select-Object Name,State
+~~~
+
+**Before edits:** Export/back up the effective IIS configuration, bindings and relevant content; record any application pool identity and required login/upload/database operations. An IIS configuration backup alone does not save its content/database.
+
+**Fix only if the required site must forbid directory listings:**
+
+~~~powershell
+Set-WebConfigurationProperty -PSPath 'IIS:\Sites\Default Web Site' -Filter system.webServer/directoryBrowse -Name enabled -Value $false
+~~~
+
+Replace **Default Web Site** with the actual site; do not apply to every site by default. If WebDAV is enabled but unused, inspect installed module/authorization and disable it only for the correct site after client compatibility checks. Avoid disabling Basic Authentication where the task requires it over HTTPS.
+
+**Evidence check (read-only, replace actual site directory):**
+
+~~~powershell
+Get-ChildItem 'C:\inetpub\wwwroot' -Recurse -File -Include *.asp,*.aspx,*.php,*.exe -ErrorAction SilentlyContinue |
+ Select-Object FullName,LastWriteTime,Length
+~~~
+
+**Interpret:** Script files may be legitimate; unknown scripts need metadata, publisher/source comparison and forensic preservation. Do not execute or delete files purely because of their extension.
+
+**Verification:** Load the actual hostname/HTTPS binding from an authorized client, test required login/upload/API/database behavior, and check IIS error/request logs. A successful local homepage does not prove the required virtual host works.
+
+**Undo:** Restore the one site setting/permission from the recorded original or a reviewed IIS backup; restore file content and DB separately if removed.
+
+### Research report expansion WS-R8 — Required service recovery before removing any role
+
+- [ ] Done
+
+**Evidence:** Official scenario/service-preservation principle; role-specific command behavior is vendor-backed.
+
+**Typing (check, role-dependent):**
+
+~~~powershell
+Get-Service NTDS,Kdc,DNS,Netlogon,DFSR,W32Time,W3SVC,DHCPServer,LanmanServer -ErrorAction SilentlyContinue |
+ Select-Object Name,Status,StartType
+Get-WindowsFeature | Where-Object Installed | Select-Object Name,DisplayName
+~~~
+
+**What to look for:** A required role unexpectedly Disabled/Stopped or a suspicious role added. **Some healthy services are demand-start or absent**; never force the entire list to Automatic.
+
+**Change ONLY if the exact required service was accidentally disabled and its original startup was Automatic (replace placeholder):**
+
+~~~powershell
+Set-Service -Name 'EXAMPLE_REQUIRED_SERVICE' -StartupType Automatic
+Start-Service -Name 'EXAMPLE_REQUIRED_SERVICE'
+~~~
+
+**Verification:** Recheck status and the application-level operation: domain login, required DNS SRV query, DHCP lease, IIS page, authorized SMB file access or other README-specified transaction. On a DC also verify directory, time and replication health as relevant.
+
+**Undo:** Restore the original recorded service startup and running state if a change was incorrect. Do not disable a role only because a generic checklist labels it risky; do not re-create a deleted directory/database with a blank role installation.
 
 ## Part 5 — Advanced Server Investigation and Embedded Windows Reference
 

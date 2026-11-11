@@ -14,6 +14,10 @@
 
 **Priority is practical, not a guaranteed score ranking.** The README, forensics questions, permitted tools and actual required services override any generic checklist. Do not remove the only admin, delete evidence, or disable a critical role merely because it appears in a public checklist.
 
+
+> [!NOTE]
+> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+
 ## Part 1 — Basics / Information Needed
 
 ### Windows terms and tools to understand first
@@ -534,6 +538,184 @@ Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction Silent
 SMB1 is legacy; do not disable SMB functionality that the scenario explicitly requires without verifying compatibility. **Do not enable BitLocker just to tick a generic security box:** loss of recovery credentials can make a VM inaccessible.
 
 **Check it worked:** Re-run the command, test the README-required client/service, and refresh the scoring report. Record how to restore only the affected policy.
+
+
+### Research report expansion W-R1 — Account inventory, Guest, password flags and privilege reconciliation
+
+- [ ] Done
+
+**Evidence:** Community/training categories with vendor-supported commands. **Do not infer an individual scoring point.**
+
+**What / why:** The research report emphasizes unauthorized accounts, built-in Guest, local Administrators/Backup Operators/Remote Desktop Users, and local password flags. Check the **actual image README** before disabling, deleting or rotating any identity.
+
+**Clicking (GUI):** Press **Win + R → lusrmgr.msc → Users**. Select an account → **Properties** to inspect disabled state, password never expires and group memberships. Under **Groups**, open **Administrators**, **Remote Desktop Users**, **Backup Operators** and any README-required group. On Windows Home, local-users GUI may not exist; use the terminal and the installed edition's supported tools.
+
+**Typing (check, elevated PowerShell):**
+
+~~~powershell
+Get-LocalUser | Select-Object Name,Enabled,PasswordRequired,PasswordExpires,PasswordLastSet,LastLogon
+Get-LocalGroupMember -Group 'Administrators'
+Get-LocalGroupMember -Group 'Remote Desktop Users' -ErrorAction SilentlyContinue
+Get-LocalGroupMember -Group 'Backup Operators' -ErrorAction SilentlyContinue
+~~~
+
+**What to look for:** An extra human login, a seemingly unauthorized local admin, enabled Guest, or password-not-required / password-never-expires on an ordinary account. Check service principals, renamed built-ins, and domain membership before changing anything. A renamed built-in account retains its SID; a display name alone is insufficient.
+
+**Typing (fix only after exact README confirmation; replace the placeholder):**
+
+~~~powershell
+Disable-LocalUser -Name 'EXAMPLE_UNAUTHORIZED_USER'
+~~~
+
+For a confirmed unauthorized administrator, remove **that exact member** rather than the whole group:
+
+~~~powershell
+Remove-LocalGroupMember -Group 'Administrators' -Member 'EXAMPLE_UNAUTHORIZED_USER'
+~~~
+
+For an authorized normal account with an inappropriate never-expiring setting:
+
+~~~powershell
+Set-LocalUser -Name 'EXAMPLE_AUTHORIZED_USER' -PasswordNeverExpires $false
+~~~
+
+If the account is required but has a weak password, set it interactively:
+
+~~~powershell
+Set-LocalUser -Name 'EXAMPLE_AUTHORIZED_USER' -Password (Read-Host -AsSecureString 'Enter new password')
+~~~
+
+**Verification:**
+
+~~~powershell
+Get-LocalUser -Name 'EXAMPLE_UNAUTHORIZED_USER' | Select-Object Name,Enabled
+Get-LocalGroupMember -Group 'Administrators'
+Get-LocalUser -Name 'EXAMPLE_AUTHORIZED_USER' | Select-Object Name,PasswordNeverExpires,PasswordRequired
+~~~
+
+**Undo:** Re-enable an account mistakenly disabled with **Enable-LocalUser -Name 'ACTUAL_USER'**, or add back its recorded group membership with **Add-LocalGroupMember**. Restore a changed never-expiring flag only if documented and required. **Deletion is different from disabling**: a recreated account has a new SID and may lose access to files/permissions; use a permitted backup if an authorized user was deleted.
+
+**Warnings:** Never disable your only working administrator, delete README-required service users, or automatically disable domain identities using local-only cmdlets. Preserve forensics questions before account changes.
+
+### Research report expansion W-R2 — Password history, lockout and effective local policy
+
+- [ ] Done
+
+**Evidence:** Training/community categories; vendor-backed Windows account-policy settings. The report lists multiple historical example values (e.g., minimum length 10–14, maximum age 60 or 90, threshold 5 or 10). **These are not universal scoring values.**
+
+**Clicking (GUI):** **Win + R → secpol.msc → Account Policies → Password Policy**, then **Account Lockout Policy**. Record each current number and the README-required value; also inspect complexity and reversible encryption. If domain joined, identify effective domain policy instead of assuming local secpol controls domain credentials.
+
+**Typing (check, elevated PowerShell or CMD):**
+
+~~~powershell
+net accounts
+gpresult /r /scope computer
+~~~
+
+**Optional baseline export before editing, into a private accessible folder:**
+
+~~~powershell
+secedit /export /cfg "$env:TEMP\cp-local-policy-before.inf"
+~~~
+
+**Typing (fix only when the exact README specifies the illustrative example):**
+
+~~~cmd
+net accounts /uniquepw:24
+net accounts /minpwlen:12
+net accounts /minpwage:1
+net accounts /maxpwage:90
+~~~
+
+These commands edit **local** numeric account settings; they do **not** configure complexity or reversible-encryption policy. Set those individually in secpol.msc only at the correct scope. A lockout example **only if required**:
+
+~~~cmd
+net accounts /lockoutthreshold:5
+net accounts /lockoutduration:30
+net accounts /lockoutwindow:30
+~~~
+
+**Verification:** Run **net accounts** again and inspect the policy GUI and resultant policy. Test one authorized user login without intentionally locking out an administrator.
+
+**Undo:** Re-run **net accounts** with the **actual recorded old values**, then restore any separately edited GUI setting. Importing the full secedit export can overwrite unrelated rights and is **not** a normal one-setting rollback.
+
+### Research report expansion W-R3 — Defender cloud/PUA, exclusions, signatures and safe scanning
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed. Some Windows Server / enterprise environments use another approved endpoint protection product; do not force Defender to active mode without checking.
+
+**Clicking (GUI):** **Start → Windows Security → Virus & threat protection → Manage settings**. Check real-time protection, cloud-delivered protection, PUA protection where available and **Exclusions**. Open **Protection updates**, **Scan options**, and **Protection history**.
+
+**Typing (check, elevated PowerShell):**
+
+~~~powershell
+Get-MpComputerStatus | Select-Object AMRunningMode,AntivirusEnabled,RealTimeProtectionEnabled,BehaviorMonitorEnabled,AntivirusSignatureLastUpdated
+Get-MpPreference | Select-Object DisableRealtimeMonitoring,DisableBehaviorMonitoring,DisableScriptScanning,PUAProtection,ExclusionPath,ExclusionExtension,ExclusionProcess
+~~~
+
+**What to look for:** Real-time monitoring disabled without an approved replacement, unexpectedly broad folder/process exclusions, stale signatures, unauthorized antivirus, or an active threat. An exclusion can be legitimate for a required app—record and verify it first.
+
+**Typing (fix only when Defender is the approved active protection and not centrally restricted):**
+
+~~~powershell
+Set-MpPreference -DisableRealtimeMonitoring $false
+Set-MpPreference -DisableBehaviorMonitoring $false
+Set-MpPreference -DisableScriptScanning $false
+~~~
+
+~~~powershell
+Set-MpPreference -PUAProtection Enabled
+Update-MpSignature
+~~~
+
+When forensic evidence is preserved and a scan is appropriate:
+
+~~~powershell
+Start-MpScan -ScanType QuickScan
+~~~
+
+**Verification:** Re-run **Get-MpComputerStatus** and **Get-MpPreference**, inspect protection/history and verify the README-required applications still function. A tamper-protection or policy-managed rejection is not an invitation to bypass protection.
+
+**Undo:** Restore only a setting or exclusion mistakenly changed **if the original setting is authorized**. Do not disable antivirus broadly or release quarantined malicious files just to recover a score.
+
+### Research report expansion W-R4 — Firewall baseline, rule scope and safe profile recovery
+
+- [ ] Done
+
+**Evidence:** Training/community; vendor-backed firewall settings.
+
+**Clicking:** **Win + R → wf.msc → Windows Defender Firewall Properties**. Inspect Domain, Private and Public profiles. Under **Inbound Rules**, open a specific rule and inspect **Program, Protocol/Port, Scope, Profile, Enabled/Action**; preserve known required remote-admin and application traffic.
+
+**Typing (check):**
+
+~~~powershell
+Get-NetFirewallProfile | Format-Table Name,Enabled,DefaultInboundAction,DefaultOutboundAction
+Get-NetFirewallRule -PolicyStore ActiveStore -Enabled True -Direction Inbound | Select-Object Name,DisplayName,Action,Profile
+Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess
+~~~
+
+**Back up the firewall policy to a private, existing folder** before high-risk edits:
+
+~~~powershell
+netsh advfirewall export "$env:TEMP\cp-firewall-before.wfw"
+~~~
+
+**Fix (only after confirming all required rule exceptions, scope and management access):**
+
+~~~powershell
+Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
+~~~
+
+If the README requires typical inbound-block/outbound-allow defaults, set only the correctly scoped profiles:
+
+~~~powershell
+Set-NetFirewallProfile -Profile Domain,Private,Public -DefaultInboundAction Block -DefaultOutboundAction Allow
+~~~
+
+**Verification:** Repeat profile/rule queries and connect from an authorized separate client to every required service. A listening port does not prove external reachability; a firewall rule can be limited by profile and remote address.
+
+**Undo:** Restore the precise prior profile values or a **single** modified rule. Full **netsh advfirewall import** replaces the entire policy and may erase later legitimate changes, so only use it after evaluating the current policy and recovery consequences.
 
 ## Part 4 — Services, Software and Persistence
 
@@ -2022,6 +2204,140 @@ Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,Owning
 **Interpretation:** An unusual executable path or listener is an investigation lead, not proof of malware. Compare against signed publisher, files and service dependencies, and permitted software; preserve forensic evidence before removal. Confirm required remote assistance, IIS, SMB, SSH or RDP before changing firewall rules.
 
 **Undo:** Restore the single authorized task, service startup type, or firewall rule from its recorded starting state. Avoid broad deletions.
+
+
+### Research report expansion W-R5 — SMBv1, required SMB signing, share permissions and fallback
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed. SMBv1 is obsolete and SMB signing protects message integrity, but legacy clients and specific file-sharing scenarios can change the safe action.
+
+**GUI:** **Win + R → optionalfeatures.exe → SMB 1.0/CIFS File Sharing Support** for optional SMB1 components; **secpol.msc → Local Policies → Security Options** for **Microsoft network client/server: Digitally sign communications (always)**; **Win + R → fsmgmt.msc → Shares** for sharing configuration.
+
+**Typing (check):**
+
+~~~powershell
+Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction SilentlyContinue
+Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol,EnableSMB2Protocol,RequireSecuritySignature
+Get-SmbClientConfiguration | Select-Object RequireSecuritySignature
+Get-SmbShare | Select-Object Name,Path,Description,Special
+~~~
+
+For one **actual share**, substitute its name:
+
+~~~powershell
+Get-SmbShareAccess -Name 'EXAMPLE_SHARE'
+~~~
+
+**Fix (only if SMB1 is installed, not required, and removal is approved):**
+
+~~~powershell
+Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart
+~~~
+
+After validating compatibility, require signing for the correct side of the SMB connection as needed:
+
+~~~powershell
+Set-SmbServerConfiguration -RequireSecuritySignature $true
+Set-SmbClientConfiguration -RequireSecuritySignature $true
+~~~
+
+**How to interpret:** Client signing covers outbound SMB; server signing covers inbound. SMB2/SMB3 signing is controlled by the *Require* setting, not legacy weak SMB1 behaviors. Do **not** remove all shares or disable the SMB server service if a README-required share, application or domain dependency exists.
+
+**Verification:** Repeat Get-Smb* commands and test normal share read/write and access denial with authorized sample users. Inspect whether a reboot is pending after SMB1 feature changes.
+
+**Undo:** Restore **only recorded original** signing and feature settings if a required client breaks. Re-enabling SMB1 is a last-resort legacy compatibility measure, not a routine scoring workaround. For an accidentally deleted share, restore its original name/path, share ACL **and NTFS ACL** from backup; recreating the share alone may not restore access.
+
+**Sources:** [Microsoft SMB signing overview](https://learn.microsoft.com/en-us/windows-server/storage/file-server/smb-signing-overview) and [Set-SmbServerConfiguration](https://learn.microsoft.com/en-us/powershell/module/smbshare/set-smbserverconfiguration).
+
+### Research report expansion W-R6 — RDP, Remote Registry and additional service checks
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed. A remote-management service is not automatically unauthorized; inspect the README and device role first.
+
+**GUI:** **Settings → System → Remote Desktop** (Windows 11; similar location on Windows 10); **Win + R → services.msc → Remote Registry**. Use **System Properties → Remote** and **Select Users** to inspect Remote Assistance/RDP access where available.
+
+**Typing (check):**
+
+~~~powershell
+Get-Service -Name RemoteRegistry,TermService -ErrorAction SilentlyContinue | Select-Object Name,Status,StartType
+Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections -ErrorAction SilentlyContinue
+Get-LocalGroupMember -Group 'Remote Desktop Users' -ErrorAction SilentlyContinue
+~~~
+
+fDenyTSConnections = **1** generally denies RDP; 0 generally allows RDP, subject to service/GPO/firewall controls. **Always record the original state**.
+
+**Fix only if expressly unneeded/unauthorized:**
+
+~~~powershell
+Stop-Service -Name RemoteRegistry -ErrorAction Stop
+Set-Service -Name RemoteRegistry -StartupType Disabled
+~~~
+
+For RDP, prefer the Remote Desktop GUI to disable an unauthorized listener. Do not lock yourself out of required remote access.
+
+**Verification:** Repeat the status/registry checks. Test RDP from an approved client **when required**, or confirm that it is unreachable if prohibited.
+
+**Undo:** Restore the exact recorded Remote Registry startup type and RDP setting/allowed groups/firewall rules using authorized console access. A blanket **Remote Desktop off** recommendation is inappropriate for a required administration session.
+
+### Research report expansion W-R7 — Installed software, scheduled tasks, persistence and evidence
+
+- [ ] Done
+
+**Evidence:** Community. Common checks include Run/RunOnce, scheduled tasks, suspect services, executable signatures, installed apps and portable tools.
+
+**Clicking:** **Win + R → appwiz.cpl**, **Task Manager → Startup apps**, **Win + R → taskschd.msc**, and **services.msc**. Inspect the exact executable and task action before disabling.
+
+**Typing (check):**
+
+~~~powershell
+Get-Package | Select-Object Name,Version,ProviderName | Sort-Object Name
+Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
+Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
+Get-ScheduledTask | Select-Object TaskPath,TaskName,State
+Get-CimInstance Win32_Service | Select-Object Name,StartName,State,PathName
+~~~
+
+**Preserve a discovered file's metadata and hash (replace sample path):**
+
+~~~powershell
+Get-Item -LiteralPath 'C:\Users\Example\Documents\suspect.exe' | Select-Object FullName,Length,LastWriteTime
+Get-FileHash -LiteralPath 'C:\Users\Example\Documents\suspect.exe' -Algorithm SHA256
+Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' | Select-Object Status,SignerCertificate
+~~~
+
+**Fix:** After forensic answers are saved and the exact task/service/app is confirmed unauthorized, **disable one item at a time** using its GUI. Do not run a suspect task to investigate it, delete all registry Run entries, or purge all software matching a broad keyword.
+
+**Verify:** Recheck the same item and required applications. If persistence returns, investigate its owning process and launch mechanism; do not guess at an unrelated service.
+
+**Undo:** Re-enable that exact task/service or restore its recorded registry entry. Uninstalling software can delete app data—restore both product **and configuration** if a required application was accidentally removed.
+
+### Research report expansion W-R8 — UAC, advanced audit policy and source evidence
+
+- [ ] Done
+
+**Evidence:** Community/vendor-backed. These controls affect security event records, privilege prompts and visibility during investigations.
+
+**GUI:** Search **Change User Account Control settings**, then **Win + R → secpol.msc → Local Policies → Security Options** for detailed UAC settings. Review **Advanced Audit Policy Configuration** for account logon, account management, logon/logoff, policy change, privilege use and object access. On a domain-joined device inspect effective GPO.
+
+**Typing (check):**
+
+~~~powershell
+Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' | Select-Object EnableLUA,ConsentPromptBehaviorAdmin,PromptOnSecureDesktop
+auditpol /get /category:*
+gpresult /r /scope computer
+~~~
+
+**Fix:** Apply only the UAC/audit subcategory explicitly required by the image or a vendor-recommended baseline compatible with installed software. A useful example **when the README specifies successful and failed logon events** is:
+
+~~~cmd
+auditpol /set /subcategory:"Logon" /success:enable /failure:enable
+~~~
+
+**Verification:** Repeat auditpol and review recent **Event Viewer → Security** entries with correct timestamp/user context. A 4688 process-create event requires process-creation auditing; the absence of an event is not proof nothing ran.
+
+**Undo:** Record original auditpol subcategory status *before* changes and restore the exact previous Success/Failure state, instead of enabling or disabling all categories blindly. UAC changes may require restarting a process/reboot; preserve a rollback path.
 
 ## Part 5 — Advanced Policies and Full Recovery Reference
 

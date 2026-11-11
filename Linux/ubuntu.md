@@ -7,6 +7,10 @@
 >
 > **Scoring:** No public guide can promise the points from any individual fix. The image README defines authorized users, critical services, prohibited software and constraints. **Read it and preserve forensic evidence before remediation.**
 
+
+> [!NOTE]
+> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+
 ## Part 1 — Basics / Information Needed
 
 ### 1.1 Ubuntu terms, differences and useful GUIs
@@ -300,6 +304,155 @@ sudo systemctl disable --now example.service
 
 **Check:** Confirm whether the service also uses **.socket** activation, a timer, dependency or alias. Test every README-required service afterward. **Undo:** Restore exactly the previous enable/running state, not blindly enable every listed unit.
 
+
+### Research report expansion U-R1 — Ubuntu users, sudo, UID 0 and local authentication
+
+- [ ] Done
+
+**Evidence:** Official/training Windows/Linux image themes, community Linux checklists, and native Ubuntu commands. No secret scoring list is claimed.
+
+**GUI (Desktop):** **Settings → Users → Unlock**. Compare authorized students/admins to the actual README; a headless server may have no GUI. Check service accounts separately in Terminal.
+
+**Typing (check):**
+
+~~~bash
+getent passwd
+getent group sudo
+getent group adm
+awk -F: '$3 == 0 {print $1 " UID=" $3 " SHELL=" $7}' /etc/passwd
+sudo passwd -S root
+sudo passwd -S -a
+~~~
+
+**Investigate sudo policies and high-privilege groups:**
+
+~~~bash
+sudo visudo -c
+sudo grep -RnsE 'NOPASSWD|!authenticate' /etc/sudoers /etc/sudoers.d 2>/dev/null
+getent group docker
+getent group lxd
+~~~
+
+**Fix only if identity is verified unauthorized:** Remove **one** privileged membership:
+
+~~~bash
+sudo gpasswd -d EXAMPLE_USER sudo
+~~~
+
+A confirmed unauthorized account can be contained with a password lock and nonlogin shell after saving evidence:
+
+~~~bash
+sudo usermod -L EXAMPLE_USER
+sudo usermod -s /usr/sbin/nologin EXAMPLE_USER
+~~~
+
+**Important:** Password locking may **not** prevent SSH-key logins or established sessions. A duplicate UID 0 account should be investigated, not have its UID changed blindly.
+
+**Verification:** Recheck **id EXAMPLE_USER**, **getent group sudo** and an authorized new admin login. **Undo:** Restore the exact previous group membership, login shell and lock state; avoid deleting home files before forensics.
+
+### Research report expansion U-R2 — Password aging, PAM quality, history and lockout
+
+- [ ] Done
+
+**Evidence:** Community/vendor-supported PAM controls. Historical length/age thresholds in the report vary, so the README supplies actual numeric constraints.
+
+**Typing (check):**
+
+~~~bash
+grep -E '^PASS_(MAX_DAYS|MIN_DAYS|WARN_AGE)' /etc/login.defs
+sudo chage -l EXAMPLE_USER
+sudo grep -nEv '^[[:space:]]*(#|$)' /etc/pam.d/common-auth /etc/pam.d/common-password
+sudo grep -RnsE 'pam_pwquality|pam_pwhistory|pam_faillock|pam_unix|pam_exec' /etc/pam.d 2>/dev/null
+~~~
+
+**Before editing PAM:** Keep a working admin/VM-console session and back up only the file actually targeted. Ubuntu's PAM integration supports **pam-auth-update** with installed profiles; a wrong control flag can block all users. Never copy a Debian/Mint stack without checking installed modules.
+
+**Change example only if README requires 90 maximum / 1 minimum / 7 warning days:**
+
+~~~bash
+sudo chage -M 90 -m 1 -W 7 EXAMPLE_USER
+~~~
+
+**Verification:** Repeat **chage -l**, test a second normal-user login and an authorized sudo/password change *before closing the current admin session*.
+
+**Undo:** Restore exact previous chage values and backed-up PAM file with recovery-console access. Do not indiscriminately disable PAM controls to repair one bad login.
+
+### Research report expansion U-R3 — UFW, required ports, service identification and rollback
+
+- [ ] Done
+
+**Evidence:** Ubuntu vendor-backed UFW and community required-service checklists.
+
+**Typing (check):**
+
+~~~bash
+sudo ufw status verbose
+sudo ufw status numbered
+sudo nft list ruleset
+sudo ss -lntup
+~~~
+
+**Before change:** Record real required ports/services: SSH on its actual port, Apache/Nginx on assigned HTTP/TLS ports, Samba, DNS, DHCP, FTP, databases and authorized management. Verify whether UFW is the active firewall manager and keep console recovery.
+
+**Fix only if UFW is chosen and SSH on TCP 22 must remain available:**
+
+~~~bash
+sudo ufw allow 22/tcp
+~~~
+
+Then, after reviewing all required exceptions:
+
+~~~bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw enable
+~~~
+
+**Verification:** Repeat **sudo ufw status numbered**, then test every required app from an authorized client. An active rule does not prove remote traffic works; use a real protocol-level connection check.
+
+**Undo:** Restore the **specific** mistaken allow/deny rule or old policy from its recorded backup via console. Avoid disabling the entire firewall as a final workaround. If nftables/firewalld already owns the policy, do not layer an incompatible manager on top.
+
+### Research report expansion U-R4 — SSH root access, effective directives and socket activation
+
+- [ ] Done
+
+**Evidence:** Vendor-backed Ubuntu OpenSSH configuration; may be required or absent by scenario.
+
+**Typing (check):**
+
+~~~bash
+dpkg-query -W openssh-server 2>/dev/null
+systemctl status ssh --no-pager
+systemctl status ssh.socket --no-pager
+sudo grep -RnsE '^[[:space:]]*(Include|Match|PermitRootLogin|PermitEmptyPasswords|PasswordAuthentication|X11Forwarding|MaxAuthTries)' /etc/ssh/sshd_config /etc/ssh/sshd_config.d 2>/dev/null
+sudo /usr/sbin/sshd -t
+sudo /usr/sbin/sshd -T | grep -Ei '^(permitrootlogin|permitemptypasswords|passwordauthentication|x11forwarding|maxauthtries)'
+~~~
+
+**Version nuance:** Ubuntu 22.10+ may use SSH socket activation. On updated Ubuntu 24.04, socket listening configuration can be derived from sshd_config; **a stopped ssh.service does not automatically mean SSH is unreachable**.
+
+**Before change:** Keep a current authenticated admin session and VM console, record the real SSH port, required password/key method and all Match/Include directives, then back up the actual file.
+
+**Configuration example only when README permits it:**
+
+~~~text
+PermitRootLogin no
+PermitEmptyPasswords no
+~~~
+
+Do not disable password authentication if the required authorized user has no tested SSH key. Other settings like **X11Forwarding no** or **MaxAuthTries 3** require compatibility review.
+
+**Typing (validate then reload when supported):**
+
+~~~bash
+sudo /usr/sbin/sshd -t
+sudo systemctl reload ssh
+~~~
+
+**Verification:** Establish a **second separate authorized SSH login**, inspect effective config and current listener. Check ssh.socket as well if used.
+
+**Undo:** Restore backed-up exact config using the console, validate it and reload the correct service/socket state. Never close the original management connection until the new one works.
+
 ## Part 4 — Services, Software, Desktop and Persistence
 
 ### 4.1 SSH service and socket activation (critical Ubuntu difference)
@@ -447,6 +600,125 @@ sudo aa-status
 ~~~
 
 Some Ubuntu installations use **journald** without a separate auth.log; rsyslog may also be installed. AppArmor modules/profiles vary; a DENIED message warrants targeted policy review, not disabling all confinement. Preserve evidence, disk space, and necessary service operation.
+
+
+### Research report expansion U-R5 — AppArmor, security update timers and apt integrity
+
+- [ ] Done
+
+**Evidence:** Ubuntu vendor-backed LSM/update behavior and community practice. Missing tools are not automatically a scored issue.
+
+**Typing (check):**
+
+~~~bash
+sudo aa-status
+systemctl status apparmor --no-pager
+sudo journalctl -k -n 80 --no-pager | grep -i apparmor
+dpkg-query -W unattended-upgrades 2>/dev/null
+systemctl status apt-daily-upgrade.timer --no-pager
+apt-cache policy
+apt-mark showhold
+sudo dpkg --audit
+~~~
+
+**What to look for:** Unexpected AppArmor disabled status, suspicious manual complain-mode profiles, update timer intentionally disabled, untrusted APT sources/PPAs or held security packages. A missing audit rule/profile or timer may be deliberate; inspect the required setup.
+
+**Typing (fix only if the installed AppArmor service is required and was disabled):**
+
+~~~bash
+sudo systemctl enable --now apparmor
+~~~
+
+If the actual image requires unattended-upgrades and the package is absent, after verifying signed sources:
+
+~~~bash
+sudo apt update
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure -plow unattended-upgrades
+~~~
+
+**Verification:** Repeat **aa-status**, confirm relevant profiles and required application behavior, inspect **/etc/apt/apt.conf.d/20auto-upgrades** and apt timer/log behavior. An active timer may have an inactive oneshot service between runs; that is normal.
+
+**Undo:** Restore a specific AppArmor profile mode or APT configuration from its recorded baseline. Never disable AppArmor globally or delete system update logs to hide one DENIED message.
+
+### Research report expansion U-R6 — Cron, systemd, shell startup, permissions and unwanted apps
+
+- [ ] Done
+
+**Evidence:** Shared community training topics, not verified secret scoring items.
+
+**Typing (check):**
+
+~~~bash
+sudo cat /etc/crontab
+sudo ls -la /etc/cron.d /etc/cron.daily /etc/cron.hourly
+sudo crontab -l
+systemctl list-timers --all
+systemctl list-unit-files --type=service --state=enabled
+sudo ss -lntup
+~~~
+
+~~~bash
+stat -c '%A %a %U:%G %n' /etc/passwd /etc/shadow /etc/group /etc/gshadow /etc/sudoers
+sudo find /etc /usr/local /opt -xdev -type f -perm /0002 -ls 2>/dev/null
+sudo find /usr/local/bin /usr/local/sbin -type f \( -perm /4000 -o -perm /2000 \) -ls 2>/dev/null
+cat /etc/hosts
+~~~
+
+**Unapproved app inventory:**
+
+~~~bash
+dpkg -l | grep -Ei 'nmap|netcat|wireshark|steam|transmission|qbittorrent|john|hydra'
+command -v snap
+~~~
+
+Check **snap list** only if Snap exists; Ubuntu Firefox may be a Snap rather than a deb. Do not remove snapd or a required application based on another distribution's default.
+
+**Fix:** Confirm the exact README prohibition and preserve evidence first. For one prohibited APT package, use **apt -s purge ACTUAL_PACKAGE** to preview dependencies; only then consider a targeted removal. For a verified malicious timer/cron job, disable or comment just the offending item after backing up its file.
+
+**Verification:** Re-run individual searches, test authorized applications and service clients, confirm update state and scoring report.
+
+**Undo:** Restore the old unit/cron line/hosts mapping, file mode, or original package and application configuration; never bulk-delete media files, services or all SUID bits.
+
+### Research report expansion U-R7 — Critical-service recovery and scoring regression triage
+
+- [ ] Done
+
+**Evidence:** CyberPatriot required-service principle and standard systemd administration.
+
+**Typing (check):**
+
+~~~bash
+systemctl list-units --type=service --state=running
+systemctl --failed
+sudo ss -lntup
+sudo journalctl -p err -n 50 --no-pager
+~~~
+
+**Before acting:** Match actual unit names to the README and record original enabled/running status. Common required roles can include SSH, Apache/Nginx, MariaDB, PostgreSQL, Samba, DNS/BIND, DHCP and mail services.
+
+**Fix ONLY when a service explicitly required by the README was accidentally disabled and its original state was enabled:**
+
+~~~bash
+sudo systemctl enable EXAMPLE_REQUIRED.service
+sudo systemctl start EXAMPLE_REQUIRED.service
+~~~
+
+**Verification:**
+
+~~~bash
+systemctl is-enabled EXAMPLE_REQUIRED.service
+systemctl is-active EXAMPLE_REQUIRED.service
+sudo journalctl -u EXAMPLE_REQUIRED.service -n 50 --no-pager
+~~~
+
+Then test its real authorized client transaction (for example SSH login, HTTPS request, SMB share, DNS lookup or DB connection). A green systemctl status alone does not prove it fulfills its application task.
+
+**Undo:** Return that specific unit to the recorded prior state when a change was incorrect, keeping the required service operational. Do not force every service Automatic or purge a server simply because a general checklist listed it as risky.
+
+**Scoring drop:** Compare the **one most recent modification** against the previously working state, restore it if it broke a required service, repeat functionality tests, then refresh the official scoring report. Preserve scoring data rather than editing or deleting it.
+
+**References:** [Ubuntu Security](https://documentation.ubuntu.com/security/), [Ubuntu Server docs](https://ubuntu.com/server/docs), [Ubuntu OpenSSH](https://documentation.ubuntu.com/server/how-to/security/openssh-server/).
 
 ## Part 5 — Advanced Networking and Policy
 
