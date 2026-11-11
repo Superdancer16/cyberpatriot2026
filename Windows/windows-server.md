@@ -30,6 +30,10 @@ Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competi
 
 ---
 
+
+> [!NOTE]
+> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+
 ## Part 1 — Basics / Information Needed
 
 ### Identify what kind of Windows Server this is
