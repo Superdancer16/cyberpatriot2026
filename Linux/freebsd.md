@@ -80,7 +80,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
@@ -744,7 +744,7 @@ Names/paths depend on installed package/version and may be overridden by rc.conf
 > cp -p /etc/ssh/sshd_config /root/cp-backups/sshd_config.before-cp
 > ee /etc/ssh/sshd_config
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >

@@ -152,7 +152,7 @@ More techniques: [Forensics questions guide](../General/All/forensics-questions.
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
@@ -197,7 +197,7 @@ Prioritize account privileges, password policy, firewall and signed updates befo
 > awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd
 > ```
 > This prints every user with a user ID (UID) of 1000 or more, which means the real people.
->
+
 #### 2.2 Delete users who are not in the README
 - [ ] **🎯 DO THIS (only if authorized) — 2.2 Delete users who are not in the README**
 
@@ -234,7 +234,7 @@ Prioritize account privileges, password policy, firewall and signed updates befo
 > ```bash
 > sudo adduser erin             # asks for a password and details
 > ```
->
+
 #### 2.4 Fix who is an administrator
 - [ ] **🎯 DO THIS — 2.4 Fix who is an administrator**
 
@@ -312,7 +312,7 @@ sudo gpasswd -d carol shadow
 > sudo passwd bob
 > ```
 > Use 12+ characters with upper case, lower case, a number and a symbol, e.g. `Blue-Train-42!x`. **Write it down.**
->
+
 > [!WARNING]
 > **Don't change your own password** unless the README asks. If you do, you must remember it, because the screen lock and `sudo` will ask for it.
 
@@ -532,7 +532,7 @@ Look for odd ports like 4444, 1337, 31337, 6667, or "ALLOW Anywhere" on a port n
 > sudo apt update
 > sudo apt full-upgrade -y
 > ```
->
+
 #### 5.2 Turn on automatic updates
 - [ ] **🎯 DO THIS — 5.2 Turn on automatic updates**
 
@@ -558,7 +558,7 @@ systemctl is-enabled mintupdate-automation-upgrade.timer   # prints "enabled" wh
 > APT::Periodic::Download-Upgradeable-Packages "1";
 > APT::Periodic::AutocleanInterval "7";
 > ```
->
+
 #### 5.3 Check the software sources
 - [ ] **🎯 DO THIS — 5.3 Check the software sources**
 
@@ -575,7 +575,7 @@ systemctl is-enabled mintupdate-automation-upgrade.timer   # prints "enabled" wh
 > grep -rhv '^#' /etc/apt/sources.list /etc/apt/sources.list.d/ | grep .
 > ```
 > Official addresses: `packages.linuxmint.com`, `archive.ubuntu.com`, `security.ubuntu.com` (or a country mirror). `[trusted=yes]` on a line is a **red flag**: it turns off signature checking.
->
+
 #### 5.4 Packages "held" back from updating
 - [ ] **🎯 DO THIS — 5.4 Packages "held" back from updating**
 
@@ -682,7 +682,7 @@ sudo find /usr/local/bin /usr/local/sbin -type f -perm /4000 -ls 2>/dev/null
 > sudo passwd -S -a
 > sudo grep -RnsE 'NOPASSWD|!authenticate|pam_exec|pam_permit|pam_debug' /etc/sudoers /etc/sudoers.d /etc/pam.d 2>/dev/null
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
 > **What to look for:** An unapproved human login, a second UID 0 account, a sudo rule granting unauthorized privileges, or a modified PAM module line. Service users and unusual installed policies may be legitimate; do not infer malice from a name alone.
@@ -863,7 +863,7 @@ sudo systemctl enable --now ssh  # start it if it isn't
 > sudo apt purge nmap wireshark john hydra
 > sudo apt autoremove
 > ```
->
+
 #### 7.2 Games
 - [ ] **🎯 DO THIS — 7.2 Games**
 
@@ -1223,7 +1223,7 @@ grep -n 'pam_permit' /etc/pam.d/common-auth # "auth sufficient pam_permit.so" = 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 #### 13.8 Tampered system programs
 - [ ] **🎯 DO THIS — 13.8 Tampered system programs**
 
@@ -1336,7 +1336,7 @@ Then open **≡ → Add-ons and themes → Extensions** and remove any you don't
 > systemctl status display-manager --no-pager
 > sudo grep -RnsE '^[[:space:]]*(allow-guest|autologin-user|autologin-user-timeout)' /etc/lightdm /usr/share/lightdm/lightdm.conf.d 2>/dev/null
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
 > **What to look for:** Unauthorized guest login or auto-login. LightDM can load multiple configuration snippets; vendor defaults may be overridden by user local settings. If installed manager is not LightDM, use that manager's actual controls.
@@ -3401,7 +3401,7 @@ sudo -u postgres psql -c 'SHOW config_file;' -c 'SHOW hba_file;' -c 'SHOW listen
 > sudo cp -a /etc/postgresql/15/main/postgresql.conf /etc/postgresql/15/main/postgresql.conf.before-cp
 > sudo cp -a /etc/postgresql/15/main/pg_hba.conf /etc/postgresql/15/main/pg_hba.conf.before-cp
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
@@ -3490,11 +3490,11 @@ A not-installed result is normal. Determine which implementation owns UDP 67 wit
 > sudo cp -a /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.before-cp
 > sudo nano /etc/dhcp/dhcpd.conf
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >

@@ -1159,7 +1159,7 @@ A missing socket unit is normal on some installations; do not install one merely
 > gsettings get org.gnome.desktop.screensaver lock-enabled
 > gsettings get org.gnome.desktop.screensaver lock-delay
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >

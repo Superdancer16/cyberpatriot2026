@@ -388,7 +388,7 @@ Get-ADGroupMember 'Domain Admins' -Recursive | Select-Object SamAccountName   # 
 > Set-ADUser bob -PasswordNeverExpires $false -PasswordNotRequired $false -AllowReversiblePasswordEncryption $false
 > Set-ADAccountControl bob -DoesNotRequirePreAuth $false
 > ```
->
+
 #### 2.5 Strong passwords
 - [ ] **🎯 DO THIS — 2.5 Strong passwords**
 
@@ -511,7 +511,7 @@ This illustrative command does **not** set maximum/minimum password age; verify 
 > Get-MpPreference | Select-Object ExclusionPath,ExclusionExtension,ExclusionProcess
 > Get-Service WinDefend -ErrorAction SilentlyContinue
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **🧠 Interpret:** Another enterprise antivirus may put Defender in a passive mode. Existing exclusions may be required for IIS, SQL, AD, backup or other approved workloads; investigate each before removing. A service not continuously running can be normal for some protective components; confirm effective provider and policies.
@@ -737,7 +737,7 @@ Review actual DC audit events and test fresh domain user logon, DC DNS, SYSVOL/N
 > Get-GPO -All | Sort-Object ModificationTime -Descending | Format-Table DisplayName, ModificationTime
 > Get-GPOReport -All -ReportType Html -Path C:\gpo-report.html; Start-Process C:\gpo-report.html
 > ```
->
+
 #### 4.4 Domain Controller: Zerologon protection
 - [ ] **🎯 DO THIS — 4.4 Domain Controller: Zerologon protection**
 
@@ -861,7 +861,7 @@ Disable-ADAccount -Identity 'EXAMPLE_USER'
 > Get-ADUserResultantPasswordPolicy -Identity 'EXAMPLE_USER'
 > gpresult /r /scope computer
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **What to look for:** A weak *effective* policy for a user because of fine-grained precedence, password-not-required flags or missing complexity settings; use exact values from the README. The report records conflicting historical community settings (minimum lengths 10–14; maximum ages 60–90 days). These are **examples, not fixed competition scores**.
@@ -907,7 +907,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 > gpresult /r /scope computer
 > Get-Service NTDS,Netlogon,Kdc -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **🧠 Interpretation:** Event 2887 can summarize unsigned LDAP binds when logging is configured. Individual client events such as 2889 may require extra diagnostic logging; **absence of events does not demonstrate that all clients support enforcement**. Channel-binding diagnostics may include other Directory Service event IDs depending on OS and policy.
@@ -940,7 +940,7 @@ Replace example.test and numbers; this is a *partial illustrative* change and do
 > Get-SmbClientConfiguration | Select-Object RequireSecuritySignature
 > Get-SmbShare | Select-Object Name,Path,Special,Description
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **What to look for:** Unauthorized SMB1 compatibility, weak signing if the role requires it, unapproved custom shares and overly broad share rights. **SYSVOL, NETLOGON, administrative shares, and required data shares must not be removed indiscriminately.**
@@ -1038,7 +1038,7 @@ Look through the records for anything suspicious, e.g. a record for `update.micr
 > Get-DnsServerResourceRecord -ZoneName corp.local | Format-Table HostName, RecordType, RecordData
 > ```
 > `-DynamicUpdate Secure` works only when **IsDsIntegrated** is `True`. For a zone that isn't, use `-DynamicUpdate None` (unless the README needs dynamic updates).
->
+
 #### 9.4 Active Directory
 - [ ] **🎯 DO THIS — 9.4 Active Directory**
 
@@ -1410,7 +1410,7 @@ Get-NetFirewallProfile
 > Get-DnsServerForwarder
 > Get-DnsServerResourceRecord -ZoneName 'example.test' -RRType SRV -ErrorAction SilentlyContinue
 > ~~~
->
+
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **🛑 Before changing anything:** Record the original zone type, AD replication scope, allowed secondaries, clients and SRV records. **Do not delete unfamiliar SRV records** or redirect domain DNS to a public resolver.
@@ -1481,7 +1481,7 @@ Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
 > Get-WebBinding | Select-Object protocol,bindingInformation
 > Get-ChildItem IIS:\AppPools | Select-Object Name,State
 > ~~~
->
+
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **🛑 Before edits:** Export/back up the effective IIS configuration, bindings and relevant content; record any application pool identity and required login/upload/database operations. An IIS configuration backup alone does not save its content/database.
@@ -1827,7 +1827,7 @@ Choose a unique name on subsequent runs. Separately back up content and database
 > Get-ChildItem IIS:\AppPools | Select-Object Name,State,processModel
 > Get-SmbShare | Format-Table Name,Path,Description
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >
@@ -1981,7 +1981,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >
@@ -2011,7 +2011,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > ```powershell
 > Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, LastLogon
 > ```
->
+
 ##### WS.2.2 Delete users who are not in the README
 - [ ] **🎯 DO THIS (only if authorized) — WS.2.2 Delete users who are not in the README**
 
@@ -2027,7 +2027,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > ```powershell
 > Remove-LocalUser -Name mallory
 > ```
->
+
 > [!CAUTION]
 > Don't delete the built-in accounts (**Administrator, Guest, DefaultAccount, WDAGUtilityAccount**): *disable* them instead (2.6). Never delete yourself or anyone on the README.
 
@@ -2043,7 +2043,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > New-LocalUser -Name erin -Password (Read-Host -AsSecureString "Password for erin")
 > Add-LocalGroupMember -Group Users -Member erin
 > ```
->
+
 ##### WS.2.4 Fix the Administrators group
 - [ ] **🎯 DO THIS — WS.2.4 Fix the Administrators group**
 
@@ -2062,7 +2062,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > Add-LocalGroupMember -Group Administrators -Member alice
 > net localgroup Administrators      # use this if Get-LocalGroupMember shows an error
 > ```
->
+
 > [!CAUTION]
 > Never remove **yourself** (the account you are logged in as) from Administrators. You would lose your admin rights.
 
@@ -2090,7 +2090,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Get-LocalUser | Where-Object { $_.SID -match '-50[0134]$' } | Format-Table Name, Enabled, SID   # finds them even if renamed
 > ```
 > The built-in **Administrator** should usually be disabled too, **unless you're logged in as it** or the README says to keep it.
->
+
 ##### WS.2.7 Fix weak password settings on accounts
 - [ ] **🎯 DO THIS — WS.2.7 Fix weak password settings on accounts**
 
@@ -2109,7 +2109,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Set-LocalUser -Name bob -UserMayChangePassword $true
 > net user bob /passwordreq:yes
 > ```
->
+
 ##### WS.2.8 Give users strong passwords
 - [ ] **🎯 DO THIS — WS.2.8 Give users strong passwords**
 
@@ -2122,7 +2122,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Set-LocalUser -Name bob -Password (Read-Host -AsSecureString "New password for bob")
 > ```
 > Use 12+ characters with upper case, lower case, a number and a symbol. **Don't change your own password** unless the README says so.
->
+
 ---
 
 #### WS.3. Account policies (passwords and lockout)
@@ -2195,7 +2195,7 @@ net accounts                     # check everything
 > auditpol /get /category:*
 > ```
 > Also: **Security Options → Audit: Force audit policy subcategory settings… to override audit policy category settings → Enabled**.
->
+
 ##### WS.4.2 User Rights Assignment
 - [ ] **🎯 DO THIS — WS.4.2 User Rights Assignment**
 
@@ -2232,7 +2232,7 @@ net accounts                     # check everything
 > Select-String '^Se' $env:TEMP\rights.inf
 > ```
 > Accounts show as SIDs: `*S-1-1-0` = Everyone, `*S-1-5-32-545` = Users, `*S-1-5-32-546` = Guests, `*S-1-5-32-544` = Administrators. A long SID that starts with `S-1-5-21-` is one user account.
->
+
 > [!WARNING]
 > Look carefully at the **Deny** rights. A planted "Deny log on locally: **Users**" locks every normal user out.
 > Don't remove **LOCAL SERVICE**, **NETWORK SERVICE**, **SERVICE** or entries that start with `NT SERVICE\`: Windows needs them.
@@ -2341,7 +2341,7 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 > Get-MpPreference | Format-List ExclusionPath, ExclusionExtension, ExclusionProcess
 > Remove-MpPreference -ExclusionPath "C:\Users\Public\tools"
 > ```
->
+
 ##### WS.5.3 No policy that turns Defender off
 - [ ] **🎯 DO THIS — WS.5.3 No policy that turns Defender off**
 
@@ -2354,7 +2354,7 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 > Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -ErrorAction SilentlyContinue                          # DisableAntiSpyware : 1 is bad
 > Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection' -ErrorAction SilentlyContinue     # any Disable value of 1 is bad
 > ```
->
+
 ##### WS.5.4 Update and scan
 - [ ] **🎯 DO THIS — WS.5.4 Update and scan**
 
@@ -2396,7 +2396,7 @@ Get-MpThreatDetection           # anything found
 >   ForEach-Object { "{0} -> {1}" -f $_.DisplayName, ($_ | Get-NetFirewallApplicationFilter).Program }
 > Disable-NetFirewallRule -DisplayName "Evil Rule"
 > ```
->
+
 ---
 
 #### WS.7. Windows Update
@@ -2423,7 +2423,7 @@ Get-MpThreatDetection           # anything found
 > Set-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name NoAutoUpdate -Value 0
 > Set-Service wuauserv -StartupType Manual
 > ```
->
+
 ##### WS.7.3 Update the other programs
 - [ ] **🎯 DO THIS — WS.7.3 Update the other programs**
 
@@ -2442,7 +2442,7 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 > Stop-Service -Name RemoteRegistry
 > Set-Service -Name RemoteRegistry -StartupType Disabled
 > ```
->
+
 ##### WS.8.1 Turn off risky services (unless the README needs them)
 - [ ] **🎯 DO THIS (only if authorized) — WS.8.1 Turn off risky services (unless the README needs them)**
 
@@ -3753,7 +3753,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 > ```powershell
 > Get-CimInstance Win32_Service | Where-Object { $_.Name -match 'TeamViewer|AnyDesk|VNC|RustDesk' -or $_.PathName -match 'TeamViewer|AnyDesk|VNC|RustDesk' } | Format-List Name,DisplayName,State,StartMode,PathName
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >
@@ -3939,7 +3939,7 @@ Look for:
 > Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*, HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
 >   Where-Object DisplayName | Sort-Object DisplayName | Format-Table DisplayName, DisplayVersion, Publisher
 > ```
->
+
 ##### WS.12.2 Store apps and games
 - [ ] **🎯 DO THIS — WS.12.2 Store apps and games**
 
@@ -4000,7 +4000,7 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 > Remove-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Run -Name "Updater"
 > ```
 > Red flags: `powershell -enc` followed by a long string, `-WindowStyle Hidden`, `nc.exe`, `mshta`, `.vbs`/`.bat`/`.ps1` files, anything in `C:\Users\Public` or `Temp`.
->
+
 ##### WS.14.2 Scheduled tasks
 - [ ] **🎯 DO THIS — WS.14.2 Scheduled tasks**
 
@@ -4014,7 +4014,7 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 >   ForEach-Object { "{0}{1} -> {2} {3}" -f $_.TaskPath, $_.TaskName, $_.Actions.Execute, $_.Actions.Arguments }
 > Unregister-ScheduledTask -TaskName "BadTask" -Confirm:$false
 > ```
->
+
 ##### WS.14.3 Services that run strange programs
 - [ ] **🎯 DO THIS — WS.14.3 Services that run strange programs**
 

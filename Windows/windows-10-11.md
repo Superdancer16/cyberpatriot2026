@@ -32,6 +32,9 @@
 > [!IMPORTANT]
 > **🎯 HOW TO USE:** Each **DO THIS** checkbox is the action to complete **only when applicable to the image README**. When present, **⭐ EASIEST WAY — GUI** is the recommended path. **🔁 ALTERNATE** commands are optional ways to do the same task; blue **NOTE** boxes hold explanations and extra context, while **CAUTION/WARNING** boxes explain safety/undo. **Never run both methods just to gain points.**
 
+> [!TIP]
+> **⚡ Fast access:** [Windows 11 training-task cards](#training-windows-11) give one clear action and the easiest method before the comprehensive Windows procedures.
+
 ## Part 1 — Basics / Information Needed
 
 > [!TIP]
@@ -129,7 +132,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >
@@ -156,6 +159,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 
 Accounts, password rules, Defender, firewall, updates and audit settings are frequent *topics* in public checklists; actual per-fix points are unknown.
 
+<a id="training-windows-11"></a>
 ### 🎯 Windows 11 Training Round 2 — task-first skill cards (generalized)
 
 > [!IMPORTANT]
@@ -673,7 +677,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 > ```powershell
 > Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, LastLogon
 > ```
->
+
 #### 2.2 Delete users who are not in the README
 - [ ] **🎯 DO THIS (only if authorized) — 2.2 Delete users who are not in the README**
 
@@ -689,7 +693,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 > ```powershell
 > Remove-LocalUser -Name mallory
 > ```
->
+
 > [!CAUTION]
 > Don't delete the built-in accounts (**Administrator, Guest, DefaultAccount, WDAGUtilityAccount**): *disable* them instead (2.6). Never delete yourself or anyone on the README.
 
@@ -705,7 +709,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 > New-LocalUser -Name erin -Password (Read-Host -AsSecureString "Password for erin")
 > Add-LocalGroupMember -Group Users -Member erin
 > ```
->
+
 #### 2.4 Fix the Administrators group
 - [ ] **🎯 DO THIS — 2.4 Fix the Administrators group**
 
@@ -724,7 +728,7 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 > Add-LocalGroupMember -Group Administrators -Member alice
 > net localgroup Administrators      # use this if Get-LocalGroupMember shows an error
 > ```
->
+
 > [!CAUTION]
 > Never remove **yourself** (the account you are logged in as) from Administrators. You would lose your admin rights.
 
@@ -752,7 +756,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Get-LocalUser | Where-Object { $_.SID -match '-50[0134]$' } | Format-Table Name, Enabled, SID   # finds them even if renamed
 > ```
 > The built-in **Administrator** should usually be disabled too, **unless you're logged in as it** or the README says to keep it.
->
+
 #### 2.7 Fix weak password settings on accounts
 - [ ] **🎯 DO THIS — 2.7 Fix weak password settings on accounts**
 
@@ -771,7 +775,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Set-LocalUser -Name bob -UserMayChangePassword $true
 > net user bob /passwordreq:yes
 > ```
->
+
 #### 2.8 Give users strong passwords
 - [ ] **🎯 DO THIS — 2.8 Give users strong passwords**
 
@@ -784,7 +788,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Set-LocalUser -Name bob -Password (Read-Host -AsSecureString "New password for bob")
 > ```
 > Use 12+ characters with upper case, lower case, a number and a symbol. **Don't change your own password** unless the README says so.
->
+
 ---
 
 
@@ -872,7 +876,7 @@ net accounts                     # check everything
 > Get-MpPreference | Format-List ExclusionPath, ExclusionExtension, ExclusionProcess
 > Remove-MpPreference -ExclusionPath "C:\Users\Public\tools"
 > ```
->
+
 #### 5.3 No policy that turns Defender off
 - [ ] **🎯 DO THIS — 5.3 No policy that turns Defender off**
 
@@ -885,7 +889,7 @@ net accounts                     # check everything
 > Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -ErrorAction SilentlyContinue                          # DisableAntiSpyware : 1 is bad
 > Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection' -ErrorAction SilentlyContinue     # any Disable value of 1 is bad
 > ```
->
+
 #### 5.4 Update and scan
 - [ ] **🎯 DO THIS — 5.4 Update and scan**
 
@@ -928,7 +932,7 @@ Get-MpThreatDetection           # anything found
 >   ForEach-Object { "{0} -> {1}" -f $_.DisplayName, ($_ | Get-NetFirewallApplicationFilter).Program }
 > Disable-NetFirewallRule -DisplayName "Evil Rule"
 > ```
->
+
 ---
 
 
@@ -956,7 +960,7 @@ Get-MpThreatDetection           # anything found
 > Set-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name NoAutoUpdate -Value 0
 > Set-Service wuauserv -StartupType Manual
 > ```
->
+
 #### 7.3 Update the other programs
 - [ ] **🎯 DO THIS — 7.3 Update the other programs**
 
@@ -984,7 +988,7 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 > auditpol /get /category:*
 > ```
 > Also: **Security Options → Audit: Force audit policy subcategory settings… to override audit policy category settings → Enabled**.
->
+
 #### 4.2 User Rights Assignment
 - [ ] **🎯 DO THIS — 4.2 User Rights Assignment**
 
@@ -1021,7 +1025,7 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 > Select-String '^Se' $env:TEMP\rights.inf
 > ```
 > Accounts show as SIDs: `*S-1-1-0` = Everyone, `*S-1-5-32-545` = Users, `*S-1-5-32-546` = Guests, `*S-1-5-32-544` = Administrators. A long SID that starts with `S-1-5-21-` is one user account.
->
+
 > [!WARNING]
 > Look carefully at the **Deny** rights. A planted "Deny log on locally: **Users**" locks every normal user out.
 > Don't remove **LOCAL SERVICE**, **NETWORK SERVICE**, **SERVICE** or entries that start with `NT SERVICE\`: Windows needs them.
@@ -1115,7 +1119,7 @@ Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogg
 > Get-NetFirewallProfile | Format-Table Name,Enabled,DefaultInboundAction
 > Get-Service wuauserv,EventLog,mpssvc -ErrorAction SilentlyContinue | Format-Table Name,Status,StartType
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **💡 Why:** Unexpected Defender exclusions and disabled protection can hide threats, but authorized applications may require an exclusion. Do **not** blindly remove all exclusions. The Windows Update service may be stopped while idle; Disabled startup type requires investigation.
@@ -1157,7 +1161,7 @@ SMB1 is legacy; do not disable SMB functionality that the scenario explicitly re
 > Get-LocalGroupMember -Group 'Remote Desktop Users' -ErrorAction SilentlyContinue
 > Get-LocalGroupMember -Group 'Backup Operators' -ErrorAction SilentlyContinue
 > ~~~
->
+
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **What to look for:** An extra human login, a seemingly unauthorized local admin, enabled Guest, or password-not-required / password-never-expires on an ordinary account. Check service principals, renamed built-ins, and domain membership before changing anything. A renamed built-in account retains its SID; a display name alone is insufficient.
@@ -1274,7 +1278,7 @@ net accounts /lockoutwindow:30
 > Get-MpComputerStatus | Select-Object AMRunningMode,AntivirusEnabled,RealTimeProtectionEnabled,BehaviorMonitorEnabled,AntivirusSignatureLastUpdated
 > Get-MpPreference | Select-Object DisableRealtimeMonitoring,DisableBehaviorMonitoring,DisableScriptScanning,PUAProtection,ExclusionPath,ExclusionExtension,ExclusionProcess
 > ~~~
->
+
 > [!NOTE]
 > **ℹ️ EXTRA INFO — context, safety or recovery (not another scoring task)**
 > **What to look for:** Real-time monitoring disabled without an approved replacement, unexpectedly broad folder/process exclusions, stale signatures, unauthorized antivirus, or an active threat. An exclusion can be legitimate for a required app—record and verify it first.
@@ -1442,7 +1446,7 @@ Look for:
 > Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*, HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*, HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
 >   Where-Object DisplayName | Sort-Object DisplayName | Format-Table DisplayName, DisplayVersion, Publisher
 > ```
->
+
 #### 12.2 Store apps and games
 - [ ] **🎯 DO THIS — 12.2 Store apps and games**
 
@@ -1505,7 +1509,7 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 > Remove-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Run -Name "Updater"
 > ```
 > Red flags: `powershell -enc` followed by a long string, `-WindowStyle Hidden`, `nc.exe`, `mshta`, `.vbs`/`.bat`/`.ps1` files, anything in `C:\Users\Public` or `Temp`.
->
+
 #### 14.2 Scheduled tasks
 - [ ] **🎯 DO THIS — 14.2 Scheduled tasks**
 
@@ -1519,7 +1523,7 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 >   ForEach-Object { "{0}{1} -> {2} {3}" -f $_.TaskPath, $_.TaskName, $_.Actions.Execute, $_.Actions.Arguments }
 > Unregister-ScheduledTask -TaskName "BadTask" -Confirm:$false
 > ```
->
+
 #### 14.3 Services that run strange programs
 - [ ] **🎯 DO THIS — 14.3 Services that run strange programs**
 
@@ -1600,7 +1604,7 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 > Stop-Service -Name RemoteRegistry
 > Set-Service -Name RemoteRegistry -StartupType Disabled
 > ```
->
+
 #### 8.1 Turn off risky services (unless the README needs them)
 - [ ] **🎯 DO THIS (only if authorized) — 8.1 Turn off risky services (unless the README needs them)**
 
@@ -2911,7 +2915,7 @@ Use `Automatic` instead when that was recorded; restore delayed automatic start 
 > ```powershell
 > Get-CimInstance Win32_Service | Where-Object { $_.Name -match 'TeamViewer|AnyDesk|VNC|RustDesk' -or $_.PathName -match 'TeamViewer|AnyDesk|VNC|RustDesk' } | Format-List Name,DisplayName,State,StartMode,PathName
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — PowerShell/command line.** Use only if you prefer it or the GUI is unavailable; this is **not a second required task**.
 >

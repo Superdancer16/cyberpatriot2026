@@ -45,6 +45,9 @@
 > [!IMPORTANT]
 > **🎯 TASK = do/check only what applies to the README.** **⭐ EASIEST WAY** shows the recommended GUI if one exists; otherwise use the Terminal commands. Blue **NOTE** boxes contain alternate methods and background information. Yellow/orange **CAUTION/WARNING** boxes contain safe-rollback reminders. **Do not run both GUI and Terminal procedures just to tick a checkbox.**
 
+> [!TIP]
+> **⚡ Fast access:** [Debian 12 training-task cards](#training-debian-12) list the recommended Terminal action, how to verify, and optional background details.
+
 ## Part 1 — Basics / Information Needed
 
 > [!TIP]
@@ -181,7 +184,7 @@ Without `sudo` (or root), `journalctl` shows only **your own** messages, so a lo
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
@@ -249,6 +252,7 @@ printf '%s' 'aGVsbG8=' | base64 --decode
 
 Review identities/sudo, password policy, firewall and updates before the longer service-specific material.
 
+<a id="training-debian-12"></a>
 ### 🎯 Debian 12 Training Round 2 — task-first skill cards (generalized)
 
 > [!IMPORTANT]
@@ -675,7 +679,7 @@ Review identities/sudo, password policy, firewall and updates before the longer 
 > awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd
 > ```
 > This prints every user with a user ID (UID) of 1000 or more, which means the real people.
->
+
 #### 2.2 Delete users who are not in the README
 - [ ] **🎯 DO THIS (only if authorized) — 2.2 Delete users who are not in the README**
 
@@ -712,7 +716,7 @@ Review identities/sudo, password policy, firewall and updates before the longer 
 > ```bash
 > sudo adduser erin             # asks for a password and details
 > ```
->
+
 #### 2.4 Fix who is an administrator
 - [ ] **🎯 DO THIS — 2.4 Fix who is an administrator**
 
@@ -790,7 +794,7 @@ sudo gpasswd -d carol shadow
 > sudo passwd bob
 > ```
 > Use a strong unique password matching the README policy; do not record real credentials in this repository.g. `Blue-Train-42!x`. **Write it down.**
->
+
 > [!WARNING]
 > **Don't change your own password** unless the README asks. If you do, you must remember it, because the screen lock and `sudo` will ask for it.
 
@@ -1652,7 +1656,7 @@ sha256sum /path/to/suspicious-file
 > TimedLoginEnable=false
 > ```
 > In `[security]`: `DisallowTCP=true`.
->
+
 #### 8.2 Screen lock
 - [ ] **🎯 DO THIS (only if authorized) — 8.2 Screen lock**
 
@@ -1980,7 +1984,7 @@ grep -n 'pam_permit' /etc/pam.d/common-auth # "auth sufficient pam_permit.so" = 
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 #### 13.8 Tampered system programs
 - [ ] **🎯 DO THIS — 13.8 Tampered system programs**
 
@@ -3663,7 +3667,7 @@ sudo -u postgres psql -c 'SHOW config_file;' -c 'SHOW hba_file;' -c 'SHOW listen
 > sudo cp -a /etc/postgresql/15/main/postgresql.conf /etc/postgresql/15/main/postgresql.conf.before-cp
 > sudo cp -a /etc/postgresql/15/main/pg_hba.conf /etc/postgresql/15/main/pg_hba.conf.before-cp
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
@@ -3752,11 +3756,11 @@ A not-installed result is normal. Determine which implementation owns UDP 67 wit
 > sudo cp -a /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.before-cp
 > sudo nano /etc/dhcp/dhcpd.conf
 > ```
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
->
+
 > [!NOTE]
 > **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
 >
