@@ -472,11 +472,11 @@ sudo cp -a /etc/login.defs /etc/login.defs.before-cp
 sudo nano /etc/login.defs
 ```
 
-If the README specifies 90 maximum days, 1 minimum day, and 14 days warning, set **those exact values**, not every example you find online:
+For example, **only if the README specifies** 90 maximum days, 7 minimum days and 14 warning days, set those exact values (different images require different settings):
 
 ```text
 PASS_MAX_DAYS  90
-PASS_MIN_DAYS  1
+PASS_MIN_DAYS  7
 PASS_WARN_AGE  14
 ```
 
