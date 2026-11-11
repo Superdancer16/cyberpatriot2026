@@ -1,0 +1,1074 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R] /Count 9 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 5312 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+BT /B 14 Tf 1 0 0 1 48 714.0 Tm (DEBIAN - PRINTABLE TASK CHECKLIST) Tj ET
+BT /R 9.5 Tf 1 0 0 1 49 685.0 Tm (223 separate tasks  |  Tick a square for each completed inspection, fix or verification) Tj ET
+BT /R 9 Tf 1 0 0 1 49 661.0 Tm (Round/date: ___________________________   Team: ___________________________) Tj ET
+BT /R 9 Tf 1 0 0 1 49 640.0 Tm (Image: __________________________   Starting score: ______   Final: ______) Tj ET
+BT /R 8 Tf 1 0 0 1 49 617.0 Tm (Write N/A beside items that do not apply. See full platform guide before changes.) Tj ET
+0.92 g 44 562.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 578.0 Tm (01. Identify Debian and establish recovery) Tj ET
+0.8 w 49 533.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 541.0 Tm (D001) Tj ET
+BT /R 9 Tf 1 0 0 1 100 541.0 Tm (Read the actual README and any special competition constraints) Tj ET
+BT /R 7 Tf 1 0 0 1 535 541.0 Tm (N/A) Tj ET
+0.8 w 49 513.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 521.0 Tm (D002) Tj ET
+BT /R 9 Tf 1 0 0 1 100 521.0 Tm (Check Debian version and codename in /etc/os-release) Tj ET
+BT /R 7 Tf 1 0 0 1 535 521.0 Tm (N/A) Tj ET
+0.8 w 49 493.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 501.0 Tm (D003) Tj ET
+BT /R 9 Tf 1 0 0 1 100 501.0 Tm (Record whether the system uses GNOME, another desktop, or no GUI) Tj ET
+BT /R 7 Tf 1 0 0 1 535 501.0 Tm (N/A) Tj ET
+0.8 w 49 473.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 481.0 Tm (D004) Tj ET
+BT /R 9 Tf 1 0 0 1 100 481.0 Tm (Confirm current user and UID/GID with id) Tj ET
+BT /R 7 Tf 1 0 0 1 535 481.0 Tm (N/A) Tj ET
+0.8 w 49 453.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 461.0 Tm (D005) Tj ET
+BT /R 9 Tf 1 0 0 1 100 461.0 Tm (Check whether sudo is installed and authorized) Tj ET
+BT /R 7 Tf 1 0 0 1 535 461.0 Tm (N/A) Tj ET
+0.8 w 49 433.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 441.0 Tm (D006) Tj ET
+BT /R 9 Tf 1 0 0 1 100 441.0 Tm (Confirm a working root or authorized sudo recovery path) Tj ET
+BT /R 7 Tf 1 0 0 1 535 441.0 Tm (N/A) Tj ET
+0.8 w 49 413.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 421.0 Tm (D007) Tj ET
+BT /R 9 Tf 1 0 0 1 100 421.0 Tm (Record system hostname and network interface addresses) Tj ET
+BT /R 7 Tf 1 0 0 1 535 421.0 Tm (N/A) Tj ET
+0.8 w 49 393.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 401.0 Tm (D008) Tj ET
+BT /R 9 Tf 1 0 0 1 100 401.0 Tm (Record default route and DNS behavior) Tj ET
+BT /R 7 Tf 1 0 0 1 535 401.0 Tm (N/A) Tj ET
+0.8 w 49 373.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 381.0 Tm (D009) Tj ET
+BT /R 9 Tf 1 0 0 1 100 381.0 Tm (Record starting scoring-report value and timestamp) Tj ET
+BT /R 7 Tf 1 0 0 1 535 381.0 Tm (N/A) Tj ET
+0.8 w 49 353.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 361.0 Tm (D010) Tj ET
+BT /R 9 Tf 1 0 0 1 100 361.0 Tm (List required human accounts and authorized administrators) Tj ET
+BT /R 7 Tf 1 0 0 1 535 361.0 Tm (N/A) Tj ET
+0.8 w 49 333.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 341.0 Tm (D011) Tj ET
+BT /R 9 Tf 1 0 0 1 100 341.0 Tm (List required services, server roles, shares and listening ports) Tj ET
+BT /R 7 Tf 1 0 0 1 535 341.0 Tm (N/A) Tj ET
+0.8 w 49 313.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 321.0 Tm (D012) Tj ET
+BT /R 9 Tf 1 0 0 1 100 321.0 Tm (Identify prohibited software and files listed by the README) Tj ET
+BT /R 7 Tf 1 0 0 1 535 321.0 Tm (N/A) Tj ET
+0.8 w 49 293.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 301.0 Tm (D013) Tj ET
+BT /R 9 Tf 1 0 0 1 100 301.0 Tm (Take an approved VM snapshot if allowed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 301.0 Tm (N/A) Tj ET
+0.8 w 49 273.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 281.0 Tm (D014) Tj ET
+BT /R 9 Tf 1 0 0 1 100 281.0 Tm (Create private change notes and record original values) Tj ET
+BT /R 7 Tf 1 0 0 1 535 281.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 247.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 199.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 215.0 Tm (02. Forensic evidence before remediation) Tj ET
+0.8 w 49 170.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 178.0 Tm (D015) Tj ET
+BT /R 9 Tf 1 0 0 1 100 178.0 Tm (Open every forensic question and note the exact answer format) Tj ET
+BT /R 7 Tf 1 0 0 1 535 178.0 Tm (N/A) Tj ET
+0.8 w 49 150.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 158.0 Tm (D016) Tj ET
+BT /R 9 Tf 1 0 0 1 100 158.0 Tm (Locate requested files before deleting or updating anything) Tj ET
+BT /R 7 Tf 1 0 0 1 535 158.0 Tm (N/A) Tj ET
+0.8 w 49 130.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 138.0 Tm (D017) Tj ET
+BT /R 9 Tf 1 0 0 1 100 138.0 Tm (Inspect file metadata with stat where relevant) Tj ET
+BT /R 7 Tf 1 0 0 1 535 138.0 Tm (N/A) Tj ET
+0.8 w 49 110.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 118.0 Tm (D018) Tj ET
+BT /R 9 Tf 1 0 0 1 100 118.0 Tm (Identify actual file type with file when relevant) Tj ET
+BT /R 7 Tf 1 0 0 1 535 118.0 Tm (N/A) Tj ET
+0.8 w 49 90.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 98.0 Tm (D019) Tj ET
+BT /R 9 Tf 1 0 0 1 100 98.0 Tm (Calculate requested SHA-256 hash with sha256sum) Tj ET
+BT /R 7 Tf 1 0 0 1 535 98.0 Tm (N/A) Tj ET
+0.8 w 49 70.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 78.0 Tm (D020) Tj ET
+BT /R 9 Tf 1 0 0 1 100 78.0 Tm (Investigate suspicious service, task or process paths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 78.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (1/9) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 5826 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D021) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Inspect current system journal without clearing it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D022) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Review relevant ssh, sudo and cron journal entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D023) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Check login history when the question involves user activity) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (D024) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Decode requested encoded text only as data) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (D025) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Save every forensic answer in the original supplied file) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (D026) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Confirm evidence was preserved and unanswered questions are noted) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 592.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 544.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 560.0 Tm (03. Human accounts, root, and administrator groups) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (D027) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Inventory /etc/passwd entries and likely human users) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (D028) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Compare local human accounts with the README) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (D029) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Identify any additional UID 0 account) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (D030) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Inspect root account password-lock status) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (D031) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Confirm the system's root-versus-sudo administration design) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (D032) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Inspect sudo group members) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (D033) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Inspect adm group members) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (D034) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Inspect disk, shadow, docker, lxd and libvirt group members if present) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (D035) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Inspect sudoers and sudoers.d authorization rules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (D036) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check for NOPASSWD or unsafe wildcard sudo grants) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (D037) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Validate sudo policy syntax with visudo -c) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (D038) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Review each normal user's login shell) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (D039) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Identify unexpected human accounts with a service-like UID) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (D040) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Check missing README-authorized users) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (D041) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Lock only a confirmed unauthorized login after evidence is saved) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (D042) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Remove only confirmed unauthorized privileged membership) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (D043) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Verify authorized sudo/root administration still works) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (D044) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Open a second authorized login after privilege changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 149.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 101.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 117.0 Tm (04. Password aging, quality, and PAM) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (D045) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Inspect login.defs password-aging defaults) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (2/9) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 6440 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D046) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Inspect each authorized user's actual aging with chage -l) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D047) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Check password-required/empty-password status when applicable) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D048) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Inspect common-auth PAM lines) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (D049) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Inspect common-password PAM lines) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (D050) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Check which PAM modules and auth profiles are actually installed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (D051) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Inspect pam_pwquality usage and settings) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (D052) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Inspect password history integration if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (D053) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Inspect failed-login/lockout module integration if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (D054) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Check for unexpected pam_exec or pam_permit entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (D055) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Check packaged PAM file integrity with dpkg -V when appropriate) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (D056) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Preserve original common-auth before changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+0.8 w 49 498.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 506.0 Tm (D057) Tj ET
+BT /R 9 Tf 1 0 0 1 100 506.0 Tm (Preserve original common-password before changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 506.0 Tm (N/A) Tj ET
+0.8 w 49 478.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 486.0 Tm (D058) Tj ET
+BT /R 9 Tf 1 0 0 1 100 486.0 Tm (Set user password aging only to README-required values) Tj ET
+BT /R 7 Tf 1 0 0 1 535 486.0 Tm (N/A) Tj ET
+0.8 w 49 458.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 466.0 Tm (D059) Tj ET
+BT /R 9 Tf 1 0 0 1 100 466.0 Tm (Set an authorized user's password interactively if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 466.0 Tm (N/A) Tj ET
+0.8 w 49 438.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 446.0 Tm (D060) Tj ET
+BT /R 9 Tf 1 0 0 1 100 446.0 Tm (Validate PAM integration before ending the current root session) Tj ET
+BT /R 7 Tf 1 0 0 1 535 446.0 Tm (N/A) Tj ET
+0.8 w 49 418.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 426.0 Tm (D061) Tj ET
+BT /R 9 Tf 1 0 0 1 100 426.0 Tm (Test a new authorized normal-user login) Tj ET
+BT /R 7 Tf 1 0 0 1 535 426.0 Tm (N/A) Tj ET
+0.8 w 49 398.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 406.0 Tm (D062) Tj ET
+BT /R 9 Tf 1 0 0 1 100 406.0 Tm (Test sudo elevation in a second session) Tj ET
+BT /R 7 Tf 1 0 0 1 535 406.0 Tm (N/A) Tj ET
+0.8 w 49 378.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 386.0 Tm (D063) Tj ET
+BT /R 9 Tf 1 0 0 1 100 386.0 Tm (Verify final chage and PAM settings against the requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 386.0 Tm (N/A) Tj ET
+0.8 w 49 358.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 366.0 Tm (D064) Tj ET
+BT /R 9 Tf 1 0 0 1 100 366.0 Tm (Restore the exact PAM backup if authentication fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 366.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 332.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 284.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 300.0 Tm (05. Signed APT sources, packages and updates) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (D065) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Record the installed Debian release codename) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (D066) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Inspect active .list and deb822 .sources entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (D067) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Check configured Debian security suite for the installed release) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (D068) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Check apt repository signatures and any Trusted=yes bypass) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (D069) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Check for mixed Ubuntu/Mint/testing/unstable sources) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (D070) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Identify unknown repositories and their owner/purpose) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (D071) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Inspect held packages using apt-mark showhold) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (D072) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Check incomplete packages with dpkg --audit) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+0.8 w 49 95.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 103.0 Tm (D073) Tj ET
+BT /R 9 Tf 1 0 0 1 100 103.0 Tm (Run apt update and investigate errors) Tj ET
+BT /R 7 Tf 1 0 0 1 535 103.0 Tm (N/A) Tj ET
+0.8 w 49 75.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 83.0 Tm (D074) Tj ET
+BT /R 9 Tf 1 0 0 1 100 83.0 Tm (Preview upgrades before applying them) Tj ET
+BT /R 7 Tf 1 0 0 1 535 83.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (3/9) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 5824 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D075) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Check if approved security updates are outstanding) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D076) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Check unattended-upgrades package if the image requires it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D077) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Inspect automatic update timer and periodic configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (D078) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Inspect supported Debian LTS coverage for relevant packages) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (D079) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Apply approved updates without performing a release upgrade) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (D080) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Recheck package state and required application functionality) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 592.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 544.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 560.0 Tm (06. Firewall and exposed network services) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (D081) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Inventory listening TCP services with ss) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (D082) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Inventory listening UDP services with ss) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (D083) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Inspect native nftables ruleset) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (D084) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Check whether nftables.service controls the firewall) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (D085) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Check whether UFW is installed and active) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (D086) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Identify any other firewall manager already in use) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (D087) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (List README-required inbound service ports) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (D088) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Identify required management source addresses) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (D089) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Back up the actual firewall configuration before edits) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (D090) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Validate nftables config syntax when applicable) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (D091) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Ensure required SSH access remains possible before deny rules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (D092) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Add only necessary service exceptions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (D093) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Apply reviewed firewall policy only with recovery access) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (D094) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Verify effective rules after changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (D095) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Test required service connections from an authorized client) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (D096) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Restore the old specific rule/config if access breaks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 189.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 141.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 157.0 Tm (07. SSH authentication, ports and authorized keys) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (D097) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Check whether openssh-server is installed and required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (D098) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check ssh service status and startup state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (D099) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check ssh.socket status if used) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (4/9) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 6335 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D100) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Record actual SSH listening interface and port) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D101) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Inspect sshd_config and included snippets) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D102) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Check PermitRootLogin effective value) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (D103) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Check PermitEmptyPasswords effective value) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (D104) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Check PasswordAuthentication effective value) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (D105) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Check PubkeyAuthentication and authorized client need) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (D106) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Check Match blocks that change settings by user or host) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (D107) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Search authorized_keys files for unexpected entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (D108) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Check ownership and permissions of relevant SSH keys) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (D109) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Back up the specific config before a change) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (D110) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Validate config syntax with sshd -t) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+0.8 w 49 498.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 506.0 Tm (D111) Tj ET
+BT /R 9 Tf 1 0 0 1 100 506.0 Tm (Reload only the applicable SSH service after approved edits) Tj ET
+BT /R 7 Tf 1 0 0 1 535 506.0 Tm (N/A) Tj ET
+0.8 w 49 478.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 486.0 Tm (D112) Tj ET
+BT /R 9 Tf 1 0 0 1 100 486.0 Tm (Test a second SSH login before closing the first) Tj ET
+BT /R 7 Tf 1 0 0 1 535 486.0 Tm (N/A) Tj ET
+0.8 w 49 458.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 466.0 Tm (D113) Tj ET
+BT /R 9 Tf 1 0 0 1 100 466.0 Tm (Verify final effective settings and port listener) Tj ET
+BT /R 7 Tf 1 0 0 1 535 466.0 Tm (N/A) Tj ET
+0.8 w 49 438.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 446.0 Tm (D114) Tj ET
+BT /R 9 Tf 1 0 0 1 100 446.0 Tm (Restore backup from VM console if SSH access breaks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 446.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 412.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 364.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 380.0 Tm (08. Required and unnecessary services) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (D115) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Inventory running systemd services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (D116) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Inventory enabled service units) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (D117) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Inspect failed systemd units) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (D118) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Inspect active socket units and activation paths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (D119) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Identify service dependencies and required client operations) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (D120) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Check Apache or Nginx if README-required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (D121) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Check MariaDB/MySQL or PostgreSQL if README-required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (D122) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Check Samba sharing if README-required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (D123) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Check DNS or DHCP servers if README-required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (D124) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Check FTP, mail or printing if README-required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (D125) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Check listening ports against required services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (D126) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Inspect unwanted legacy Telnet/TFTP/VNC services if installed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+0.8 w 49 95.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 103.0 Tm (D127) Tj ET
+BT /R 9 Tf 1 0 0 1 100 103.0 Tm (Inspect suspicious service ExecStart and User fields) Tj ET
+BT /R 7 Tf 1 0 0 1 535 103.0 Tm (N/A) Tj ET
+0.8 w 49 75.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 83.0 Tm (D128) Tj ET
+BT /R 9 Tf 1 0 0 1 100 83.0 Tm (Preserve configuration and evidence before service changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 83.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (5/9) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 5968 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D129) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Disable only confirmed unauthorized services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D130) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Verify every README-required role still performs its function) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D131) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Restore the original startup/running state if needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 652.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 604.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 620.0 Tm (09. Software, games, media and installed applications) Tj ET
+0.8 w 49 575.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 583.0 Tm (D132) Tj ET
+BT /R 9 Tf 1 0 0 1 100 583.0 Tm (Inventory installed packages for explicitly prohibited software) Tj ET
+BT /R 7 Tf 1 0 0 1 535 583.0 Tm (N/A) Tj ET
+0.8 w 49 555.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 563.0 Tm (D133) Tj ET
+BT /R 9 Tf 1 0 0 1 100 563.0 Tm (Inspect games installed as GNOME packages if present) Tj ET
+BT /R 7 Tf 1 0 0 1 535 563.0 Tm (N/A) Tj ET
+0.8 w 49 535.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 543.0 Tm (D134) Tj ET
+BT /R 9 Tf 1 0 0 1 100 543.0 Tm (Inspect unauthorized network, password-cracking or remote tools) Tj ET
+BT /R 7 Tf 1 0 0 1 535 543.0 Tm (N/A) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (D135) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Check Firefox ESR or other README-required browsers) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (D136) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Inspect portable executables outside APT package inventory) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (D137) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Check relevant files in home, tmp and var/tmp) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (D138) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Find potentially prohibited media files without mass deletion) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (D139) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Preserve user or forensic files associated with a question) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (D140) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Preview APT purge dependencies before removing a package) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (D141) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Remove only a confirmed prohibited package or file) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (D142) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Verify package state and required applications afterward) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (D143) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Restore a mistakenly removed app with its configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 329.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 281.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 297.0 Tm (10. File ownership, permissions and capabilities) Tj ET
+0.8 w 49 252.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 260.0 Tm (D144) Tj ET
+BT /R 9 Tf 1 0 0 1 100 260.0 Tm (Inspect /etc/passwd owner/group and file permissions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 260.0 Tm (N/A) Tj ET
+0.8 w 49 232.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 240.0 Tm (D145) Tj ET
+BT /R 9 Tf 1 0 0 1 100 240.0 Tm (Inspect /etc/group owner/group and file permissions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 240.0 Tm (N/A) Tj ET
+0.8 w 49 212.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 220.0 Tm (D146) Tj ET
+BT /R 9 Tf 1 0 0 1 100 220.0 Tm (Inspect /etc/shadow and /etc/gshadow access restrictions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 220.0 Tm (N/A) Tj ET
+0.8 w 49 192.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 200.0 Tm (D147) Tj ET
+BT /R 9 Tf 1 0 0 1 100 200.0 Tm (Inspect /etc/sudoers and sudoers.d permissions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 200.0 Tm (N/A) Tj ET
+0.8 w 49 172.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 180.0 Tm (D148) Tj ET
+BT /R 9 Tf 1 0 0 1 100 180.0 Tm (Search for world-writable files in /etc) Tj ET
+BT /R 7 Tf 1 0 0 1 535 180.0 Tm (N/A) Tj ET
+0.8 w 49 152.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 160.0 Tm (D149) Tj ET
+BT /R 9 Tf 1 0 0 1 100 160.0 Tm (Search for suspicious writable files in /usr/local or /opt) Tj ET
+BT /R 7 Tf 1 0 0 1 535 160.0 Tm (N/A) Tj ET
+0.8 w 49 132.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 140.0 Tm (D150) Tj ET
+BT /R 9 Tf 1 0 0 1 100 140.0 Tm (Inventory unusual SUID executables in relevant directories) Tj ET
+BT /R 7 Tf 1 0 0 1 535 140.0 Tm (N/A) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (D151) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Inventory unusual SGID executables in relevant directories) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (D152) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check capability-bearing binaries if getcap is installed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (D153) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check home directory exposure for required users) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (6/9) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 5689 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D154) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Compare suspicious binary ownership with dpkg package records) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D155) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Record original owner/mode before any adjustment) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D156) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Fix only a verified incorrect sensitive-file permission) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (D157) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Verify needed programs and normal login still work) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 632.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 584.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 600.0 Tm (11. Scheduled tasks, startup and persistence) Tj ET
+0.8 w 49 555.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 563.0 Tm (D158) Tj ET
+BT /R 9 Tf 1 0 0 1 100 563.0 Tm (Inspect root crontab) Tj ET
+BT /R 7 Tf 1 0 0 1 535 563.0 Tm (N/A) Tj ET
+0.8 w 49 535.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 543.0 Tm (D159) Tj ET
+BT /R 9 Tf 1 0 0 1 100 543.0 Tm (Inspect system crontab) Tj ET
+BT /R 7 Tf 1 0 0 1 535 543.0 Tm (N/A) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (D160) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Inspect scheduled entries in cron.d) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (D161) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Inspect user crontabs relevant to the question) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (D162) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Inspect enabled systemd units) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (D163) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Inspect systemd timers) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (D164) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Inspect suspicious unit file and ExecStart command) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (D165) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Check service logs and execution times) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (D166) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Inspect shell profile and profile.d startup entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (D167) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Inspect suspicious PATH modifications and aliases) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (D168) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Inspect /etc/hosts for unexpected redirects) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (D169) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Map unexpected network listeners to processes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (D170) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Preserve task/unit configuration and forensic evidence) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (D171) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Disable only a confirmed malicious scheduled entry) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (D172) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Verify unwanted persistence no longer activates) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (D173) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Restore any required job or service mistakenly disabled) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 229.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 181.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 197.0 Tm (12. Logging, AppArmor and kernel security) Tj ET
+0.8 w 49 152.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 160.0 Tm (D174) Tj ET
+BT /R 9 Tf 1 0 0 1 100 160.0 Tm (Inspect journald boot history and log retention) Tj ET
+BT /R 7 Tf 1 0 0 1 535 160.0 Tm (N/A) Tj ET
+0.8 w 49 132.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 140.0 Tm (D175) Tj ET
+BT /R 9 Tf 1 0 0 1 100 140.0 Tm (Check relevant authentication events) Tj ET
+BT /R 7 Tf 1 0 0 1 535 140.0 Tm (N/A) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (D176) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Check journal error and warning events) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (D177) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check whether rsyslog is installed and required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (D178) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check whether auditd is installed and required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (7/9) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 6384 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D179) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Check audit rules and disk/log volume before new rules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (D180) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Check AppArmor service and module status) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (D181) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Inspect AppArmor enforcing/complain profiles) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (D182) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Investigate relevant AppArmor DENIED events) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (D183) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Check kernel ASLR setting) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (D184) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Check forwarding policy when the machine is not a router) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (D185) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Check redirects/source-routing settings if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (D186) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Check IPv6 role before changing IPv6 sysctl) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (D187) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Back up actual sysctl/profile files before changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (D188) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Verify required services after AppArmor/sysctl changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 512.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 464.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 480.0 Tm (13. Critical-server role checks \(when required\)) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (D189) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Record required server roles before changing their configurations) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (D190) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Back up actual configuration for each required role) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (D191) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Check Apache site and directory browsing policy) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (D192) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Validate Apache syntax before reload) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (D193) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Test required Apache site from an authorized client) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (D194) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check Nginx server_tokens and autoindex if installed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (D195) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Validate Nginx syntax before reload) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (D196) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Test required Nginx site and hostname) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (D197) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Check PHP web SAPI settings if applicable) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (D198) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Check MariaDB authentication and database privileges if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (D199) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Test required database query/application operation) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (D200) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Check vsftpd anonymous access if FTP is required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (D201) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Test authorized FTP login and data transfer) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (D202) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Check Samba share definitions and filesystem permissions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (D203) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Validate Samba config with testparm if installed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (D204) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Test authorized Samba client read/write) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (D205) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Check required DNS zone/records and query behavior) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+0.8 w 49 95.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 103.0 Tm (D206) Tj ET
+BT /R 9 Tf 1 0 0 1 100 103.0 Tm (Check required DHCP pool and client leases) Tj ET
+BT /R 7 Tf 1 0 0 1 535 103.0 Tm (N/A) Tj ET
+0.8 w 49 75.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 83.0 Tm (D207) Tj ET
+BT /R 9 Tf 1 0 0 1 100 83.0 Tm (Check mail server authentication and relay restrictions if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 83.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (8/9) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 19 0 R >>
+endobj
+21 0 obj
+<< /Length 4073 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (DEBIAN CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (D208) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Restore only a changed service config if a client test fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 692.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 644.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 660.0 Tm (14. Desktop and final verification) Tj ET
+0.8 w 49 615.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 623.0 Tm (D209) Tj ET
+BT /R 9 Tf 1 0 0 1 100 623.0 Tm (Identify current display manager and desktop environment) Tj ET
+BT /R 7 Tf 1 0 0 1 535 623.0 Tm (N/A) Tj ET
+0.8 w 49 595.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 603.0 Tm (D210) Tj ET
+BT /R 9 Tf 1 0 0 1 100 603.0 Tm (Check GNOME or actual desktop automatic login setting) Tj ET
+BT /R 7 Tf 1 0 0 1 535 603.0 Tm (N/A) Tj ET
+0.8 w 49 575.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 583.0 Tm (D211) Tj ET
+BT /R 9 Tf 1 0 0 1 100 583.0 Tm (Check screen lock after inactivity) Tj ET
+BT /R 7 Tf 1 0 0 1 535 583.0 Tm (N/A) Tj ET
+0.8 w 49 555.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 563.0 Tm (D212) Tj ET
+BT /R 9 Tf 1 0 0 1 100 563.0 Tm (Check lock on resume if the desktop provides it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 563.0 Tm (N/A) Tj ET
+0.8 w 49 535.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 543.0 Tm (D213) Tj ET
+BT /R 9 Tf 1 0 0 1 100 543.0 Tm (Check unauthorized remote desktop or sharing) Tj ET
+BT /R 7 Tf 1 0 0 1 535 543.0 Tm (N/A) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (D214) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Check normal user login and sudo elevation) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (D215) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Reopen every forensic question and verify saved answers) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (D216) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Recheck users and privileged groups against README) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (D217) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Recheck firewall and required service clients) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (D218) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Recheck failed services and security logs) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (D219) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Recheck installed updates and held packages) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (D220) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Confirm unauthorized programs and persistence were addressed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (D221) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Refresh scoring report and record final value) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (D222) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Record N/A items and reasons) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (D223) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Save rollback notes and finish without unsafe reboot) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 309.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+BT /B 9 Tf 1 0 0 1 50 287.0 Tm (FINAL REVIEW  -  required services tested / exceptions / reviewer:) Tj ET
+BT /R 8 Tf 1 0 0 1 50 262.0 Tm (_________________________________________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (9/9) Tj ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 21 0 R >>
+endobj
+xref
+0 23
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000170 00000 n 
+0000000240 00000 n 
+0000000315 00000 n 
+0000005678 00000 n 
+0000005812 00000 n 
+0000011689 00000 n 
+0000011823 00000 n 
+0000018314 00000 n 
+0000018449 00000 n 
+0000024325 00000 n 
+0000024461 00000 n 
+0000030848 00000 n 
+0000030984 00000 n 
+0000037004 00000 n 
+0000037140 00000 n 
+0000042881 00000 n 
+0000043017 00000 n 
+0000049453 00000 n 
+0000049589 00000 n 
+0000053714 00000 n 
+trailer
+<< /Size 23 /Root 1 0 R >>
+startxref
+53850
+%%EOF

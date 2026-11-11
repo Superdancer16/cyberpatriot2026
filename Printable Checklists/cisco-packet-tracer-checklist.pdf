@@ -1,0 +1,1113 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R] /Count 10 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 5312 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+BT /B 14 Tf 1 0 0 1 48 714.0 Tm (CISCO PACKET TRACER - PRINTABLE CHECKLIST) Tj ET
+BT /R 9.1 Tf 1 0 0 1 49 685.0 Tm (229 separate tasks | Check one at a time after verifying the actual activity requirements) Tj ET
+BT /R 9 Tf 1 0 0 1 49 661.0 Tm (Round/date: ___________________________   Team: ___________________________) Tj ET
+BT /R 9 Tf 1 0 0 1 49 640.0 Tm (Activity/file: _______________________  Initial: __________  Final: __________) Tj ET
+BT /R 8 Tf 1 0 0 1 49 617.0 Tm (Write N/A when task not assigned. Never modify the activity grader or overwrite working configs.) Tj ET
+0.92 g 44 562.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 578.0 Tm (01. Read and preserve the Packet Tracer activity) Tj ET
+0.8 w 49 533.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 541.0 Tm (C001) Tj ET
+BT /R 9 Tf 1 0 0 1 100 541.0 Tm (Read the entire Packet Tracer activity instruction pane) Tj ET
+BT /R 7 Tf 1 0 0 1 535 541.0 Tm (N/A) Tj ET
+0.8 w 49 513.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 521.0 Tm (C002) Tj ET
+BT /R 9 Tf 1 0 0 1 100 521.0 Tm (Identify required PKA/PKT file type and submission method) Tj ET
+BT /R 7 Tf 1 0 0 1 535 521.0 Tm (N/A) Tj ET
+0.8 w 49 493.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 501.0 Tm (C003) Tj ET
+BT /R 9 Tf 1 0 0 1 100 501.0 Tm (Record the exact device names mentioned in the task) Tj ET
+BT /R 7 Tf 1 0 0 1 535 501.0 Tm (N/A) Tj ET
+0.8 w 49 473.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 481.0 Tm (C004) Tj ET
+BT /R 9 Tf 1 0 0 1 100 481.0 Tm (Record all required configurations and changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 481.0 Tm (N/A) Tj ET
+0.8 w 49 453.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 461.0 Tm (C005) Tj ET
+BT /R 9 Tf 1 0 0 1 100 461.0 Tm (Record settings or services that must remain unchanged) Tj ET
+BT /R 7 Tf 1 0 0 1 535 461.0 Tm (N/A) Tj ET
+0.8 w 49 433.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 441.0 Tm (C006) Tj ET
+BT /R 9 Tf 1 0 0 1 100 441.0 Tm (Identify available Check Results or Activity Assessment controls) Tj ET
+BT /R 7 Tf 1 0 0 1 535 441.0 Tm (N/A) Tj ET
+0.8 w 49 413.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 421.0 Tm (C007) Tj ET
+BT /R 9 Tf 1 0 0 1 100 421.0 Tm (Use grading feedback only when the activity permits it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 421.0 Tm (N/A) Tj ET
+0.8 w 49 393.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 401.0 Tm (C008) Tj ET
+BT /R 9 Tf 1 0 0 1 100 401.0 Tm (Save a working copy of the activity if permitted) Tj ET
+BT /R 7 Tf 1 0 0 1 535 401.0 Tm (N/A) Tj ET
+0.8 w 49 373.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 381.0 Tm (C009) Tj ET
+BT /R 9 Tf 1 0 0 1 100 381.0 Tm (Record initial completion result when shown) Tj ET
+BT /R 7 Tf 1 0 0 1 535 381.0 Tm (N/A) Tj ET
+0.8 w 49 353.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 361.0 Tm (C010) Tj ET
+BT /R 9 Tf 1 0 0 1 100 361.0 Tm (Identify all permitted source notes and external resources) Tj ET
+BT /R 7 Tf 1 0 0 1 535 361.0 Tm (N/A) Tj ET
+0.8 w 49 333.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 341.0 Tm (C011) Tj ET
+BT /R 9 Tf 1 0 0 1 100 341.0 Tm (Do not erase any device startup configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 341.0 Tm (N/A) Tj ET
+0.8 w 49 313.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 321.0 Tm (C012) Tj ET
+BT /R 9 Tf 1 0 0 1 100 321.0 Tm (Do not reset or modify the activity assessment/grader) Tj ET
+BT /R 7 Tf 1 0 0 1 535 321.0 Tm (N/A) Tj ET
+0.8 w 49 293.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 301.0 Tm (C013) Tj ET
+BT /R 9 Tf 1 0 0 1 100 301.0 Tm (Keep a task list with each device and interface) Tj ET
+BT /R 7 Tf 1 0 0 1 535 301.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 267.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 219.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 235.0 Tm (02. Inspect topology, IP plan and endpoints) Tj ET
+0.8 w 49 190.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 198.0 Tm (C014) Tj ET
+BT /R 9 Tf 1 0 0 1 100 198.0 Tm (Identify all routers and their model/IOS capabilities) Tj ET
+BT /R 7 Tf 1 0 0 1 535 198.0 Tm (N/A) Tj ET
+0.8 w 49 170.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 178.0 Tm (C015) Tj ET
+BT /R 9 Tf 1 0 0 1 100 178.0 Tm (Identify all switches and model/port numbering) Tj ET
+BT /R 7 Tf 1 0 0 1 535 178.0 Tm (N/A) Tj ET
+0.8 w 49 150.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 158.0 Tm (C016) Tj ET
+BT /R 9 Tf 1 0 0 1 100 158.0 Tm (Identify every PC, server and wireless endpoint) Tj ET
+BT /R 7 Tf 1 0 0 1 535 158.0 Tm (N/A) Tj ET
+0.8 w 49 130.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 138.0 Tm (C017) Tj ET
+BT /R 9 Tf 1 0 0 1 100 138.0 Tm (Record each physical link between devices) Tj ET
+BT /R 7 Tf 1 0 0 1 535 138.0 Tm (N/A) Tj ET
+0.8 w 49 110.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 118.0 Tm (C018) Tj ET
+BT /R 9 Tf 1 0 0 1 100 118.0 Tm (Record router interface names and peer interfaces) Tj ET
+BT /R 7 Tf 1 0 0 1 535 118.0 Tm (N/A) Tj ET
+0.8 w 49 90.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 98.0 Tm (C019) Tj ET
+BT /R 9 Tf 1 0 0 1 100 98.0 Tm (Record client VLAN membership requirements) Tj ET
+BT /R 7 Tf 1 0 0 1 535 98.0 Tm (N/A) Tj ET
+0.8 w 49 70.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 78.0 Tm (C020) Tj ET
+BT /R 9 Tf 1 0 0 1 100 78.0 Tm (Record IPv4 addresses and masks for each LAN) Tj ET
+BT /R 7 Tf 1 0 0 1 535 78.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (1/10) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 5653 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (C021) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Record client default gateways) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (C022) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Record DNS server addresses) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (C023) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Record any IPv6 prefixes and addresses) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (C024) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Record each server's configured address and role) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (C025) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Record static and dynamic routing requirements) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (C026) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Check which topology devices are administratively shut down) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (C027) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Record each network service to test at the end) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 572.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 524.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 540.0 Tm (03. Cisco IOS basics and safe baseline) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (C028) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Open the CLI on each relevant router and switch) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (C029) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Identify user EXEC and privileged EXEC prompt) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (C030) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Enter enable mode only with authorized credentials) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (C031) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Check device model and IOS version) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (C032) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Inspect running configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (C033) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Inspect saved startup configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (C034) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check interface IP addresses and status) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C035) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Check relevant switch VLAN list) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C036) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check operational trunks if supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C037) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check router routing table) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C038) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Check access lists if configured) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C039) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Record original settings before any modification) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (C040) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Use question-mark help for an unsupported command) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (C041) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Do not run erase startup-config or reload as a shortcut) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 209.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 161.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 177.0 Tm (04. Physical links and interface state) Tj ET
+0.8 w 49 132.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 140.0 Tm (C042) Tj ET
+BT /R 9 Tf 1 0 0 1 100 140.0 Tm (Check every required cable connects correct ports) Tj ET
+BT /R 7 Tf 1 0 0 1 535 140.0 Tm (N/A) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (C043) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Check cable/media compatibility and interface modules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (C044) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check correct router/switch interface identity) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (C045) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check both ends of an unexpectedly down link) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (2/10) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 5672 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (C046) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Distinguish administratively down from down/down) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (C047) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Enable only a required disabled interface) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (C048) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Confirm link becomes operational after change) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (C049) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Check switch port speed and duplex if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (C050) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Check line protocol state where supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (C051) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Verify local gateway ping when IP is configured) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (C052) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Restore an intentionally disabled port if changed incorrectly) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (C053) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Record and resolve unexpected link failure before continuing) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 552.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 504.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 520.0 Tm (05. PC, server and network addressing) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (C054) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Open each PC Desktop IP Configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (C055) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Check static versus DHCP choice) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (C056) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Check each client IPv4 address) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (C057) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Check each client subnet mask) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (C058) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Check each client default gateway) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (C059) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check each client's DNS server) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C060) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Check server IP, subnet and gateway if present) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C061) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Verify subnet network/broadcast logic for assigned prefix) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C062) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check no host uses a conventional broadcast/network address) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C063) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Check duplicate addresses or incorrect host subnet) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C064) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Run ipconfig on required PC when supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (C065) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Ping each client's local gateway) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (C066) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Ping same-VLAN destination when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (C067) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Restore exact originally assigned IP data if needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 189.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 141.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 157.0 Tm (06. VLANs, access ports and trunks) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (C068) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Inspect existing VLAN IDs and names) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (C069) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Create only the missing task-required VLANs) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (C070) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Verify every required VLAN exists) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (3/10) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 6070 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (C071) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Identify each access port for an endpoint) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (C072) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Configure correct access VLAN on each assigned port) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (C073) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Verify access port mode is appropriate) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (C074) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Confirm required access ports are enabled) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (C075) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Identify all inter-switch trunk links) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (C076) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Identify router-on-a-stick trunk links) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (C077) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Check trunking mode at both ends) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (C078) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Check 802.1Q tagging/encapsulation support) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (C079) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Check allowed VLAN list at both trunk ends) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (C080) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Check native VLAN setting and mismatch risks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (C081) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Preserve existing required management and voice VLANs) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+0.8 w 49 498.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 506.0 Tm (C082) Tj ET
+BT /R 9 Tf 1 0 0 1 100 506.0 Tm (Verify show interfaces trunk output) Tj ET
+BT /R 7 Tf 1 0 0 1 535 506.0 Tm (N/A) Tj ET
+0.8 w 49 478.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 486.0 Tm (C083) Tj ET
+BT /R 9 Tf 1 0 0 1 100 486.0 Tm (Verify required VLAN clients communicate) Tj ET
+BT /R 7 Tf 1 0 0 1 535 486.0 Tm (N/A) Tj ET
+0.8 w 49 458.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 466.0 Tm (C084) Tj ET
+BT /R 9 Tf 1 0 0 1 100 466.0 Tm (Restore accidentally pruned VLAN or wrong port mode) Tj ET
+BT /R 7 Tf 1 0 0 1 535 466.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 432.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 384.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 400.0 Tm (07. VLAN gateways and inter-VLAN routing) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C085) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Identify router-on-a-stick versus Layer 3 switch design) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C086) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Verify router physical interface for VLAN trunk is enabled) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C087) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check correct 802.1Q subinterface per VLAN) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C088) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Check subinterface VLAN ID matches intended tagged VLAN) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C089) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Check each subinterface IPv4 address and subnet) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (C090) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Check trunk carries every required routed VLAN) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (C091) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Check client gateways point at correct router/SVI) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (C092) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Check SVI exists on multilayer switch when used) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (C093) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Check operational Layer 2 member ports for each active SVI) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (C094) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Enable ip routing only on capable switch when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (C095) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Verify each client can reach its local gateway) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (C096) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Verify permitted communication between VLAN subnets) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (C097) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Restore previously correct subinterface/SVI settings if needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 89.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (4/10) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 5795 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.92 g 44 696.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 712.0 Tm (08. Static, default and dynamic routing) Tj ET
+0.8 w 49 667.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 675.0 Tm (C098) Tj ET
+BT /R 9 Tf 1 0 0 1 100 675.0 Tm (Inspect connected routes on each router) Tj ET
+BT /R 7 Tf 1 0 0 1 535 675.0 Tm (N/A) Tj ET
+0.8 w 49 647.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 655.0 Tm (C099) Tj ET
+BT /R 9 Tf 1 0 0 1 100 655.0 Tm (List all required remote destination networks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 655.0 Tm (N/A) Tj ET
+0.8 w 49 627.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 635.0 Tm (C100) Tj ET
+BT /R 9 Tf 1 0 0 1 100 635.0 Tm (Check static route next hops for correct reachability) Tj ET
+BT /R 7 Tf 1 0 0 1 535 635.0 Tm (N/A) Tj ET
+0.8 w 49 607.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 615.0 Tm (C101) Tj ET
+BT /R 9 Tf 1 0 0 1 100 615.0 Tm (Check default route on the appropriate upstream router) Tj ET
+BT /R 7 Tf 1 0 0 1 535 615.0 Tm (N/A) Tj ET
+0.8 w 49 587.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 595.0 Tm (C102) Tj ET
+BT /R 9 Tf 1 0 0 1 100 595.0 Tm (Check return routes on remote networks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 595.0 Tm (N/A) Tj ET
+0.8 w 49 567.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 575.0 Tm (C103) Tj ET
+BT /R 9 Tf 1 0 0 1 100 575.0 Tm (Check subnet mask/prefix for each installed route) Tj ET
+BT /R 7 Tf 1 0 0 1 535 575.0 Tm (N/A) Tj ET
+0.8 w 49 547.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 555.0 Tm (C104) Tj ET
+BT /R 9 Tf 1 0 0 1 100 555.0 Tm (Verify longest-prefix routing behavior if multiple routes match) Tj ET
+BT /R 7 Tf 1 0 0 1 535 555.0 Tm (N/A) Tj ET
+0.8 w 49 527.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 535.0 Tm (C105) Tj ET
+BT /R 9 Tf 1 0 0 1 100 535.0 Tm (Identify assigned dynamic routing protocol) Tj ET
+BT /R 7 Tf 1 0 0 1 535 535.0 Tm (N/A) Tj ET
+0.8 w 49 507.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 515.0 Tm (C106) Tj ET
+BT /R 9 Tf 1 0 0 1 100 515.0 Tm (Check OSPF process and area assignments if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 515.0 Tm (N/A) Tj ET
+0.8 w 49 487.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 495.0 Tm (C107) Tj ET
+BT /R 9 Tf 1 0 0 1 100 495.0 Tm (Check OSPF neighbor states) Tj ET
+BT /R 7 Tf 1 0 0 1 535 495.0 Tm (N/A) Tj ET
+0.8 w 49 467.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 475.0 Tm (C108) Tj ET
+BT /R 9 Tf 1 0 0 1 100 475.0 Tm (Check OSPF-learned routes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 475.0 Tm (N/A) Tj ET
+0.8 w 49 447.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 455.0 Tm (C109) Tj ET
+BT /R 9 Tf 1 0 0 1 100 455.0 Tm (Check EIGRP AS/network selection if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 455.0 Tm (N/A) Tj ET
+0.8 w 49 427.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 435.0 Tm (C110) Tj ET
+BT /R 9 Tf 1 0 0 1 100 435.0 Tm (Check EIGRP neighbors and learned routes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 435.0 Tm (N/A) Tj ET
+0.8 w 49 407.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 415.0 Tm (C111) Tj ET
+BT /R 9 Tf 1 0 0 1 100 415.0 Tm (Check RIPv2 version and network selection if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 415.0 Tm (N/A) Tj ET
+0.8 w 49 387.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 395.0 Tm (C112) Tj ET
+BT /R 9 Tf 1 0 0 1 100 395.0 Tm (Check routing protocol administrative distance when relevant) Tj ET
+BT /R 7 Tf 1 0 0 1 535 395.0 Tm (N/A) Tj ET
+0.8 w 49 367.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 375.0 Tm (C113) Tj ET
+BT /R 9 Tf 1 0 0 1 100 375.0 Tm (Ping an approved remote test host) Tj ET
+BT /R 7 Tf 1 0 0 1 535 375.0 Tm (N/A) Tj ET
+0.8 w 49 347.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 355.0 Tm (C114) Tj ET
+BT /R 9 Tf 1 0 0 1 100 355.0 Tm (Use traceroute to locate an unexpected routed failure) Tj ET
+BT /R 7 Tf 1 0 0 1 535 355.0 Tm (N/A) Tj ET
+0.8 w 49 327.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 335.0 Tm (C115) Tj ET
+BT /R 9 Tf 1 0 0 1 100 335.0 Tm (Undo only one incorrect route/protocol setting) Tj ET
+BT /R 7 Tf 1 0 0 1 535 335.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 301.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 253.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 269.0 Tm (09. DHCP pools, relay and DNS) Tj ET
+0.8 w 49 224.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 232.0 Tm (C116) Tj ET
+BT /R 9 Tf 1 0 0 1 100 232.0 Tm (Identify the actual DHCP server device) Tj ET
+BT /R 7 Tf 1 0 0 1 535 232.0 Tm (N/A) Tj ET
+0.8 w 49 204.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 212.0 Tm (C117) Tj ET
+BT /R 9 Tf 1 0 0 1 100 212.0 Tm (Inspect DHCP pool network and subnet mask) Tj ET
+BT /R 7 Tf 1 0 0 1 535 212.0 Tm (N/A) Tj ET
+0.8 w 49 184.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 192.0 Tm (C118) Tj ET
+BT /R 9 Tf 1 0 0 1 100 192.0 Tm (Inspect default-router option in DHCP pool) Tj ET
+BT /R 7 Tf 1 0 0 1 535 192.0 Tm (N/A) Tj ET
+0.8 w 49 164.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 172.0 Tm (C119) Tj ET
+BT /R 9 Tf 1 0 0 1 100 172.0 Tm (Inspect DNS server option in DHCP pool) Tj ET
+BT /R 7 Tf 1 0 0 1 535 172.0 Tm (N/A) Tj ET
+0.8 w 49 144.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 152.0 Tm (C120) Tj ET
+BT /R 9 Tf 1 0 0 1 100 152.0 Tm (Inspect reserved/excluded address ranges) Tj ET
+BT /R 7 Tf 1 0 0 1 535 152.0 Tm (N/A) Tj ET
+0.8 w 49 124.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 132.0 Tm (C121) Tj ET
+BT /R 9 Tf 1 0 0 1 100 132.0 Tm (Check pool has usable remaining leases) Tj ET
+BT /R 7 Tf 1 0 0 1 535 132.0 Tm (N/A) Tj ET
+0.8 w 49 104.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 112.0 Tm (C122) Tj ET
+BT /R 9 Tf 1 0 0 1 100 112.0 Tm (Check client-facing router helper address if DHCP is remote) Tj ET
+BT /R 7 Tf 1 0 0 1 535 112.0 Tm (N/A) Tj ET
+0.8 w 49 84.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 92.0 Tm (C123) Tj ET
+BT /R 9 Tf 1 0 0 1 100 92.0 Tm (Check DHCP snooping trust when configured) Tj ET
+BT /R 7 Tf 1 0 0 1 535 92.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (5/10) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 5572 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (C124) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Request/renew DHCP on one approved client) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (C125) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Verify assigned client IP and prefix) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (C126) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Verify assigned gateway and DNS data) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (C127) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Inspect DNS server service status) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (C128) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Inspect required DNS records and hostnames) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (C129) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Check client DNS server address matches service) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (C130) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Verify required hostname resolves or opens) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (C131) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Restore only an incorrect pool/helper/DNS record) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 552.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 504.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 520.0 Tm (10. Application/server tasks) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (C132) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Check required Packet Tracer server service list) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (C133) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Check HTTP or HTTPS enabled if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (C134) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Open required web page via IP) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (C135) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Open required web page via DNS hostname) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (C136) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Check FTP service state when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (C137) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check FTP authorized user account) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C138) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Test an authorized FTP file transfer) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C139) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check TFTP service/file when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C140) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check email domain and user accounts when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C141) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Test mail send/receive if assigned) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C142) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Check time/NTP if assigned) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (C143) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Check required application firewall/ACL path) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (C144) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Do not enable unrelated server services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (C145) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Restore service/record data if a client test fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 189.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 141.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 157.0 Tm (11. Cisco device login and SSH) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (C146) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Check intended hostname and domain name) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (C147) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check enable secret requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (C148) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check authorized local usernames and secrets) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (6/10) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 6277 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (C149) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Check console line login and passwords if assigned) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (C150) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Check VTY lines and their transport settings) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (C151) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Check SSH keys/IOS support) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (C152) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Check SSH v2 setting where supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (C153) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Verify no unnecessary Telnet access if SSH-only required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (C154) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Check management SVI/router interface IP reachability) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (C155) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Check VTY ACL or approved management hosts if assigned) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (C156) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Test a new authorized SSH login) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (C157) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Preserve console recovery if SSH fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (C158) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Check banner or password policy only if task requires it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (C159) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Save device configuration after verified changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 492.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 444.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 460.0 Tm (12. ACLs, port security and STP) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (C160) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (List traffic flows that must be allowed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (C161) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (List traffic flows that must be denied) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (C162) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Record source and destination networks for ACL) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C163) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Record protocol and port for extended ACL) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C164) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check ACL wildcard mask against intended prefix) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C165) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Inspect ACL rule order and implicit deny) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C166) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Check ACL interface binding and direction) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C167) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Apply only task-required ACL entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (C168) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Test one permitted flow across ACL) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (C169) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Test one intentionally blocked flow across ACL) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (C170) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Check access port maximum MAC address setting) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (C171) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Check port-security violation mode) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (C172) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Check learned/sticky MAC state when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (C173) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Confirm edge port security does not disable legitimate PC) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (C174) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Check STP topology and root bridge where required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (C175) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Check PortFast only on genuine host-facing edge port) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+0.8 w 49 95.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 103.0 Tm (C176) Tj ET
+BT /R 9 Tf 1 0 0 1 100 103.0 Tm (Check BPDU Guard does not disable switch uplink) Tj ET
+BT /R 7 Tf 1 0 0 1 535 103.0 Tm (N/A) Tj ET
+0.8 w 49 75.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 83.0 Tm (C177) Tj ET
+BT /R 9 Tf 1 0 0 1 100 83.0 Tm (Restore accidental ACL/port-security/STP disruption) Tj ET
+BT /R 7 Tf 1 0 0 1 535 83.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (7/10) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 5611 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+BT /R 8 Tf 1 0 0 1 51 712.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 664.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 680.0 Tm (13. EtherChannel, NAT, wireless and IPv6) Tj ET
+0.8 w 49 635.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 643.0 Tm (C178) Tj ET
+BT /R 9 Tf 1 0 0 1 100 643.0 Tm (Check whether EtherChannel is actually required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 643.0 Tm (N/A) Tj ET
+0.8 w 49 615.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 623.0 Tm (C179) Tj ET
+BT /R 9 Tf 1 0 0 1 100 623.0 Tm (Check EtherChannel member ports and modes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 623.0 Tm (N/A) Tj ET
+0.8 w 49 595.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 603.0 Tm (C180) Tj ET
+BT /R 9 Tf 1 0 0 1 100 603.0 Tm (Verify matching trunk/VLAN settings on bundle members) Tj ET
+BT /R 7 Tf 1 0 0 1 535 603.0 Tm (N/A) Tj ET
+0.8 w 49 575.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 583.0 Tm (C181) Tj ET
+BT /R 9 Tf 1 0 0 1 100 583.0 Tm (Check LACP negotiation compatibility) Tj ET
+BT /R 7 Tf 1 0 0 1 535 583.0 Tm (N/A) Tj ET
+0.8 w 49 555.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 563.0 Tm (C182) Tj ET
+BT /R 9 Tf 1 0 0 1 100 563.0 Tm (Verify show etherchannel summary where supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 563.0 Tm (N/A) Tj ET
+0.8 w 49 535.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 543.0 Tm (C183) Tj ET
+BT /R 9 Tf 1 0 0 1 100 543.0 Tm (Identify NAT inside and outside interfaces if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 543.0 Tm (N/A) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (C184) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Inspect NAT selection ACL) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (C185) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Check PAT overload mapping when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (C186) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Generate matching inside-to-outside traffic) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (C187) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Verify NAT translations appear) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (C188) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Record wireless SSID exactly as assigned) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (C189) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Check wireless security mode and passphrase) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (C190) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Verify client wireless adapter/association) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (C191) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Verify wireless client DHCP/address/gateway) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C192) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Check IPv6 unicast-routing requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C193) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check IPv6 addresses and prefix lengths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C194) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check IPv6 neighbor and route information) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C195) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Test authorized IPv6 reachability) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C196) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Restore specific bad advanced configuration if needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 249.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 201.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 217.0 Tm (14. Troubleshooting and simulation) Tj ET
+0.8 w 49 172.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 180.0 Tm (C197) Tj ET
+BT /R 9 Tf 1 0 0 1 100 180.0 Tm (Test problem from lower layers upward) Tj ET
+BT /R 7 Tf 1 0 0 1 535 180.0 Tm (N/A) Tj ET
+0.8 w 49 152.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 160.0 Tm (C198) Tj ET
+BT /R 9 Tf 1 0 0 1 100 160.0 Tm (Check physical cable and interface first) Tj ET
+BT /R 7 Tf 1 0 0 1 535 160.0 Tm (N/A) Tj ET
+0.8 w 49 132.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 140.0 Tm (C199) Tj ET
+BT /R 9 Tf 1 0 0 1 100 140.0 Tm (Check client subnet and gateway next) Tj ET
+BT /R 7 Tf 1 0 0 1 535 140.0 Tm (N/A) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (C200) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Check access VLAN and trunk allowances) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (C201) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check router subinterface or SVI) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (C202) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check forward and return routes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (8/10) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 19 0 R >>
+endobj
+21 0 obj
+<< /Length 6086 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (C203) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Check ACL direction and actual permitted traffic) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (C204) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Check DHCP relay and server when lease fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (C205) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Check DNS when IP works but hostname fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (C206) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Check HTTP service when ping works but web fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (C207) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Check port security or BPDU shutdown when edge port fails) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (C208) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Check NAT only if translations are required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (C209) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Use Packet Tracer Simulation Mode when helpful) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (C210) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Filter ARP/ICMP/DHCP/DNS protocol events where supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (C211) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Use Capture/Forward to see the first drop) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (C212) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Confirm intended blocked flows versus unintended drops) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (C213) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Verify a changed setting with actual client traffic) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 492.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 444.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 460.0 Tm (15. Final review, saving and submission) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (C214) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Recheck all task-required interface statuses) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (C215) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Recheck all PC/server IP and gateway settings) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (C216) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Recheck required VLANs and trunks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (C217) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Recheck static or dynamic routes and return paths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (C218) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Recheck DHCP leases and DNS functionality) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (C219) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Recheck web/FTP/email required services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (C220) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Recheck SSH or management authentication) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (C221) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Recheck allowed and denied ACL flows) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (C222) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Recheck port security/STP and other advanced features) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (C223) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Inspect any permitted Check Results only as allowed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (C224) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Confirm no unrelated working configuration was removed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (C225) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Save running-config to startup-config when required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (C226) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Save the correct PKA/PKT file under required name) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (C227) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Submit activity through the official method if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (C228) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Record completion/result and outstanding items) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (C229) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Confirm no invented credentials/IPs remain from examples) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 89.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (9/10) Tj ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 21 0 R >>
+endobj
+23 0 obj
+<< /Length 513 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (CISCO PACKET TRACER CHECKLIST) Tj ET 0 g
+BT /B 9 Tf 1 0 0 1 50 722.0 Tm (FINAL REVIEW - required connectivity / saved file / reviewer:) Tj ET
+BT /R 8 Tf 1 0 0 1 50 697.0 Tm (_________________________________________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (10/10) Tj ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 23 0 R >>
+endobj
+xref
+0 25
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000178 00000 n 
+0000000248 00000 n 
+0000000323 00000 n 
+0000005686 00000 n 
+0000005820 00000 n 
+0000011524 00000 n 
+0000011658 00000 n 
+0000017381 00000 n 
+0000017516 00000 n 
+0000023638 00000 n 
+0000023774 00000 n 
+0000029621 00000 n 
+0000029757 00000 n 
+0000035381 00000 n 
+0000035517 00000 n 
+0000041846 00000 n 
+0000041982 00000 n 
+0000047645 00000 n 
+0000047781 00000 n 
+0000053919 00000 n 
+0000054055 00000 n 
+0000054619 00000 n 
+trailer
+<< /Size 25 /Root 1 0 R >>
+startxref
+54755
+%%EOF
