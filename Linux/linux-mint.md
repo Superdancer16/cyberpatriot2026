@@ -544,6 +544,115 @@ sudo find /usr/local/bin /usr/local/sbin -type f -perm /4000 -ls 2>/dev/null
 
 **Verify:** Browser, authorized user login, screen lock, sudo, required SSH/web/share traffic, updated score and saved forensic files. Restore only the specific changed setting if a normal task breaks.
 
+
+### Research report expansion M-R1 — Users, sudo, UID 0 and PAM integrity
+
+- [ ] Done
+
+**Evidence:** Community/training, verified against native Linux tools. This is not an official scoring list.
+
+**GUI:** Cinnamon **Menu → Administration → Users and Groups**; for service identities use Terminal. Read the image README before disabling users.
+
+**Typing (check):**
+
+~~~bash
+getent passwd
+getent group sudo
+awk -F: '$3 == 0 {print $1, $3, $7}' /etc/passwd
+sudo passwd -S -a
+sudo grep -RnsE 'NOPASSWD|!authenticate|pam_exec|pam_permit|pam_debug' /etc/sudoers /etc/sudoers.d /etc/pam.d 2>/dev/null
+~~~
+
+**What to look for:** An unapproved human login, a second UID 0 account, a sudo rule granting unauthorized privileges, or a modified PAM module line. Service users and unusual installed policies may be legitimate; do not infer malice from a name alone.
+
+**Fix only after verifying the exact unauthorized sudo membership:**
+
+~~~bash
+sudo gpasswd -d EXAMPLE_USER sudo
+~~~
+
+For an unauthorized login, after preserving its forensic evidence:
+
+~~~bash
+sudo usermod -L EXAMPLE_USER
+sudo usermod -s /usr/sbin/nologin EXAMPLE_USER
+~~~
+
+**Verification:** Repeat **id EXAMPLE_USER**, **getent group sudo**, **sudo passwd -S EXAMPLE_USER**, and validate sudoers with **sudo visudo -c**. Test a second authorized admin login.
+
+**Undo:** Restore recorded shell, lock status and group memberships (only if previously authorized). A password lock can leave SSH-key access or existing sessions possible—inspect them. Do not delete the only sudo account or root.
+
+### Research report expansion M-R2 — Password aging, quality and lockout without breaking login
+
+- [ ] Done
+
+**Typing (check):**
+
+~~~bash
+grep -E '^PASS_(MAX_DAYS|MIN_DAYS|WARN_AGE)' /etc/login.defs
+sudo chage -l EXAMPLE_USER
+sudo grep -nEv '^[[:space:]]*(#|$)' /etc/pam.d/common-auth /etc/pam.d/common-password
+dpkg-query -W libpam-pwquality libpam-runtime libpam-modules 2>/dev/null
+~~~
+
+**Before PAM changes:** Keep a working root/console recovery path; preserve actual config files:
+
+~~~bash
+sudo cp -a /etc/pam.d/common-auth /etc/pam.d/common-auth.before-cp
+sudo cp -a /etc/pam.d/common-password /etc/pam.d/common-password.before-cp
+~~~
+
+**Fix only if the README specifies the illustrative 90-day maximum, 1-day minimum and 7-day warning:**
+
+~~~bash
+sudo chage -M 90 -m 1 -W 7 EXAMPLE_USER
+~~~
+
+For complexity/history/failed-login controls, inspect the actual installed module and supported **pam-auth-update** profiles. Never paste a new full PAM stack from Debian or a historical GitHub script; module order mistakes can lock out all logins.
+
+**Verification:** Re-run **chage -l** and test a new normal-user login, sudo, and an authorized password change from a separate terminal/session before closing the original administrator session.
+
+**Undo:** Restore the original per-user aging settings or the specific PAM files from backups using your retained root/console access.
+
+### Research report expansion M-R3 — Mint repository integrity, PPAs, updates and Snap preference
+
+- [ ] Done
+
+**Evidence:** Mint-specific community/vender topics; package managers vary by Mint release.
+
+**GUI:** **Menu → Administration → Software Sources**. Inspect **Official Repositories, PPAs, Additional Repositories**; compare against the README and installed release. Then use **Update Manager → Refresh**.
+
+**Typing (check):**
+
+~~~bash
+cat /etc/os-release
+cat /etc/upstream-release/lsb-release 2>/dev/null
+apt-cache policy
+sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Components:|Signed-By:|Trusted:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+apt-mark showhold
+sudo dpkg --audit
+~~~
+
+**Mint version note:** Mint 21 commonly uses Ubuntu **jammy**, Mint 22 uses **noble**; do not copy release names without checking actual installed OS/base. Unknown PPAs and Trusted: yes sources merit inspection but may be intentionally required.
+
+**Check Snap preference if relevant:**
+
+~~~bash
+dpkg-query -W snapd 2>/dev/null
+cat /etc/apt/preferences.d/nosnap.pref 2>/dev/null
+~~~
+
+**Fix:** Back up the **specific** confirmed malicious repository/PPAs file and disable only that source using Software Sources or careful editor changes. Never delete all PPAs, remove snapd automatically, or disable APT signature checks to silence errors.
+
+**Verification:**
+
+~~~bash
+sudo apt update
+apt -s upgrade
+~~~
+
+Check no unexpected sources/signature errors remain and all required software works. **Undo:** Restore the changed source/preference file backup; reverting sources does not revert installed package versions.
+
 ## Part 4 — Services, Desktop, Software and Threat Investigation
 
 Inspect services, software, screen lock, SSH, permissions, privileged groups and persistent threats.
@@ -1056,6 +1165,124 @@ Then open **≡ → Add-ons and themes → Extensions** and remove any you don't
 > Do this in the Firefox of the user you are logged in as. Each user has their own Firefox settings.
 
 ---
+
+
+### Research report expansion M-R4 — LightDM guest sessions and automatic login
+
+- [ ] Done
+
+**GUI:** Cinnamon **Menu → Administration → Login Window** (when installed). Inspect permitted autologin/guest options and actual active display manager.
+
+**Typing (check):**
+
+~~~bash
+systemctl status display-manager --no-pager
+sudo grep -RnsE '^[[:space:]]*(allow-guest|autologin-user|autologin-user-timeout)' /etc/lightdm /usr/share/lightdm/lightdm.conf.d 2>/dev/null
+~~~
+
+**What to look for:** Unauthorized guest login or auto-login. LightDM can load multiple configuration snippets; vendor defaults may be overridden by user local settings. If installed manager is not LightDM, use that manager's actual controls.
+
+**Fix only if the README prohibits guest sessions and LightDM is active:** Inspect existing override first. If a new local override is appropriate:
+
+~~~bash
+sudo mkdir -p /etc/lightdm/lightdm.conf.d
+sudo nano /etc/lightdm/lightdm.conf.d/50-cp-security.conf
+~~~
+
+Configuration file contents:
+
+~~~text
+[Seat:*]
+allow-guest=false
+~~~
+
+Do not overwrite an existing file without a private backup. Avoid duplicate options/sections.
+
+**Verification:** Recheck the actual effective config and test a **new** authorized login at a safe checkpoint; do not restart LightDM mid-round while unsaved forensic work exists.
+
+**Undo:** Restore an existing file's exact backup, or remove only your newly created override after checking its path and contents. Verify the original login workflow.
+
+### Research report expansion M-R5 — Cinnamon screen-lock and user settings
+
+- [ ] Done
+
+**GUI:** **System Settings → Screensaver**. Inspect auto-lock and lock-on-resume rules for the *actual* logged-in user.
+
+**Typing (check as ordinary desktop user, NOT root):**
+
+~~~bash
+printf '%s\n' "$XDG_CURRENT_DESKTOP"
+gsettings list-schemas | grep -E 'cinnamon.desktop.screensaver|gnome.desktop.screensaver'
+~~~
+
+If installed:
+
+~~~bash
+gsettings list-recursively org.cinnamon.desktop.screensaver
+~~~
+
+**Fix:** Change only the policy-required setting in the GUI; if using gsettings first record the actual schema/key/type and old value. Cinnamon, MATE and Xfce are different; don't copy GNOME keys blindly.
+
+**Verification:** Recheck the relevant key with **gsettings get** and test lock/unlock/resume. **Undo:** Restore exact old user-specific value and test login again.
+
+### Research report expansion M-R6 — Software, Flatpak, files, timers and SUID investigation
+
+- [ ] Done
+
+**Evidence:** Community/training inventory topics; a potentially risky filename is not itself a confirmed vulnerability.
+
+**Typing (check):**
+
+~~~bash
+dpkg -l | grep -Ei 'nmap|wireshark|netcat|steam|transmission|qbittorrent|hydra|john'
+command -v flatpak
+~~~
+
+If Flatpak is installed:
+
+~~~bash
+flatpak list --app
+~~~
+
+~~~bash
+sudo find /home -type f \( -iname '*.mp3' -o -iname '*.mp4' -o -iname '*.avi' -o -iname '*.torrent' \) -print 2>/dev/null
+sudo crontab -l
+systemctl list-timers --all
+systemctl list-unit-files --type=service --state=enabled
+sudo ss -lntup
+~~~
+
+~~~bash
+sudo find /etc /usr/local /opt -xdev -type f -perm /0002 -ls 2>/dev/null
+sudo find /usr/local/bin /usr/local/sbin -type f \( -perm /4000 -o -perm /2000 \) -ls 2>/dev/null
+cat /etc/hosts
+~~~
+
+**Fix:** For a truly prohibited APT package preview dependency removals first using **apt -s purge ACTUAL_PACKAGE**, then remove only when authorized. For a verified malicious cron/unit/hosts mapping, back up the exact file and disable/remove only that entry **after forensic evidence is saved**.
+
+**Verification:** Re-run the relevant single inspection and test the expected browser, SSH, file share, database, user login and scoring report.
+
+**Undo:** Restore the one package with its original configuration, the backed-up cron/hosts line, the recorded service state, or file permissions. Do not run a blanket rm, chmod -R or mass package purge.
+
+### Research report expansion M-R7 — SSH, UFW, AppArmor and required-service rollback
+
+- [ ] Done
+
+**Typing (check):**
+
+~~~bash
+systemctl status ssh --no-pager
+sudo /usr/sbin/sshd -T 2>/dev/null | grep -Ei '^(permitrootlogin|permitemptypasswords|passwordauthentication)'
+sudo ufw status verbose
+sudo aa-status
+systemctl status unattended-upgrades --no-pager
+~~~
+
+Missing units/tools can be normal on an image. Before editing SSH, back up the exact config, check README-required auth/port, run **sudo /usr/sbin/sshd -t**, reload only if supported, and **test a second authorized SSH login** while the old session remains open. Do not disable password auth when required.
+
+Before turning on UFW's default inbound deny, add exact allow rules for required SSH/web/file-share services and retain console access. Do not run **ufw reset** as a repair. Investigate AppArmor DENIED events instead of globally disabling the framework. Use Mint Update Manager and signed APT sources for updates.
+
+**Verify:** Active required service connections and scoring report, user login and privilege elevation. **Undo:** Reverse the last specific change (firewall rule, SSH config, AppArmor profile, service unit) from its recorded state; never delete score data or restore malicious files casually.
 
 ## Part 5 — Advanced Kernel and Reference Procedures
 
