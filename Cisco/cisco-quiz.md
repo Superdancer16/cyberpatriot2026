@@ -125,7 +125,6 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 
 ---
 
----
 
 ### CyberPatriot XIX: which NetAcad modules to study?
 
@@ -1332,7 +1331,6 @@ Apply concepts through multi-step reasoning, CLI output interpretation, protocol
 
 ---
 
----
 
 ### Additional quiz-style question bank: deeper concepts and exam traps
 
@@ -2088,7 +2086,6 @@ The following new questions are original and reinforce the network topics emphas
 **Q385. How can a correct DNS A record still fail to provide name resolution?**
 
 **Answer:** The client may use the wrong DNS server, be unable to route to it, or be blocked by a firewall/ACL; record correctness alone is insufficient.
-
 
 
 ---

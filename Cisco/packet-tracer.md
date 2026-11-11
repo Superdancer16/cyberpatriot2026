@@ -108,7 +108,6 @@ This is **Packet Tracer practice**, not a substitute for the separate [Cisco qui
 
 ---
 
----
 
 ### 0. Before you configure anything
 
@@ -128,7 +127,6 @@ This is **Packet Tracer practice**, not a substitute for the separate [Cisco qui
 
 ---
 
----
 
 ### 1. Inventory the topology
 
@@ -155,7 +153,6 @@ This is **Packet Tracer practice**, not a substitute for the separate [Cisco qui
 
 ---
 
----
 
 ### 2. IOS CLI and baseline inspection
 
@@ -276,7 +273,6 @@ show interfaces gigabitEthernet 0/0
 
 ---
 
----
 
 ### 4. PCs, servers and IP addressing
 
@@ -303,7 +299,6 @@ Replace the example gateway with the actual same-subnet router interface.
 
 ---
 
----
 
 ### 5. VLANs, access ports and trunks
 
@@ -371,7 +366,6 @@ If supported, inspect a specific port using **show interfaces fastEthernet 0/5 s
 
 ---
 
----
 
 ### 6. Inter-VLAN routing
 
@@ -442,7 +436,6 @@ A VLAN SVI can be down because the VLAN lacks an active Layer 2 port. On a **Lay
 
 ---
 
----
 
 ### 7. Static and default routing
 
@@ -486,7 +479,6 @@ traceroute 192.168.30.10
 
 ---
 
----
 
 ### 9. DHCP pools and relay
 
@@ -602,7 +594,6 @@ Apply security requirements only after verifying the network path and keeping re
 
 ---
 
----
 
 ### 11. Port security and switch edge protections
 
@@ -636,7 +627,6 @@ end
 
 ---
 
----
 
 ### 12. STP, EtherChannel and trunk security
 
@@ -699,7 +689,6 @@ show interfaces trunk
 
 ---
 
----
 
 ### 13. IPv4 ACLs and filtering
 
@@ -770,7 +759,6 @@ Do not delete a named ACL that other interfaces or systems still use. ACL direct
 
 ---
 
----
 
 ### 17. Secure device management
 
@@ -918,7 +906,6 @@ This example is **illustrative**: RIP network statements are historically classf
 
 ---
 
----
 
 ### 14. NAT and PAT
 
@@ -967,7 +954,6 @@ An empty translation table without matching traffic doesn't necessarily mean a b
 
 ---
 
----
 
 ### 15. Wireless configuration
 
@@ -990,7 +976,6 @@ An empty translation table without matching traffic doesn't necessarily mean a b
 
 ---
 
----
 
 ### 16. IPv6 addressing and routing
 
@@ -1036,7 +1021,6 @@ end
 
 ---
 
----
 
 ### 18. Logging and management visibility
 
@@ -1068,7 +1052,6 @@ end
 
 ---
 
----
 
 ### 19. Packet Tracer Simulation and activity checks
 
@@ -1090,7 +1073,6 @@ end
 
 ---
 
----
 
 ### 21. Expanded original configuration reference
 
@@ -2223,7 +2205,6 @@ Some tasks grade running configuration directly; use the actual submission instr
 
 ---
 
----
 
 ### 23. Sources and scope
 

@@ -29,7 +29,6 @@ Forensics questions are text files on the desktop (`Forensics Question 1.txt`, �
 
 ---
 
----
 
 <a id="topic-2"></a>
 ## The common question types
@@ -123,7 +122,6 @@ Windows: **Settings → Apps** sorted by **Install date**, or **Event Viewer →
 
 ---
 
----
 
 <a id="topic-3"></a>
 ## Don't lose the evidence
