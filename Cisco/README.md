@@ -1,4 +1,8 @@
-# Cisco — Networking Quiz and Packet Tracer
+# 🌐 Cisco — Networking Quiz and Packet Tracer
+
+> [!TIP]
+> **🧭 Quick start:** Follow the category links and open the most relevant guide. Look for **🔎 Check**, **🛠️ Fix**, **✅ Verify**, **↩️ Undo**, and **⚠️ Caution** throughout.
+
 
 Both Cisco guides follow **Basics / Information Needed → First Things to Do → Common Fundamentals/High-Priority Tasks → Intermediate → Advanced → Final Review**.
 

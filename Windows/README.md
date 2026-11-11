@@ -1,4 +1,8 @@
-# Windows — Prioritized CyberPatriot Manuals
+# 🪟 Windows — Prioritized CyberPatriot Manuals
+
+> [!TIP]
+> **🧭 Quick orientation:** Use the links below to locate the right topic. Throughout the manuals, look for **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution**.
+
 
 Choose one self-contained guide. Each starts with **Basics / Info**, then **First Things to Do**, followed by **Commonly Assessed Checks**, **Services/Software**, **Advanced Investigation**, and **Final Verification**.
 

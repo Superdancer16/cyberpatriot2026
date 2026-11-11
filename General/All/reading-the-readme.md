@@ -1,9 +1,25 @@
-# Reading the README
+# 📋 Reading the README
+
+> [!TIP]
+> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+
+> [!IMPORTANT]
+> **Follow the actual image README and competition instructions.** Preserve forensic evidence and record rollback details before making system changes.
+
+## 🧭 Quick links
+
+[What to pull out of the README](#topic-1) · [Example](#topic-2) · [After the README: the Forensics Questions](#topic-3) · [Turn requirements into a verification sheet](#topic-4)
+
+---
+
 
 The README on the desktop is the most important thing on the image. **Every decision you make depends on it.** If the README says Bob is an administrator, then removing Bob's admin rights *loses* points, even though "fewer admins" is normally safer.
 
 Take 5–10 minutes. Read it **twice**. Write things down.
 
+---
+
+<a id="topic-1"></a>
 ## What to pull out of the README
 
 Make a note (paper, or a text file on your own computer) with these headings:
@@ -40,6 +56,9 @@ Sentences that tell you what is *prohibited*:
 ### 6. Special instructions
 Anything unusual: "Do not change the password of user X", "The database must allow remote connections", "Group Y must exist and contain users A and B". These are often worth points or prevent penalties.
 
+---
+
+<a id="topic-2"></a>
 ## Example
 
 > *Company: Cyber Plumbing Co. This Linux Mint workstation is used by the office team. Authorized administrators: **alice** (you, password: Pl@mb3r!), **bob**. Authorized users: carol, dave, erin. The office uses **SSH** to manage this computer remotely. Prohibited files such as music must not be stored. Hacking tools and games are not allowed.*
@@ -54,22 +73,28 @@ Prohibited:        media files, hacking tools, games
 
 That is exactly what the scripts ask for when they start.
 
+---
+
+<a id="topic-3"></a>
 ## After the README: the Forensics Questions
 Open each Forensics Question file and **answer them before fixing anything**. Fixing things can destroy evidence: deleting a user deletes the clue that was in their home folder. See [Forensics questions](forensics-questions.md).
 
+---
+
+<a id="topic-4"></a>
 ## Turn requirements into a verification sheet
 
 - [ ] Done
 
-**What:** Translate prose into explicit keep/change/test decisions.
+**🎯 What:** Translate prose into explicit keep/change/test decisions.
 
-**Why it matters:** A README can require a capability without naming every supporting service. For example, AD requires DNS/time/replication and a website may depend on a database service account.
+**💡 Why it matters:** A README can require a capability without naming every supporting service. For example, AD requires DNS/time/replication and a website may depend on a database service account.
 
-**Before changing anything:** Keep the original README unchanged. Record requirements privately without copying passwords into a shared log. Compare usernames exactly, while remembering service and built-in accounts may be omitted from the human-user lists.
+**🛑 Before changing anything:** Keep the original README unchanged. Record requirements privately without copying passwords into a shared log. Compare usernames exactly, while remembering service and built-in accounts may be omitted from the human-user lists.
 
-**Clicking (GUI):** Open the README, every forensic question and the Scoring Report side by side. For each required service identify its application and a client test before opening settings.
+**🖱️ Clicking (GUI):** Open the README, every forensic question and the Scoring Report side by side. For each required service identify its application and a client test before opening settings.
 
-**Typing (check):** Linux terminal:
+**🔎 Typing (check):** Linux terminal:
 
 ```bash
 whoami
@@ -93,10 +118,10 @@ Use these to identify your own account and machine; do not guess based on a disp
 | Staff file share | Share + filesystem ACL and actual users | Authorized read/write; unauthorized denied | Both ACL layers and share path |
 | Required SSH | Daemon + socket, auth, firewall sources | New authorized connection and required command/SFTP | Config, units and original firewall rule |
 
-**Typing (fix, only when appropriate):** No system fix is performed here. Use the correct OS checklist for each requirement and enter the actual names/values, not the handbook's example names.
+**🛠️ Typing (fix, only when appropriate):** No system fix is performed here. Use the correct OS checklist for each requirement and enter the actual names/values, not the handbook's example names.
 
-**Check it worked:** You can point to a README sentence for every removal or restriction and a function test for every required service. Unclear requirements remain marked for review rather than guessed.
+**✅ Check it worked:** You can point to a README sentence for every removal or restriction and a function test for every required service. Unclear requirements remain marked for review rather than guessed.
 
-**Undo:** Correct your working notes if you misread a requirement; preserve the original README and forensic question text.
+**↩️ Undo:** Correct your working notes if you misread a requirement; preserve the original README and forensic question text.
 
-**Warnings:** A tool's default baseline never overrides scenario requirements. Read round-specific rules on outside assistance, internet use, scripts and snapshots before applying general practice advice.
+**⚠️ Warnings:** A tool's default baseline never overrides scenario requirements. Read round-specific rules on outside assistance, internet use, scripts and snapshots before applying general practice advice.

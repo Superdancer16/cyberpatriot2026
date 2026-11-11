@@ -1,5 +1,19 @@
-# Sources, attribution and maintenance
+# 📚 Sources, attribution and maintenance
 
+> [!TIP]
+> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+
+> [!NOTE]
+> **Source transparency:** Community checklists are training references, not official disclosures of secret scoring items or general code-reuse licenses.
+
+## 🧭 Quick links
+
+[Existing documentation and reuse scope](#topic-1) · [Official references for version-sensitive settings](#topic-2) · [Maintaining an actionable procedure](#topic-3) · [Additional public research reviewed for the 2026–27 priority-order expansion](#topic-4)
+
+---
+
+
+<a id="topic-1"></a>
 ## Existing documentation and reuse scope
 
 The repository's original README states that documentation was reproduced **with permission** from [Ripper1004/CyberPatriot-Toolkit documentation](https://github.com/Ripper1004/CyberPatriot-Toolkit/tree/main/docs). That attribution is retained. The permission statement predates this expansion; the repository does not contain a separate permission instrument defining broader redistribution rights.
@@ -10,6 +24,9 @@ Reference checkout reviewed: Ripper1004/CyberPatriot-Toolkit revision `5761e54b9
 
 The old scripts date from a substantially older Linux ecosystem. Do not adopt their world-readable shadow permissions, logged/shared passwords, bulk deletion, release-specific repository replacements, obsolete PAM modules or global cron removal. This handbook instead requires private backups, release-aware configuration, explicit scenario exceptions and client verification.
 
+---
+
+<a id="topic-2"></a>
 ## Official references for version-sensitive settings
 
 Consult the documentation matching the **installed version**, especially when a command/property is absent. A reference's current version may differ from an older competition image.
@@ -28,6 +45,9 @@ Consult the documentation matching the **installed version**, especially when a 
 | Cisco ACL ordering, direction and wildcard examples | [Cisco commonly used IP ACLs](https://www.cisco.com/c/en/us/support/docs/ip/access-lists/26448-ACLsamples.html) and the device's IOS configuration guide/context help |
 | PostgreSQL client authentication | [PostgreSQL pg_hba.conf](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) and documentation for the installed major version |
 
+---
+
+<a id="topic-3"></a>
 ## Maintaining an actionable procedure
 
 - [ ] Confirm the exact OS/release, package and required role before editing.
@@ -41,7 +61,11 @@ Consult the documentation matching the **installed version**, especially when a 
 Round schedules, resource rules, team limits and scoring behavior come from the current official round materials. The inherited season tables are reference context, not an authoritative schedule or guarantee of a particular image.
 
 
-## Additional public research reviewed for the 2026–27 priority-order expansion
+---
+
+<a id="topic-4"></a>
+<a id="additional-public-research-reviewed-for-the-202627-priority-order-expansion"></a>
+## 📚 Additional public references and topic coverage
 
 These are **supplemental topic inventories**, not authorities for unverified numeric point values or permission to run third-party scripts:
 

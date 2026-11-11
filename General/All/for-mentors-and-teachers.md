@@ -1,7 +1,23 @@
-# For mentors and teachers
+# 🎓 For mentors and teachers
+
+> [!TIP]
+> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+
+> [!IMPORTANT]
+> **Follow the actual image README and competition instructions.** Preserve forensic evidence and record rollback details before making system changes.
+
+## 🧭 Quick links
+
+[What your students get](#topic-1) · [Before the first session](#topic-2) · [A suggested six-session plan](#topic-3) · [Running a session](#topic-4) · [Making your own practice problems](#topic-5) · [Keeping the material up to date](#topic-6) · [Assess a complete procedure, not command memorization](#topic-7)
+
+---
+
 
 How to run practice sessions with this toolkit in a class or club, even if your students have never touched Linux or a command line.
 
+---
+
+<a id="topic-1"></a>
 ## What your students get
 
 - **Lessons** (the "Start here" pages): seven short reads, about an hour in total, that explain how an image, the README and scoring work.
@@ -9,6 +25,9 @@ How to run practice sessions with this toolkit in a class or club, even if your 
 - **Manual references** for README interpretation, round timing, logs, file hashes, decoding, terminology and networking. Use the linked Markdown guides; there is no bundled tools website.
 - **Manual procedures** with inspection, verification and rollback. External automation needs independent review and is not included here.
 
+---
+
+<a id="topic-2"></a>
 ## Before the first session
 
 1. **Install VMware Workstation** (or the VM software your images were made for) on every student computer. Make sure virtualization is enabled in the BIOS.
@@ -19,6 +38,9 @@ How to run practice sessions with this toolkit in a class or club, even if your 
 > [!TIP]
 > If school computers erase local data at logout, save permitted practice notes in an approved location. Do not include passwords, shadow files or private forensic samples.
 
+---
+
+<a id="topic-3"></a>
 ## A suggested six-session plan
 
 | Session | Goal | Use |
@@ -32,6 +54,9 @@ How to run practice sessions with this toolkit in a class or club, even if your 
 
 After that, rotate students through Windows Server and Debian, using their checklists. For the Cisco part of a round, use the [Cisco & Packet Tracer guide](../../Cisco/packet-tracer.md) and the worked subnetting examples in that guide.
 
+---
+
+<a id="topic-4"></a>
 ## Running a session
 
 - **One student per image.** Pairs work well if one person drives and the other reads the checklist aloud.
@@ -40,32 +65,41 @@ After that, rotate students through Windows Server and Debian, using their check
 - **Fresh start:** revert only an authorized practice VM, then start fresh progress notes and verify the baseline score.
 - **Handing in work:** request a private change log with before/after evidence and recovery notes, without secrets or active-round answers.
 
+---
+
+<a id="topic-5"></a>
 ## Making your own practice problems
 
 If you're comfortable with Linux, you can plant problems in a throwaway VM yourself: add an unauthorized user, give someone sudo rights, install a "hacking tool", put an MP3 in a home folder, add a cron job. Take a snapshot first. Keep an instructor-only answer key with the exact original state and rollback for each exercise. This repository does not include vulnerability-planting scripts or tests; do not run such tools on school or production computers.
 
+---
+
+<a id="topic-6"></a>
 ## Keeping the material up to date
 
 Edit the existing Markdown under `docs/`, preserve relative links and review a pull request. This repository has no website build or deployment. Review version-sensitive commands against official references and identify any untested examples.
 
+---
+
+<a id="topic-7"></a>
 ## Assess a complete procedure, not command memorization
 
 - [ ] Done
 
-**What:** Teach students to explain a requirement, inspect a state, make a justified change, verify the real function and recover.
+**🎯 What:** Teach students to explain a requirement, inspect a state, make a justified change, verify the real function and recover.
 
-**Why it matters:** A student who memorizes a disable command may break a required server. The same service can be prohibited on one image and critical on another.
+**💡 Why it matters:** A student who memorizes a disable command may break a required server. The same service can be prohibited on one image and critical on another.
 
-**Before changing anything:** Use an isolated, authorized practice VM with no real personal data. Follow the actual competition rules for outside help; classroom coaching permissions do not automatically extend to a live round. Confirm instructor recovery access and backups before planting a reversible configuration error.
+**🛑 Before changing anything:** Use an isolated, authorized practice VM with no real personal data. Follow the actual competition rules for outside help; classroom coaching permissions do not automatically extend to a live round. Confirm instructor recovery access and backups before planting a reversible configuration error.
 
-**Clicking (GUI):** Demonstrate one service's Properties screen, its dependency list and the application's client test. Ask students to record the original startup type and status before changing either. Let a student locate the matching native terminal inspection.
+**🖱️ Clicking (GUI):** Demonstrate one service's Properties screen, its dependency list and the application's client test. Ask students to record the original startup type and status before changing either. Let a student locate the matching native terminal inspection.
 
-**Typing (check):** Have students use the relevant checklist's read-only query and explain every result column. Do not supply a bulk hardening command as the learning exercise. An empty result, hidden error and absent package mean different things.
+**🔎 Typing (check):** Have students use the relevant checklist's read-only query and explain every result column. Do not supply a bulk hardening command as the learning exercise. An empty result, hidden error and absent package mean different things.
 
-**Typing (fix, only when appropriate):** Give one written scenario requirement and one reversible misconfiguration. The student chooses the corresponding exact procedure, backs up the setting and applies only that change. Rotate roles: operator, requirement reader, verifier and recorder, with one active operator per VM.
+**🛠️ Typing (fix, only when appropriate):** Give one written scenario requirement and one reversible misconfiguration. The student chooses the corresponding exact procedure, backs up the setting and applies only that change. Rotate roles: operator, requirement reader, verifier and recorder, with one active operator per VM.
 
-**Check it worked:** Require four pieces of evidence: the README rationale, before/after native output, an ordinary-user client test, and a demonstrated rollback. Forensics exercises require evidence preservation before any remediation. For Cisco require both the running configuration and saved startup configuration plus connectivity/ACL tests.
+**✅ Check it worked:** Require four pieces of evidence: the README rationale, before/after native output, an ordinary-user client test, and a demonstrated rollback. Forensics exercises require evidence preservation before any remediation. For Cisco require both the running configuration and saved startup configuration plus connectivity/ACL tests.
 
-**Undo:** Have the student restore the recorded setting and prove the required function still works. Restore the clean practice baseline between students only after collecting permitted private notes. Reversion can discard all later changes.
+**↩️ Undo:** Have the student restore the recorded setting and prove the required function still works. Restore the clean practice baseline between students only after collecting permitted private notes. Reversion can discard all later changes.
 
-**Warnings:** Avoid malware samples, real passwords, public scanning, or fake active-round answers in teaching materials. Keep instructor answer keys separate. Review procedures when OS/package versions change and record which platform/version was actually exercised; this handbook's examples are not a claim of execution on every image.
+**⚠️ Warnings:** Avoid malware samples, real passwords, public scanning, or fake active-round answers in teaching materials. Keep instructor answer keys separate. Review procedures when OS/package versions change and record which platform/version was actually exercised; this handbook's examples are not a claim of execution on every image.

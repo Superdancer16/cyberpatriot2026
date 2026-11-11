@@ -1,4 +1,12 @@
-# Cisco Quiz — Comprehensive Networking Vocabulary, Questions and Answers
+# 🧠 Cisco Quiz — Comprehensive Networking Vocabulary, Questions and Answers
+
+> [!TIP]
+> **🧭 Jump to a stage:** [📘 Basics](#stage-1) · [🚀 First steps](#stage-2) · [🛡️ Priority](#stage-3) · [⚙️ Practical work](#stage-4) · [🧰 Advanced](#stage-5) · [✅ Final](#stage-6)
+> **🎯 Goal:** Work from foundational concepts toward more complex configuration and scenario questions.
+
+> [!IMPORTANT]
+> **🧠 Practice approach:** Answer each original short-response question before revealing its answer. Follow the current competition rules on outside notes and resources.
+
 
 **Purpose:** A comprehensive, searchable, open-ended **question → correct answer** bank for studying CyberPatriot Cisco **multiple-choice concepts**. There are **no A–D answer choices**, no proprietary NetAcad test questions, and no Packet Tracer lab exercises here. Read the question, try to answer from memory, then check the answer. During permitted reference-based study, press **Ctrl+F** to find a term.
 
@@ -8,7 +16,14 @@
 
 > **Guide order:** Basics and vocabulary → First study tasks → Common fundamentals and ports → Intermediate concepts → Advanced scenarios and protocol details → Final review. These are priority study topics, **not** a prediction of secret quiz items.
 
+---
+
+<a id="stage-1"></a>
 ## Part 1 — Basics / Information Needed
+
+> [!TIP]
+> 📘 **Know the essentials:** Definitions, tools and rules before starting.
+
 
 ### Cisco quiz basics you should understand first
 
@@ -27,7 +42,14 @@ Know the difference between a **term**, a **protocol**, an **OSI layer**, a **po
 
 **Scoring caution:** Exact graded quiz questions and answer choices are not public; the official assigned NetAcad module material is the primary source for the current round. This is an **original question-and-answer reference**, not an answer key.
 
+---
+
+<a id="stage-2"></a>
 ## Part 2 — First Things to Do
+
+> [!IMPORTANT]
+> 🚀 **First actions:** Read instructions and establish a safe starting point.
+
 
 Review official modules and the study workflow; this section links to all topic categories.
 
@@ -103,7 +125,6 @@ Module ranges are **official round scopes**, not a claim that a particular Q num
 
 ---
 
----
 
 ### CyberPatriot XIX: which NetAcad modules to study?
 
@@ -152,7 +173,14 @@ The official [CyberPatriot training page](https://www.uscyberpatriot.org/competi
 
 The questions below contain answers; cover them while practicing so you learn concepts instead of only recognizing words.
 
+---
+
+<a id="stage-3"></a>
 ## Part 3 — Common Networking Fundamentals and Vocabulary
+
+> [!IMPORTANT]
+> 🛡️ **Core material:** Practice the essential skills and concepts before advanced variations.
+
 
 These high-frequency fundamentals help answer direct-recall and short scenario questions quickly.
 
@@ -659,7 +687,14 @@ These high-frequency fundamentals help answer direct-recall and short scenario q
 
 **Source correction notes:** OSPF is an open standards-based protocol, not a Cisco-only protocol. TCP and UDP port numbers belong to **Transport (OSI Layer 4)**, not Session (Layer 5). IPv6 uses Neighbor Discovery instead of ARP.
 
+---
+
+<a id="stage-4"></a>
 ## Part 4 — Intermediate IPv6, Switching, Services and Security
+
+> [!TIP]
+> ⚙️ **Practice carefully:** Apply the methods to the actual exercise or study problem.
+
 
 Study service behavior, protocol distinctions, switch security, IPv6 and command meaning.
 
@@ -1105,7 +1140,14 @@ Study service behavior, protocol distinctions, switch security, IPv6 and command
 
 **Answer:** The ITU Telecommunication Standardization Sector, which develops telecommunications standards and recommendations.
 
+---
+
+<a id="stage-5"></a>
 ## Part 5 — Advanced Routing, Scenarios and Expanded Question Bank
+
+> [!NOTE]
+> 🧰 **Deep reference:** Explore advanced cases, troubleshooting and common misconceptions.
+
 
 Apply concepts through multi-step reasoning, CLI output interpretation, protocol behavior and troubleshooting.
 
@@ -1289,7 +1331,6 @@ Apply concepts through multi-step reasoning, CLI output interpretation, protocol
 
 ---
 
----
 
 ### Additional quiz-style question bank: deeper concepts and exam traps
 
@@ -2047,8 +2088,14 @@ The following new questions are original and reinforce the network topics emphas
 **Answer:** The client may use the wrong DNS server, be unable to route to it, or be blocked by a firewall/ACL; record correctness alone is insufficient.
 
 
+---
 
+<a id="stage-6"></a>
 ## Part 6 — Final Review and Sources
+
+> [!TIP]
+> ✅ **Final review:** Recheck objectives, answers, configuration and any submission rules.
+
 
 Review all missed terms, official course modules and the permitted reference policy before any assessment.
 
