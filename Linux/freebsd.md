@@ -48,7 +48,6 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 ---
 
----
 
 <a id="topic-2"></a>
 ## 0. Before you start
@@ -81,7 +80,6 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 ---
 
----
 
 <a id="topic-3"></a>
 ## 1. Users and groups
@@ -151,7 +149,6 @@ Normal output: `root`, `toor` (empty shell) and `uucp` (its own `uucico` program
 
 ---
 
----
 
 <a id="topic-4"></a>
 ## 2. Password policy
@@ -187,7 +184,6 @@ This asks for 12+ characters using at least three kinds (lower case, upper case,
 
 ---
 
----
 
 <a id="topic-5"></a>
 ## 3. Firewall (pf)
@@ -225,7 +221,6 @@ ipfw list                       # the rules now in use
 
 ---
 
----
 
 <a id="topic-6"></a>
 ## 4. Services
@@ -264,7 +259,6 @@ sysrc dumpdev=NO                # no crash dumps (they contain memory, i.e. pass
 
 ---
 
----
 
 <a id="topic-7"></a>
 ## 5. SSH
@@ -285,7 +279,6 @@ blacklistd blocks through pf, so it only works if `/etc/pf.conf` has the `anchor
 
 ---
 
----
 
 <a id="topic-8"></a>
 ## 6. Software and updates

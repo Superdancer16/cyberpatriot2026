@@ -13,8 +13,6 @@
 ---
 
 
----
-
 <a id="topic-1"></a>
 ## Existing documentation and reuse scope
 

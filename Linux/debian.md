@@ -37,7 +37,7 @@
 
 
 > [!NOTE]
-> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+> **📚 Evidence guide for CyberPatriot XVI–XIX:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the additional procedures below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
 
 ---
 
@@ -4055,7 +4055,6 @@ sudo journalctl -p err -n 30 --no-pager
 - [BiermanM historical security script themes](https://github.com/BiermanM/CyberPatriot-Scripts) — **concept reference only**, no scripts reproduced or run.
 
 **Content scope:** This is a consolidated reference and not a statement that every change earns a point. Where inherited historical instructions conflict with the current Debian package/version or a competition image's README, **inspect the installed implementation and prioritize the README**. The guide intentionally includes overlapping manual procedures so it remains independently usable.
-
 
 
 ---
