@@ -703,6 +703,184 @@ A service may start through a timer/socket even if its unit is disabled. Native 
 
 **Verification:** A new authorized user login, working sudo, required SSH/web/database/share client tests, correct firewall rules, and current score. Restore only the last proven breaking change.
 
+
+### Research report expansion D-R1 — Authorized users, UID 0, sudo and root recovery
+
+- [ ] Done
+
+**Evidence:** Community training categories and vendor-supported Linux administration. Debian is covered here as training material; the report does **not** establish it was a scored recent online-round image.
+
+**Why:** Extra human users, duplicate UID 0 accounts, unauthorized sudo rules and an unexpectedly usable root login can create privileged access. Debian may legitimately have **root with a password and no sudo**, depending on installation choices.
+
+**GUI:** On Debian GNOME (when installed): **Settings → Users → Unlock** for human accounts; system/service users and sudoers require Terminal. A server without GUI is normal.
+
+**Typing (check; sudo assumes working authorized privileges):**
+
+~~~bash
+getent passwd
+getent group sudo
+getent group adm
+awk -F: '$3 == 0 {print $1 " UID=" $3 " SHELL=" $7}' /etc/passwd
+sudo passwd -S root
+sudo grep -RnsE 'NOPASSWD|!authenticate|^[[:space:]]*%sudo' /etc/sudoers /etc/sudoers.d 2>/dev/null
+~~~
+
+If sudo is unavailable, switch to an authorized **su -** root console and omit the sudo prefix. A low UID with a nologin shell is often a required service account.
+
+**Typing (fix only after confirming an unauthorized identity):**
+
+~~~bash
+sudo usermod -L EXAMPLE_UNAUTHORIZED_USER
+sudo usermod -s /usr/sbin/nologin EXAMPLE_UNAUTHORIZED_USER
+~~~
+
+Locking the password does **not** necessarily block SSH keys, existing sessions or all authentication methods; investigate those separately. To remove a verified unauthorized sudo group grant:
+
+~~~bash
+sudo gpasswd -d EXAMPLE_UNAUTHORIZED_USER sudo
+~~~
+
+**Verification:**
+
+~~~bash
+id EXAMPLE_UNAUTHORIZED_USER
+getent group sudo
+sudo passwd -S EXAMPLE_UNAUTHORIZED_USER
+sudo visudo -c
+~~~
+
+**Undo:** Restore the user's actual previous shell (not blindly /bin/bash), group membership and original password lock state via **usermod -U** only if it was previously unlocked and the README requires it. Do not lock root until another admin/recovery path has been tested. Deleting a user with **userdel -r** may destroy forensic evidence and home data.
+
+### Research report expansion D-R2 — Password aging, PAM complexity and suspected PAM tampering
+
+- [ ] Done
+
+**Evidence:** Community/vendor-supported PAM and chage management; numeric training baselines are **examples only**.
+
+**Typing (check):**
+
+~~~bash
+grep -E '^PASS_(MAX_DAYS|MIN_DAYS|WARN_AGE)' /etc/login.defs
+sudo chage -l EXAMPLE_AUTHORIZED_USER
+sudo grep -nEv '^[[:space:]]*(#|$)' /etc/pam.d/common-password /etc/pam.d/common-auth
+dpkg -V libpam-runtime libpam-modules
+sudo grep -RnsE 'pam_exec|pam_permit|pam_debug|pam_pwquality|pam_pwhistory|pam_faillock' /etc/pam.d 2>/dev/null
+~~~
+
+**What to look for:** Wrong aging, duplicate PAM modules, unexpected pam_exec or pam_permit, or a changed packaged PAM file. **dpkg -V output isn't proof of malware**: package conffiles and permitted local policy may legitimately differ; compare with vendor files and README.
+
+**Before a PAM edit (from a working root/recovery console):**
+
+~~~bash
+sudo cp -a /etc/pam.d/common-auth /etc/pam.d/common-auth.before-cp
+sudo cp -a /etc/pam.d/common-password /etc/pam.d/common-password.before-cp
+~~~
+
+**Change (only when README explicitly requires, example 90 max / 1 min / 7 warning):**
+
+~~~bash
+sudo chage -M 90 -m 1 -W 7 EXAMPLE_AUTHORIZED_USER
+~~~
+
+For password quality/history, first check installed **libpam-pwquality**, **pam-auth-update** profiles and the exact Debian PAM stack. Edit the correct supported module/options with **sudo pam-auth-update** or careful editor inspection. **Never paste a generic complete PAM block or add arbitrary new control flags.**
+
+**Verification:**
+
+~~~bash
+sudo chage -l EXAMPLE_AUTHORIZED_USER
+sudo visudo -c
+~~~
+
+Also test an authorized ordinary user's actual password login, sudo, and password change in a **separate new session**, while retaining the admin/root console.
+
+**Undo:** Restore exact old chage settings and previously backed-up individual PAM files using the retained root/recovery session; test login before closing it. Do not replace /etc/passwd or /etc/shadow wholesale without a validated rescue plan.
+
+### Research report expansion D-R3 — Debian APT source integrity, security suites and unattended upgrades
+
+- [ ] Done
+
+**Evidence:** Debian vendor-backed; the report notes old codenames and community repository replacement advice are unreliable across releases.
+
+**Check installed release and ALL active .list/.sources entries:**
+
+~~~bash
+cat /etc/os-release
+apt-cache policy
+sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Components:|Signed-By:|Trusted:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+apt-mark showhold
+sudo dpkg --audit
+~~~
+
+**Debian release difference:** Debian 12 = bookworm / bookworm-security; Debian 13 = trixie / trixie-security. Use only suites for the **actual OS release** and required signed sources. Debian 11 has legacy support caveats; **do not upgrade the OS release during a competition without instructions**.
+
+**Backup before a specific change:** For an actual source file, copy that file to a unique private backup via **sudo cp -a SOURCE SOURCE.before-cp**, then use **sudo nano SOURCE**. Never add **Trusted: yes** or **[trusted=yes]** merely to stop signature errors.
+
+**Typing (check for update problems):**
+
+~~~bash
+sudo apt update
+apt -s upgrade
+systemctl status apt-daily-upgrade.timer --no-pager
+dpkg-query -W unattended-upgrades 2>/dev/null
+~~~
+
+**Change only when the README requires an enabled/working automatic security-update mechanism and it is absent:**
+
+~~~bash
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure unattended-upgrades
+~~~
+
+**Verification:** Inspect **/etc/apt/apt.conf.d/20auto-upgrades**, configured allowed origins, **apt-daily-upgrade.timer**, and **/var/log/unattended-upgrades/** where present. Run **sudo dpkg --audit** and inspect held packages. A timer can be inactive except while its task is running.
+
+**Undo:** Restore only the modified repository or APT configuration file(s) from backups; installed package downgrades are a separate operation. Do not delete dpkg lock files while another package manager is running.
+
+### Research report expansion D-R4 — nftables versus UFW, configuration validation and recovery
+
+- [ ] Done
+
+**Evidence:** Debian vendor-backed; Debian commonly uses nftables as the modern packet-filtering framework but does not guarantee a universal preinstalled firewall manager.
+
+**Typing (check):**
+
+~~~bash
+sudo ss -lntup
+sudo nft list ruleset
+systemctl status nftables --no-pager
+command -v ufw
+~~~
+
+If UFW is installed, separately:
+
+~~~bash
+sudo ufw status verbose
+sudo ufw status numbered
+~~~
+
+**What to check:** Is native nftables, UFW, firewalld or another manager controlling access? Which SSH/web/DNS/DHCP/database ports are README-required? Do not enable conflicting firewalls or apply deny-all before preserving remote-console access.
+
+**Before editing a native nftables configuration:** Identify its real unit/includes; the common default is **/etc/nftables.conf** but it may not be the active file. Preserve exact file:
+
+~~~bash
+sudo cp -a /etc/nftables.conf /etc/nftables.conf.before-cp
+~~~
+
+**Fix only when the required change is approved:** Use **sudo nano /etc/nftables.conf** and edit precisely the relevant chain/rule, then validate syntax **before** applying:
+
+~~~bash
+sudo nft -c -f /etc/nftables.conf
+~~~
+
+If syntax passes and an approved console/rollback path exists, apply only the reviewed ruleset:
+
+~~~bash
+sudo nft -f /etc/nftables.conf
+~~~
+
+**Verification:** Re-run **sudo nft list ruleset** and test every required client connection from an authorized separate host; a syntax pass cannot guarantee connectivity.
+
+**Undo:** Restore **the previously saved exact rules file** using local/recovery console, validate it, then reapply it. Avoid **nft flush ruleset** as a casual rollback; it removes filtering and is not a secure final state.
+
 ## Part 4 — Services, Software, Desktop and Persistence
 
 Check required services and suspicious programs, login configuration, SSH, filesystem privileges, sudo, timers, auditing and AppArmor.
@@ -1399,6 +1577,158 @@ apt-cache policy firefox-esr
 **Clicking:** In GNOME, open **Software** (if installed) for updates. In Firefox ESR, use **Help → About Firefox** to identify release. Match README-required browsers and add-ons rather than assuming every browser or extension is disallowed.
 
 **Fix, only when appropriate:** Update through signed Debian repositories and preserve package holds required by the image. Do not replace ESR with an arbitrary upstream binary or Snap solely because an Ubuntu example recommends it. Confirm required browser functionality and scores afterwards.
+
+
+### Research report expansion D-R5 — SSH root/empty-password access, validation and permitted logins
+
+- [ ] Done
+
+**Evidence:** Debian vendor-backed. An installed SSH server may be mandatory or disallowed depending on README.
+
+**Check exact effective configuration and overrides:**
+
+~~~bash
+dpkg-query -W openssh-server 2>/dev/null
+systemctl status ssh --no-pager
+sudo grep -RnsE '^[[:space:]]*(Include|Match|PermitRootLogin|PermitEmptyPasswords|PasswordAuthentication|X11Forwarding|MaxAuthTries)' /etc/ssh/sshd_config /etc/ssh/sshd_config.d 2>/dev/null
+sudo /usr/sbin/sshd -t
+sudo /usr/sbin/sshd -T | grep -Ei '^(permitrootlogin|permitemptypasswords|passwordauthentication|x11forwarding|maxauthtries)'
+~~~
+
+**Before fixing:** Retain console or existing admin session, identify approved auth method/SSH port and save the exact file. A generic defensible example when the README permits:
+
+~~~text
+PermitRootLogin no
+PermitEmptyPasswords no
+~~~
+
+These lines belong in the *appropriate* existing sshd config/supported include, not the shell. Avoid duplicate keys and inspect **Match** directives. Disabling X11Forwarding or reducing MaxAuthTries may break assigned tasks—do so only if required.
+
+**Typing (validate then controlled reload if the SSH service supports it):**
+
+~~~bash
+sudo /usr/sbin/sshd -t
+sudo systemctl reload ssh
+~~~
+
+**Verification:** Establish a **second authorized SSH login** using the permitted authentication while keeping the original session open; repeat **sshd -T** with the relevant Match criteria as needed. On a session using socket activation, inspect ssh.socket too.
+
+**Undo:** Restore the specific sshd config from backup, validate it, and reload from console. Do not block the only route to the VM.
+
+### Research report expansion D-R6 — Sensitive file modes, SUID/SGID and powerful groups
+
+- [ ] Done
+
+**Evidence:** Community practice categories; normal SUID files and powerful-group grants can also be legitimate.
+
+**Typing (read-only):**
+
+~~~bash
+stat -c '%A %a %U:%G %n' /etc/passwd /etc/group /etc/shadow /etc/gshadow /etc/sudoers
+sudo find /etc -xdev -type f -perm /0002 -ls 2>/dev/null
+sudo find /usr/local /opt -xdev -type f -perm /0002 -ls 2>/dev/null
+sudo find /usr/bin /usr/sbin /usr/local/bin -xdev -type f \( -perm /4000 -o -perm /2000 \) -ls 2>/dev/null
+~~~
+
+**Check privileged groups (each may or may not exist):**
+
+~~~bash
+getent group sudo
+getent group adm
+getent group docker
+getent group lxd
+getent group libvirt
+~~~
+
+**Why:** World-writable sensitive files and extra SUID bits can allow escalation; membership in docker/lxd/disk/shadow can grant significant access. Investigate service dependencies, owner and package before acting.
+
+**Fix only for an exact confirmed unauthorized grant:**
+
+~~~bash
+sudo gpasswd -d EXAMPLE_UNAUTHORIZED_USER docker
+~~~
+
+For an identified malicious SUID bit on a specific path, **after recording old mode and owner**, only if the file is confirmed unauthorized:
+
+~~~bash
+sudo chmod u-s /path/to/verified-file
+~~~
+
+**Verification:** Repeat **id USER**, stat and find on the specific path; test the affected required application. A normal packaged SUID executable (for example passwd) must not be altered blindly.
+
+**Undo:** Restore only the original verified group membership or permission mode. Do not indiscriminately **chmod -R**, **chown -R** or strip all SUID bits.
+
+### Research report expansion D-R7 — Cron, systemd, shell startup and hosts-file persistence
+
+- [ ] Done
+
+**Evidence:** Community/training practice; this is not an official disclosure of hidden scoring conditions.
+
+**Typing (check):**
+
+~~~bash
+sudo cat /etc/crontab
+sudo ls -la /etc/cron.d /etc/cron.daily /etc/cron.hourly
+sudo crontab -l
+systemctl list-timers --all
+systemctl list-unit-files --type=service --state=enabled
+sudo ss -lntup
+~~~
+
+Inspect exact suspicious jobs, including user-specific crontabs and startup files:
+
+~~~bash
+sudo grep -RnsE 'curl|wget|base64|bash -c|/tmp/' /etc/cron.d /etc/profile.d /etc/systemd/system 2>/dev/null
+cat /etc/hosts
+~~~
+
+**Interpretation:** These text patterns can occur in legitimate backups/update tasks, and **no match does not prove clean**. Review one discovered task/unit with **systemctl cat ACTUAL_UNIT**, owner, executable path, journal messages and package source. Never execute decoded or suspicious scripts to evaluate them.
+
+**Change:** Preserve the exact cron line/service unit and associated forensic answer; if confirmed unauthorized, disable a **single** unit via **sudo systemctl disable --now ACTUAL_UNIT** or comment only the malicious line in the correctly backed-up cron file. For hosts poisoning, edit only the confirmed malicious mapping, preserving README-required internal hostnames.
+
+**Verification:** Repeat cron/systemd/hosts inspection, check **getent hosts ACTUAL_HOSTNAME**, required service tests and the scoring report.
+
+**Undo:** Restore the original single unit enablement/cron line/hosts mapping; do not remove an entire user's crontab or replace /etc/hosts wholesale.
+
+### Research report expansion D-R8 — AppArmor, audit logs, required services and score-drop recovery
+
+- [ ] Done
+
+**Evidence:** Community/vendor-supported tooling; actual services and score feedback are scenario-dependent.
+
+**Typing (check):**
+
+~~~bash
+command -v aa-status
+sudo aa-status
+systemctl status apparmor auditd rsyslog systemd-journald --no-pager
+sudo journalctl -p warning -n 40 --no-pager
+sudo ss -lntup
+~~~
+
+A missing rsyslog, auditd or aa-status tool may reflect the installed image—not automatically an insecure system. Auditing needs storage and configured rules; do not deploy a giant rule set blindly.
+
+**Before stopping a suspect service:** Read README requirements and establish a working application-level check for Apache/Nginx/FTP/Samba/MySQL/PostgreSQL/DNS/DHCP/mail. Save the original unit state/config.
+
+**Fix only for a confirmed unneeded service, substitute actual unit name:**
+
+~~~bash
+sudo systemctl disable --now EXAMPLE_UNAUTHORIZED.service
+~~~
+
+**Verification:**
+
+~~~bash
+systemctl is-enabled EXAMPLE_UNAUTHORIZED.service
+systemctl is-active EXAMPLE_UNAUTHORIZED.service
+systemctl --failed
+~~~
+
+Check required web/database/file sharing/remote login from an approved client. A socket or timer may reactivate a service; investigate activation mechanisms rather than deleting packages automatically.
+
+**Undo:** Restore only the previous enabled/active unit state, using local console if remote access was lost. If points drop after a change, compare the last one change, restore the known-good value and refresh scoring; do not manipulate scoring files.
+
+**References:** [Debian security documentation](https://www.debian.org/security/), [Debian Reference](https://www.debian.org/doc/manuals/debian-reference/), [Debian nftables](https://wiki.debian.org/nftables), [Debian PAM](https://wiki.debian.org/PAM).
 
 ## Part 5 — Advanced Kernel, Critical Services and Recovery
 
