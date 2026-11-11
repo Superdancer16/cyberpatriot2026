@@ -282,6 +282,10 @@ Review identities/sudo, password policy, firewall and updates before the longer 
 
 **↩️ Undo:** Restore the exact original account-expiry value noted from `chage -l` and verify login status. Do not erase home directories before forensics.
 
+- [ ] **🎯 Remove a confirmed unauthorized account (if removal is required):** Check the exact username against the image README, record `id EXAMPLE_USER`, preserve required files, then `sudo deluser EXAMPLE_USER` (removes the account, not automatically the home directory). If the image calls for **removal**, account expiration alone may not satisfy it.
+  - **✅ Verify:** `id EXAMPLE_USER` reports no such user; confirm an authorized administrator still logs in. **⚠️** Never delete `root`, a required service account or a user's home directory without explicit authorization.
+
+
 #### 2.3 Create users the README says should exist
 - [ ] **🎯 DO THIS — 2.3 Create users the README says should exist**
 
@@ -316,6 +320,10 @@ Review identities/sudo, password policy, firewall and updates before the longer 
 
 - **Remove unauthorized sudo:** `getent group sudo` → `sudo gpasswd -d EXAMPLE_USER sudo` only for a README-confirmed nonadmin. Verify with `id EXAMPLE_USER`; inspect `/etc/sudoers.d` for other grants. **Undo:** Re-add only the original authorized memberships with `sudo usermod -aG sudo EXAMPLE_USER`.
 - **Required custom group membership:** `sudo adduser EXAMPLE_USER EXAMPLE_GROUP` only if requested. Verify `id EXAMPLE_USER` and `getent group EXAMPLE_GROUP`; remove mistaken membership with `sudo gpasswd -d EXAMPLE_USER EXAMPLE_GROUP`.
+
+- [ ] **🎯 Remove an unauthorized administrator membership:** Inspect `id EXAMPLE_USER` and `getent group sudo`, then use `sudo gpasswd -d EXAMPLE_USER sudo` only for someone who should remain a **standard user**.
+  - **✅ Verify:** `id EXAMPLE_USER` no longer includes `sudo`. **↩️ Undo:** `sudo adduser EXAMPLE_USER sudo` only if this was an authorized original membership; inspect any separate sudoers grants.
+
 
 #### 2.5 Look for hidden root accounts and hidden users
 - [ ] **🎯 DO THIS — 2.5 Look for hidden root accounts and hidden users**
@@ -375,6 +383,10 @@ sudo gpasswd -d carol shadow
 
 - **Password verification:** Set authorized passwords interactively (`sudo passwd EXAMPLE_USER`) and test a fresh authorized login. Never store plaintext credentials or reset a daemon/service account blindly.
 
+- [ ] **🎯 Replace a confirmed weak authorized-user password:** `sudo passwd EXAMPLE_USER` → enter a strong README-compliant password **interactively** → confirm it. 
+  - **✅ Verify:** `passwd: password updated successfully`, then a permitted fresh login works; do not print passwords in documentation or shell history.
+
+
 #### 2.8 Debian root account: verify recovery **before** changing it
 - [ ] **🎯 DO THIS — 2.8 Debian root account: verify recovery **before** changing it**
 
@@ -431,6 +443,13 @@ sudo passwd -S -a
 
 ---
 
+#### 2.11 Add a required user to a required group
+- [ ] **🎯 ADD A GROUP MEMBER — Terminal:** Confirm `getent passwd EXAMPLE_USER` and `getent group EXAMPLE_GROUP`; then enter **`sudo adduser EXAMPLE_USER EXAMPLE_GROUP`** using the **exact** username and group listed in the image README. If the group is required but absent, create it first with `sudo addgroup EXAMPLE_GROUP`.
+- **✅ Verify:** `id EXAMPLE_USER` and `getent group EXAMPLE_GROUP` show the required member. Existing login sessions may need to be reopened before new group membership takes effect.
+- **↩️ Undo:** `sudo gpasswd -d EXAMPLE_USER EXAMPLE_GROUP` removes a mistakenly added member; don't delete the entire group if required elsewhere.
+> [!NOTE]
+> **ℹ️ Example:** `sudo adduser bselmy queensguard` adds one member to an *existing* group. It does not create a new group and does not replace the separate verification step. Use the names from your current image.
+
 ### 3. Password and lockout policy
 
 #### 3.1 Password aging defaults for **new** accounts
@@ -453,17 +472,21 @@ sudo cp -a /etc/login.defs /etc/login.defs.before-cp
 sudo nano /etc/login.defs
 ```
 
-If the README specifies 90 maximum days, 1 minimum day, and 14 days warning, set **those exact values**, not every example you find online:
+For example, **only if the README specifies** 90 maximum days, 7 minimum days and 14 warning days, set those exact values (different images require different settings):
 
 ```text
 PASS_MAX_DAYS  90
-PASS_MIN_DAYS  1
+PASS_MIN_DAYS  7
 PASS_WARN_AGE  14
 ```
 
 **Check/undo:** Repeat grep and `chage`; to restore, copy back the recorded `login.defs` backup. The defaults do not automatically change existing users.
 
 - **Default minimum password age:** Back up `/etc/login.defs` and set `PASS_MIN_DAYS` only to the required value. This affects *new* accounts; inspect and adjust existing ones separately with `chage -l` and `chage -m`.
+
+- [ ] **🎯 Set the required default minimum password age:** `sudo cp -a /etc/login.defs /etc/login.defs.before-cp` → `sudo nano /etc/login.defs` → set **`PASS_MIN_DAYS 7` only if the current image requires 7** → Ctrl+O, Enter, Ctrl+X.
+  - **✅ Verify:** `grep '^PASS_MIN_DAYS' /etc/login.defs`; existing accounts require separate `chage` changes. **↩️ Undo:** Restore the saved original file/value.
+
 
 #### 3.2 Apply aging to the users who already exist
 - [ ] **🎯 DO THIS — 3.2 Apply aging to the users who already exist**
@@ -511,6 +534,10 @@ It should look like: `password requisite pam_pwquality.so retry=3 ...`. You can 
 
 - **Minimum password length:** Use the installed `libpam-pwquality`/`pam_pwquality.so` configuration, not a copied PAM stack. Back up `/etc/pam.d/common-password`, verify module placement and test a noncritical password change before closing admin access.
 
+- [ ] **🎯 Require minimum password length:** `sudo apt update`; install **`libpam-pwquality` only if needed** (`sudo apt install libpam-pwquality`). Back up `/etc/pam.d/common-password`; in `sudo nano /etc/pam.d/common-password`, edit the **existing** `pam_pwquality.so` line to include **`minlen=12` when required** (do not add a duplicate PAM entry).
+  - **✅ Verify:** `grep -n 'pam_pwquality.so' /etc/pam.d/common-password`; test a normal password change on a safe noncritical authorized account. **↩️ Undo:** Restore the original PAM file if authentication breaks.
+
+
 #### 3.4 Password history (no re-using old passwords)
 - [ ] **🎯 DO THIS — 3.4 Password history (no re-using old passwords)**
 
@@ -535,6 +562,10 @@ grep nullok /etc/pam.d/common-auth
 
 - **Empty-password prevention:** Inspect `pam_unix.so` in `/etc/pam.d/common-auth`; if unauthorized, back up the file and remove `nullok` without altering unrelated PAM ordering. Verify ordinary login and `sudo` still work.
 
+- [ ] **🎯 Reject empty-password logins:** `sudo cp -a /etc/pam.d/common-auth /etc/pam.d/common-auth.before-cp` → `sudo nano /etc/pam.d/common-auth` → remove only the unauthorized **`nullok`** option from the relevant existing `pam_unix.so` line.
+  - **✅ Verify:** `grep -n pam_unix.so /etc/pam.d/common-auth` and an authorized fresh login/`sudo` still work. Keep console recovery while changing PAM.
+
+
 #### 3.6 Account lockout after failed logins (careful!)
 - [ ] **🎯 DO THIS — 3.6 Account lockout after failed logins (careful!)**
 
@@ -549,6 +580,10 @@ Use [17.2's complete PAM backup, module discovery, lockout verification and reco
 ---
 
 - **Failed-login lockout:** Check installed `pam_faillock` and `pam-auth-update` profiles before changes (`grep -Rns pam_faillock /etc/pam.d /usr/share/pam-configs`). Preserve recovery access, validate supported configuration, and test a legitimate login before exiting.
+
+- [ ] **🎯 Configure failed-login lockout where required:** Check installed PAM integration first: `sudo grep -Rns 'pam_faillock' /etc/pam.d /usr/share/pam-configs 2>/dev/null`. If a compatible `pam-auth-update` profile is available, review its `preauth`, `authfail` and `authsucc` entries and select it using `sudo pam-auth-update`, then configure the required lockout threshold according to the installed Debian release.
+  - **✅ Verify:** Test a successful fresh login and `sudo` **before closing the original admin console**; check `faillock` state if installed. **⚠️** Do not blindly paste partial PAM profiles or an example's priority/control flags: incorrect order can lock out everyone. Keep exact backups for rollback.
+
 
 #### 3.7 Debian PAM safe modification protocol and account-lockout checks
 - [ ] **🎯 DO THIS — 3.7 Debian PAM safe modification protocol and account-lockout checks**
@@ -609,6 +644,10 @@ Prefer clicking? `sudo apt install gufw`, then open **Firewall Configuration**.
 ---
 
 - **Required firewall:** Identify whether UFW or nftables already manages rules; allow README-required SSH/web/DB ports *before* enabling a deny-by-default policy. Verify `sudo ufw status verbose` when UFW is used, plus a second-client connection. Undo by restoring the saved rule set.
+
+- [ ] **🎯 Enable UFW where the image calls for it:** Check whether another firewall (e.g. nftables) is already managing rules; if UFW is required but absent, `sudo apt update && sudo apt install ufw`. Allow every README-required inbound service (especially SSH) **before** `sudo ufw enable`.
+  - **✅ Verify:** `sudo ufw status verbose` reports active and shows permitted required ports; test a second client's connection. **↩️ Undo:** Restore the prior firewall ownership/rules if connectivity or required services break.
+
 
 #### 4.2 Define rules by required service, **not** by a universal port list
 - [ ] **🎯 DO THIS — 4.2 Define rules by required service, **not** by a universal port list**
@@ -680,6 +719,10 @@ For Debian 12 will normally use **`deb.debian.org/debian`** with **`bookworm`** 
 - Unrecognized third-party repos and `[trusted=yes]`/`Trusted: yes` bypasses warrant investigation; do not remove required signed vendor sources before verifying them.
 - A **`deb cdrom:`** line makes `apt update` fail or ask for the install disc. Put a `#` in front of it (`sudo nano /etc/apt/sources.list`).
 
+- [ ] **🎯 Restore valid security repositories before updating:** Identify your exact Debian release with `cat /etc/os-release`, inspect both `/etc/apt/sources.list` and any deb822 `*.sources` files. Debian 12 examples use the `bookworm`, `bookworm-updates` and `bookworm-security` suites, **not a universal repo list**. Preserve existing trusted entries; fix only wrong/missing sources.
+  - **✅ Verify:** `sudo apt update` completes without missing repositories/signature errors. **⚠️** Never replace a Debian 13 or other release's sources with Debian 12 examples.
+
+
 #### 5.2 Install all updates
 - [ ] **🎯 DO THIS — 5.2 Install all updates**
 
@@ -689,6 +732,10 @@ apt -s upgrade  # preview package changes first
 sudo apt upgrade  # review the proposed changes before confirming
 ```
 (GNOME's **Software** app also shows updates.)
+
+- [ ] **🎯 Install required security/application updates:** `sudo apt update` → review pending packages → `sudo apt upgrade` (read prompts and keep required custom configurations when appropriate). Include **Chromium** and **OpenSSH** packages *when installed and required*, using the image's approved repositories.
+  - **✅ Verify:** `apt list --upgradable`, `dpkg-query -W chromium openssh-server 2>/dev/null`, browser version and a fresh authorized SSH login. **⚠️** Do not remove the README-required browser or overwrite the SSH daemon's working configuration blindly.
+
 
 #### 5.3 Turn on automatic updates
 - [ ] **🎯 DO THIS — 5.3 Turn on automatic updates**
@@ -701,6 +748,10 @@ cat /etc/apt/apt.conf.d/20auto-upgrades
 **✅ Check it worked:** the file has `APT::Periodic::Update-Package-Lists "1";` and `APT::Periodic::Unattended-Upgrade "1";` (inspect other APT periodic directives too).
 
 - **Daily refresh:** When automatic updates are required, confirm the installed `apt-daily.timer` and unattended-upgrade configuration rather than assuming all Debian releases use the same unit names.
+
+- [ ] **🎯 Enable daily package-list refresh:** Open **`sudo nano /etc/apt/apt.conf.d/20auto-upgrades`**, then ensure `APT::Periodic::Update-Package-Lists "1";` exists when daily refresh is required. Preserve any existing approved unattended-upgrade entries.
+  - **✅ Verify:** `grep -R 'Update-Package-Lists' /etc/apt/apt.conf.d/`; confirm the relevant APT timers and update mechanism work.
+
 
 #### 5.4 Held packages
 - [ ] **🎯 DO THIS — 5.4 Held packages**
@@ -1059,6 +1110,10 @@ sudo apt purge vsftpd                      # remove it completely (if the README
 
 - **Web/FTP role check:** Disable `apache2` or `vsftpd` only if each is **not** required by the image README. Record original enable/start status, stop/disable just the unneeded service, confirm ports with `ss -lntup`, and restore with `sudo systemctl enable --now SERVICE` if mistakenly changed.
 
+- [ ] **🎯 Disable unneeded Apache2:** Confirm no README-required web application uses it; record `systemctl is-enabled apache2` and `systemctl is-active apache2` → `sudo systemctl disable --now apache2`. **✅ Verify:** `systemctl is-enabled apache2` / `systemctl is-active apache2` and required sites still work. **↩️ Undo:** Restore the original enabled/running state.
+- [ ] **🎯 Disable unneeded FTP (vsftpd):** Confirm FTP is *not* a critical service; record its original status → `sudo systemctl disable --now vsftpd`. **✅ Verify:** Stopped/disabled and required access unaffected. **↩️ Undo:** Restore the original state with `systemctl enable --now vsftpd` only if it was enabled and running previously.
+
+
 #### 6.3 Make sure the critical services are running
 - [ ] **🎯 DO THIS — 6.3 Make sure the critical services are running**
 
@@ -1132,6 +1187,10 @@ sudo apt purge example-package
 
 - **Software examples:** Games and diagnostic utilities are candidates for inspection, not automatic removal. Confirm package identity and README prohibition before uninstalling; verify no required browser/service is lost.
 
+- [ ] **🎯 Remove a specifically prohibited packet analyzer (Wireshark example):** Check `dpkg -l | grep -i wireshark`, confirm it is not required, then `sudo apt purge wireshark` (and only separately identified related packages if prohibited).
+  - **✅ Verify:** `dpkg-query -W wireshark 2>/dev/null` no longer reports an installed package. **⚠️** Do not blindly purge every wildcard match or remove a required troubleshooting tool.
+
+
 #### 7.2 Games
 - [ ] **🎯 DO THIS — 7.2 Games**
 
@@ -1139,6 +1198,10 @@ sudo apt purge example-package
 dpkg -l | grep -Ei 'aisleriot|gnome-mines|gnome-sudoku|mahjongg|minetest|supertux|freeciv|0ad|wesnoth|bsdgames|steam'
 # Review installed package and dependencies first; do not mass-purge: sudo apt purge aisleriot gnome-mines
 ```
+
+- [ ] **🎯 Remove an explicitly prohibited game (AisleRiot example):** Verify `dpkg-query -W aisleriot`, then **`sudo apt purge aisleriot`** only if the image prohibits it.
+  - **✅ Verify:** The package is absent and required desktop components still run; do not treat every game package as a universal vulnerability.
+
 
 #### 7.3 File-sharing and remote-access programs
 - [ ] **🎯 DO THIS — 7.3 File-sharing and remote-access programs**
@@ -1164,6 +1227,10 @@ sudo rm "/home/bob/Music/song.mp3"
 > Check the forensics questions first. A question might ask about one of these files.
 
 - **Media cleanup:** Identify exact prohibited media paths first; answer any related forensic question and preserve evidence before removal. Verify only intended files were removed.
+
+- [ ] **🎯 Remove specifically prohibited MP3s:** Use `find /home -type f -iname '*.mp3' -print 2>/dev/null` to locate actual files; inspect names/paths and README restrictions; delete only the identified prohibited files (not a blanket `rm *.mp3` in an unknown directory).
+  - **✅ Verify:** Repeat the focused search and confirm the correct files are gone while permitted files remain.
+
 
 #### 7.5 Other files that break policy
 - [ ] **🎯 DO THIS — 7.5 Other files that break policy**
@@ -1328,6 +1395,10 @@ If `sshd -t` says **Missing privilege separation directory: /run/sshd**, SSH is 
 
 - **SSH root and upgrades:** Inspect effective `sshd -T` output for `permitrootlogin`, validate config with `sudo sshd -t` and maintain a second working SSH session before applying changes. Update OpenSSH through approved APT packages; retain required settings, users and ports.
 
+- [ ] **🎯 Disable direct SSH root login while keeping SSH working:** If OpenSSH is required, `sudo cp -a /etc/ssh/sshd_config /etc/ssh/sshd_config.before-cp` → `sudo nano /etc/ssh/sshd_config` → set **`PermitRootLogin no`** in the appropriate effective configuration.
+  - **✅ Verify:** `sudo sshd -t` passes → reload the *actual* SSH unit → `sudo sshd -T | grep permitrootlogin` shows `no`; test a second authorized **nonroot** SSH login before closing the original session. **↩️ Undo:** Restore the saved configuration and validate/reload if required.
+
+
 #### 9.3 Check for override files
 - [ ] **🎯 DO THIS — 9.3 Check for override files**
 
@@ -1382,6 +1453,10 @@ sudo chown root:shadow /etc/shadow /etc/gshadow
 **✅ Check it worked:** run the `ls -l` line again: `passwd` and `group` show `-rw-r--r-- root root`, `shadow` and `gshadow` show `-rw-r----- root shadow`.
 
 - **`/etc/shadow` permissions:** Check `stat -c '%a %U:%G %n' /etc/shadow` and the distribution's expected owner/group/mode. Correct only a confirmed exposure; verify readable only by authorized principals. Record the original mode/group for rollback.
+
+- [ ] **🎯 Repair exposed `/etc/shadow` permissions:** `stat -c '%a %U:%G %n' /etc/shadow` → if world-readable or otherwise incorrectly exposed, use **`sudo chmod 640 /etc/shadow`** only where that mode matches this image's expected owner/group; Debian installations may use a different secure mode.
+  - **✅ Verify:** `ls -l /etc/shadow` has no permissions for **other** users, and the installed authentication stack still works. **↩️ Undo:** Restore recorded original secure mode/ownership, not a guess.
+
 
 #### 11.2 SUID programs (run as root for anyone)
 - [ ] **🎯 DO THIS — 11.2 SUID programs (run as root for anyone)**
@@ -1492,6 +1567,11 @@ Red flags: `nc`, `ncat`, `bash -i`, `/dev/tcp/`, `curl ... | bash`, `wget`, `bas
 **🛠️ Fix:** `sudo crontab -e -u bob` (delete the line), or `sudo rm /etc/cron.d/badfile`.
 
 - **Suspicious scheduled jobs:** Examine user and root crontabs, `/etc/cron.*` and systemd timers for unexplained `nc`/`netcat` listeners or downloaded commands. Preserve the file and command as evidence before disabling a confirmed unauthorized entry; verify that it no longer starts.
+
+- [ ] **🎯 Investigate netcat persistence:** `sudo crontab -l`, inspect user crontabs and `systemctl list-timers --all`; look for unexpected netcat invocations such as `nc.traditional` opening a shell. Record the exact entry, PID, process path and original file metadata.
+  - **🛠️ Fix (only after confirmation):** Edit the affected crontab with `sudo crontab -e` (or correct user crontab) to remove the malicious entry; stop its confirmed process PID, then isolate the malicious executable if it is **not** an OS-required binary.
+  - **✅ Verify:** The unexpected listener/persistence is gone. **⚠️** Do not copy another image's PID or delete `/usr/bin/nc.traditional` solely because its filename exists.
+
 
 #### 13.2 Services that start a backdoor at boot
 - [ ] **🎯 DO THIS — 13.2 Services that start a backdoor at boot**
@@ -1739,6 +1819,10 @@ Then open **≡ → Add-ons and themes → Extensions** and remove any you don't
 
 - **Required Chromium:** If the image requires Chromium, preserve its install path and profile; upgrade only with the correct Debian-provided package or approved source. Confirm the application still launches before removing other packages.
 
+- [ ] **🎯 Preserve required Chromium:** Check `dpkg-query -W chromium` or the installed equivalent, verify the approved browser starts, and update using the correct Debian package. **Never purge Chromium when the README requires it.**
+  - **✅ Verify:** Chromium still launches after updating and remains the required default browser, if specified.
+
+
 ### 🔐 SSH root/empty-password access, validation and permitted logins
 
 - [ ] **🎯 DO THIS — 🔐 SSH root/empty-password access, validation and permitted logins**
@@ -1950,6 +2034,11 @@ sudo sysctl -p
 **🔎 Check:** `sysctl kernel.randomize_va_space` prints `= 2`. Also look for files in `/etc/sysctl.d/` that set the opposite (for example `ip_forward=1`): `grep -r . /etc/sysctl.d/`
 
 - **TCP SYN cookies:** Read `sysctl net.ipv4.tcp_syncookies`; enable only when required in a supported sysctl drop-in, confirm the effective value is `1`, and keep existing network access.
+
+- [ ] **🎯 Enable IPv4 TCP SYN cookies where required:** `sysctl net.ipv4.tcp_syncookies`; back up its effective config file and set **`net.ipv4.tcp_syncookies=1`**, then `sudo sysctl --system`. **✅ Verify:** `sysctl net.ipv4.tcp_syncookies` shows `1`.
+- [ ] **🎯 Disable IPv4 forwarding only on a nonrouter:** Check role/VPN/containers first with `sysctl net.ipv4.ip_forward`. If routing is not required and the image calls for it, persist **`net.ipv4.ip_forward=0`** in the appropriate `/etc/sysctl.conf` or `/etc/sysctl.d/` file → `sudo sysctl --system`.
+  - **✅ Verify:** `sysctl net.ipv4.ip_forward` shows `0` and required networking still works. **↩️ Undo:** Restore recorded original sysctl settings, then reapply.
+
 
 #### 10.2 Turn off core dumps
 - [ ] **🎯 DO THIS — 10.2 Turn off core dumps**

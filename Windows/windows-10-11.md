@@ -180,6 +180,10 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 
 **✅ Verify / undo:** Reopen the account to confirm it is disabled; verify another authorized administrator can sign in and record its previous state for restoration.
 
+- [ ] **🎯 Remove a confirmed unauthorized local user (when the task requires removal):** Open **Win + R → `lusrmgr.msc` → Users**; identify the exact user from the README; preserve evidence; right-click → **Delete → Yes** only when explicitly required. Disabling is reversible, but **does not complete a task requiring removal**.
+  - **✅ Verify:** User is absent from Users / `Get-LocalUser`; authorized admins still sign in. **↩️ Undo:** Account deletion is not equivalent to re-enabling; recovery requires an approved backup, and a re-created user gets a new SID.
+
+
 #### 2.3 Create users the README says should exist
 - [ ] **🎯 DO THIS — 2.3 Create users the README says should exist**
 
@@ -215,6 +219,10 @@ Accounts, password rules, Defender, firewall, updates and audit settings are fre
 > Never remove **yourself** (the account you are logged in as) from Administrators. You would lose your admin rights.
 
 - **Extra check:** A README-listed user who must remain active but not be an admin should be changed to **Standard User** (or removed from the Administrators group), not deleted. Reopen group membership to verify.
+
+- [ ] **🎯 Demote an authorized standard user:** **Settings → Accounts → Other users → select user → Change account type → Standard User → OK**, or open `lusrmgr.msc` → Groups → Administrators and remove that one user.
+  - **✅ Verify:** User still exists and can log in, but is **not** an administrator. **↩️ Undo:** Restore only their original authorized group membership.
+
 
 #### 2.5 Check the other powerful groups
 - [ ] **🎯 DO THIS — 2.5 Check the other powerful groups**
@@ -278,6 +286,16 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 
 - **Password verification:** After **Set Password**, confirm a permitted fresh login from another authorized session; never post credentials or reset unknown service-account passwords.
 
+#### 2.9 Create a required custom local group
+- [ ] **🎯 CREATE THE GROUP — GUI:** **Win + R → `lusrmgr.msc` → Groups → Action → New Group…** → type the **exact group name** from the image README → **Create → Close**. Do not create a group unless the image calls for one.
+- **✅ Verify:** The group appears under **Groups** with the exact spelling. **↩️ Undo:** Delete only a mistakenly created empty group after checking that no required permissions depend on it.
+
+#### 2.10 Add the specified users to the required group
+- [ ] **🎯 ADD GROUP MEMBERS — GUI:** **`lusrmgr.msc` → Groups → double-click the required group → Add…** → type each README-specified username, separated by semicolons if entering multiple → **Check Names → OK → Apply → OK**.
+- **✅ Verify:** Reopen the group and compare its **Members** list against the README **one user at a time**. **↩️ Undo:** Remove only an accidentally added member, not the group or unrelated accounts.
+> [!NOTE]
+> **ℹ️ Example:** If the README specifies group `SpiderVerse` and members `esther;wyatt;turner;tina`, **create** that group and then **add** those four members as separate checked tasks. Names and memberships always come from the active README.
+
 ### 3. Account policies (passwords and lockout)
 
 #### 3.1 Password Policy
@@ -285,7 +303,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 
 | Setting | Set to |
 |---|---|
-| Enforce password history | **24** passwords remembered |
+| Enforce password history | **Image-required count** (e.g. 5; 24 is one general benchmark) |
 | Maximum password age | **90** days (or what the README says) |
 | Minimum password age | **1** day |
 | Minimum password length | **12** characters |
@@ -294,7 +312,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
 ```powershell
-net accounts /uniquepw:24 /maxpwage:90 /minpwage:1 /minpwlen:12
+net accounts  # inspect current policy; use secpol.msc for the exact README-required values
 ```
 
 **⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
@@ -308,6 +326,11 @@ secedit /export /cfg $env:TEMP\check.inf /areas SECURITYPOLICY; Select-String 'P
 **✅ Check it worked:** `net accounts` shows the numbers, and the last line above shows `PasswordComplexity = 1` and `ClearTextPassword = 0`.
 
 - **Check related policy fields together:** `secpol.msc` → **Account Policies → Password Policy** → **Enforce password history** and **Password must meet complexity requirements**. Use scenario-required settings, then reopen the policies; domain Group Policy can override local values.
+
+- [ ] **🎯 Password history:** **Win + R → `secpol.msc` → Account Policies → Password Policy → Enforce password history** → use the **image-required** number → Apply → OK.
+- [ ] **🎯 Password complexity:** In the same Password Policy screen, open **Password must meet complexity requirements → Enabled → Apply → OK**, if required.
+  - **✅ Verify:** Reopen both fields and confirm their *effective* policy. **ℹ️ Example:** A scenario may call for **5 remembered passwords**, even if this guide lists a stronger general baseline. The README/scoring requirement overrides generic sample numbers.
+
 
 #### 3.2 Account Lockout Policy
 - [ ] **🎯 DO THIS — 3.2 Account Lockout Policy**
@@ -330,6 +353,10 @@ net accounts                     # check everything
 ---
 
 - **Lockout check:** In `secpol.msc` → **Account Lockout Policy**, verify threshold, lockout duration, and reset-counter window together. Record previous values and preserve a working admin login.
+
+- [ ] **🎯 Lockout threshold:** **`secpol.msc` → Account Policies → Account Lockout Policy → Account lockout threshold** → enter the exact required number (for example, **5**) → OK. Review duration and counter reset.
+  - **✅ Verify:** Reopen the threshold and confirm the value. **⚠️** Keep an alternate admin login; never deliberately lock out the only administrator.
+
 
 ### 5. Microsoft Defender antivirus
 
@@ -406,6 +433,10 @@ Get-MpThreatDetection           # anything found
 
 - **Verification:** Confirm Domain, Private and Public firewall profiles are enabled where required; test README-required network connections before declaring success.
 
+- [ ] **🎯 Enable all required firewall profiles:** **Windows Security → Firewall & network protection** → inspect **Domain**, **Private**, **Public** individually; turn on the profiles required by the image.
+  - **✅ Verify:** Each applicable profile reports **On**, and required network/remote services still connect.
+
+
 #### 6.2 Check the inbound rules
 - [ ] **🎯 DO THIS — 6.2 Check the inbound rules**
 
@@ -449,6 +480,10 @@ Get-MpThreatDetection           # anything found
 
 - **Automatic updates:** Set an approved automatic-update policy and confirm effective status after `gpupdate` or restart as appropriate; avoid interrupting required applications.
 
+- [ ] **🎯 Automatic Windows updates:** **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → Windows Update → Manage end user experience → Configure Automatic Updates → Enabled → Apply → OK** (path varies by build).
+  - **✅ Verify:** Reopen policy and inspect Windows Update status; preserve any required update/reboot restrictions.
+
+
 #### 7.3 Update the other programs
 - [ ] **🎯 DO THIS — 7.3 Update the other programs**
 
@@ -457,6 +492,10 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 ---
 
 - **Third-party apps:** Update required software in place from its trusted publisher; verify version, launch and required installation path. Do not uninstall, move or replace a README-required app.
+
+- [ ] **🎯 Update a required application (Notepad++ example):** Launch the installed application → **? → About Notepad++**, check publisher's official release → download matching installer from the official Notepad++ site → close the app → run installer using the **existing default installation path**, then reopen it.
+  - **✅ Verify:** **Help/About** shows an approved current version, the application launches, and it remains in the correct location. **⚠️** A required application may incur penalties if moved, removed or installed outside its expected directory; don't blindly use an example version number.
+
 
 ### 4. Local policies
 
@@ -478,6 +517,10 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 > Also: **Security Options → Audit: Force audit policy subcategory settings… to override audit policy category settings → Enabled**.
 
 - **Credential Validation audit:** `secpol.msc` → **Advanced Audit Policy Configuration → Account Logon → Audit Credential Validation**. Set the required Success/Failure choices and verify `auditpol /get /subcategory:"Credential Validation"`.
+
+- [ ] **🎯 Audit Credential Validation (Success):** **`secpol.msc` → Advanced Audit Policy Configuration → System Audit Policies → Account Logon → Audit Credential Validation** → check **Configure the following audit events** and **Success**, if required → Apply → OK.
+  - **✅ Verify:** `auditpol /get /subcategory:"Credential Validation"` shows the required effective Success/Failure settings; domain GPO may override local policy.
+
 
 #### 4.2 User Rights Assignment
 - [ ] **🎯 DO THIS — 4.2 User Rights Assignment**
@@ -521,6 +564,11 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 > Don't remove **LOCAL SERVICE**, **NETWORK SERVICE**, **SERVICE** or entries that start with `NT SERVICE\`: Windows needs them.
 
 - **Two additional rights to review:** **Manage auditing and security log** and **Take ownership of files or other objects**. Remove only confirmed unauthorized principals; re-open each policy and preserve required Administrators/security identities.
+
+- [ ] **🎯 Remove an unauthorized auditing privilege:** **`secpol.msc` → Local Policies → User Rights Assignment → Manage auditing and security log** → select only the unauthorized user → **Remove → Apply → OK**.
+- [ ] **🎯 Remove an unauthorized ownership privilege:** Same User Rights Assignment screen → **Take ownership of files or other objects** → remove only the unauthorized user → Apply → OK.
+  - **✅ Verify:** Reopen each right and confirm authorized security/admin groups remain. **↩️ Undo:** Restore only the principal you removed, based on the original list.
+
 
 #### 4.3 Security Options
 - [ ] **🎯 DO THIS — 4.3 Security Options**
@@ -573,6 +621,11 @@ Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0 | Format-List
 ```
 
 - **Related security options:** Review **Accounts: Limit local account use of blank passwords to console logon only**, **Interactive logon: Don't display last signed-in**, and **UAC: Enumerate administrator accounts on elevation**. Apply only the required value and confirm the effective policy.
+
+- [ ] **🎯 Restrict blank-password network use:** **`secpol.msc` → Local Policies → Security Options → Accounts: Limit local account use of blank passwords to console logon only → Enabled → Apply → OK**.
+- [ ] **🎯 Hide last signed-in account:** In Security Options → **Interactive logon: Don't display last signed-in → Enabled → Apply → OK**.
+  - **✅ Verify:** Both policy entries show the requested values; confirm legitimate interactive login still works.
+
 
 #### 4.4 PowerShell logging
 - [ ] **🎯 DO THIS — 4.4 PowerShell logging**
@@ -882,6 +935,10 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStat
 
 - **RDP decision:** Turn Remote Desktop off only when not required; if required, limit authorized users and verify a legitimate remote login instead of disabling the service.
 
+- [ ] **🎯 Disable Remote Desktop connections only when unneeded:** **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → Remote Desktop Services → Remote Desktop Session Host → Connections → Allow users to connect remotely by using Remote Desktop Services → Disabled → Apply → OK**.
+  - **✅ Verify:** Remote access is disabled when not required. **⚠️** If RDP is a critical service or this is your only session, preserve it and secure authorized users/NLA instead.
+
+
 ### 11. Shared folders
 
 #### 11.1 Remove shares that aren't needed
@@ -905,6 +962,10 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStat
 
 - **Share forensics and cleanup:** Open `fsmgmt.msc` → **Shares** to record the exact name/path for a forensic answer. Remove only an unauthorized *custom* share; administrative (`$`) shares may be normal. Recheck both share list and required access.
 
+- [ ] **🎯 Stop an unauthorized custom or hidden share:** **Win + R → `fsmgmt.msc` → Shares → right-click the confirmed unauthorized custom share (for example, `USERS$`) → Stop Sharing → Yes**.
+  - **✅ Verify:** The share is absent and all README-required shares still function. **↩️ Undo:** Recreate the original share only if mistaken, with its recorded path and permissions. Do **not** remove standard administrative/system shares simply because they end in `$`.
+
+
 ### 12. Prohibited software
 
 #### 12.1 Uninstall hacking tools, games, torrent and remote-control programs
@@ -927,6 +988,13 @@ Look for:
 > ```
 
 - **Examples to investigate (not blanket removals):** Prohibited game bundles, disk-usage tools and packet analyzers. Match the README and installed version; uninstall through **Settings → Installed apps** only after confirming they are not required. Verify they are gone.
+
+**Specific software checks (only when the image prohibits the application):**
+- [ ] **🎯 Uninstall prohibited game bundles (e.g., WildTangent Games):** **Settings → Apps → Installed apps** or **Win + R → `appwiz.cpl`** → select package → **Uninstall**; follow the vendor's prompts.
+- [ ] **🎯 Uninstall prohibited disk tools (e.g., WinDirStat):** From the same installed-apps list → choose the exact prohibited application → **Uninstall**.
+- [ ] **🎯 Uninstall prohibited packet analyzers (e.g., Wireshark):** Confirm no authorized network-analysis task requires it, then uninstall via the same UI.
+  - **✅ Verify:** Each *targeted* package is absent from the installed-apps list; required apps still run. **⚠️** These product names are examples, not universally unauthorized software.
+
 
 #### 12.2 Store apps and games
 - [ ] **🎯 DO THIS — 12.2 Store apps and games**
@@ -964,6 +1032,10 @@ Remove-Item "C:\Users\bob\Music\song.mp3"
 Also look in other folders on `C:\` that aren't part of Windows (e.g. `C:\Media`, `C:\Share`), and **empty the Recycle Bin** when forensics is done.
 
 - **Media cleanup:** Locate files and preserve forensic answers first; remove only explicitly prohibited media, verify the exact path and avoid deleting legitimate required content.
+
+- [ ] **🎯 Remove specifically prohibited MP3s:** **File Explorer → This PC → C: → Users → Public → Public Music** is one possible location; search the actual image for files matching the README restriction, select **only prohibited files → Delete** after preserving necessary evidence.
+  - **✅ Verify:** Reopen the affected folder/search and confirm prohibited files are gone without deleting required media.
+
 
 #### 13.3 Password lists and other data
 - [ ] **🎯 DO THIS — 13.3 Password lists and other data**
@@ -1014,6 +1086,10 @@ Stop-Service -Name BadService -Force; Set-Service -Name BadService -StartupType 
 sc.exe delete BadService            # only for a service you are sure is malware. Type sc.exe: in PowerShell, sc means something else
 ```
 
+- [ ] **🎯 Investigate a suspicious executable launched as a service:** **Task Manager → Processes → right-click suspect process → Open file location**; verify the path, digital signature, parent process and whether it is truly unauthorized. Record its original startup mechanism before stopping it.
+  - **⚠️ Example:** A malicious `mfc.exe` or an unusual executable under `C:\Windows\System32` is a lead, **not** proof by filename; never delete a legitimate Windows executable.
+
+
 #### 14.4 Sticky Keys / Utility Manager backdoor
 - [ ] **🎯 DO THIS — 14.4 Sticky Keys / Utility Manager backdoor**
 
@@ -1047,6 +1123,10 @@ Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess, @{n
 
 - **Backdoor and forensic listeners:** In an elevated Command Prompt run `netstat -abno`; match port → PID → executable and inspect its startup task/service before containment. **Never** use another image's PID or kill a required process. Verify that the unwanted listener is gone.
 
+- [ ] **🎯 Contain a confirmed remote-access backdoor:** Correlate listener PID from `netstat -abno` or `Get-NetTCPConnection` with its executable, active process and any service/scheduled task. Stop the **confirmed** unauthorized process, disable its persistence, and quarantine/remove only the malicious file.
+  - **✅ Verify:** The listener and persistence no longer recur after a safe restart. **↩️ Undo:** Restore a required process/file only from a verified clean backup.
+
+
 ### 16. Web browsers
 
 #### 16.1 Microsoft Edge
@@ -1055,6 +1135,10 @@ Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess, @{n
 **⋯ → Settings → Privacy, search, and services** → **Microsoft Defender SmartScreen: On**, **Block potentially unwanted apps: On**. **Cookies and site permissions → Pop-ups and redirects → Block**. **⋯ → Settings → Profiles → Passwords → Offer to save passwords: Off**. Update via **⋯ → Help and feedback → About Microsoft Edge**.
 
 - **Browser placement:** Verify Edge and other required browsers are the correct approved versions in their intended locations; don't move or uninstall required applications as a generic cleanup step.
+
+- [ ] **🎯 Preserve required browser locations:** Verify that the README-required browsers (including Chrome, if required) still launch from their expected/default installation directory before and after updates.
+  - **⚠️** Moving, uninstalling or installing a required browser in a different folder can lose points; do not treat it as prohibited simply because other tools are disallowed.
+
 
 #### 16.2 Firefox (if installed)
 - [ ] **🎯 DO THIS — 16.2 Firefox (if installed)**
@@ -1127,6 +1211,12 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 
 > [!CAUTION]
 > **Important:** Do not disable protected or core services such as RPC, DCOM or Windows Event Log. If access is denied, check elevation, protection and effective Group Policy; never use force to bypass dependencies. Delayed Automatic start must be restored in the GUI. Removing a remote-control *application* is a separate, less reversible decision and needs explicit authorization.
+
+**✅ Two explicit service checks (use the shared GUI workflow and rollback below):**
+- [ ] **🎯 Simple TCP/IP Services:** **Win + R → `services.msc` → Simple TCP/IP Services (`simptcp`)** → record original state; if unneeded **Startup type → Disabled → Stop → Apply → OK**.
+- [ ] **🎯 Remote Registry:** Same screen → **Remote Registry (`RemoteRegistry`)** → record original state; if unneeded **Disabled → Stop → Apply → OK**.
+  - **✅ Verify:** Both installed, unneeded services show **Stopped / Disabled**. **↩️ Undo:** Restore each original startup type and running state if it was required; a missing service is not something to install.
+
 
 #### 8.2 Make sure the security services are running
 - [ ] **🎯 DO THIS — 8.2 Make sure the security services are running**
@@ -1226,6 +1316,10 @@ Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
 ```
 Wanted: `1`, `2`, `1`. If `EnableLUA` was `0`, UAC only comes back after a restart.
 
+- [ ] **🎯 Prevent administrator enumeration at elevation:** **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → Credential User Interface → Enumerate administrator accounts on elevation → Disabled → Apply → OK**, when required.
+  - **✅ Verify:** Reopen the policy and confirm **Disabled** without breaking an authorized elevation prompt.
+
+
 #### 15.2 AutoPlay off
 - [ ] **🎯 DO THIS — 15.2 AutoPlay off**
 
@@ -1257,6 +1351,10 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 > **Do not turn on BitLocker** on a practice image. Without the recovery key you can lock yourself out of the whole VM.
 
 - **SmartScreen:** In **Windows Security → App & browser control → Reputation-based protection settings**, verify required warning/blocking toggles; confirm changes without disabling necessary application protections.
+
+- [ ] **🎯 Enable Windows Defender SmartScreen policy:** **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → File Explorer → Configure Windows Defender SmartScreen** (name can vary) → **Enabled → Apply → OK**.
+  - **✅ Verify:** Effective SmartScreen settings **warn/block** as required; confirm compatible Windows Security reputation settings.
+
 
 #### 15.6 WDigest off (no plain-text passwords in memory)
 - [ ] **🎯 DO THIS — 15.6 WDigest off (no plain-text passwords in memory)**
