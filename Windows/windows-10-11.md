@@ -24,7 +24,7 @@
 
 
 > [!NOTE]
-> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+> **📚 Evidence guide for CyberPatriot XVI–XIX:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the additional procedures below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
 
 ---
 
@@ -89,7 +89,6 @@ Double-click it on the desktop and refresh it as you work.
 
 ---
 
----
 
 ### 1. Forensics questions (FIRST)
 
@@ -130,7 +129,6 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 
 ---
 
----
 
 <a id="stage-3"></a>
 ## Part 3 — Commonly Assessed High-Priority Checks
@@ -248,7 +246,6 @@ Use 12+ characters with upper case, lower case, a number and a symbol. **Don't c
 
 ---
 
----
 
 ### 3. Account policies (passwords and lockout)
 
@@ -301,7 +298,6 @@ net accounts                     # check everything
 
 ---
 
----
 
 ### 5. Microsoft Defender antivirus
 
@@ -352,7 +348,6 @@ Get-MpThreatDetection           # anything found
 
 ---
 
----
 
 ### 6. Firewall
 
@@ -383,7 +378,6 @@ Disable-NetFirewallRule -DisplayName "Evil Rule"
 
 ---
 
----
 
 ### 7. Windows Update
 
@@ -415,7 +409,6 @@ Firefox (**≡ → Help → About Firefox**), Chrome (**⋮ → Help → About G
 
 ---
 
----
 
 ### 4. Local policies
 
@@ -799,7 +792,6 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStat
 
 ---
 
----
 
 ### 11. Shared folders
 
@@ -820,7 +812,6 @@ Revoke-SmbShareAccess -Name Public -AccountName Everyone -Force   # take Everyon
 
 ---
 
----
 
 ### 12. Prohibited software
 
@@ -859,7 +850,6 @@ Get-ChildItem C:\Users, C:\Temp -Recurse -Force -Include nc.exe,ncat.exe,nmap.ex
 
 ---
 
----
 
 ### 13. Prohibited files
 
@@ -887,7 +877,6 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 
 ---
 
----
 
 ### 14. Backdoors and malware
 
@@ -955,7 +944,6 @@ Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess, @{n
 
 ---
 
----
 
 ### 16. Web browsers
 
@@ -983,7 +971,6 @@ Then **≡ → Help → About Firefox** to update. Also check **Add-ons and them
 
 ---
 
----
 
 ### 8. Services
 
@@ -2107,7 +2094,6 @@ New-ItemProperty -Path $pp -Name UpdatePromptSettings -Value 0 -PropertyType DWo
 
 ---
 
----
 
 ### 9. Windows features
 
@@ -2151,7 +2137,6 @@ Remove-WindowsCapability -Online -Name SNMP.Client~~~~0.0.1.0       # skip if th
 
 ---
 
----
 
 ### 15. Other settings
 
@@ -2223,7 +2208,6 @@ Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled=TRUE" | Sel
 
 ---
 
----
 
 ### 17. Critical services
 
@@ -2789,7 +2773,6 @@ Replace the DNS target with the README-required internal hostname; internet DNS 
 
 ---
 
----
 
 ### 20. Complete PowerShell basics — included in this Windows checklist
 
@@ -2937,10 +2920,8 @@ Expected: `original value`. This file restore does not model account/password re
 
 ---
 
----
 
 ### 21. Advanced Windows investigations — included in this checklist
-
 
 
 > **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**

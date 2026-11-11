@@ -24,7 +24,7 @@ Linux Mint is in **Round 1, the State round, and the Semifinals** this season. I
 
 
 > [!NOTE]
-> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+> **📚 Evidence guide for CyberPatriot XVI–XIX:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the additional procedures below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
 
 ---
 
@@ -98,7 +98,6 @@ Double-click **Scoring Report** on the desktop. Keep it open in a browser tab an
 
 ---
 
----
 
 ### 1. Forensics questions (do these FIRST)
 
@@ -145,7 +144,6 @@ More techniques: [Forensics questions guide](../General/All/forensics-questions.
 
 ---
 
----
 
 <a id="stage-3"></a>
 ## Part 3 — Commonly Assessed High-Priority Checks
@@ -301,7 +299,6 @@ sudo passwd -l mallory                             # account that shouldn't log 
 
 ---
 
----
 
 ### 3. Password and lockout policy
 
@@ -397,7 +394,6 @@ Use [17.2's complete PAM backup, module discovery, lockout verification and reco
 
 ---
 
----
 
 ### 4. Firewall (UFW)
 
@@ -443,7 +439,6 @@ Look for odd ports like 4444, 1337, 31337, 6667, or "ALLOW Anywhere" on a port n
 
 ---
 
----
 
 ### 5. Updates
 
@@ -753,7 +748,6 @@ sudo systemctl enable --now ssh  # start it if it isn't
 
 ---
 
----
 
 ### 7. Prohibited software and files
 
@@ -811,7 +805,6 @@ sudo ls -la /home/*/ /tmp /var/tmp /opt     # look for anything odd, including h
 
 ---
 
----
 
 ### 8. Login screen and desktop
 
@@ -894,7 +887,6 @@ sudo systemctl mask ctrl-alt-del.target
 
 ---
 
----
 
 ### 9. SSH server (only if installed)
 
@@ -966,7 +958,6 @@ Record key fingerprints and compare them with the README and known administrator
 
 ---
 
----
 
 ### 11. File permissions
 
@@ -1015,7 +1006,6 @@ sudo chmod 750 /home/bob        # other users can't look inside
 
 ---
 
----
 
 ### 12. Sudo rules
 
@@ -1043,7 +1033,6 @@ sudo visudo -f /etc/sudoers.d/90-bob # a file in sudoers.d
 
 ---
 
----
 
 ### 13. Backdoors and malware
 
@@ -1140,7 +1129,6 @@ These tools only **report**. Look at each file they name (forensics first!) befo
 
 ---
 
----
 
 ### 14. Logging and auditing
 
@@ -1164,7 +1152,6 @@ sudo augenrules --load
 
 ---
 
----
 
 ### 15. AppArmor
 
@@ -1184,7 +1171,6 @@ sudo aa-enforce /usr/bin/man      # change /usr/bin/man to the name aa-status li
 
 ---
 
----
 
 ### 17. Web browser (Firefox)
 
@@ -1397,7 +1383,6 @@ grep -rs core /etc/security/limits.conf /etc/security/limits.d/ | grep -v ':#'  
 
 ---
 
----
 
 ### 16. Critical services (only what the README lists)
 
@@ -1405,7 +1390,6 @@ If the README needs a web server, database, FTP, Samba or similar, **harden it i
 
 ---
 
----
 
 ### 17. Detailed manual safety and verification procedures
 
@@ -1931,7 +1915,6 @@ sudo ss -tulpn
 
 ---
 
----
 
 ### 20. Complete Linux critical-service hardening procedures (embedded)
 
@@ -3138,10 +3121,8 @@ Unexpected recent or world-writable files need comparison with a trusted package
 **⚠️ Warnings:** Headers, hidden version strings and disabled PHP functions are supporting controls, not proof an application is secure. Keep required functionality and patch vulnerabilities.
 
 
-
 ---
 
----
 
 ### 21. Advanced Linux manual investigations (embedded)
 
@@ -3384,10 +3365,8 @@ Confirm normal login, sudo, DNS/networking and all required services. Record any
 - CyberPatriot community topic inventories: [PeapGit CPLHF](https://github.com/PeapGit/cplhf) (historical hardening automation: **do not execute as part of this guide**), [Minagera Linux checklist](https://github.com/Minagera/CyberPatriot/blob/main/Checklists/Linux/README.md), [chessischess Linux checklist](https://github.com/chessischess/cyberpatriot-checklist/blob/master/Linux_Checklist.md).
 
 
-
 ---
 
----
 
 ### 22. Complete Linux terminal basics (embedded)
 

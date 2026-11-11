@@ -40,7 +40,7 @@ Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competi
 
 
 > [!NOTE]
-> **How this guide uses the CyberPatriot XVI–XIX research catalog:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the research-expansion sections below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
+> **📚 Evidence guide for CyberPatriot XVI–XIX:** **Official** means documented by CyberPatriot; **Training** means found in public practice/training materials; **Community** means covered by published checklists or educational repositories; **Inferred** means normal vendor-supported security hardening that is **not known to have been scored**. The report is a topic inventory, **not a list of actual confidential competition vulnerabilities, scoring keys or guaranteed points**. In the additional procedures below, every suggested change requires a verified scenario reason, a saved original value and a check of required service availability. All PowerShell/Bash examples are **manual commands inside Markdown**, not automation scripts. The image README and current rules always take precedence.
 
 ---
 
@@ -188,7 +188,6 @@ Get-ScheduledTask | Select-Object TaskName,TaskPath,State
 
 ---
 
----
 
 <a id="stage-3"></a>
 ## Part 3 — Commonly Assessed High-Priority Checks
@@ -364,7 +363,6 @@ Set-ADAccountPassword -Identity bob -Reset -NewPassword (Read-Host -AsSecureStri
 
 ---
 
----
 
 ### 3. Password and lockout policy
 
@@ -974,7 +972,6 @@ This changes only what the server *accepts* (the `Server` keys), not how the ser
 
 ---
 
----
 
 ### 6. Services
 
@@ -1177,7 +1174,6 @@ Or with `gpedit.msc` → **Administrative Templates → Windows Components → W
 
 ---
 
----
 
 ### 10. Prohibited software, files, startup persistence, browser and security settings
 
@@ -1632,7 +1628,6 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 
 ---
 
----
 
 ### 13. Complete Windows Server operating-system security procedures (self-contained reference)
 
@@ -4103,7 +4098,6 @@ Expected: `original value`. This file restore does not model account/password re
 ---
 
 #### WS.21. Advanced Windows Server investigations — included in this handbook
-
 
 
 > **Use after:** Server roles and required services are identified in Parts 1–4. These are **manual Windows Server procedures inside this document**, not a script. Read the README, preserve forensic evidence, and retain a working admin/management path first.
