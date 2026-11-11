@@ -249,6 +249,414 @@ printf '%s' 'aGVsbG8=' | base64 --decode
 
 Review identities/sudo, password policy, firewall and updates before the longer service-specific material.
 
+### 🎯 Debian 12 Training Round 2 — task-first skill cards (generalized)
+
+> [!IMPORTANT]
+> These tasks correspond to concepts demonstrated in the supplied *CyberPatriot Debian 12 Training Round 2 Answer Key*. **The source's exact usernames, forensic answers and points are deliberately not republished.** This is a task/reference checklist, **not a list of universal fixes**. Debian's supported Terminal commands are usually the easiest method; alternative checks and contextual explanations appear only in colored boxes.
+
+#### 🎯 DT01 — Decode a multi-layer forensic message
+
+- [ ] **DO THIS only when relevant to the image README:** Decode a multi-layer forensic message.
+
+**⭐ EASIEST WAY — Debian Terminal:** Read the supplied forensic text and identify each encoding; use an approved decoder to apply Base64, ROT13, reversal, or other requested transformations **one layer at a time**.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `printf '%s' 'aGVsbG8=' | base64 --decode`
+
+**✅ VERIFY:** Save the decoded response in the exact format requested by the question.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not upload private evidence to an unapproved site or execute decoded output.
+
+#### 🎯 DT02 — Locate media files named in a forensic question
+
+- [ ] **DO THIS only when relevant to the image README:** Locate media files named in a forensic question.
+
+**⭐ EASIEST WAY — Debian Terminal:** Open Terminal and use a focused filename search under the home directories; record the exact path requested, without deleting anything.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `find /home -type f -iname '*.mp3' -print 2>/dev/null`
+
+**✅ VERIFY:** Verify the path belongs to the actual requested files and save the question answer.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** `locate` may use a stale database; `find` reflects existing files. Do not assume any MP3 is prohibited until checking README.
+
+#### 🎯 DT03 — Identify and contain unauthorized human users
+
+- [ ] **DO THIS only when relevant to the image README:** Identify and contain unauthorized human users.
+
+**⭐ EASIEST WAY — Debian Terminal:** List all accounts, compare the README against real human logins, and **lock only confirmed unauthorized accounts** after preserving evidence.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `getent passwd`
+
+**✅ VERIFY:** Recheck the account's existence and lock status; ensure required service accounts remain untouched.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A training key may delete a user directly; containment first is easier to undo, and `userdel -r` can destroy home data.
+
+#### 🎯 DT04 — Remove a user’s unauthorized sudo privileges
+
+- [ ] **DO THIS only when relevant to the image README:** Remove a user’s unauthorized sudo privileges.
+
+**⭐ EASIEST WAY — Debian Terminal:** Inspect `sudo` membership and effective sudoers; remove the exact user only if the README lists them as a nonadministrator.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo gpasswd -d EXAMPLE_USER sudo`
+
+**✅ VERIFY:** Check `id EXAMPLE_USER` and `getent group sudo`, then test a permitted administrator account.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not remove the only administrator or forget NOPASSWD policies in `/etc/sudoers.d`.
+
+#### 🎯 DT05 — Set a weak authorized user's password
+
+- [ ] **DO THIS only when relevant to the image README:** Set a weak authorized user's password.
+
+**⭐ EASIEST WAY — Debian Terminal:** Use an authorized Terminal and run `sudo passwd EXAMPLE_USER`, entering the README-compliant password interactively.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo passwd -S EXAMPLE_USER`
+
+**✅ VERIFY:** Confirm the password-change success and test a legitimate new login.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never type real passwords in GitHub text or reset an unknown daemon's service account.
+
+#### 🎯 DT06 — Add a required user to the correct group
+
+- [ ] **DO THIS only when relevant to the image README:** Add a required user to the correct group.
+
+**⭐ EASIEST WAY — Debian Terminal:** Verify the user and group both exist, then use `sudo adduser EXAMPLE_USER EXAMPLE_REQUIRED_GROUP` only when the README requires this membership.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo usermod -aG EXAMPLE_REQUIRED_GROUP EXAMPLE_USER`
+
+**✅ VERIFY:** Verify the user appears in `getent group EXAMPLE_REQUIRED_GROUP` or `id EXAMPLE_USER`.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Creating a group or adding members unnecessarily may grant unwanted permissions; group names are image-specific.
+
+#### 🎯 DT07 — Set the required default minimum password age
+
+- [ ] **DO THIS only when relevant to the image README:** Set the required default minimum password age.
+
+**⭐ EASIEST WAY — Debian Terminal:** Inspect `PASS_MIN_DAYS` in `/etc/login.defs`, back it up, and use `sudo nano /etc/login.defs` to apply the exact README value.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `grep -E '^PASS_MIN_DAYS' /etc/login.defs`
+
+**✅ VERIFY:** Re-read the file and check individual existing users with `chage -l`.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Changes to login.defs are defaults and don't necessarily update existing accounts. Restore its previous value if wrong.
+
+#### 🎯 DT08 — Require a password minimum length through the installed PAM module
+
+- [ ] **DO THIS only when relevant to the image README:** Require a password minimum length through the installed PAM module.
+
+**⭐ EASIEST WAY — Debian Terminal:** Check whether `libpam-pwquality` exists, back up `/etc/pam.d/common-password`, then edit the **existing** supported `pam_pwquality.so` configuration to match the actual requirement.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo grep -n 'pam_pwquality' /etc/pam.d/common-password`
+
+**✅ VERIFY:** Test an authorized password change on a noncritical account and confirm the new minimum policy operates.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never insert duplicate PAM lines or blindly copy module order; mistakes can lock out every account.
+
+#### 🎯 DT09 — Configure and test a supported failed-login lockout policy
+
+- [ ] **DO THIS only when relevant to the image README:** Configure and test a supported failed-login lockout policy.
+
+**⭐ EASIEST WAY — Debian Terminal:** Preserve root/recovery access, inspect supported `pam_faillock` and `pam-auth-update` profiles, and configure **only** the required lockout using the installed Debian PAM mechanisms.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo grep -Rns 'pam_faillock' /etc/pam.d /usr/share/pam-configs 2>/dev/null`
+
+**✅ VERIFY:** Test a normal new login and sudo before closing the admin console; inspect faillock output when available.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A training example creates PAM profile snippets; their exact priorities/control flags are version-specific. Do not paste a partial PAM stack into another image.
+
+#### 🎯 DT10 — Reject empty passwords in PAM where required
+
+- [ ] **DO THIS only when relevant to the image README:** Reject empty passwords in PAM where required.
+
+**⭐ EASIEST WAY — Debian Terminal:** Inspect `/etc/pam.d/common-auth` and the actual `pam_unix.so` authentication options; remove an unauthorized `nullok` **only after backing up that file**.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo grep -n 'pam_unix.so' /etc/pam.d/common-auth`
+
+**✅ VERIFY:** Test a separate authorized login, sudo, and expected account functionality.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Edit using sudo; the presence of a module option is not automatically a problem without confirming the README and authentication path.
+
+#### 🎯 DT11 — Verify IPv4 TCP SYN cookies are enabled when appropriate
+
+- [ ] **DO THIS only when relevant to the image README:** Verify IPv4 TCP SYN cookies are enabled when appropriate.
+
+**⭐ EASIEST WAY — Debian Terminal:** Check the effective sysctl value; if the image requires SYN cookies, edit its actual effective sysctl config to enable `net.ipv4.tcp_syncookies=1`.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sysctl net.ipv4.tcp_syncookies`
+
+**✅ VERIFY:** Confirm effective value is `1` and required networking remains operational.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Prefer one narrowly scoped supported sysctl file, not a blind replacement of `/etc/sysctl.conf`.
+
+#### 🎯 DT12 — Disable IPv4 forwarding only on a host that must not route
+
+- [ ] **DO THIS only when relevant to the image README:** Disable IPv4 forwarding only on a host that must not route.
+
+**⭐ EASIEST WAY — Debian Terminal:** Check `net.ipv4.ip_forward`, the host role, VPN/container configuration and README, then set it to `0` **only if routing is not required**.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sysctl net.ipv4.ip_forward`
+
+**✅ VERIFY:** Verify the effective value and test normal networking and approved remote access.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Changing forwarding on an actual router/VPN host can break required services and lose points.
+
+#### 🎯 DT13 — Enable the required host firewall without blocking access
+
+- [ ] **DO THIS only when relevant to the image README:** Enable the required host firewall without blocking access.
+
+**⭐ EASIEST WAY — Debian Terminal:** Identify the active firewall manager, record required inbound ports, allow necessary SSH/web/DB services, then enable UFW if it is the assigned manager.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo ufw status verbose`
+
+**✅ VERIFY:** Confirm UFW status/rules and test required client connections from another approved device.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not enable a deny-all policy before permitting a required SSH session; Debian may already use nftables.
+
+#### 🎯 DT14 — Correct exposed /etc/shadow permissions
+
+- [ ] **DO THIS only when relevant to the image README:** Correct exposed /etc/shadow permissions.
+
+**⭐ EASIEST WAY — Debian Terminal:** Check ownership and mode using `stat -c '%a %U:%G %n' /etc/shadow`; if it is accessible to ordinary users, restore a supported Debian secure mode/group such as root:shadow with restrictive permissions.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `ls -l /etc/shadow`
+
+**✅ VERIFY:** Confirm nonprivileged users cannot read password hashes and system login still functions.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A mode of `600` may already be secure; do not force `640` if the actual distribution profile requires something else.
+
+#### 🎯 DT15 — Disable Apache only when web service is not required
+
+- [ ] **DO THIS only when relevant to the image README:** Disable Apache only when web service is not required.
+
+**⭐ EASIEST WAY — Debian Terminal:** Inspect `systemctl status apache2`, actual websites and README, then stop/disable Apache only if confirmed unneeded.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo systemctl disable --now apache2`
+
+**✅ VERIFY:** Verify service state and make sure any other required web sites still work.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never disable a required Apache service just because a training image treated it as unwanted.
+
+#### 🎯 DT16 — Disable vsftpd only when FTP service is not required
+
+- [ ] **DO THIS only when relevant to the image README:** Disable vsftpd only when FTP service is not required.
+
+**⭐ EASIEST WAY — Debian Terminal:** Inspect the installed FTP server, startup state and README; stop and disable only when confirmed unnecessary.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo systemctl disable --now vsftpd`
+
+**✅ VERIFY:** Recheck the unit and ensure any required file-transfer service remains functional.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** If FTP is critical, secure the service instead; don't purge its data or users.
+
+#### 🎯 DT17 — Enable daily update-list refresh when required
+
+- [ ] **DO THIS only when relevant to the image README:** Enable daily update-list refresh when required.
+
+**⭐ EASIEST WAY — Debian Terminal:** Back up the applicable APT periodic configuration, then set `APT::Periodic::Update-Package-Lists "1";` in the actual `/etc/apt/apt.conf.d/20auto-upgrades` file when requested.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `grep -R 'APT::Periodic::Update-Package-Lists' /etc/apt/apt.conf.d 2>/dev/null`
+
+**✅ VERIFY:** Verify the file setting and the relevant APT timer/update mechanism.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Daily repository-list refresh is not necessarily identical to automatically installing security updates.
+
+#### 🎯 DT18 — Repair Debian security repositories and apply approved updates
+
+- [ ] **DO THIS only when relevant to the image README:** Repair Debian security repositories and apply approved updates.
+
+**⭐ EASIEST WAY — Debian Terminal:** Verify `/etc/os-release`, APT `.list` and `.sources` files match the Debian codename; repair only broken signed repositories, run `sudo apt update`, preview changes, and apply permitted updates.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `apt-cache policy && apt -s upgrade`
+
+**✅ VERIFY:** Recheck update errors and required browser/SSH/application versions and functionality.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never overwrite all repository sources from an old example, bypass signature checks, or automatically choose the wrong `sshd_config` on a dpkg prompt.
+
+#### 🎯 DT19 — Preserve and update a required Chromium browser
+
+- [ ] **DO THIS only when relevant to the image README:** Preserve and update a required Chromium browser.
+
+**⭐ EASIEST WAY — Debian Terminal:** Check Chromium's installed package, browser launch, current repository version and README need. Update through approved signed Debian sources without removing the required browser.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `apt-cache policy chromium`
+
+**✅ VERIFY:** Verify Chromium remains installed at the expected location and can launch.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** The training image specifically penalized removing its required browser; this is an image-specific dependency, not a universal package name.
+
+#### 🎯 DT20 — Update OpenSSH while preserving required configuration
+
+- [ ] **DO THIS only when relevant to the image README:** Update OpenSSH while preserving required configuration.
+
+**⭐ EASIEST WAY — Debian Terminal:** Confirm OpenSSH server is required, record its service/auth settings, apply a reviewed security update, and carefully choose how to handle local sshd configuration during package prompts.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `apt-cache policy openssh-server`
+
+**✅ VERIFY:** Validate `sshd -t` and perform a second authorized SSH login after the update.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not replace a working SSH configuration blindly; a security update should not disable a required login.
+
+#### 🎯 DT21 — Remove only confirmed prohibited MP3/media files
+
+- [ ] **DO THIS only when relevant to the image README:** Remove only confirmed prohibited MP3/media files.
+
+**⭐ EASIEST WAY — Debian Terminal:** Locate the exact files, answer forensics questions, compare with the README's media prohibition, then remove only the specifically disallowed files after preserving recoverability.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `find /home -type f -iname '*.mp3' -print 2>/dev/null`
+
+**✅ VERIFY:** Re-run the same targeted search and ensure evidence/required media remains.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Avoid `rm *.mp3` in a broad directory without checking file names; use a recoverable approach when possible.
+
+#### 🎯 DT22 — Remove specifically prohibited games or diagnostic utilities
+
+- [ ] **DO THIS only when relevant to the image README:** Remove specifically prohibited games or diagnostic utilities.
+
+**⭐ EASIEST WAY — Debian Terminal:** Review installed AisleRiot, Wireshark or other named software against the actual README, preview dependencies and remove only packages explicitly prohibited for this image.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `apt -s purge aisleriot`
+
+**✅ VERIFY:** Check package removal and confirm no required debugging/network tools or dependencies were affected.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Wireshark can be legitimately required in other scenarios; wildcard purges may remove unrelated packages.
+
+#### 🎯 DT23 — Investigate a suspicious netcat persistence job
+
+- [ ] **DO THIS only when relevant to the image README:** Investigate a suspicious netcat persistence job.
+
+**⭐ EASIEST WAY — Debian Terminal:** Inspect root/user crontabs, timers and running processes, identify the exact scheduled executable and network listener, preserve evidence, then disable only a confirmed malicious task.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo crontab -l`
+
+**✅ VERIFY:** Confirm the job cannot restart, its process is stopped, and no required service broke.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not run a copied PID kill or delete a system binary based solely on filename; first confirm actual process, package owner and provenance.
+
+#### 🎯 DT24 — Disable remote root SSH login while keeping SSH available
+
+- [ ] **DO THIS only when relevant to the image README:** Disable remote root SSH login while keeping SSH available.
+
+**⭐ EASIEST WAY — Debian Terminal:** If OpenSSH is a README-required service, record current auth, back up its real config and set `PermitRootLogin no` only when compatible; validate with `sshd -t` and reload when safe.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `sudo /usr/sbin/sshd -T | grep permitrootlogin`
+
+**✅ VERIFY:** Test a **second ordinary authorized SSH login** and recheck the effective root-login setting.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not disable SSH, password authentication or required admin access while trying to prevent direct root login.
+
+#### 🎯 DT25 — Final checks after training-style changes
+
+- [ ] **DO THIS only when relevant to the image README:** Final checks after training-style changes.
+
+**⭐ EASIEST WAY — Debian Terminal:** Review score, saved forensic files, authorized accounts, PAM login, required apps, firewall, SSH, browser, AppArmor and service health. Complete only after confirming all README dependencies.
+
+> [!NOTE]
+> **🔁 ALTERNATE CHECK / EXTRA INFORMATION — not an extra required fix**
+>
+> `systemctl --failed && sudo ss -lntup`
+
+**✅ VERIFY:** Record any N/A item and recheck the current scoring report without editing scoring files.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Individual training point values and answers cannot be assumed for another image.
+
+
+---
+
 ### 2. Users and groups
 
 #### 2.1 See every user on the computer
