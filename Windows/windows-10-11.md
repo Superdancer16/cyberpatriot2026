@@ -156,6 +156,510 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 
 Accounts, password rules, Defender, firewall, updates and audit settings are frequent *topics* in public checklists; actual per-fix points are unknown.
 
+### 🎯 Windows 11 Training Round 2 — task-first skill cards (generalized)
+
+> [!IMPORTANT]
+> **Why these tasks are here:** The supplied *CyberPatriot Windows 11 Training Round 2 Answer Key* illustrates these categories. The guide presents **generalized techniques**, not the image's usernames, forensic answers, point values or guaranteed competition scoring conditions. Match the actual README. **The easiest GUI method is the task workflow; optional commands are extra information**, not extra things to run.
+
+#### 🎯 WT01 — Investigate listening ports for a forensic question
+
+- [ ] **DO THIS if required by the image README:** Investigate listening ports for a forensic question.
+
+**⭐ EASIEST WAY — Command Prompt:** Open **Start → Command Prompt → Run as administrator**, run `netstat -abno`, then match the question’s local port, process name and PID. Record the requested value without changing any process.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-NetTCPConnection -State Listen | Sort-Object LocalPort | Select-Object LocalAddress,LocalPort,OwningProcess`
+
+**✅ VERIFY:** Confirm the output corresponds to the actual asked-for process and local port.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never use a sample PID or reported port as an answer for another image.
+
+#### 🎯 WT02 — Inspect Windows network shares for forensics
+
+- [ ] **DO THIS if required by the image README:** Inspect Windows network shares for forensics.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `fsmgmt.msc` → Shares**. Locate the requested share name, path and type.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-SmbShare | Select-Object Name,Path,Description,Special`
+
+**✅ VERIFY:** Record exactly what the forensic question asks for and save the question file.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Administrative/special shares may be legitimate; do not delete a share merely because it is hidden.
+
+#### 🎯 WT03 — Recognize and decode layered text encodings
+
+- [ ] **DO THIS if required by the image README:** Recognize and decode layered text encodings.
+
+**⭐ EASIEST WAY — Offline tool / approved decoder:** Read the question for clues such as ROT13, Base64 and reversing character order. Decode **one layer at a time** using an approved offline tool or permitted decoder.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aGVsbG8='))`
+
+**✅ VERIFY:** Check the final text makes sense and matches the required answer format.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never upload private evidence to an unapproved website and never execute decoded text.
+
+#### 🎯 WT04 — Review and contain a confirmed unauthorized local user
+
+- [ ] **DO THIS if required by the image README:** Review and contain a confirmed unauthorized local user.
+
+**⭐ EASIEST WAY — GUI:** Open **Win + R → `lusrmgr.msc` → Users**, compare the account with the README, and **disable** the confirmed unauthorized account before considering deletion.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Disable-LocalUser -Name 'EXAMPLE_UNAUTHORIZED_USER'`
+
+**✅ VERIFY:** Confirm the account is disabled and your authorized admin still works.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Deleting a user can destroy its SID and permissions; if an explicit task requires deletion, preserve evidence and a supported recovery path first.
+
+#### 🎯 WT05 — Set an authorized user's required password
+
+- [ ] **DO THIS if required by the image README:** Set an authorized user's required password.
+
+**⭐ EASIEST WAY — GUI:** Open **Computer Management → Local Users and Groups → Users**, right-click the correct authorized account → **Set Password**, then choose a secure password following the image requirements.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Set-LocalUser -Name 'EXAMPLE_AUTHORIZED_USER' -Password (Read-Host -AsSecureString 'New password')`
+
+**✅ VERIFY:** Check password sign-in using a separate authorized session.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not publish passwords or reset an unknown service account, and never lock out the only administrator.
+
+#### 🎯 WT06 — Remove a user who should not be an administrator
+
+- [ ] **DO THIS if required by the image README:** Remove a user who should not be an administrator.
+
+**⭐ EASIEST WAY — GUI:** Open **Settings → Accounts → Other users → choose account → Change account type → Standard User**, or **`lusrmgr.msc` → Groups → Administrators → Remove** only the unauthorized member.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Remove-LocalGroupMember -Group 'Administrators' -Member 'EXAMPLE_USER'`
+
+**✅ VERIFY:** Verify the user remains enabled when required but no longer has local admin privileges.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not remove your own admin access or an authorized domain administration group.
+
+#### 🎯 WT07 — Create a required custom local security group
+
+- [ ] **DO THIS if required by the image README:** Create a required custom local security group.
+
+**⭐ EASIEST WAY — GUI:** Open **Computer Management → Local Users and Groups → Groups → Action → New Group** and enter the **exact README-specified group name**.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `New-LocalGroup -Name 'EXAMPLE_REQUIRED_GROUP'`
+
+**✅ VERIFY:** Verify the group appears in `lusrmgr.msc` under Groups.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A group name from one training image is not a universal requirement.
+
+#### 🎯 WT08 — Add only specified members to a required local group
+
+- [ ] **DO THIS if required by the image README:** Add only specified members to a required local group.
+
+**⭐ EASIEST WAY — GUI:** Open **`lusrmgr.msc` → Groups → required group → Add → enter exact README-authorized users → Check Names → OK**.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Add-LocalGroupMember -Group 'EXAMPLE_REQUIRED_GROUP' -Member 'EXAMPLE_USER'`
+
+**✅ VERIFY:** Reopen the group and compare every listed member with the README.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not add all ordinary users or grant Administrators membership to a normal group.
+
+#### 🎯 WT09 — Inspect and set password history
+
+- [ ] **DO THIS if required by the image README:** Inspect and set password history.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Account Policies → Password Policy → Enforce password history**. Apply the **image-required** count.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `net accounts`
+
+**✅ VERIFY:** Reopen the policy and confirm it matches the scenario; record initial and final values.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** The training exercise uses a specific number; it is not a universal score threshold.
+
+#### 🎯 WT10 — Require password complexity when assigned
+
+- [ ] **DO THIS if required by the image README:** Require password complexity when assigned.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Account Policies → Password Policy → Password must meet complexity requirements → Enabled** if required.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `secedit /export /cfg "$env:TEMP\cp-account-policy.inf"`
+
+**✅ VERIFY:** Verify the effective policy, not merely a local setting overridden by domain Group Policy.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not force a domain-wide security policy change to fix one local account.
+
+#### 🎯 WT11 — Set the assigned account lockout threshold
+
+- [ ] **DO THIS if required by the image README:** Set the assigned account lockout threshold.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Account Policies → Account Lockout Policy → Account lockout threshold** and set the exact image value; review duration and counter-reset options.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `net accounts`
+
+**✅ VERIFY:** Verify the configured threshold and related lockout duration and observation window.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A threshold from a training image is not automatically correct for a live competition image; do not intentionally lock your last admin.
+
+#### 🎯 WT12 — Enable the required Credential Validation audit
+
+- [ ] **DO THIS if required by the image README:** Enable the required Credential Validation audit.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Advanced Audit Policy Configuration → System Audit Policies → Account Logon → Audit Credential Validation** and enable the required Success/Failure options.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `auditpol /get /subcategory:"Credential Validation"`
+
+**✅ VERIFY:** Verify the requested audit category is enabled and relevant Security events are available.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Use the exact requested Success/Failure selection; logging does not automatically repair an authentication vulnerability.
+
+#### 🎯 WT13 — Remove unauthorized Manage auditing and security log privilege
+
+- [ ] **DO THIS if required by the image README:** Remove unauthorized Manage auditing and security log privilege.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Local Policies → User Rights Assignment → Manage auditing and security log**. Remove only a confirmed unauthorized member.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `secedit /export /cfg "$env:TEMP\cp-user-rights.inf" /areas USER_RIGHTS`
+
+**✅ VERIFY:** Reopen the right and confirm only authorized accounts/groups retain it.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not remove required Administrators or security-management principals.
+
+#### 🎯 WT14 — Remove unauthorized Take ownership privilege
+
+- [ ] **DO THIS if required by the image README:** Remove unauthorized Take ownership privilege.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Local Policies → User Rights Assignment → Take ownership of files or other objects** and remove only unauthorized identities.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `secedit /export /cfg "$env:TEMP\cp-user-rights.inf" /areas USER_RIGHTS`
+
+**✅ VERIFY:** Verify the selected right now matches approved membership.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** This right is powerful, but legitimate administrators may require it; preserve recovery.
+
+#### 🎯 WT15 — Limit network use of blank local passwords
+
+- [ ] **DO THIS if required by the image README:** Limit network use of blank local passwords.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Local Policies → Security Options → Accounts: Limit local account use of blank passwords to console logon only** and enable as required.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-LocalUser | Select-Object Name,PasswordRequired`
+
+**✅ VERIFY:** Reopen the option and check the effective setting.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** This restriction is not a substitute for assigning proper passwords to approved accounts.
+
+#### 🎯 WT16 — Hide the last signed-in user on the logon screen
+
+- [ ] **DO THIS if required by the image README:** Hide the last signed-in user on the logon screen.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `secpol.msc` → Local Policies → Security Options → Interactive logon: Don't display last signed-in** and enable if required.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `gpresult /r /scope computer`
+
+**✅ VERIFY:** Confirm the effective policy and that authorized users can still sign in.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Settings/wording vary by edition and GPO; do not mistake local UI with resultant policy.
+
+#### 🎯 WT17 — Enable required firewall profiles
+
+- [ ] **DO THIS if required by the image README:** Enable required firewall profiles.
+
+**⭐ EASIEST WAY — GUI:** Open **Windows Security → Firewall & network protection** and check **Domain**, **Private** and **Public** profiles, switching on those required by the image.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-NetFirewallProfile | Select-Object Name,Enabled`
+
+**✅ VERIFY:** Verify all applicable profiles and ensure necessary service connections still work.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Keep task-required rules for file sharing, remote administration or web applications.
+
+#### 🎯 WT18 — Disable unneeded Remote Desktop access
+
+- [ ] **DO THIS if required by the image README:** Disable unneeded Remote Desktop access.
+
+**⭐ EASIEST WAY — GUI:** If the README prohibits RDP, open **Settings → System → Remote Desktop** or the effective **`gpedit.msc` Remote Desktop Services** policy and disable incoming sessions.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections`
+
+**✅ VERIFY:** Verify unauthorized RDP is unavailable and approved management access remains.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** On a required remote-access or Server image, disabling RDP may cause a scoring penalty.
+
+#### 🎯 WT19 — Disable administrator-account enumeration at elevation
+
+- [ ] **DO THIS if required by the image README:** Disable administrator-account enumeration at elevation.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → Credential User Interface → Enumerate administrator accounts on elevation** and set the approved value.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `gpresult /r /scope computer`
+
+**✅ VERIFY:** Inspect the final effective policy and confirm authorized elevation still works.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** This is a separate policy from UAC itself; only change the exact assigned setting.
+
+#### 🎯 WT20 — Stop sharing a confirmed unauthorized hidden custom share
+
+- [ ] **DO THIS if required by the image README:** Stop sharing a confirmed unauthorized hidden custom share.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `fsmgmt.msc` → Shares**, find the **exact unapproved custom share** and select **Stop Sharing** after checking its path and owners.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-SmbShare | Select-Object Name,Path,Special`
+
+**✅ VERIFY:** Verify that the unauthorized share is absent while all required shares work.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not remove administrative shares, SYSVOL/NETLOGON or an approved share merely because its name ends in `$`.
+
+#### 🎯 WT21 — Disable unnecessary Simple TCP/IP Services
+
+- [ ] **DO THIS if required by the image README:** Disable unnecessary Simple TCP/IP Services.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `services.msc` → Simple TCP/IP Services** when installed. If specifically not required, stop it and set **Startup type: Disabled**.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Service -Name 'simptcp' -ErrorAction SilentlyContinue`
+
+**✅ VERIFY:** Verify the service remains stopped/disabled and other services continue working.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** The service may be absent; that is not a vulnerability by itself.
+
+#### 🎯 WT22 — Disable unnecessary Remote Registry service
+
+- [ ] **DO THIS if required by the image README:** Disable unnecessary Remote Registry service.
+
+**⭐ EASIEST WAY — GUI:** Open **Win + R → `services.msc` → Remote Registry → Properties**. If the README doesn't require it, **Stop** and set **Startup type: Disabled**.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Service -Name 'RemoteRegistry' -ErrorAction SilentlyContinue`
+
+**✅ VERIFY:** Check the final status and required management functions.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Restore the original startup state if a required management tool loses access.
+
+#### 🎯 WT23 — Configure approved automatic Windows updates
+
+- [ ] **DO THIS if required by the image README:** Configure approved automatic Windows updates.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → Windows Update → Manage end user experience → Configure Automatic Updates**. Use the image-required setting.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Service wuauserv | Select-Object Name,Status,StartType`
+
+**✅ VERIFY:** Verify the effective update policy and check that update scanning is functional.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A domain/WSUS policy may take precedence; don't override an approved organization update source.
+
+#### 🎯 WT24 — Update a required third-party application safely
+
+- [ ] **DO THIS if required by the image README:** Update a required third-party application safely.
+
+**⭐ EASIEST WAY — GUI:** Open the application (for example Notepad++) → **Help / ? → About / Check for Updates**, then obtain a signed approved version from its **official vendor** and complete the installer.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Package | Where-Object Name -Match 'Notepad'`
+
+**✅ VERIFY:** Verify the installed version, executable location and application launch.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not hardcode a training-image version or move a README-required application from its assigned default install location.
+
+#### 🎯 WT25 — Remove confirmed prohibited media while preserving evidence
+
+- [ ] **DO THIS if required by the image README:** Remove confirmed prohibited media while preserving evidence.
+
+**⭐ EASIEST WAY — File Explorer:** Open **File Explorer → This PC → Users**, inspect the specified folder and file types, preserve any forensic evidence, then remove **only README-prohibited media**.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-ChildItem 'C:\Users\Public' -Recurse -File -Include *.mp3,*.mp4 -ErrorAction SilentlyContinue`
+
+**✅ VERIFY:** Recheck the target folder and ensure required/media-forensics files were retained.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Never run a broad removal across all user folders or remove README-required files.
+
+#### 🎯 WT26 — Uninstall a confirmed prohibited game bundle
+
+- [ ] **DO THIS if required by the image README:** Uninstall a confirmed prohibited game bundle.
+
+**⭐ EASIEST WAY — GUI:** Open **Settings → Apps → Installed apps** or **Control Panel → Programs and Features**, select the exact unauthorized game bundle and follow its uninstall wizard.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Package | Where-Object Name -Match 'WildTangent|Game'`
+
+**✅ VERIFY:** Verify uninstallation and check that required apps still work.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A game seen in one training image isn't necessarily installed or prohibited on another.
+
+#### 🎯 WT27 — Uninstall a confirmed prohibited disk-usage utility
+
+- [ ] **DO THIS if required by the image README:** Uninstall a confirmed prohibited disk-usage utility.
+
+**⭐ EASIEST WAY — GUI:** Open **Control Panel → Programs and Features** and remove the actual unauthorized utility (such as WinDirStat) **only if the README prohibits it**.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Package | Where-Object Name -Match 'WinDirStat'`
+
+**✅ VERIFY:** Verify the item is gone and no required software was affected.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A disk-analysis utility is often benign; the README controls whether it should be removed.
+
+#### 🎯 WT28 — Uninstall a confirmed prohibited packet analyzer
+
+- [ ] **DO THIS if required by the image README:** Uninstall a confirmed prohibited packet analyzer.
+
+**⭐ EASIEST WAY — GUI:** Open **Control Panel → Programs and Features**, select the actual disallowed packet analyzer (such as Wireshark), and uninstall only after checking the task requirements.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Package | Where-Object Name -Match 'Wireshark'`
+
+**✅ VERIFY:** Confirm it is removed, and make sure required network tools remain.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** A packet analyzer can be legitimate in training environments; do not treat its presence alone as malicious.
+
+#### 🎯 WT29 — Investigate and contain a confirmed unauthorized backdoor
+
+- [ ] **DO THIS if required by the image README:** Investigate and contain a confirmed unauthorized backdoor.
+
+**⭐ EASIEST WAY — Task Manager / File Explorer:** Open **Task Manager → Details** to identify the suspicious process, use **Open file location**, preserve path/hash/evidence, then stop/quarantine **only a confirmed malicious** process/file with the authorized defender.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-CimInstance Win32_Process | Select-Object Name,ProcessId,ExecutablePath`
+
+**✅ VERIFY:** Verify the process and its persistence source are no longer active; check scoring and essential services.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Do not delete a similarly named Windows/system executable or blindly terminate a PID copied from an answer key.
+
+#### 🎯 WT30 — Enable SmartScreen warnings or blocking as required
+
+- [ ] **DO THIS if required by the image README:** Enable SmartScreen warnings or blocking as required.
+
+**⭐ EASIEST WAY — GUI:** Press **Win + R → `gpedit.msc` → Computer Configuration → Administrative Templates → Windows Components → File Explorer → Configure Windows Defender SmartScreen** and enable the required protective behavior.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System' -ErrorAction SilentlyContinue`
+
+**✅ VERIFY:** Confirm the policy is applied and that approved downloads/applications continue working.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** Policy location and available choices vary by Windows version; use current installed policy labels.
+
+#### 🎯 WT31 — Check protected browser/application install locations
+
+- [ ] **DO THIS if required by the image README:** Check protected browser/application install locations.
+
+**⭐ EASIEST WAY — File Explorer / installed apps:** Open installed-app details and File Explorer to confirm that **README-required Chrome, Notepad++ or other applications** remain installed at the expected authorized location.
+
+> [!NOTE]
+> **🔁 ALTERNATE / EXTRA INFORMATION — not a second required task**
+>
+> `Get-Package | Select-Object Name,Version | Sort-Object Name`
+
+**✅ VERIFY:** Confirm the required program launches from the approved path.
+
+> [!CAUTION]
+> **⚠️ Extra context / rollback safety:** The supplied training key includes penalties for missing/relocated software; do not uninstall or relocate required applications to chase generic cleanup points.
+
+
+---
+
 ### 2. Users and groups
 
 #### 2.1 List every user
