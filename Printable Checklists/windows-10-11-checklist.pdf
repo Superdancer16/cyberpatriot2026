@@ -1,0 +1,864 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R] /Count 8 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 5316 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+BT /B 14 Tf 1 0 0 1 48 714.0 Tm (WINDOWS 10 / 11 - PRINTABLE TASK CHECKLIST) Tj ET
+BT /R 9.5 Tf 1 0 0 1 49 685.0 Tm (175 tasks  |  Use each box for one completed check, fix or verification) Tj ET
+BT /R 9 Tf 1 0 0 1 49 661.0 Tm (Round/date: ___________________________   Team: ___________________________) Tj ET
+BT /R 9 Tf 1 0 0 1 49 640.0 Tm (Image: __________________________   Starting score: ______   Final: ______) Tj ET
+BT /R 8 Tf 1 0 0 1 49 617.0 Tm (Write N/A beside items that do not apply. Follow the original Windows guide before any change.) Tj ET
+0.92 g 44 562.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 578.0 Tm (01. Read the image instructions and prepare safely) Tj ET
+0.8 w 49 533.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 541.0 Tm (W001) Tj ET
+BT /R 9 Tf 1 0 0 1 100 541.0 Tm (Read the complete image README before making any change) Tj ET
+BT /R 7 Tf 1 0 0 1 535 541.0 Tm (N/A) Tj ET
+0.8 w 49 513.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 521.0 Tm (W002) Tj ET
+BT /R 9 Tf 1 0 0 1 100 521.0 Tm (Record the current Windows version, edition and build) Tj ET
+BT /R 7 Tf 1 0 0 1 535 521.0 Tm (N/A) Tj ET
+0.8 w 49 493.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 501.0 Tm (W003) Tj ET
+BT /R 9 Tf 1 0 0 1 100 501.0 Tm (Record the initial scoring report value and timestamp) Tj ET
+BT /R 7 Tf 1 0 0 1 535 501.0 Tm (N/A) Tj ET
+0.8 w 49 473.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 481.0 Tm (W004) Tj ET
+BT /R 9 Tf 1 0 0 1 100 481.0 Tm (Write down all required user accounts) Tj ET
+BT /R 7 Tf 1 0 0 1 535 481.0 Tm (N/A) Tj ET
+0.8 w 49 453.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 461.0 Tm (W005) Tj ET
+BT /R 9 Tf 1 0 0 1 100 461.0 Tm (Write down all required local administrators) Tj ET
+BT /R 7 Tf 1 0 0 1 535 461.0 Tm (N/A) Tj ET
+0.8 w 49 433.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 441.0 Tm (W006) Tj ET
+BT /R 9 Tf 1 0 0 1 100 441.0 Tm (Identify any domain membership or centrally managed policies) Tj ET
+BT /R 7 Tf 1 0 0 1 535 441.0 Tm (N/A) Tj ET
+0.8 w 49 413.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 421.0 Tm (W007) Tj ET
+BT /R 9 Tf 1 0 0 1 100 421.0 Tm (List README-required services and applications) Tj ET
+BT /R 7 Tf 1 0 0 1 535 421.0 Tm (N/A) Tj ET
+0.8 w 49 393.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 401.0 Tm (W008) Tj ET
+BT /R 9 Tf 1 0 0 1 100 401.0 Tm (List prohibited applications, files and remote-access tools) Tj ET
+BT /R 7 Tf 1 0 0 1 535 401.0 Tm (N/A) Tj ET
+0.8 w 49 373.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 381.0 Tm (W009) Tj ET
+BT /R 9 Tf 1 0 0 1 100 381.0 Tm (Identify required network shares and their authorized users) Tj ET
+BT /R 7 Tf 1 0 0 1 535 381.0 Tm (N/A) Tj ET
+0.8 w 49 353.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 361.0 Tm (W010) Tj ET
+BT /R 9 Tf 1 0 0 1 100 361.0 Tm (Identify required network services and listening ports) Tj ET
+BT /R 7 Tf 1 0 0 1 535 361.0 Tm (N/A) Tj ET
+0.8 w 49 333.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 341.0 Tm (W011) Tj ET
+BT /R 9 Tf 1 0 0 1 100 341.0 Tm (Confirm the current administrator can elevate successfully) Tj ET
+BT /R 7 Tf 1 0 0 1 535 341.0 Tm (N/A) Tj ET
+0.8 w 49 313.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 321.0 Tm (W012) Tj ET
+BT /R 9 Tf 1 0 0 1 100 321.0 Tm (Record a VM recovery method or approved snapshot if allowed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 321.0 Tm (N/A) Tj ET
+0.8 w 49 293.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 301.0 Tm (W013) Tj ET
+BT /R 9 Tf 1 0 0 1 100 301.0 Tm (Open an elevated PowerShell window) Tj ET
+BT /R 7 Tf 1 0 0 1 535 301.0 Tm (N/A) Tj ET
+0.8 w 49 273.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 281.0 Tm (W014) Tj ET
+BT /R 9 Tf 1 0 0 1 100 281.0 Tm (Record every changed setting and its original value) Tj ET
+BT /R 7 Tf 1 0 0 1 535 281.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 247.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 199.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 215.0 Tm (02. Forensic questions and evidence) Tj ET
+0.8 w 49 170.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 178.0 Tm (W015) Tj ET
+BT /R 9 Tf 1 0 0 1 100 178.0 Tm (Find every Forensics Question file supplied with the image) Tj ET
+BT /R 7 Tf 1 0 0 1 535 178.0 Tm (N/A) Tj ET
+0.8 w 49 150.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 158.0 Tm (W016) Tj ET
+BT /R 9 Tf 1 0 0 1 100 158.0 Tm (Read each complete question and required answer format) Tj ET
+BT /R 7 Tf 1 0 0 1 535 158.0 Tm (N/A) Tj ET
+0.8 w 49 130.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 138.0 Tm (W017) Tj ET
+BT /R 9 Tf 1 0 0 1 100 138.0 Tm (Locate the relevant user, file, program, event or configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 138.0 Tm (N/A) Tj ET
+0.8 w 49 110.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 118.0 Tm (W018) Tj ET
+BT /R 9 Tf 1 0 0 1 100 118.0 Tm (Record suspicious-file paths before any cleanup) Tj ET
+BT /R 7 Tf 1 0 0 1 535 118.0 Tm (N/A) Tj ET
+0.8 w 49 90.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 98.0 Tm (W019) Tj ET
+BT /R 9 Tf 1 0 0 1 100 98.0 Tm (Record file hash when the question requests one) Tj ET
+BT /R 7 Tf 1 0 0 1 535 98.0 Tm (N/A) Tj ET
+0.8 w 49 70.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 78.0 Tm (W020) Tj ET
+BT /R 9 Tf 1 0 0 1 100 78.0 Tm (Record timestamps and time zone when requested) Tj ET
+BT /R 7 Tf 1 0 0 1 535 78.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (1/8) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 5952 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (W021) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Inspect relevant Event Viewer logs without clearing them) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (W022) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Decode requested text only as data; never execute it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (W023) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Save each answer in the original question file) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (W024) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Confirm every question file was saved) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (W025) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Reopen unanswered questions after other safe investigations) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 612.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 564.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 580.0 Tm (03. Users, Guest account and administrators) Tj ET
+0.8 w 49 535.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 543.0 Tm (W026) Tj ET
+BT /R 9 Tf 1 0 0 1 100 543.0 Tm (List all local users, including disabled and built-in accounts) Tj ET
+BT /R 7 Tf 1 0 0 1 535 543.0 Tm (N/A) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (W027) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Compare human users with the README authorization list) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (W028) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Inspect built-in Guest account state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (W029) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Inspect built-in Administrator account and recovery requirements) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (W030) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Inspect local Administrators group membership) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (W031) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Inspect Remote Desktop Users group membership) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (W032) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Inspect Backup Operators and any other privileged local groups) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (W033) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Identify domain groups that legitimately administer this workstation) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (W034) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check PasswordRequired and PasswordNeverExpires for each real user) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (W035) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Check each authorized user's Enabled state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (W036) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Disable a confirmed unauthorized user only after preserving evidence) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (W037) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Remove confirmed unauthorized local administrator membership) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (W038) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Add a missing authorized user only if the README requires it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (W039) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Restore missing authorized administrator membership if needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (W040) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Set a required user's password interactively if policy requires it) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (W041) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Verify local user and privileged-group membership after changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (W042) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Test a second authorized administrator sign-in) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 189.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 141.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 157.0 Tm (04. Passwords, lockout and effective policy) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (W043) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Record current local account password policy with net accounts) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (W044) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Inspect minimum password length) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (W045) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Inspect maximum password age) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (2/8) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 5981 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (W046) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Inspect minimum password age) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (W047) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Inspect password history requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (W048) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Inspect complexity requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (W049) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Inspect reversible encryption setting) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (W050) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Inspect account lockout threshold) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (W051) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Inspect account lockout duration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (W052) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Inspect account lockout observation window) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (W053) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Check whether Group Policy overrides local settings) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (W054) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Back up current policy values before editing) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (W055) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Change only values actually required by the image) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (W056) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Verify final account policy with net accounts and policy GUI) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+0.8 w 49 498.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 506.0 Tm (W057) Tj ET
+BT /R 9 Tf 1 0 0 1 100 506.0 Tm (Test an authorized normal-user login after policy changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 506.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 472.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 424.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 440.0 Tm (05. Defender and endpoint protection) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (W058) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Identify which antivirus provider is active) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (W059) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check Microsoft Defender antivirus and real-time protection state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (W060) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Check behavior monitoring state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (W061) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Check script scanning state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (W062) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check cloud-delivered protection when available) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (W063) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Check potentially unwanted application protection) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (W064) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Inspect Defender exclusion paths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (W065) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Inspect Defender excluded file extensions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (W066) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Inspect Defender excluded processes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (W067) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Review exclusions against required applications before removal) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (W068) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Check current Defender signature date) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (W069) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Update signatures when required and supported) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (W070) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Review protection history and relevant detections) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (W071) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Perform an approved scan after collecting forensic evidence) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (W072) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Verify protection state and required software still work) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 89.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (3/8) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 5900 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+0.92 g 44 696.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 712.0 Tm (06. Firewall and network exposure) Tj ET
+0.8 w 49 667.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 675.0 Tm (W073) Tj ET
+BT /R 9 Tf 1 0 0 1 100 675.0 Tm (Check Domain firewall profile Enabled state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 675.0 Tm (N/A) Tj ET
+0.8 w 49 647.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 655.0 Tm (W074) Tj ET
+BT /R 9 Tf 1 0 0 1 100 655.0 Tm (Check Private firewall profile Enabled state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 655.0 Tm (N/A) Tj ET
+0.8 w 49 627.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 635.0 Tm (W075) Tj ET
+BT /R 9 Tf 1 0 0 1 100 635.0 Tm (Check Public firewall profile Enabled state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 635.0 Tm (N/A) Tj ET
+0.8 w 49 607.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 615.0 Tm (W076) Tj ET
+BT /R 9 Tf 1 0 0 1 100 615.0 Tm (Check default inbound and outbound actions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 615.0 Tm (N/A) Tj ET
+0.8 w 49 587.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 595.0 Tm (W077) Tj ET
+BT /R 9 Tf 1 0 0 1 100 595.0 Tm (Identify the currently active network profile) Tj ET
+BT /R 7 Tf 1 0 0 1 535 595.0 Tm (N/A) Tj ET
+0.8 w 49 567.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 575.0 Tm (W078) Tj ET
+BT /R 9 Tf 1 0 0 1 100 575.0 Tm (Inventory enabled inbound allow rules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 575.0 Tm (N/A) Tj ET
+0.8 w 49 547.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 555.0 Tm (W079) Tj ET
+BT /R 9 Tf 1 0 0 1 100 555.0 Tm (Inspect suspicious rules for executable and port scope) Tj ET
+BT /R 7 Tf 1 0 0 1 535 555.0 Tm (N/A) Tj ET
+0.8 w 49 527.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 535.0 Tm (W080) Tj ET
+BT /R 9 Tf 1 0 0 1 100 535.0 Tm (Inspect remote IP scope of required inbound rules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 535.0 Tm (N/A) Tj ET
+0.8 w 49 507.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 515.0 Tm (W081) Tj ET
+BT /R 9 Tf 1 0 0 1 100 515.0 Tm (List listening TCP ports and their owning processes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 515.0 Tm (N/A) Tj ET
+0.8 w 49 487.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 495.0 Tm (W082) Tj ET
+BT /R 9 Tf 1 0 0 1 100 495.0 Tm (List listening UDP endpoints where needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 495.0 Tm (N/A) Tj ET
+0.8 w 49 467.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 475.0 Tm (W083) Tj ET
+BT /R 9 Tf 1 0 0 1 100 475.0 Tm (Record or export existing firewall policy before risky changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 475.0 Tm (N/A) Tj ET
+0.8 w 49 447.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 455.0 Tm (W084) Tj ET
+BT /R 9 Tf 1 0 0 1 100 455.0 Tm (Enable appropriate profiles only after required exceptions are safe) Tj ET
+BT /R 7 Tf 1 0 0 1 535 455.0 Tm (N/A) Tj ET
+0.8 w 49 427.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 435.0 Tm (W085) Tj ET
+BT /R 9 Tf 1 0 0 1 100 435.0 Tm (Disable only confirmed unauthorized inbound rules) Tj ET
+BT /R 7 Tf 1 0 0 1 535 435.0 Tm (N/A) Tj ET
+0.8 w 49 407.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 415.0 Tm (W086) Tj ET
+BT /R 9 Tf 1 0 0 1 100 415.0 Tm (Test every README-required network function from an approved client) Tj ET
+BT /R 7 Tf 1 0 0 1 535 415.0 Tm (N/A) Tj ET
+0.8 w 49 387.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 395.0 Tm (W087) Tj ET
+BT /R 9 Tf 1 0 0 1 100 395.0 Tm (Verify firewall state and record any rollback needed) Tj ET
+BT /R 7 Tf 1 0 0 1 535 395.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 361.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 313.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 329.0 Tm (07. Updates and Windows features) Tj ET
+0.8 w 49 284.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 292.0 Tm (W088) Tj ET
+BT /R 9 Tf 1 0 0 1 100 292.0 Tm (Open Windows Update and inspect pending updates) Tj ET
+BT /R 7 Tf 1 0 0 1 535 292.0 Tm (N/A) Tj ET
+0.8 w 49 264.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 272.0 Tm (W089) Tj ET
+BT /R 9 Tf 1 0 0 1 100 272.0 Tm (Check Windows Update service configuration) Tj ET
+BT /R 7 Tf 1 0 0 1 535 272.0 Tm (N/A) Tj ET
+0.8 w 49 244.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 252.0 Tm (W090) Tj ET
+BT /R 9 Tf 1 0 0 1 100 252.0 Tm (Check whether updates are managed by domain policy) Tj ET
+BT /R 7 Tf 1 0 0 1 535 252.0 Tm (N/A) Tj ET
+0.8 w 49 224.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 232.0 Tm (W091) Tj ET
+BT /R 9 Tf 1 0 0 1 100 232.0 Tm (Inspect update history and any failed security updates) Tj ET
+BT /R 7 Tf 1 0 0 1 535 232.0 Tm (N/A) Tj ET
+0.8 w 49 204.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 212.0 Tm (W092) Tj ET
+BT /R 9 Tf 1 0 0 1 100 212.0 Tm (Install permitted security updates without forced release upgrade) Tj ET
+BT /R 7 Tf 1 0 0 1 535 212.0 Tm (N/A) Tj ET
+0.8 w 49 184.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 192.0 Tm (W093) Tj ET
+BT /R 9 Tf 1 0 0 1 100 192.0 Tm (Update required applications and browsers from approved sources) Tj ET
+BT /R 7 Tf 1 0 0 1 535 192.0 Tm (N/A) Tj ET
+0.8 w 49 164.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 172.0 Tm (W094) Tj ET
+BT /R 9 Tf 1 0 0 1 100 172.0 Tm (Check whether a restart is pending) Tj ET
+BT /R 7 Tf 1 0 0 1 535 172.0 Tm (N/A) Tj ET
+0.8 w 49 144.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 152.0 Tm (W095) Tj ET
+BT /R 9 Tf 1 0 0 1 100 152.0 Tm (Verify required applications still work after updates) Tj ET
+BT /R 7 Tf 1 0 0 1 535 152.0 Tm (N/A) Tj ET
+0.8 w 49 124.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 132.0 Tm (W096) Tj ET
+BT /R 9 Tf 1 0 0 1 100 132.0 Tm (Inspect SMBv1 optional feature state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 132.0 Tm (N/A) Tj ET
+0.8 w 49 104.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 112.0 Tm (W097) Tj ET
+BT /R 9 Tf 1 0 0 1 100 112.0 Tm (Inspect SMB client signing requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 112.0 Tm (N/A) Tj ET
+0.8 w 49 84.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 92.0 Tm (W098) Tj ET
+BT /R 9 Tf 1 0 0 1 100 92.0 Tm (Inspect SMB server signing requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 92.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (4/8) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 5915 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (W099) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Review legacy Telnet, TFTP, SNMP and PowerShell 2.0 components) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (W100) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Disable an unnecessary legacy feature only if compatible) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (W101) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Verify disabled feature state and any reboot requirement) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 652.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 604.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 620.0 Tm (08. Services, remote access and sharing) Tj ET
+0.8 w 49 575.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 583.0 Tm (W102) Tj ET
+BT /R 9 Tf 1 0 0 1 100 583.0 Tm (Inventory installed services and startup types) Tj ET
+BT /R 7 Tf 1 0 0 1 535 583.0 Tm (N/A) Tj ET
+0.8 w 49 555.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 563.0 Tm (W103) Tj ET
+BT /R 9 Tf 1 0 0 1 100 563.0 Tm (Map unexpected service executables to actual file paths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 563.0 Tm (N/A) Tj ET
+0.8 w 49 535.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 543.0 Tm (W104) Tj ET
+BT /R 9 Tf 1 0 0 1 100 543.0 Tm (Check Remote Registry state and whether it is required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 543.0 Tm (N/A) Tj ET
+0.8 w 49 515.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 523.0 Tm (W105) Tj ET
+BT /R 9 Tf 1 0 0 1 100 523.0 Tm (Check Remote Desktop state and whether it is required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 523.0 Tm (N/A) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (W106) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Check Network Level Authentication if RDP is required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (W107) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Review authorized Remote Desktop Users membership) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (W108) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Check Remote Assistance policy and any required exception) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (W109) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Check SSH server or other remote-control services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (W110) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Check required web, file, database or backup services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (W111) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Check SMB share names and underlying folder paths) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (W112) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check each required share's share permissions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (W113) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Check each required share's NTFS permissions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (W114) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Test file access as an authorized nonadministrator) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (W115) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Disable a confirmed unnecessary service one at a time) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (W116) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Verify remaining required services still function) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (W117) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Restore any required service accidentally disabled) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 249.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 201.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 217.0 Tm (09. Prohibited software, files and browser security) Tj ET
+0.8 w 49 172.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 180.0 Tm (W118) Tj ET
+BT /R 9 Tf 1 0 0 1 100 180.0 Tm (Inspect installed desktop programs and app packages) Tj ET
+BT /R 7 Tf 1 0 0 1 535 180.0 Tm (N/A) Tj ET
+0.8 w 49 152.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 160.0 Tm (W119) Tj ET
+BT /R 9 Tf 1 0 0 1 100 160.0 Tm (Inspect Microsoft Store apps when relevant) Tj ET
+BT /R 7 Tf 1 0 0 1 535 160.0 Tm (N/A) Tj ET
+0.8 w 49 132.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 140.0 Tm (W120) Tj ET
+BT /R 9 Tf 1 0 0 1 100 140.0 Tm (Inspect portable utilities not registered as installed programs) Tj ET
+BT /R 7 Tf 1 0 0 1 535 140.0 Tm (N/A) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (W121) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Compare remote-control and networking tools with README) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (W122) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Identify prohibited games or torrent clients) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (W123) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Preview or review uninstall effects before removing software) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (5/8) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 5828 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (W124) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Locate potentially prohibited media files without bulk deletion) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (W125) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Preserve files involved in forensic questions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (W126) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Check browser version and permitted extensions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (W127) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Check SmartScreen and suspicious download warnings) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (W128) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Check AutoPlay or automatic removable-media actions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (W129) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Verify approved browsers and apps still launch) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (W130) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Confirm prohibited items were handled without affecting needed apps) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 572.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 524.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 540.0 Tm (10. Startup persistence and malicious changes) Tj ET
+0.8 w 49 495.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 503.0 Tm (W131) Tj ET
+BT /R 9 Tf 1 0 0 1 100 503.0 Tm (Inspect Startup apps for unknown executables) Tj ET
+BT /R 7 Tf 1 0 0 1 535 503.0 Tm (N/A) Tj ET
+0.8 w 49 475.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 483.0 Tm (W132) Tj ET
+BT /R 9 Tf 1 0 0 1 100 483.0 Tm (Inspect HKLM Run startup registry entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 483.0 Tm (N/A) Tj ET
+0.8 w 49 455.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 463.0 Tm (W133) Tj ET
+BT /R 9 Tf 1 0 0 1 100 463.0 Tm (Inspect HKCU Run startup registry entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 463.0 Tm (N/A) Tj ET
+0.8 w 49 435.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 443.0 Tm (W134) Tj ET
+BT /R 9 Tf 1 0 0 1 100 443.0 Tm (Inspect scheduled tasks and task actions) Tj ET
+BT /R 7 Tf 1 0 0 1 535 443.0 Tm (N/A) Tj ET
+0.8 w 49 415.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 423.0 Tm (W135) Tj ET
+BT /R 9 Tf 1 0 0 1 100 423.0 Tm (Inspect newly installed or suspicious services) Tj ET
+BT /R 7 Tf 1 0 0 1 535 423.0 Tm (N/A) Tj ET
+0.8 w 49 395.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 403.0 Tm (W136) Tj ET
+BT /R 9 Tf 1 0 0 1 100 403.0 Tm (Inspect service Log On As identities) Tj ET
+BT /R 7 Tf 1 0 0 1 535 403.0 Tm (N/A) Tj ET
+0.8 w 49 375.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 383.0 Tm (W137) Tj ET
+BT /R 9 Tf 1 0 0 1 100 383.0 Tm (Check unexpected executables in AppData or Temp) Tj ET
+BT /R 7 Tf 1 0 0 1 535 383.0 Tm (N/A) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (W138) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Inspect hosts-file changes and required entries) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (W139) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Inspect unexpected listening ports or remote connections) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (W140) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Check suspicious executable hash and signature) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (W141) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Inspect Sticky Keys or accessibility-program replacement indicators) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (W142) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Correlate suspicious entries with event logs) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (W143) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Disable only confirmed unauthorized persistence after preserving evidence) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (W144) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Verify suspicious startup item no longer runs) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (W145) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Retest required logins and applications) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 189.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 141.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 157.0 Tm (11. Audit, user rights and advanced safeguards) Tj ET
+0.8 w 49 112.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 120.0 Tm (W146) Tj ET
+BT /R 9 Tf 1 0 0 1 100 120.0 Tm (Inspect current audit policy categories) Tj ET
+BT /R 7 Tf 1 0 0 1 535 120.0 Tm (N/A) Tj ET
+0.8 w 49 92.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 100.0 Tm (W147) Tj ET
+BT /R 9 Tf 1 0 0 1 100 100.0 Tm (Check account logon auditing where required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 100.0 Tm (N/A) Tj ET
+0.8 w 49 72.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 80.0 Tm (W148) Tj ET
+BT /R 9 Tf 1 0 0 1 100 80.0 Tm (Check account management auditing where required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 80.0 Tm (N/A) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (6/8) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 6152 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+0.8 w 49 718.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 726.0 Tm (W149) Tj ET
+BT /R 9 Tf 1 0 0 1 100 726.0 Tm (Check logon and logoff auditing where required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 726.0 Tm (N/A) Tj ET
+0.8 w 49 698.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 706.0 Tm (W150) Tj ET
+BT /R 9 Tf 1 0 0 1 100 706.0 Tm (Check policy-change auditing where required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 706.0 Tm (N/A) Tj ET
+0.8 w 49 678.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 686.0 Tm (W151) Tj ET
+BT /R 9 Tf 1 0 0 1 100 686.0 Tm (Check process creation auditing if required) Tj ET
+BT /R 7 Tf 1 0 0 1 535 686.0 Tm (N/A) Tj ET
+0.8 w 49 658.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 666.0 Tm (W152) Tj ET
+BT /R 9 Tf 1 0 0 1 100 666.0 Tm (Inspect User Account Control enabled state) Tj ET
+BT /R 7 Tf 1 0 0 1 535 666.0 Tm (N/A) Tj ET
+0.8 w 49 638.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 646.0 Tm (W153) Tj ET
+BT /R 9 Tf 1 0 0 1 100 646.0 Tm (Inspect security options for guest and anonymous access) Tj ET
+BT /R 7 Tf 1 0 0 1 535 646.0 Tm (N/A) Tj ET
+0.8 w 49 618.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 626.0 Tm (W154) Tj ET
+BT /R 9 Tf 1 0 0 1 100 626.0 Tm (Inspect interactive logon and inactivity settings) Tj ET
+BT /R 7 Tf 1 0 0 1 535 626.0 Tm (N/A) Tj ET
+0.8 w 49 598.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 606.0 Tm (W155) Tj ET
+BT /R 9 Tf 1 0 0 1 100 606.0 Tm (Inspect user rights for privileged groups) Tj ET
+BT /R 7 Tf 1 0 0 1 535 606.0 Tm (N/A) Tj ET
+0.8 w 49 578.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 586.0 Tm (W156) Tj ET
+BT /R 9 Tf 1 0 0 1 100 586.0 Tm (Inspect effective Group Policy precedence) Tj ET
+BT /R 7 Tf 1 0 0 1 535 586.0 Tm (N/A) Tj ET
+0.8 w 49 558.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 566.0 Tm (W157) Tj ET
+BT /R 9 Tf 1 0 0 1 100 566.0 Tm (Inspect SMB signing and NTLM compatibility before changes) Tj ET
+BT /R 7 Tf 1 0 0 1 535 566.0 Tm (N/A) Tj ET
+0.8 w 49 538.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 546.0 Tm (W158) Tj ET
+BT /R 9 Tf 1 0 0 1 100 546.0 Tm (Inspect screen lock and resume authentication) Tj ET
+BT /R 7 Tf 1 0 0 1 535 546.0 Tm (N/A) Tj ET
+0.8 w 49 518.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 526.0 Tm (W159) Tj ET
+BT /R 9 Tf 1 0 0 1 100 526.0 Tm (Inspect WDigest plaintext-credential policy where relevant) Tj ET
+BT /R 7 Tf 1 0 0 1 535 526.0 Tm (N/A) Tj ET
+0.8 w 49 498.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 506.0 Tm (W160) Tj ET
+BT /R 9 Tf 1 0 0 1 100 506.0 Tm (Inspect LLMNR and NetBIOS policy only if role-compatible) Tj ET
+BT /R 7 Tf 1 0 0 1 535 506.0 Tm (N/A) Tj ET
+0.8 w 49 478.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 486.0 Tm (W161) Tj ET
+BT /R 9 Tf 1 0 0 1 100 486.0 Tm (Verify new audit events appear when auditing is enabled) Tj ET
+BT /R 7 Tf 1 0 0 1 535 486.0 Tm (N/A) Tj ET
+0.8 w 49 458.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 466.0 Tm (W162) Tj ET
+BT /R 9 Tf 1 0 0 1 100 466.0 Tm (Restore exact recorded policy if access breaks) Tj ET
+BT /R 7 Tf 1 0 0 1 535 466.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 432.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.92 g 44 384.0 520 32 re f 0 g
+BT /B 10 Tf 1 0 0 1 50 400.0 Tm (12. Final verification and handoff) Tj ET
+0.8 w 49 355.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 363.0 Tm (W163) Tj ET
+BT /R 9 Tf 1 0 0 1 100 363.0 Tm (Reopen and save all forensic answer files) Tj ET
+BT /R 7 Tf 1 0 0 1 535 363.0 Tm (N/A) Tj ET
+0.8 w 49 335.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 343.0 Tm (W164) Tj ET
+BT /R 9 Tf 1 0 0 1 100 343.0 Tm (Recheck the complete authorized user and admin list) Tj ET
+BT /R 7 Tf 1 0 0 1 535 343.0 Tm (N/A) Tj ET
+0.8 w 49 315.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 323.0 Tm (W165) Tj ET
+BT /R 9 Tf 1 0 0 1 100 323.0 Tm (Verify strong password and lockout policy matches README) Tj ET
+BT /R 7 Tf 1 0 0 1 535 323.0 Tm (N/A) Tj ET
+0.8 w 49 295.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 303.0 Tm (W166) Tj ET
+BT /R 9 Tf 1 0 0 1 100 303.0 Tm (Verify Defender status and signature freshness) Tj ET
+BT /R 7 Tf 1 0 0 1 535 303.0 Tm (N/A) Tj ET
+0.8 w 49 275.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 283.0 Tm (W167) Tj ET
+BT /R 9 Tf 1 0 0 1 100 283.0 Tm (Verify all applicable firewall profiles are on) Tj ET
+BT /R 7 Tf 1 0 0 1 535 283.0 Tm (N/A) Tj ET
+0.8 w 49 255.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 263.0 Tm (W168) Tj ET
+BT /R 9 Tf 1 0 0 1 100 263.0 Tm (Verify only necessary inbound exceptions remain) Tj ET
+BT /R 7 Tf 1 0 0 1 535 263.0 Tm (N/A) Tj ET
+0.8 w 49 235.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 243.0 Tm (W169) Tj ET
+BT /R 9 Tf 1 0 0 1 100 243.0 Tm (Verify updates are complete or pending status documented) Tj ET
+BT /R 7 Tf 1 0 0 1 535 243.0 Tm (N/A) Tj ET
+0.8 w 49 215.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 223.0 Tm (W170) Tj ET
+BT /R 9 Tf 1 0 0 1 100 223.0 Tm (Verify required services, shares and web connections work) Tj ET
+BT /R 7 Tf 1 0 0 1 535 223.0 Tm (N/A) Tj ET
+0.8 w 49 195.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 203.0 Tm (W171) Tj ET
+BT /R 9 Tf 1 0 0 1 100 203.0 Tm (Verify no unauthorized software or persistence remains) Tj ET
+BT /R 7 Tf 1 0 0 1 535 203.0 Tm (N/A) Tj ET
+0.8 w 49 175.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 183.0 Tm (W172) Tj ET
+BT /R 9 Tf 1 0 0 1 100 183.0 Tm (Confirm administrator and ordinary user logins still work) Tj ET
+BT /R 7 Tf 1 0 0 1 535 183.0 Tm (N/A) Tj ET
+0.8 w 49 155.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 163.0 Tm (W173) Tj ET
+BT /R 9 Tf 1 0 0 1 100 163.0 Tm (Refresh scoring report and record final value and time) Tj ET
+BT /R 7 Tf 1 0 0 1 535 163.0 Tm (N/A) Tj ET
+0.8 w 49 135.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 143.0 Tm (W174) Tj ET
+BT /R 9 Tf 1 0 0 1 100 143.0 Tm (Review each change and its rollback note) Tj ET
+BT /R 7 Tf 1 0 0 1 535 143.0 Tm (N/A) Tj ET
+0.8 w 49 115.0 10 10 re S
+BT /B 8 Tf 1 0 0 1 67 123.0 Tm (W175) Tj ET
+BT /R 9 Tf 1 0 0 1 100 123.0 Tm (Save any permitted evidence and cleanly finish without unsafe reboot) Tj ET
+BT /R 7 Tf 1 0 0 1 535 123.0 Tm (N/A) Tj ET
+BT /R 8 Tf 1 0 0 1 51 89.0 Tm (Notes / exceptions: ______________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (7/8) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 510 >>
+stream
+0.08 0.20 0.32 rg 0 760 612 32 re f 1 1 1 rg BT /B 11 Tf 1 0 0 1 45 771 Tm (WINDOWS 10/11 CHECKLIST) Tj ET 0 g
+BT /B 9 Tf 1 0 0 1 50 722.0 Tm (FINAL REVIEW  -  required services tested / exceptions / reviewer:) Tj ET
+BT /R 8 Tf 1 0 0 1 50 697.0 Tm (_________________________________________________________________________________) Tj ET
+0.7 G 0.5 w 46 48 m 565 48 l S 0 g BT /R 8 Tf 1 0 0 1 49 34 Tm (CyberPatriot printable checklist - original guide unchanged) Tj ET BT /R 8 Tf 1 0 0 1 535 34 Tm (8/8) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /R 3 0 R /B 4 0 R >> >> /Contents 19 0 R >>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000163 00000 n 
+0000000233 00000 n 
+0000000308 00000 n 
+0000005675 00000 n 
+0000005809 00000 n 
+0000011812 00000 n 
+0000011946 00000 n 
+0000017978 00000 n 
+0000018113 00000 n 
+0000024065 00000 n 
+0000024201 00000 n 
+0000030168 00000 n 
+0000030304 00000 n 
+0000036184 00000 n 
+0000036320 00000 n 
+0000042524 00000 n 
+0000042660 00000 n 
+0000043221 00000 n 
+trailer
+<< /Size 21 /Root 1 0 R >>
+startxref
+43357
+%%EOF
