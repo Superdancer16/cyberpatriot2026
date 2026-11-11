@@ -1,5 +1,12 @@
-# Linux and FreeBSD — Prioritized CyberPatriot Manuals
+# 🐧 Linux and FreeBSD — Prioritized CyberPatriot Manuals
 
+> [!TIP]
+> **🧭 Quick orientation:** Use the links below to locate the right topic. Throughout the manuals, look for **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution**.
+
+
+---
+
+<a id="topic-1"></a>
 ## Begin with Basics, then First Things to Do
 
 All three main Linux guides are now structured by learning stage and practical priority: **Basics / Info → README and Forensics → Common Security Checks → Services/Software → Advanced and Recovery → Final Verification**.

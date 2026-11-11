@@ -1,5 +1,12 @@
-# Misc Softwares
+# 🧰 Misc Softwares
 
+> [!TIP]
+> **🧭 Quick orientation:** Use the links below to locate the right topic. Throughout the manuals, look for **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution**.
+
+
+---
+
+<a id="topic-1"></a>
 ## External tools and software references
 
 - [Using the scripts (historical reference; not included in this repository)](using-the-scripts.md)
