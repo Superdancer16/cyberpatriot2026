@@ -1900,23 +1900,25 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > Get-LocalUser | Format-Table Name, Enabled, PasswordRequired, PasswordExpires, LastLogon
 > ```
 
-##### WS.2.2 Delete users who are not in the README
-- [ ] **🎯 DO THIS (only if authorized) — WS.2.2 Delete users who are not in the README**
+##### WS.2.2 Reconcile unauthorized local users
+- [ ] **🎯 DO THIS — WS.2.2 Reconcile unauthorized local users**
 
 > [!NOTE]
 > **💡 Why it matters:** Extra accounts are how attackers get back in.
 
-**⭐ EASIEST WAY — Click through the GUI:** In `lusrmgr.msc` → **Users**, right-click the user → **Delete**.
+**⭐ EASIEST WAY — GUI (non-DC only):** In `lusrmgr.msc` → **Users**, confirm the user is unauthorized, preserve evidence, then **Properties → Account is disabled** for reversible containment. If the image explicitly requires account **removal**, use **Delete** after validating the identity; disabling alone may not meet a removal task.
 
 > [!NOTE]
 > **🔁 Alternate (optional) — PowerShell:**
 >
 > ```powershell
-> Remove-LocalUser -Name mallory
+> Disable-LocalUser -Name EXAMPLE_UNAUTHORIZED_USER
+> # If removal is specifically required after preserving evidence:
+> # Remove-LocalUser -Name EXAMPLE_UNAUTHORIZED_USER
 > ```
 
 > [!CAUTION]
-> Don't delete the built-in accounts (**Administrator, Guest, DefaultAccount, WDAGUtilityAccount**): *disable* them instead (2.6). Never delete yourself or anyone on the README.
+> **Verify:** Reopen the account and check the scored task, required logins and services. Never delete built-in identities, your only admin, a README-authorized user or a service account. On Domain Controllers, use the **AD-specific** user procedures, not local SAM cmdlets.
 
 ##### WS.2.3 Create users the README says should exist
 - [ ] **🎯 DO THIS — WS.2.3 Create users the README says should exist**
