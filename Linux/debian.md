@@ -2002,30 +2002,18 @@ sudo ss -lntup
 sudo journalctl -p err -n 50 --no-pager
 ```
 
-#### 16.1 General service editing workflow
+#### 16.1 Shared service editing and recovery
 
-When the README says a service **must keep working**, you don't remove it. You make it **safer**. This guide covers the services that appear most often on Mint, Debian and Ubuntu images.
+**Shared service workflow (applies to each service below):** Read the image README; identify the installed package, **actual** systemd unit, configuration path, required users/ports and working client behavior. Do not install or remove a required server merely to match an example.
 
-> [!IMPORTANT]
-> Rules for every service:
-> 1. **Back up the config file first:** `sudo cp file file.bak`
-> 2. **Test the config** before restarting (each section shows the test command).
-> 3. **Check the service still works** after restarting: `systemctl status <name>`. If it's red or "failed", restore the backup.
-> 4. **Check the Scoring Report.** If the score dropped, undo your last change.
+1. **Inspect:** `systemctl status UNIT --no-pager`, `systemctl cat UNIT`, `sudo ss -lntup`; preserve forensic evidence and console/authorized recovery access.
+2. **Back up:** `sudo cp -a ACTUAL_CONFIG ACTUAL_CONFIG.before-cp` (choose a fresh suffix if one exists). The example paths below apply **only when they exist**; use the correct package/version path.
+3. **Fix:** Use the service's existing configuration sections and included files; make one required change. In `nano`: **Ctrl+W** search, **Ctrl+O → Enter** save, **Ctrl+X** exit.
+4. **Verify:** Run that service's syntax check **before** reloading/restarting; confirm `systemctl status UNIT`, `sudo journalctl -u UNIT -n 50 --no-pager`, an actual client transaction, and the scoring report.
+5. **↩️ Undo:** Restore the exact saved file(s), validate again, reload/restart if needed, and retest the required client. Do not use a purge/reinstall as a first repair or assume a green daemon status proves application access.
 
-Use the per-service manual procedures below for every installed required service. No automation is included in this repository.
-
----
-
-#### Safe service editing workflow
-
-All commands here are for a **terminal on Ubuntu, Linux Mint or Debian**, using `sudo` for privileged operations. They are written individually so you can inspect the result before the next command. They are not commands to run on this handbook's development workspace. For FreeBSD use its the FreeBSD checklist; packages generally configure under `/usr/local/etc` and use rc services.
-
-Before every service change: read the README, identify its package/unit, record a working client test, preserve evidence, and keep console access. A package can be absent without being a vulnerability. Do not install an unnecessary server just to complete a checklist. Replace all example site, share, user and network names with the image's actual values.
-
-For a config edit, `sudo cp -a` preserves metadata. Use a unique backup suffix if `.before-cp` already exists. In `nano`, **Ctrl+W** searches, **Ctrl+O → Enter** saves, **Ctrl+X** exits. Edit existing directives in their correct section instead of appending contradictory copies. Check included files and per-site overrides. A successful syntax check does not prove client access works.
-
-If a service fails: read `systemctl status` and `journalctl -u UNIT -n 50 --no-pager`, restore the edited file, recheck syntax, then reload/restart. Do not purge and reinstall as a first repair.
+> [!CAUTION]
+> **Avoid downtime:** Preserve required websites, shares, DNS/DHCP, FTP, SSH, databases and application dependencies. A change in one file may be overridden by an included config. Do not copy example paths/credentials into a different installed release.
 
 #### Apache web server (`apache2`)
 
