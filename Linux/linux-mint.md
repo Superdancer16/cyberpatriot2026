@@ -179,25 +179,28 @@ Prioritize account privileges, password policy, firewall and signed updates befo
 > ```
 > This prints every user with a user ID (UID) of 1000 or more, which means the real people.
 
-#### 2.2 Delete users who are not in the README
-- [ ] **🎯 DO THIS (only if authorized) — 2.2 Delete users who are not in the README**
+#### 2.2 Reconcile unauthorized users
+- [ ] **🎯 DO THIS — 2.2 Reconcile unauthorized users**
 
 > [!NOTE]
-> **🎯 What:** Remove each account that isn't listed as an authorized admin or user.
+> **🎯 What:** Identify any login not authorized by the README; preserve forensic evidence before disabling or removing it.
 
 > [!NOTE]
 > **💡 Why it matters:** An extra account is the easiest way for an attacker to get back in.
 
-**⭐ EASIEST WAY — GUI (when available):** In **Users and Groups**, select the user → click **Delete** (the "−" button) → keep or delete their files.
+**⭐ EASIEST WAY — Terminal:** Confirm the identity, record `sudo chage -l EXAMPLE_USER`, then use `sudo usermod --expiredate 1970-01-02 EXAMPLE_USER` to contain access reversibly. If the README/scoring task requires the account **removed**, delete only after preserving evidence; an expired account may not satisfy a removal task.
 
 > [!NOTE]
 > **🔁 Alternate (optional) — Terminal:**
 >
 > ```bash
-> sudo userdel mallory          # delete the account (keeps /home/mallory for now)
+> sudo chage -l EXAMPLE_USER              # record original expiry
+> sudo usermod --expiredate 1970-01-02 EXAMPLE_USER  # disable
+> # If explicit account removal is required and evidence is preserved:
+> # sudo userdel EXAMPLE_USER
 > ```
 >
-**✅ Check it worked:** `id mallory` should say `no such user`.
+**✅ Verify:** `sudo chage -l EXAMPLE_USER` shows expiry; if removed, `id EXAMPLE_USER` reports no such user. Verify an authorized admin can still sign in. Undo a mistaken expiry by restoring the original value.
 
 > [!CAUTION]
 > Check the spelling against the README **three times**. Deleting an authorized user is a penalty. Never delete yourself, `root`, or system accounts (UID below 1000 like `www-data`, `syslog`, `messagebus`).
