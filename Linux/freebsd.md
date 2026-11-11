@@ -50,6 +50,9 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 
 <a id="topic-2"></a>
+> [!IMPORTANT]
+> **🎯 TASK = do/check only what applies to the README.** **⭐ EASIEST WAY** shows the recommended GUI if one exists; otherwise use the Terminal commands. Blue **NOTE** boxes contain alternate methods and background information. Yellow/orange **CAUTION/WARNING** boxes contain safe-rollback reminders. **Do not run both GUI and Terminal procedures just to tick a checkbox.**
+
 ## 0. Before you start
 
 - [ ] Read the README; write down admins, users, critical services.
@@ -58,25 +61,39 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 - [ ] Answer the forensics questions ([guide](../General/All/forensics-questions.md)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
 
 ### 0.1 Fast path: run the hardening script
-- [ ] Done
+- [ ] **🎯 DO THIS — 0.1 Fast path: run the hardening script**
 
-**🎯 What:** Prepare a manual baseline. The upstream automation is not included in this repository.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Prepare a manual baseline. The upstream automation is not included in this repository.
 
-**💡 Why it matters:** A status label cannot establish that a setting is correct on this particular image.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** A status label cannot establish that a setting is correct on this particular image.
 
-**🛑 Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Read the README and preserve forensics evidence. Record your current administrator account, required users, services, ports, and initial score.
 
-**🖱️ Clicking (GUI):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
+**⭐ EASIEST WAY — GUI (when available):** Open the README and Scoring Report from the desktop. In your VM manager, create a practice snapshot only if the round rules permit it. Open the platform's account and service management screens described below.
 
-**🔎 Typing (check):** Use the read-only inventory commands in the next section of this checklist. Save their output in a private working folder; do not publish passwords or password hashes.
-
-**🛠️ Typing (fix, only when appropriate):** Work through one manual item at a time below. Read every command before entering it. There is no script to download from this repository.
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
 **✅ Check it worked:** Repeat each inspection, test the README-required function, then refresh the Scoring Report. A lack of new points does not prove the change failed.
 
-**↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
-**⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
 
 ---
 
@@ -85,14 +102,14 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 ## 1. Users and groups
 
 ### 1.1 List users
-- [ ] Done
+- [ ] **🎯 DO THIS — 1.1 List users**
 
 ```bash
 awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd
 ```
 
 ### 1.2 Delete unauthorized users, add missing ones
-- [ ] Done
+- [ ] **🎯 DO THIS (only if authorized) — 1.2 Delete unauthorized users, add missing ones**
 
 ```bash
 pw userdel mallory              # add -r to also delete their home folder
@@ -102,7 +119,7 @@ passwd erin                     # ...then give erin a password
 ```
 
 ### 1.3 Admins = the `wheel` group
-- [ ] Done
+- [ ] **🎯 DO THIS — 1.3 Admins = the wheel group**
 
 ```bash
 pw groupshow wheel
@@ -114,7 +131,7 @@ If the `pam_group` line starts with `#`, anyone who learns the root password can
 If `sudo` or `doas` is installed, also check their rules (section 7).
 
 ### 1.4 Hidden root accounts
-- [ ] Done
+- [ ] **🎯 DO THIS — 1.4 Hidden root accounts**
 
 ```bash
 awk -F: '$3 == 0 {print $1, $2}' /etc/master.passwd
@@ -126,7 +143,7 @@ pw userdel mallory              # any OTHER UID-0 account is a backdoor: delete 
 ```
 
 ### 1.5 Empty passwords and weak passwords
-- [ ] Done
+- [ ] **🎯 DO THIS — 1.5 Empty passwords and weak passwords**
 
 ```bash
 awk -F: '$2 == "" {print $1}' /etc/master.passwd     # accounts with NO password
@@ -138,9 +155,11 @@ pw lock mallory                                      # or lock an account nobody
 > If **`root`** is on the empty-password list, give it a password with `passwd root`. **Never lock root**: you would lose `su -`. Keep a tested root/sudo/doas recovery path before any authentication change.
 
 ### 1.6 System accounts that can log in
-- [ ] Done
+- [ ] **🎯 DO THIS — 1.6 System accounts that can log in**
 
-**🎯 What:** System accounts (UID below 1000, like `daemon`, `www`, `games`) never log in, so their shell is `/usr/sbin/nologin`. An attacker who gives one a real shell (and a password) has a hidden login.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** System accounts (UID below 1000, like `daemon`, `www`, `games`) never log in, so their shell is `/usr/sbin/nologin`. An attacker who gives one a real shell (and a password) has a hidden login.
 ```bash
 awk -F: '$3 < 1000 && $7 != "/usr/sbin/nologin" {print $1, $3, $7}' /etc/passwd
 pw usermod mallory -s /usr/sbin/nologin    # mallory = the account you found
@@ -154,7 +173,7 @@ Normal output: `root`, `toor` (empty shell) and `uucp` (its own `uucico` program
 ## 2. Password policy
 
 ### 2.1 Strong hashing and password expiry (`/etc/login.conf`)
-- [ ] Done
+- [ ] **🎯 DO THIS — 2.1 Strong hashing and password expiry (/etc/login.conf)**
 
 ```bash
 ee /etc/login.conf
@@ -171,7 +190,7 @@ cap_mkdb /etc/login.conf
 Both settings only apply to passwords set **after** this: if you already changed passwords in 1.5, set them again (`passwd bob`). `minpasswordlen` and `mixpasswordcase` in `login.conf` do nothing on FreeBSD (the manual lists them as "not implemented"); password length is set in 2.2.
 
 ### 2.2 Password complexity (`pam_passwdqc`)
-- [ ] Done
+- [ ] **🎯 DO THIS — 2.2 Password complexity (pam_passwdqc)**
 
 ```bash
 ee /etc/pam.d/passwd
@@ -189,7 +208,7 @@ This asks for 12+ characters using at least three kinds (lower case, upper case,
 ## 3. Firewall (pf)
 
 ### 3.1 Write a pf ruleset
-- [ ] Done
+- [ ] **🎯 DO THIS — 3.1 Write a pf ruleset**
 
 ```bash
 ee /etc/pf.conf
@@ -226,7 +245,7 @@ ipfw list                       # the rules now in use
 ## 4. Services
 
 ### 4.1 See what starts at boot
-- [ ] Done
+- [ ] **🎯 DO THIS — 4.1 See what starts at boot**
 
 ```bash
 service -e                      # every enabled service
@@ -235,7 +254,7 @@ sockstat -4 -6 -l               # what's listening
 ```
 
 ### 4.2 Turn off what the README doesn't need
-- [ ] Done
+- [ ] **🎯 DO THIS — 4.2 Turn off what the README doesn't need**
 
 ```bash
 sysrc ftpd_enable=NO    ; service ftpd onestop
@@ -247,7 +266,7 @@ Do the same for anything else in the 4.1 lists that the README doesn't need, for
 Also check `/etc/inetd.conf`: any line without `#` starts a service (telnet, ftp...). Comment them out. (There is no `telnetd_enable`: the telnet server runs through inetd, and FreeBSD 14 only has it as a package, `freebsd-telnetd`.)
 
 ### 4.3 Safer defaults in `/etc/rc.conf`
-- [ ] Done
+- [ ] **🎯 DO THIS — 4.3 Safer defaults in /etc/rc.conf**
 
 ```bash
 sysrc sendmail_enable=NONE      # no mail server (unless the README needs mail)
@@ -264,7 +283,7 @@ sysrc dumpdev=NO                # no crash dumps (they contain memory, i.e. pass
 ## 5. SSH
 
 ### 5.1 Secure sshd_config
-- [ ] Done
+- [ ] **🎯 DO THIS — 5.1 Secure sshd_config**
 
 Only if SSH is critical; otherwise `sysrc sshd_enable=NO; service sshd stop`.
 ```bash
@@ -284,7 +303,7 @@ blacklistd blocks through pf, so it only works if `/etc/pf.conf` has the `anchor
 ## 6. Software and updates
 
 ### 6.1 Remove prohibited packages
-- [ ] Done
+- [ ] **🎯 DO THIS (only if authorized) — 6.1 Remove prohibited packages**
 
 ```bash
 pkg info                        # everything installed
@@ -296,14 +315,14 @@ pkg autoremove -y
 > `/usr/bin/nc` (netcat) is **part of FreeBSD itself** and can't be removed. Look for it in cron jobs and running processes instead.
 
 ### 6.2 Known security holes
-- [ ] Done
+- [ ] **🎯 DO THIS — 6.2 Known security holes**
 
 ```bash
 pkg audit -F                    # lists installed packages with known vulnerabilities
 ```
 
 ### 6.3 Updates
-- [ ] Done
+- [ ] **🎯 DO THIS — 6.3 Updates**
 
 ```bash
 pkg lock -l                     # locked packages are never upgraded
@@ -321,7 +340,7 @@ echo '0 3 * * * root /usr/sbin/freebsd-update cron' >> /etc/crontab   # only if 
 ```
 
 ### 6.4 Media files
-- [ ] Done
+- [ ] **🎯 DO THIS — 6.4 Media files**
 
 ```bash
 find /home /usr/home /root /tmp -type f \( -iname '*.mp3' -o -iname '*.mp4' -o -iname '*.avi' -o -iname '*.mkv' -o -iname '*.wav' -o -iname '*.flac' \)
@@ -332,7 +351,7 @@ find /home /usr/home /root /tmp -type f \( -iname '*.mp3' -o -iname '*.mp4' -o -
 ## 7. sudo / doas rules
 
 ### 7.1 No password-less root
-- [ ] Done
+- [ ] **🎯 DO THIS — 7.1 No password-less root**
 
 ```bash
 cat /usr/local/etc/sudoers /usr/local/etc/sudoers.d/* 2>/dev/null   # edit with: visudo
@@ -345,7 +364,7 @@ Remove `NOPASSWD` (sudo) and `nopass` (doas). Only the README admins (or `%wheel
 ## 8. Kernel security settings
 
 ### 8.1 /etc/sysctl.conf
-- [ ] Done
+- [ ] **🎯 DO THIS — 8.1 /etc/sysctl.conf**
 
 Open the file with `ee /etc/sysctl.conf` and make sure it has these lines (change a line that already sets the same name instead of adding a second one):
 ```
@@ -374,9 +393,11 @@ Apply right away: `service sysctl restart`. `see_other_uids=0` means users can't
 **✅ Check it worked:** `sysctl security.bsd.see_other_uids net.inet.tcp.blackhole` shows `0` and `2`.
 
 ### 8.2 Ask for the root password in single-user mode
-- [ ] Done
+- [ ] **🎯 DO THIS — 8.2 Ask for the root password in single-user mode**
 
-**🎯 What:** Anyone at the keyboard can reboot into single-user mode and get a root shell **without a password** unless the `console` line in `/etc/ttys` says `insecure`. This is the "Enable console password prompt" choice of the FreeBSD installer's hardening menu.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Anyone at the keyboard can reboot into single-user mode and get a root shell **without a password** unless the `console` line in `/etc/ttys` says `insecure`. This is the "Enable console password prompt" choice of the FreeBSD installer's hardening menu.
 ```bash
 grep '^console' /etc/ttys                     # default: console none unknown off secure
 sed -i '' '/^console/s/off secure/off insecure/' /etc/ttys
@@ -390,9 +411,11 @@ grep -q allow_destructive_dtrace /boot/loader.conf || echo 'security.bsd.allow_d
 ```
 
 ### 8.3 Kernel securelevel (optional, do it LAST)
-- [ ] Done
+- [ ] **🎯 DO THIS — 8.3 Kernel securelevel (optional, do it LAST)**
 
-**🎯 What:** At securelevel 1 nobody, not even root, can load kernel modules, remove the "system immutable" file flag or write to raw memory and mounted disks. It only takes effect at the next boot.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** At securelevel 1 nobody, not even root, can load kernel modules, remove the "system immutable" file flag or write to raw memory and mounted disks. It only takes effect at the next boot.
 ```bash
 sysrc kern_securelevel_enable=YES kern_securelevel=1
 ```
@@ -406,7 +429,7 @@ sysrc kern_securelevel_enable=YES kern_securelevel=1
 ## 9. Permissions
 
 ### 9.1 Important files and SUID programs
-- [ ] Done
+- [ ] **🎯 DO THIS — 9.1 Important files and SUID programs**
 
 ```bash
 ls -l /etc/master.passwd /etc/spwd.db      # must be -rw------- root wheel
@@ -422,7 +445,7 @@ chmod 700 /home/bob                            # fix one that is open to everyon
 ## 10. Backdoors
 
 ### 10.1 Cron, start-up scripts, shell files, keys, hosts
-- [ ] Done
+- [ ] **🎯 DO THIS — 10.1 Cron, start-up scripts, shell files, keys, hosts**
 
 ```bash
 ls -la /var/cron/tabs/ ; grep -Hv '^#' /var/cron/tabs/* 2>/dev/null   # every user's cron jobs (file name = user)
@@ -441,7 +464,7 @@ grep _load /boot/loader.conf     # modules loaded at boot
 FreeBSD's own `.cshrc`/`.shrc` have harmless aliases like `h`, `j`, `la`, `lf`, `ll`. An alias that changes `su`, `sudo`, `ls`, `ps` or `passwd` is a trap.
 
 ### 10.2 Tampered system files
-- [ ] Done
+- [ ] **🎯 DO THIS — 10.2 Tampered system files**
 
 ```bash
 freebsd-update IDS | less        # lists system files that differ from the official release
@@ -453,7 +476,7 @@ freebsd-update IDS | less        # lists system files that differ from the offic
 ## 11. Logging
 
 ### 11.1 Security auditing on
-- [ ] Done
+- [ ] **🎯 DO THIS — 11.1 Security auditing on**
 
 ```bash
 sysrc auditd_enable=YES && service auditd start
@@ -475,13 +498,19 @@ The commands below use a **root console running `sh`**, even though fences use `
 
 ### 13.1 Account, wheel and PAM recovery
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 13.1 Account, wheel and PAM recovery**
 
-**🎯 What:** Preserve usable administration and inspect FreeBSD account policy.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Preserve usable administration and inspect FreeBSD account policy.
 
-**💡 Why it matters:** `wheel` controls root escalation through the configured `su` PAM policy; membership alone does not grant passwordless sudo. FreeBSD account data includes database files rebuilt by its native tools.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** `wheel` controls root escalation through the configured `su` PAM policy; membership alone does not grant passwordless sudo. FreeBSD account data includes database files rebuilt by its native tools.
 
-**🛑 Before changing anything:** Keep one root console open. Save private copies:
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Keep one root console open. Save private copies:
 
 ```bash
 install -d -m 700 /root/cp-backups
@@ -491,26 +520,30 @@ cp -Rp /etc/pam.d /root/cp-backups/pam.d.before-cp
 
 Do not expose `/etc/master.passwd`, which contains password hashes. Use unique backup paths when repeating.
 
-**🖱️ Clicking (GUI):** A base FreeBSD installation has no standard graphical account control panel. Use the VM console and `ee` text editor. In `ee`, press **Esc** for its menu and follow the save/exit prompts.
+**⭐ EASIEST WAY — GUI (when available):** A base FreeBSD installation has no standard graphical account control panel. Use the VM console and `ee` text editor. In `ee`, press **Esc** for its menu and follow the save/exit prompts.
 
-**🔎 Typing (check):**
-
-```bash
-id
-pw usershow bob
-pw groupshow wheel
-pw usershow -a | awk -F: '$3 == 0 { print $1, $3, $6, $7 }'
-pw usershow bob -P
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> id
+> pw usershow bob
+> pw groupshow wheel
+> pw usershow -a | awk -F: '$3 == 0 { print $1, $3, $6, $7 }'
+> pw usershow bob -P
+> ```
+>
 The last command pretty-prints account details, not a plaintext password. Root and the traditional `toor` alternative may exist; investigate enabled credentials and shells rather than deleting every extra UID-0 entry blindly. Inspect `/etc/pam.d/su` and installed sudo/doas rules if used.
 
-**🛠️ Typing (fix, only when appropriate):** For an authorized administrator:
-
-```bash
-pw groupmod wheel -m bob
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> pw groupmod wheel -m bob
+> ```
+>
 For a confirmed unauthorized member:
 
 ```bash
@@ -527,70 +560,96 @@ This locks the password; inspect SSH keys and active sessions too. Use `vipw` fo
 
 **✅ Check it worked:** New login as the intended ordinary user, `id`, and a permitted `su -` with root's password. Root's own `su - bob` does not validate Bob's password. Test existing sudo/doas authorization separately if installed.
 
-**↩️ Undo:** Restore recorded wheel membership with `pw groupmod`, and `pw unlock mallory` only if it was originally unlocked. Recover account entries with `vipw`/supported account tools and their database rebuilding, coordinating any changes made since backup. Do not blindly overwrite account databases.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore recorded wheel membership with `pw groupmod`, and `pw unlock mallory` only if it was originally unlocked. Recover account entries with `vipw`/supported account tools and their database rebuilding, coordinating any changes made since backup. Do not blindly overwrite account databases.
 
-**⚠️ Warnings:** Do not lock root while `su` is your only administrator path. Service accounts and the base `toor` entry need context. Never log password hashes or use a shared example password.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Do not lock root while `su` is your only administrator path. Service accounts and the base `toor` entry need context. Never log password hashes or use a shared example password.
 
 ### 13.2 Login classes, password quality and aging
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 13.2 Login classes, password quality and aging**
 
-**🎯 What:** Apply FreeBSD login class capabilities and PAM password quality carefully.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Apply FreeBSD login class capabilities and PAM password quality carefully.
 
-**💡 Why it matters:** `/etc/login.conf` syntax uses colon-delimited capabilities and line continuations; an invalid file or PAM line can break password changes. An expired credential is distinct from a locked account.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** `/etc/login.conf` syntax uses colon-delimited capabilities and line continuations; an invalid file or PAM line can break password changes. An expired credential is distinct from a locked account.
 
-**🛑 Before changing anything:** Back up `/etc/login.conf`, its database if present, and `/etc/pam.d/passwd`. Keep a root console. Record the user's class and expiration with `pw usershow bob -P`.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Back up `/etc/login.conf`, its database if present, and `/etc/pam.d/passwd`. Keep a root console. Record the user's class and expiration with `pw usershow bob -P`.
 
-**🖱️ Clicking (GUI):** No standard base GUI exists; use `ee /etc/login.conf` and inspect the account's class with native tools.
+**⭐ EASIEST WAY — GUI (when available):** No standard base GUI exists; use `ee /etc/login.conf` and inspect the account's class with native tools.
 
-**🔎 Typing (check):**
-
-```bash
-grep -nE 'passwd_format|passwordtime|default:' /etc/login.conf
-cat /etc/pam.d/passwd
-man login.conf
-man pam_passwdqc
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> grep -nE 'passwd_format|passwordtime|default:' /etc/login.conf
+> cat /etc/pam.d/passwd
+> man login.conf
+> man pam_passwdqc
+> ```
+>
 Read the installed release's manual. Do not assume Linux pwquality options work with FreeBSD passwdqc or force an older hashing algorithm over a supported stronger default.
 
-**🛠️ Typing (fix, only when appropriate):** In the applicable class, preserve the stanza and inspect `passwordtime=90d` only if 90-day expiration is required. Keep supported hashing defaults unless the README or current release guidance requires a change. Rebuild after editing:
-
-```bash
-cap_mkdb /etc/login.conf
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> cap_mkdb /etc/login.conf
+> ```
+>
 Use section 2.2's `pam_passwdqc` line only when that module is available and the actual stack has the expected order. For an existing user's explicit password expiry, consult `man pw` and use the scenario's recorded date; changing a login class does not retroactively prove all old passwords comply.
 
 **✅ Check it worked:** As an ordinary authorized user in a separate session run `passwd`, confirm rejection of a deliberately weak test password, then choose a unique strong password. Verify a fresh login succeeds and inspect the user's resulting expiry. Do not test on root first.
 
-**↩️ Undo:** Restore the changed PAM file and login.conf from private backup, run `cap_mkdb /etc/login.conf` again, and restore the user's recorded expiry with the native account tool. Test before closing root.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the changed PAM file and login.conf from private backup, run `cap_mkdb /etc/login.conf` again, and restore the user's recorded expiry with the native account tool. Test before closing root.
 
-**⚠️ Warnings:** Never append Linux pam_faillock or pam_pwhistory recipes into FreeBSD's stack without explicit release support and correct policy integration. Do not repeatedly fail the only administrator login to test lockout.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Never append Linux pam_faillock or pam_pwhistory recipes into FreeBSD's stack without explicit release support and correct policy integration. Do not repeatedly fail the only administrator login to test lockout.
 
 ### 13.3 pf with console recovery and required client tests
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 13.3 pf with console recovery and required client tests**
 
-**🎯 What:** Validate and load the existing packet-filter policy without discarding required traffic.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Validate and load the existing packet-filter policy without discarding required traffic.
 
-**💡 Why it matters:** A syntactically valid ruleset can still lock out administrators or block DHCP, DNS and IPv6 neighbor discovery. FreeBSD pf differs from current OpenBSD pf.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** A syntactically valid ruleset can still lock out administrators or block DHCP, DNS and IPv6 neighbor discovery. FreeBSD pf differs from current OpenBSD pf.
 
-**🛑 Before changing anything:** Use the local VM console, identify interfaces and active firewall ownership. Do not run pf and ipfw concurrently merely because both are available.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Use the local VM console, identify interfaces and active firewall ownership. Do not run pf and ipfw concurrently merely because both are available.
 
-**🖱️ Clicking (GUI):** There is no standard pf GUI on base FreeBSD. Keep the VM console visible while a second authorized machine tests access.
+**⭐ EASIEST WAY — GUI (when available):** There is no standard pf GUI on base FreeBSD. Keep the VM console visible while a second authorized machine tests access.
 
-**Typing (check and backup):**
-
-```bash
-ifconfig
-route -n get default
-sysrc pf_enable firewall_enable
-pfctl -s info
-pfctl -sr
-cp -p /etc/rc.conf /root/cp-backups/rc.conf.before-pf
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> ifconfig
+> route -n get default
+> sysrc pf_enable firewall_enable
+> pfctl -s info
+> pfctl -sr
+> cp -p /etc/rc.conf /root/cp-backups/rc.conf.before-pf
+> ```
+>
 If `/etc/pf.conf` exists:
 
 ```bash
@@ -599,12 +658,14 @@ cp -p /etc/pf.conf /root/cp-backups/pf.conf.before-cp
 
 A disabled filter or missing config requires deliberate planning, not blind replacement. Record whether it was enabled and save existing rules privately.
 
-**🛠️ Typing (fix, only when appropriate):** `ee /etc/pf.conf`; preserve the existing policy and add only required source-scoped service allowances. For example, within a suitable existing policy:
-
-```text
-pass in on em0 inet proto tcp from 192.168.10.0/24 to (em0) port 22 keep state
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```text
+> pass in on em0 inet proto tcp from 192.168.10.0/24 to (em0) port 22 keep state
+> ```
+>
 Replace interface/subnet/port. The broad example in section 3 is only a starting illustration: retain DHCP client/server, DNS and necessary ICMP/ICMPv6 rules for the actual role. Validate:
 
 ```bash
@@ -626,19 +687,29 @@ service pf start
 
 **✅ Check it worked:** `pfctl -s info` should show Enabled; `pfctl -sr` should show intended rules. Test **new** required connections, DHCP renewal on a noncritical test client if applicable, and name resolution. Existing states can hide a missing allow rule.
 
-**↩️ Undo:** From the console restore the original file, validate and load it again. If pf was newly enabled and must be reverted, `pfctl -d` disables filtering temporarily; then restore the recorded rc.conf enable state. Do not leave protection disabled as the permanent repair. Do not `pfctl -F all` to troubleshoot one denied connection.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** From the console restore the original file, validate and load it again. If pf was newly enabled and must be reverted, `pfctl -d` disables filtering temporarily; then restore the recorded rc.conf enable state. Do not leave protection disabled as the permanent repair. Do not `pfctl -F all` to troubleshoot one denied connection.
 
-**⚠️ Warnings:** A blacklisting anchor only has effect if its daemon and application integration are correctly configured; do not assume the anchor alone stops guessing. Do not replace an existing ipfw policy using a pf tutorial.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** A blacklisting anchor only has effect if its daemon and application integration are correctly configured; do not assume the anchor alone stops guessing. Do not replace an existing ipfw policy using a pf tutorial.
 
 ### 13.4 SSH and package-provided network services
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 13.4 SSH and package-provided network services**
 
-**🎯 What:** Use rc services, package-specific configuration and actual client tests.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Use rc services, package-specific configuration and actual client tests.
 
-**💡 Why it matters:** FreeBSD base OpenSSH uses `/etc/ssh`; third-party servers generally use `/usr/local/etc`, not Linux paths.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** FreeBSD base OpenSSH uses `/etc/ssh`; third-party servers generally use `/usr/local/etc`, not Linux paths.
 
-**🛑 Before changing anything:** Record required clients and working transactions. Keep root console and an existing authorized connection open. Determine base versus package ownership:
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Record required clients and working transactions. Keep root console and an existing authorized connection open. Determine base versus package ownership:
 
 ```bash
 service -l
@@ -649,7 +720,7 @@ pkg info
 
 A base file may not belong to a pkg package; `pkg which PATH` returning no owner does not prove malware.
 
-**🖱️ Clicking (GUI):** Test required web/file/database applications with an existing client/browser. Server configuration normally uses `ee`, not a base graphical control panel.
+**⭐ EASIEST WAY — GUI (when available):** Test required web/file/database applications with an existing client/browser. Server configuration normally uses `ee`, not a base graphical control panel.
 
 | Required service | Typical rc name | Typical config | Validation before apply |
 |---|---|---|---|
@@ -663,21 +734,25 @@ A base file may not belong to a pkg package; `pkg which PATH` returning no owner
 
 Names/paths depend on installed package/version and may be overridden by rc.conf. Inspect `service NAME rcvar`, `sysrc -a` and package messages before editing.
 
-**Typing (check, backup and edit):** SSH example:
-
-```bash
-service sshd status
-sysrc sshd_enable
-cp -p /etc/ssh/sshd_config /root/cp-backups/sshd_config.before-cp
-ee /etc/ssh/sshd_config
-```
-
-**🛠️ Typing (fix, only when appropriate):** Inspect `PermitRootLogin no`, `PermitEmptyPasswords no` and the actual authentication rules, preserving a permitted login for each required user. Keep forwarding/SFTP only as required. Validate and apply separately:
-
-```bash
-/usr/sbin/sshd -t
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> service sshd status
+> sysrc sshd_enable
+> cp -p /etc/ssh/sshd_config /root/cp-backups/sshd_config.before-cp
+> ee /etc/ssh/sshd_config
+> ```
+>
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> /usr/sbin/sshd -t
+> ```
+>
 After no errors:
 
 ```bash
@@ -688,44 +763,58 @@ For another installed server, use the table to identify its file, copy it privat
 
 **✅ Check it worked:** `service sshd status`, `/usr/sbin/sshd -T` and `sockstat -4 -6 -l`; test a fresh authorized SSH session. For each other service test its actual authorized client operation, not merely its rc status. Inspect `/var/log/messages`, `/var/log/auth.log` and the daemon's configured log.
 
-**↩️ Undo:** Restore the exact changed file, validate it and reload/restart that service. Restore its recorded rc enable value with `sysrc NAME_enable=YES/NO` only after confirming the real variable. Preserve original stopped/disabled states for services that were not needed.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the exact changed file, validate it and reload/restart that service. Restore its recorded rc enable value with `sysrc NAME_enable=YES/NO` only after confirming the real variable. Preserve original stopped/disabled states for services that were not needed.
 
-**⚠️ Warnings:** Do not disable a required SSH/web/database server or replace its full config with a Linux excerpt. Do not change `PermitRootLogin` until a working ordinary-user administration path is established.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Do not disable a required SSH/web/database server or replace its full config with a Linux excerpt. Do not change `PermitRootLogin` until a working ordinary-user administration path is established.
 
 ### 13.5 Packages, permissions, persistence and final verification
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 13.5 Packages, permissions, persistence and final verification**
 
-**🎯 What:** Complete FreeBSD-native update and investigation checks without applying Linux baselines.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Complete FreeBSD-native update and investigation checks without applying Linux baselines.
 
-**💡 Why it matters:** Base-system updates and pkg packages are separate. Base support/update methods depend on release and installation type; a handbook version label does not establish current support.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** Base-system updates and pkg packages are separate. Base support/update methods depend on release and installation type; a handbook version label does not establish current support.
 
-**🛑 Before changing anything:** Record release, enabled repositories and package origin. Preserve evidence and pending forensic answers. Do not raise kernel securelevel while repair may require changing immutable files.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Record release, enabled repositories and package origin. Preserve evidence and pending forensic answers. Do not raise kernel securelevel while repair may require changing immutable files.
 
-**🖱️ Clicking (GUI):** Use a file manager only if installed to inspect specific file properties; do not recursively change system ownership. Keep the console for package/update recovery.
+**⭐ EASIEST WAY — GUI (when available):** Use a file manager only if installed to inspect specific file properties; do not recursively change system ownership. Keep the console for package/update recovery.
 
-**🔎 Typing (check):**
-
-```bash
-freebsd-version -ku
-pkg -vv
-pkg audit -F
-pkg check -s -a
-stat -f '%Lp %Su:%Sg %N' /etc/master.passwd /etc/passwd /etc/group
-find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -ls 2>/dev/null
-crontab -l
-crontab -u bob -l
-ls -la /etc/cron.d /usr/local/etc/rc.d /usr/local/etc/periodic 2>/dev/null
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> freebsd-version -ku
+> pkg -vv
+> pkg audit -F
+> pkg check -s -a
+> stat -f '%Lp %Su:%Sg %N' /etc/master.passwd /etc/passwd /etc/group
+> find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -ls 2>/dev/null
+> crontab -l
+> crontab -u bob -l
+> ls -la /etc/cron.d /usr/local/etc/rc.d /usr/local/etc/periodic 2>/dev/null
+> ```
+>
 `pkg audit -F` refreshes advisory metadata, so it writes to disk; it is not evidence-preserving analysis. Hash mismatches need investigation, not automatic removal. FreeBSD master.passwd should not be readable by ordinary users; do not apply Linux root:shadow mode 640 to it.
 
-**🛠️ Typing (fix, only when appropriate):** Preview package upgrades:
-
-```bash
-pkg upgrade -n
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> pkg upgrade -n
+> ```
+>
 After reviewing required packages and repository consistency:
 
 ```bash
@@ -738,6 +827,10 @@ For an unauthorized cron entry, back up the user's crontab and use `crontab -u b
 
 **✅ Check it worked:** Repeat package audit after updates, inspect rc services and socket listeners, test permitted logins and required services, review logs, and verify scoring freshness. For auditd inspect `/etc/security/audit_control`, `service auditd status`, and read an appropriate saved audit file with `praudit`; do not clear trails.
 
-**↩️ Undo:** Restore the individual config/cron/sysctl value and validate again. A removed sysctl file entry does not reset the live value. Use supported package/base recovery for the specific update; file backups do not reverse package changes. Boot environments are useful only when available and permitted, and rollback can discard later fixes.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the individual config/cron/sysctl value and validate again. A removed sysctl file entry does not reset the live value. Use supported package/base recovery for the specific update; file backups do not reverse package changes. Boot environments are useful only when available and permitted, and rollback can discard later fixes.
 
-**⚠️ Warnings:** Securelevel can prevent repairs until reboot; leave optional hardening until core functionality is verified. Never clear logs, remove every privileged binary, or delete package-owned system files based on names alone.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Securelevel can prevent repairs until reboot; leave optional hardening until core functionality is verified. Never clear logs, remove every privileged binary, or delete package-owned system files based on names alone.
