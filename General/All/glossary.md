@@ -1,4 +1,11 @@
-# Glossary
+# 📖 Glossary
+
+> [!TIP]
+> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+
+> [!IMPORTANT]
+> **Follow the actual image README and competition instructions.** Preserve forensic evidence and record rollback details before making system changes.
+
 
 Short explanations of words you'll see in the checklists and scripts.
 
@@ -55,6 +62,9 @@ Short explanations of words you'll see in the checklists and scripts.
 | **Web shell** | A malicious web page that lets an attacker run commands on the server. |
 | **World-writable** | A file anyone on the system can change. Almost always a mistake. |
 
+---
+
+<a id="topic-1"></a>
 ## Terms used in verification and recovery
 
 | Word | Meaning and practical implication |

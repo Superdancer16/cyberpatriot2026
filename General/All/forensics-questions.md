@@ -1,7 +1,23 @@
-# Forensics questions
+# 🔎 Forensics questions
+
+> [!TIP]
+> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+
+> [!CAUTION]
+> **Preserve evidence first.** Record relevant artifacts and answers before changing accounts, logs, binaries, services, or files.
+
+## 🧭 Quick links
+
+[How to answer](#topic-1) · [The common question types](#topic-2) · [Don't lose the evidence](#topic-3) · [Repeatable investigation procedures](#topic-4)
+
+---
+
 
 Forensics questions are text files on the desktop (`Forensics Question 1.txt`, …). Each one asks something about the computer, and you type the answer into the file. They're often worth **more than any single fix**, so do them **first**, before anything you change destroys the evidence.
 
+---
+
+<a id="topic-1"></a>
 ## How to answer
 1. Open the file. Read the **whole** question, including the example answer format.
 2. Find the answer.
@@ -13,6 +29,9 @@ Forensics questions are text files on the desktop (`Forensics Question 1.txt`, �
 
 ---
 
+---
+
+<a id="topic-2"></a>
 ## The common question types
 
 ### "What is the hash of file X?"
@@ -104,12 +123,18 @@ Windows: **Settings → Apps** sorted by **Install date**, or **Event Viewer →
 
 ---
 
+---
+
+<a id="topic-3"></a>
 ## Don't lose the evidence
 
 - Don't delete a user, file or program until you've checked whether a question mentions it.
 - If you must change something, **copy it first** (`cp file ~/evidence/`).
 - Don't empty the Recycle Bin / Trash until forensics is finished.
 
+---
+
+<a id="topic-4"></a>
 ## Repeatable investigation procedures
 
 These are practice examples, not active competition answers. Use the question's exact path, hash algorithm, date range and answer format. **Read-only** below means the command is intended not to modify the target deliberately; live inspection still creates shell history/events and can update access times. A live machine is not a forensic disk image. Exports/copies write new files. Scans, quarantine, password resets, package installation, service restarts and deletion can alter evidence.
@@ -118,15 +143,15 @@ These are practice examples, not active competition answers. Use the question's 
 
 - [ ] Done
 
-**What:** Record path, size, timestamps, owner/permissions and content hash before remediation.
+**🎯 What:** Record path, size, timestamps, owner/permissions and content hash before remediation.
 
-**Why it matters:** A renamed executable can keep the same bytes/hash. Timestamps can be manipulated, and copying a file changes some destination metadata.
+**💡 Why it matters:** A renamed executable can keep the same bytes/hash. Timestamps can be manipulated, and copying a file changes some destination metadata.
 
-**Before changing anything:** Read every forensic question first. Do not execute or preview an untrusted executable/document. Use a private evidence folder outside a web root or shared directory and record the system timezone.
+**🛑 Before changing anything:** Read every forensic question first. Do not execute or preview an untrusted executable/document. Use a private evidence folder outside a web root or shared directory and record the system timezone.
 
-**Clicking (GUI):** Windows **Explorer → View → Show → Hidden items / File name extensions**; right-click the file → **Properties → Details / Security**. Linux file manager **Ctrl+H** shows dotfiles, then **Properties** for the specific file. Do not change attributes just to reveal a file. Use a text editor only when safe and disable active content/macros.
+**🖱️ Clicking (GUI):** Windows **Explorer → View → Show → Hidden items / File name extensions**; right-click the file → **Properties → Details / Security**. Linux file manager **Ctrl+H** shows dotfiles, then **Properties** for the specific file. Do not change attributes just to reveal a file. Use a text editor only when safe and disable active content/macros.
 
-**Typing (check):** Windows PowerShell, elevating only for protected evidence:
+**🔎 Typing (check):** Windows PowerShell, elevating only for protected evidence:
 
 ```powershell
 Get-Date -Format o
@@ -162,25 +187,25 @@ Copy-Item -LiteralPath 'C:\Users\bob\Documents\sample.txt' -Destination 'C:\CP-B
 Get-FileHash -LiteralPath 'C:\CP-Backups\sample-evidence.txt' -Algorithm SHA256
 ```
 
-**Check it worked:** Source and copied content hashes should match at collection time. Record source/destination and the collection time privately. Do not claim the copy preserves every forensic attribute or constitutes a complete chain of custody.
+**✅ Check it worked:** Source and copied content hashes should match at collection time. Record source/destination and the collection time privately. Do not claim the copy preserves every forensic attribute or constitutes a complete chain of custody.
 
-**Undo:** No target change is intended. Remove a redundant working copy only after answers and required evidence have been preserved, following the exercise rules.
+**↩️ Undo:** No target change is intended. Remove a redundant working copy only after answers and required evidence have been preserved, following the exercise rules.
 
-**Warnings:** NTFS alternate streams, ACLs, sparse files and symlinks need special care; a simple cross-filesystem copy can lose metadata. Reading a log while it is changing may produce different hashes between passes. Do not upload private samples or credentials to public analysis sites.
+**⚠️ Warnings:** NTFS alternate streams, ACLs, sparse files and symlinks need special care; a simple cross-filesystem copy can lose metadata. Reading a log while it is changing may produce different hashes between passes. Do not upload private samples or credentials to public analysis sites.
 
 ### F.2 Find hidden files and inspect encodings safely
 
 - [ ] Done
 
-**What:** Search the smallest relevant scope and decode data without executing it.
+**🎯 What:** Search the smallest relevant scope and decode data without executing it.
 
-**Why it matters:** Filename extensions can be misleading. Base64 is encoding, not encryption; decoded output may be a command or binary rather than readable text.
+**💡 Why it matters:** Filename extensions can be misleading. Base64 is encoding, not encryption; decoded output may be a command or binary rather than readable text.
 
-**Before changing anything:** Record the question's filename/content hints. Search the named user's folder before the whole disk. Access-denied output means coverage is incomplete, not that no file exists.
+**🛑 Before changing anything:** Record the question's filename/content hints. Search the named user's folder before the whole disk. Access-denied output means coverage is incomplete, not that no file exists.
 
-**Clicking (GUI):** Show hidden files/extensions as in F.1. Open ordinary text in a plain editor rather than a shell; do not enable Office macros or launch scripts.
+**🖱️ Clicking (GUI):** Show hidden files/extensions as in F.1. Open ordinary text in a plain editor rather than a shell; do not enable Office macros or launch scripts.
 
-**Typing (check):** Windows:
+**🔎 Typing (check):** Windows:
 
 ```powershell
 Get-ChildItem -LiteralPath 'C:\Users\bob' -Recurse -File -Force -ErrorAction Continue | Where-Object Name -like '*secret*' | Select-Object FullName,Length,LastWriteTimeUtc
@@ -210,25 +235,25 @@ PowerShell:
 
 Expected output is `hello`. A PowerShell `-EncodedCommand` is commonly UTF-16LE; inspect as text with `[Text.Encoding]::Unicode.GetString(...)` when appropriate. Do not pass decoded text to `Invoke-Expression`, `bash`, `cmd` or a script interpreter.
 
-**Check it worked:** Compare the result's format with the question. Decode one layer at a time; invalid padding/bytes may mean the wrong encoding or incomplete input. Preserve the original string.
+**✅ Check it worked:** Compare the result's format with the question. Decode one layer at a time; invalid padding/bytes may mean the wrong encoding or incomplete input. Preserve the original string.
 
-**Undo:** No target change is intended; close the text view without saving accidental edits. Do not edit the evidence to make a decoder accept it.
+**↩️ Undo:** No target change is intended; close the text view without saving accidental edits. Do not edit the evidence to make a decoder accept it.
 
-**Warnings:** `strings`, metadata and signatures are clues. An unsigned executable is not automatically malicious; a signed file can still be abused.
+**⚠️ Warnings:** `strings`, metadata and signatures are clues. An unsigned executable is not automatically malicious; a signed file can still be abused.
 
 ### F.3 Processes, connections and persistence correlation
 
 - [ ] Done
 
-**What:** Link a listener to its executable, account and launch mechanism.
+**🎯 What:** Link a listener to its executable, account and launch mechanism.
 
-**Why it matters:** A process name alone is weak evidence. Killing it can destroy transient state and leave its scheduler/service ready to restart it.
+**💡 Why it matters:** A process name alone is weak evidence. Killing it can destroy transient state and leave its scheduler/service ready to restart it.
 
-**Before changing anything:** Record the question and collection time. Leave the process running during initial evidence collection unless immediate containment is explicitly required.
+**🛑 Before changing anything:** Record the question and collection time. Leave the process running during initial evidence collection unless immediate containment is explicitly required.
 
-**Clicking (GUI):** Windows **Task Manager → Details**, enable **PID / Command line** columns; inspect **Services**, **Startup apps** and Task Scheduler **Actions / Triggers / General**. Linux System Monitor provides PID/user clues; use the terminal for systemd/cron and executable paths.
+**🖱️ Clicking (GUI):** Windows **Task Manager → Details**, enable **PID / Command line** columns; inspect **Services**, **Startup apps** and Task Scheduler **Actions / Triggers / General**. Linux System Monitor provides PID/user clues; use the terminal for systemd/cron and executable paths.
 
-**Typing (check):** Windows elevated PowerShell:
+**🔎 Typing (check):** Windows elevated PowerShell:
 
 ```powershell
 Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess
@@ -267,27 +292,27 @@ Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
 Get-ScheduledTask | Select-Object TaskPath,TaskName,Actions,Triggers,Principal
 ```
 
-**Typing (fix, only when appropriate):** No remediation in this investigation procedure. Save the requested answer/evidence first, then use the platform's task/service/account procedure for reversible containment.
+**🛠️ Typing (fix, only when appropriate):** No remediation in this investigation procedure. Save the requested answer/evidence first, then use the platform's task/service/account procedure for reversible containment.
 
-**Check it worked:** Explain the evidence chain in your notes: local address/port → PID → executable/command line → account → task/service/cron/key. Correlate with logs before attributing an action to a person.
+**✅ Check it worked:** Explain the evidence chain in your notes: local address/port → PID → executable/command line → account → task/service/cron/key. Correlate with logs before attributing an action to a person.
 
-**Undo:** No intentional target change. Do not restart a process to reproduce its original transient state; that creates new evidence.
+**↩️ Undo:** No intentional target change. Do not restart a process to reproduce its original transient state; that creates new evidence.
 
-**Warnings:** Web servers, Python applications and remote support tools may legitimately listen. A listening socket does not prove it was reachable through the firewall or used by an attacker.
+**⚠️ Warnings:** Web servers, Python applications and remote support tools may legitimately listen. A listening socket does not prove it was reachable through the firewall or used by an attacker.
 
 ### F.4 Event logs, shell history and answer verification
 
 - [ ] Done
 
-**What:** Correlate recorded activity and submit only the requested answer.
+**🎯 What:** Correlate recorded activity and submit only the requested answer.
 
-**Why it matters:** Logs can be absent, rotated, tampered with or incomplete. Shell history records typed commands selectively and does not prove they succeeded.
+**💡 Why it matters:** Logs can be absent, rotated, tampered with or incomplete. Shell history records typed commands selectively and does not prove they succeeded.
 
-**Before changing anything:** Record timezone and avoid clearing logs. Preserve the relevant original files/exports before changing accounts, audit policy or services.
+**🛑 Before changing anything:** Record timezone and avoid clearing logs. Preserve the relevant original files/exports before changing accounts, audit policy or services.
 
-**Clicking (GUI):** Windows `eventvwr.msc` → **Windows Logs → Security** → **Filter Current Log**; inspect the full event message and **Details → XML View** when needed. **Save All Events As** exports a copy. On Linux use the installed Logs viewer or `journalctl`.
+**🖱️ Clicking (GUI):** Windows `eventvwr.msc` → **Windows Logs → Security** → **Filter Current Log**; inspect the full event message and **Details → XML View** when needed. **Save All Events As** exports a copy. On Linux use the installed Logs viewer or `journalctl`.
 
-**Typing (check):** Windows:
+**🔎 Typing (check):** Windows:
 
 ```powershell
 Get-WinEvent -FilterHashtable @{LogName='Security';Id=4624,4625,4720,4732;StartTime=(Get-Date).AddDays(-2)} -MaxEvents 100 | Format-List TimeCreated,Id,Message
@@ -314,8 +339,8 @@ wevtutil epl Security C:\CP-Backups\Security-before.evtx
 
 Use a private existing destination and a unique filename. This exports; it does not clear the source.
 
-**Check it worked:** Compare multiple sources, identify time/actor/target accurately, and type the answer into the desktop question file in the exact requested format. Save with **Ctrl+S**, reopen to confirm persistence, then check the report after its normal refresh interval. A delayed result is not a reason to alter evidence or brute-force guesses.
+**✅ Check it worked:** Compare multiple sources, identify time/actor/target accurately, and type the answer into the desktop question file in the exact requested format. Save with **Ctrl+S**, reopen to confirm persistence, then check the report after its normal refresh interval. A delayed result is not a reason to alter evidence or brute-force guesses.
 
-**Undo:** If you typed an answer in the wrong place, edit only that answer field. Do not change question text, invent missing events or restore logs over the live originals.
+**↩️ Undo:** If you typed an answer in the wrong place, edit only that answer field. Do not change question text, invent missing events or restore logs over the live originals.
 
-**Warnings:** Never include real active competition answers in shared notes. Do not publish private log contents, password material or identifying data in a public pull request.
+**⚠️ Warnings:** Never include real active competition answers in shared notes. Do not publish private log contents, password material or identifying data in a public pull request.

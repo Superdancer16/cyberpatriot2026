@@ -1,7 +1,23 @@
-# Round game plan
+# 🧭 Round game plan
+
+> [!TIP]
+> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+
+> [!IMPORTANT]
+> **Follow the actual image README and competition instructions.** Preserve forensic evidence and record rollback details before making system changes.
+
+## 🧭 Quick links
+
+[Before the round (the day before)](#topic-1) · [The 4 hours](#topic-2) · [How to use the Scoring Report](#topic-3) · [Team rules](#topic-4) · [Using the scripts in a practice round](#topic-5) · [Use checkpoints instead of bulk changes](#topic-6)
+
+---
+
 
 A good plan matters more than speed. Teams lose the most points by rushing and breaking something the README needed.
 
+---
+
+<a id="topic-1"></a>
 ## Before the round (the day before)
 
 - [ ] Everyone knows which image they own (e.g. Alex → Windows, Sam → Linux, Jordan → Cisco).
@@ -9,6 +25,9 @@ A good plan matters more than speed. Teams lose the most points by rushing and b
 - [ ] Everyone has read [Things that lose points](things-that-lose-points.md).
 - [ ] Printed or downloaded copies of the checklists for your OS.
 
+---
+
+<a id="topic-2"></a>
 ## The 4 hours
 
 | Time | What to do |
@@ -21,6 +40,9 @@ A good plan matters more than speed. Teams lose the most points by rushing and b
 | **3:30–3:50** | Final checks: critical services still working? Any **penalties** on the Scoring Report? Fix them. |
 | **3:50–4:00** | Stop making risky changes. Make sure your score is saved (the scoring report shows the latest time). |
 
+---
+
+<a id="topic-3"></a>
 ## How to use the Scoring Report
 
 - Open it from the desktop. It refreshes every minute or two.
@@ -28,6 +50,9 @@ A good plan matters more than speed. Teams lose the most points by rushing and b
 - If your score **goes down**, you just caused a penalty. Undo your last change.
 - If a fix you made doesn't add points, it might not be scored on this image. That's normal, so move on.
 
+---
+
+<a id="topic-4"></a>
 ## Team rules
 
 - **One person per image.** Two people changing the same computer causes chaos.
@@ -36,6 +61,9 @@ A good plan matters more than speed. Teams lose the most points by rushing and b
 - **Don't get stuck.** If something takes more than 10 minutes, skip it and come back.
 - **Ask a teammate** before uninstalling anything the README might need.
 
+---
+
+<a id="topic-5"></a>
 ## Using the scripts in a practice round
 
 External automation is not included here. If separately authorized, review it using [Using the scripts safely](../../Misc%20Softwares/using-the-scripts.md); the manual checklist remains the verification source.
@@ -46,24 +74,27 @@ External automation is not included here. If separately authorized, review it us
 
 See [Using the scripts safely](../../Misc%20Softwares/using-the-scripts.md).
 
+---
+
+<a id="topic-6"></a>
 ## Use checkpoints instead of bulk changes
 
 - [ ] Done
 
-**What:** Make one coherent change, verify it, and keep a small recovery record.
+**🎯 What:** Make one coherent change, verify it, and keep a small recovery record.
 
-**Why it matters:** A score change after ten unrelated edits is hard to diagnose. Some legitimate security improvements are unscored; continually changing a correct setting wastes time.
+**💡 Why it matters:** A score change after ten unrelated edits is hard to diagnose. Some legitimate security improvements are unscored; continually changing a correct setting wastes time.
 
-**Before changing anything:** Treat the four-hour schedule above as a practice template. Follow the actual round's time, team-size, resource and snapshot rules. Assign one operator per image; a second person may read/check instructions if permitted.
+**🛑 Before changing anything:** Treat the four-hour schedule above as a practice template. Follow the actual round's time, team-size, resource and snapshot rules. Assign one operator per image; a second person may read/check instructions if permitted.
 
-**Clicking (GUI):** Keep the README and Scoring Report open. Before an account/service/firewall change open the relevant management screen and record the old value. Refresh the report after function checks, allowing its normal update delay.
+**🖱️ Clicking (GUI):** Keep the README and Scoring Report open. Before an account/service/firewall change open the relevant management screen and record the old value. Refresh the report after function checks, allowing its normal update delay.
 
-**Typing (check):** Use the read-only command from the procedure you are about to perform. Record the time, exact target, old value and expected result in private notes. Do not put passwords or shadow contents in the log.
+**🔎 Typing (check):** Use the read-only command from the procedure you are about to perform. Record the time, exact target, old value and expected result in private notes. Do not put passwords or shadow contents in the log.
 
-**Typing (fix, only when appropriate):** Change one related set of settings from the manual checklist. Run updates with time for review/restarts, not blindly while forensic evidence is still needed. Do not run a hardening script merely to keep to the schedule.
+**🛠️ Typing (fix, only when appropriate):** Change one related set of settings from the manual checklist. Run updates with time for review/restarts, not blindly while forensic evidence is still needed. Do not run a hardening script merely to keep to the schedule.
 
-**Check it worked:** Native setting query passes, required client transaction passes, report is fresh and no new penalty appears. Mark done only after those checks. Revisit skipped forensic questions before destructive cleanup.
+**✅ Check it worked:** Native setting query passes, required client transaction passes, report is fresh and no new penalty appears. Mark done only after those checks. Revisit skipped forensic questions before destructive cleanup.
 
-**Undo:** Reverse the last specific change using its backup. If the score/function does not recover, verify report freshness and the exact error before changing something else. A full snapshot rollback can lose later fixes and may be restricted by the rules.
+**↩️ Undo:** Reverse the last specific change using its backup. If the score/function does not recover, verify report freshness and the exact error before changing something else. A full snapshot rollback can lose later fixes and may be restricted by the rules.
 
-**Warnings:** Stop speculative changes near the end, save answers and permitted files, and leave required services functioning. A stale score report can reflect network/time issues; do not edit the scoring agent to repair it.
+**⚠️ Warnings:** Stop speculative changes near the end, save answers and permitted files, and leave required services functioning. A stale score report can reflect network/time issues; do not edit the scoring agent to repair it.
