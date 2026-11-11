@@ -22,6 +22,9 @@
 ---
 
 <a id="stage-1"></a>
+> [!IMPORTANT]
+> **🎯 TASK = do/check only what applies to the README.** **⭐ EASIEST WAY** shows the recommended GUI if one exists; otherwise use the Terminal commands. Blue **NOTE** boxes contain alternate methods and background information. Yellow/orange **CAUTION/WARNING** boxes contain safe-rollback reminders. **Do not run both GUI and Terminal procedures just to tick a checkbox.**
+
 ## Part 1 — Basics / Information Needed
 
 > [!TIP]
@@ -30,13 +33,13 @@
 
 ### 1.1 Ubuntu terms, differences and useful GUIs
 
-- [ ] Understand **sudo** (an authorized privilege elevation), **APT** (Debian/Ubuntu package manager), **Snap** (separate package distribution), **systemd services/timers/sockets**, **UFW**, **AppArmor**, **PAM**, **Netplan** and **NetworkManager**.
-- [ ] Know the desktop-versus-server difference. GNOME users can open **Settings → Users**, **Privacy / Screen Lock**, **Sharing**, and **Software & Updates** if installed. A headless Ubuntu Server often has no desktop.
-- [ ] Keep a working authorized sudo/console session while changing accounts, SSH, network configuration, firewall or PAM.
-- [ ] Check actual installed version and architecture. Ubuntu 24.04 and 22.04 differ in OpenSSH activation, package versions and some GNOME settings.
-- [ ] Use individual copyable commands; **do not run a downloaded one-line hardening script**.
+- [ ] **🎯 DO THIS —** Understand **sudo** (an authorized privilege elevation), **APT** (Debian/Ubuntu package manager), **Snap** (separate package distribution), **systemd services/timers/sockets**, **UFW**, **AppArmor**, **PAM**, **Netplan** and **NetworkManager**.
+- [ ] **🎯 DO THIS —** Know the desktop-versus-server difference. GNOME users can open **Settings → Users**, **Privacy / Screen Lock**, **Sharing**, and **Software & Updates** if installed. A headless Ubuntu Server often has no desktop.
+- [ ] **🎯 DO THIS —** Keep a working authorized sudo/console session while changing accounts, SSH, network configuration, firewall or PAM.
+- [ ] **🎯 DO THIS —** Check actual installed version and architecture. Ubuntu 24.04 and 22.04 differ in OpenSSH activation, package versions and some GNOME settings.
+- [ ] **🎯 DO THIS —** Use individual copyable commands; **do not run a downloaded one-line hardening script**.
 
-**Typing (check; Terminal via Ctrl+Alt+T on a desktop, console on server):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 cat /etc/os-release
@@ -46,13 +49,15 @@ command -v sudo
 systemctl status display-manager --no-pager
 ~~~
 
-**🧠 Interpretation:** **PRETTY_NAME** and **VERSION_ID** identify the release. A missing display manager is normal on Ubuntu Server. A lack of sudo rights is a real operational constraint—do not lock root or the only authorized admin without recovery.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🧠 Interpretation:** **PRETTY_NAME** and **VERSION_ID** identify the release. A missing display manager is normal on Ubuntu Server. A lack of sudo rights is a real operational constraint—do not lock root or the only authorized admin without recovery.
 
 ### 1.2 How to read and verify commands
 
 **Read-only inspection** usually uses **cat, getent, stat, apt-cache, systemctl status, ss, journalctl**, and **grep**. Modification uses **passwd, usermod, systemctl disable, ufw enable, apt install, nano** or editing configuration. Inspect first.
 
-**GUI editing:** use **Files** to locate a nonprotected file, and a terminal text editor for privileged config. To edit a protected file that actually exists:
+**⭐ EASIEST WAY — GUI (when available):** use **Files** to locate a nonprotected file, and a terminal text editor for privileged config. To edit a protected file that actually exists:
 
 ~~~bash
 sudo nano /etc/ssh/sshd_config
@@ -77,12 +82,12 @@ This is **only an example when OpenSSH Server is installed**. Choose a new backu
 
 ### 2.1 Read the competition image README and scoring report
 
-- [ ] Open the README on the desktop, record **authorized administrators**, **normal users**, **required software**, **prohibited files/apps**, **critical services/ports**, and **forensics question locations**.
-- [ ] Read it again before disabling any service. The same program (SSH, FTP, web server, database, Samba, printing, DNS) can be prohibited on one image and critical on another.
-- [ ] Open the scoring report and record the starting value. Refresh after individually verified changes; do not modify scoring-engine files.
-- [ ] Take a VM snapshot only if permitted; rollback may discard subsequent fixes.
+- [ ] **🎯 DO THIS —** Open the README on the desktop, record **authorized administrators**, **normal users**, **required software**, **prohibited files/apps**, **critical services/ports**, and **forensics question locations**.
+- [ ] **🎯 DO THIS —** Read it again before disabling any service. The same program (SSH, FTP, web server, database, Samba, printing, DNS) can be prohibited on one image and critical on another.
+- [ ] **🎯 DO THIS —** Open the scoring report and record the starting value. Refresh after individually verified changes; do not modify scoring-engine files.
+- [ ] **🎯 DO THIS —** Take a VM snapshot only if permitted; rollback may discard subsequent fixes.
 
-**Typing (check; do not modify files):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 whoami
@@ -97,9 +102,9 @@ Compare the output with the README. Ordinary service accounts are often expected
 
 ### 2.2 Answer forensic questions before deleting or changing evidence
 
-- [ ] Read each question word for word, identify the specific requested evidence, save exact answers in the original provided format, then proceed with remediation.
+- [ ] **🎯 DO THIS —** Read each question word for word, identify the specific requested evidence, save exact answers in the original provided format, then proceed with remediation.
 
-**Typing (read-only examples):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 find "$HOME/Desktop" -maxdepth 2 -type f -iname '*forensic*' -print 2>/dev/null
@@ -122,13 +127,15 @@ sudo journalctl -u ssh -n 50 --no-pager
 last -a | head -25
 ~~~
 
-**💡 Why:** File hashes, timestamps, processes, user accounts and logs may change or disappear after upgrades, user deletion, antivirus cleanup or service restarts. A missing event is not proof no action occurred. **Never execute suspicious files**, including decoded Base64 payloads.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why:** File hashes, timestamps, processes, user accounts and logs may change or disappear after upgrades, user deletion, antivirus cleanup or service restarts. A missing event is not proof no action occurred. **Never execute suspicious files**, including decoded Base64 payloads.
 
 **Verify/undo:** Confirm forensic answers are saved. Restore only an accidental file modification from a permitted backup; deleting evidence may not be reversible.
 
 ### 2.3 Establish an administrative recovery route
 
-- [ ] Confirm the authorized admin can elevate; keep the VM console available before SSH/firewall/network edits.
+- [ ] **🎯 DO THIS —** Confirm the authorized admin can elevate; keep the VM console available before SSH/firewall/network edits.
 
 ~~~bash
 sudo -v
@@ -151,21 +158,23 @@ These are **frequently appearing concepts in public checklists**, not a guarante
 
 ### 3.1 Users, groups, UID 0 and sudo rights
 
-- [ ] Compare every real human account and privileged group against the image README.
+- [ ] **🎯 DO THIS —** Compare every real human account and privileged group against the image README.
 
-**🔎 Typing (check):**
-
-~~~bash
-getent passwd
-getent group sudo
-getent group adm
-awk -F: '$3 == 0 {print $1, $3, $7}' /etc/passwd
-sudo passwd -S -a
-~~~
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ~~~bash
+> getent passwd
+> getent group sudo
+> getent group adm
+> awk -F: '$3 == 0 {print $1, $3, $7}' /etc/passwd
+> sudo passwd -S -a
+> ~~~
+>
 Only root normally needs UID 0. Service accounts with lower UIDs and nonlogin shells can be legitimate. The sudo group is not the only source of privileged rights; inspect sudoers in Part 3.2.
 
-**🖱️ GUI:** GNOME → **Settings → Users → Unlock**, compare authorized account roles (GUI omits many system accounts).
+**⭐ EASIEST WAY — GUI (when available):** GNOME → **Settings → Users → Unlock**, compare authorized account roles (GUI omits many system accounts).
 
 **Change examples ONLY after matching the README:**
 
@@ -190,13 +199,15 @@ id exampleuser
 getent group sudo
 ~~~
 
-**↩️ Undo:** Restore precisely the prior account role/group, testing a second authorized admin login. Deleting a user/home directory is much harder to reverse than disabling a confirmed unauthorized account.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore precisely the prior account role/group, testing a second authorized admin login. Deleting a user/home directory is much harder to reverse than disabling a confirmed unauthorized account.
 
 ### 3.2 Strong passwords, aging, PAM and lockout
 
-- [ ] Know the README's exact password policy; inspect actual PAM modules before editing.
+- [ ] **🎯 DO THIS —** Know the README's exact password policy; inspect actual PAM modules before editing.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo chage -l exampleuser
@@ -206,7 +217,9 @@ sudo grep -RnsE 'pam_pwquality|pam_pwhistory|pam_faillock|nullok' /etc/pam.d /et
 sudo visudo -c
 ~~~
 
-**What to know:** login.defs supplies defaults for *new accounts*; existing users need their own aging review. PAM controls authentication and is **order-sensitive**. Copying a random stack can lock out every account. pam_tally2 is obsolete on modern Ubuntu. Check whether **libpam-pwquality** and supported auth profiles exist before editing.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **What to know:** login.defs supplies defaults for *new accounts*; existing users need their own aging review. PAM controls authentication and is **order-sensitive**. Copying a random stack can lock out every account. pam_tally2 is obsolete on modern Ubuntu. Check whether **libpam-pwquality** and supported auth profiles exist before editing.
 
 **Changing one authorized user's password (interactive, if required):**
 
@@ -227,13 +240,15 @@ sudo chage -l exampleuser
 sudo visudo -c
 ~~~
 
-**↩️ Undo:** Restore the previously recorded aging values if wrong. Before any PAM edit, retain a root console, back up the exact file and test a new ordinary-user authentication before closing the old login. Do not add duplicate pam_unix or pam_faillock entries blindly.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the previously recorded aging values if wrong. Before any PAM edit, retain a root console, back up the exact file and test a new ordinary-user authentication before closing the old login. Do not add duplicate pam_unix or pam_faillock entries blindly.
 
 ### 3.3 Firewall rules and required ports
 
-- [ ] Discover actual firewall owner and **required service ports** before enabling deny-by-default.
+- [ ] **🎯 DO THIS —** Discover actual firewall owner and **required service ports** before enabling deny-by-default.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo ss -lntup
@@ -265,7 +280,7 @@ sudo ufw status verbose
 
 ### 3.4 Signed APT repositories and security updates
 
-- [ ] Verify installed Ubuntu version and repository source integrity. Some releases use deb822 .sources files.
+- [ ] **🎯 DO THIS —** Verify installed Ubuntu version and repository source integrity. Some releases use deb822 .sources files.
 
 ~~~bash
 cat /etc/os-release
@@ -296,17 +311,19 @@ sudo apt upgrade
 
 ### 3.5 Snap packages and Firefox (Ubuntu-specific)
 
-- [ ] Know that Ubuntu's Firefox on many supported desktop versions is delivered as a **Snap**, not simply a Debian package.
+- [ ] **🎯 DO THIS —** Know that Ubuntu's Firefox on many supported desktop versions is delivered as a **Snap**, not simply a Debian package.
 
-**Typing (check, only if Snap is installed):**
-
-~~~bash
-command -v snap
-snap list
-snap refresh --list
-~~~
-
-**🖱️ Clicking:** Open **Software / App Center** or Firefox **Help → About Firefox**, using the actual desktop application. **Do not assume the APT package alone updates Firefox's Snap.**
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ~~~bash
+> command -v snap
+> snap list
+> snap refresh --list
+> ~~~
+>
+**⭐ EASIEST WAY — GUI (when available):** Open **Software / App Center** or Firefox **Help → About Firefox**, using the actual desktop application. **Do not assume the APT package alone updates Firefox's Snap.**
 
 **Change only if necessary/allowed:** Snap's supported refresh mechanism manages installed packages; do not remove snapd or unrelated snaps to speed the image. Confirm which browser and application packages the README requires.
 
@@ -314,7 +331,7 @@ snap refresh --list
 
 ### 3.6 Required-service preservation
 
-- [ ] Before turning off any daemons, identify dependency and required-client test.
+- [ ] **🎯 DO THIS —** Before turning off any daemons, identify dependency and required-client test.
 
 ~~~bash
 systemctl list-units --type=service --state=running
@@ -337,23 +354,27 @@ sudo systemctl disable --now example.service
 <a id="research-report-expansion-u-r1--ubuntu-users-sudo-uid-0-and-local-authentication"></a>
 ### 🔐 Ubuntu users, sudo, UID 0 and local authentication
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 🔐 Ubuntu users, sudo, UID 0 and local authentication**
 
-**📚 Evidence:** Official/training Windows/Linux image themes, community Linux checklists, and native Ubuntu commands. No secret scoring list is claimed.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** Official/training Windows/Linux image themes, community Linux checklists, and native Ubuntu commands. No secret scoring list is claimed.
 
-**GUI (Desktop):** **Settings → Users → Unlock**. Compare authorized students/admins to the actual README; a headless server may have no GUI. Check service accounts separately in Terminal.
+**⭐ EASIEST WAY — GUI (when available):** **Settings → Users → Unlock**. Compare authorized students/admins to the actual README; a headless server may have no GUI. Check service accounts separately in Terminal.
 
-**🔎 Typing (check):**
-
-~~~bash
-getent passwd
-getent group sudo
-getent group adm
-awk -F: '$3 == 0 {print $1 " UID=" $3 " SHELL=" $7}' /etc/passwd
-sudo passwd -S root
-sudo passwd -S -a
-~~~
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ~~~bash
+> getent passwd
+> getent group sudo
+> getent group adm
+> awk -F: '$3 == 0 {print $1 " UID=" $3 " SHELL=" $7}' /etc/passwd
+> sudo passwd -S root
+> sudo passwd -S -a
+> ~~~
+>
 **Investigate sudo policies and high-privilege groups:**
 
 ~~~bash
@@ -383,11 +404,13 @@ sudo usermod -s /usr/sbin/nologin EXAMPLE_USER
 <a id="research-report-expansion-u-r2--password-aging-pam-quality-history-and-lockout"></a>
 ### 🔐 Password aging, PAM quality, history and lockout
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 🔐 Password aging, PAM quality, history and lockout**
 
-**📚 Evidence:** Community/vendor-supported PAM controls. Historical length/age thresholds in the report vary, so the README supplies actual numeric constraints.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** Community/vendor-supported PAM controls. Historical length/age thresholds in the report vary, so the README supplies actual numeric constraints.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 grep -E '^PASS_(MAX_DAYS|MIN_DAYS|WARN_AGE)' /etc/login.defs
@@ -406,16 +429,20 @@ sudo chage -M 90 -m 1 -W 7 EXAMPLE_USER
 
 **✅ Verification:** Repeat **chage -l**, test a second normal-user login and an authorized sudo/password change *before closing the current admin session*.
 
-**↩️ Undo:** Restore exact previous chage values and backed-up PAM file with recovery-console access. Do not indiscriminately disable PAM controls to repair one bad login.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore exact previous chage values and backed-up PAM file with recovery-console access. Do not indiscriminately disable PAM controls to repair one bad login.
 
 <a id="research-report-expansion-u-r3--ufw-required-ports-service-identification-and-rollback"></a>
 ### 🛡️ UFW, required ports, service identification and rollback
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 🛡️ UFW, required ports, service identification and rollback**
 
-**📚 Evidence:** Ubuntu vendor-backed UFW and community required-service checklists.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** Ubuntu vendor-backed UFW and community required-service checklists.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo ufw status verbose
@@ -442,16 +469,20 @@ sudo ufw enable
 
 **✅ Verification:** Repeat **sudo ufw status numbered**, then test every required app from an authorized client. An active rule does not prove remote traffic works; use a real protocol-level connection check.
 
-**↩️ Undo:** Restore the **specific** mistaken allow/deny rule or old policy from its recorded backup via console. Avoid disabling the entire firewall as a final workaround. If nftables/firewalld already owns the policy, do not layer an incompatible manager on top.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the **specific** mistaken allow/deny rule or old policy from its recorded backup via console. Avoid disabling the entire firewall as a final workaround. If nftables/firewalld already owns the policy, do not layer an incompatible manager on top.
 
 <a id="research-report-expansion-u-r4--ssh-root-access-effective-directives-and-socket-activation"></a>
 ### 🔐 SSH root access, effective directives and socket activation
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 🔐 SSH root access, effective directives and socket activation**
 
-**📚 Evidence:** Vendor-backed Ubuntu OpenSSH configuration; may be required or absent by scenario.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** Vendor-backed Ubuntu OpenSSH configuration; may be required or absent by scenario.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 dpkg-query -W openssh-server 2>/dev/null
@@ -475,7 +506,7 @@ PermitEmptyPasswords no
 
 Do not disable password authentication if the required authorized user has no tested SSH key. Other settings like **X11Forwarding no** or **MaxAuthTries 3** require compatibility review.
 
-**Typing (validate then reload when supported):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo /usr/sbin/sshd -t
@@ -484,7 +515,9 @@ sudo systemctl reload ssh
 
 **✅ Verification:** Establish a **second separate authorized SSH login**, inspect effective config and current listener. Check ssh.socket as well if used.
 
-**↩️ Undo:** Restore backed-up exact config using the console, validate it and reload the correct service/socket state. Never close the original management connection until the new one works.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore backed-up exact config using the console, validate it and reload the correct service/socket state. Never close the original management connection until the new one works.
 
 ---
 
@@ -497,7 +530,7 @@ sudo systemctl reload ssh
 
 ### 4.1 SSH service and socket activation (critical Ubuntu difference)
 
-- [ ] Confirm whether SSH is installed/required and whether **ssh.service** or **ssh.socket** controls the listener.
+- [ ] **🎯 DO THIS —** Confirm whether SSH is installed/required and whether **ssh.service** or **ssh.socket** controls the listener.
 
 ~~~bash
 dpkg-query -W openssh-server 2>/dev/null
@@ -528,18 +561,20 @@ Inspect each identified file's owner/mode, keys and README need; never delete al
 
 ### 4.2 GNOME, GDM, automatic login and screen locking
 
-- [ ] Identify actual display manager and desktop. Do not apply these GNOME-specific settings to Ubuntu Server, KDE or Xfce images.
+- [ ] **🎯 DO THIS —** Identify actual display manager and desktop. Do not apply these GNOME-specific settings to Ubuntu Server, KDE or Xfce images.
 
-**🖱️ Clicking:** GNOME **Settings → Users → Unlock** to inspect automatic login; **Settings → Privacy & Security / Screen Lock** to require a password after inactivity; **Settings → Sharing / Remote Desktop** to review required/unneeded remote features. Exact labels vary with GNOME release.
+**⭐ EASIEST WAY — GUI (when available):** GNOME **Settings → Users → Unlock** to inspect automatic login; **Settings → Privacy & Security / Screen Lock** to require a password after inactivity; **Settings → Sharing / Remote Desktop** to review required/unneeded remote features. Exact labels vary with GNOME release.
 
-**Typing (check, run as the logged-in desktop user, NOT sudo):**
-
-~~~bash
-gsettings list-schemas | grep -E 'gnome.desktop.screensaver|gnome.desktop.session'
-gsettings get org.gnome.desktop.screensaver lock-enabled
-gsettings get org.gnome.desktop.session idle-delay
-~~~
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ~~~bash
+> gsettings list-schemas | grep -E 'gnome.desktop.screensaver|gnome.desktop.session'
+> gsettings get org.gnome.desktop.screensaver lock-enabled
+> gsettings get org.gnome.desktop.session idle-delay
+> ~~~
+>
 **GDM config inspection (read-only):**
 
 ~~~bash
@@ -553,7 +588,7 @@ If editing a real GNOME/GDM configuration, back up the specific file and use the
 
 ### 4.3 Prohibited packages, Flatpak and suspicious media
 
-- [ ] Check the README's prohibited software list before removing packages or media.
+- [ ] **🎯 DO THIS —** Check the README's prohibited software list before removing packages or media.
 
 ~~~bash
 dpkg -l | grep -Ei 'steam|transmission|qbittorrent|john|hydra|nmap|wireshark|vnc|telnet|netcat'
@@ -579,7 +614,7 @@ Only then consider an authorized targeted removal. **Never run a pasted bulk apt
 
 ### 4.4 Cron, systemd timers, shell startup and backdoors
 
-- [ ] Inspect scheduling and persistence before disabling anything.
+- [ ] **🎯 DO THIS —** Inspect scheduling and persistence before disabling anything.
 
 ~~~bash
 sudo cat /etc/crontab
@@ -597,11 +632,13 @@ systemctl show example.service -p FragmentPath -p ExecStart -p User
 sudo journalctl -u example.service -n 50 --no-pager
 ~~~
 
-**What to look for:** Newly created units, unexpected scripts from writable directories, unusual user login hooks, scheduled commands and unexpected listeners. These can be legitimate; record evidence and compare with README before changing. **Do not execute unknown scripts to test them.**
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **What to look for:** Newly created units, unexpected scripts from writable directories, unusual user login hooks, scheduled commands and unexpected listeners. These can be legitimate; record evidence and compare with README before changing. **Do not execute unknown scripts to test them.**
 
 ### 4.5 File ownership, SUID/capabilities and sensitive configuration
 
-- [ ] Inspect permissions and owners on password-related files and writable directories.
+- [ ] **🎯 DO THIS —** Inspect permissions and owners on password-related files and writable directories.
 
 ~~~bash
 stat -c '%A %a %U:%G %n' /etc/passwd /etc/group /etc/shadow /etc/gshadow
@@ -609,7 +646,9 @@ sudo find /usr/bin /usr/sbin /usr/local/bin -xdev -type f -perm /4000 -ls 2>/dev
 sudo find /home /tmp /var/tmp -xdev -type f -perm /0002 -ls 2>/dev/null
 ~~~
 
-**🧠 Interpretation:** /etc/shadow should not be readable by ordinary users, but exact Debian/Ubuntu mode/group may differ. SUID files such as passwd can be legitimate. **Do not chmod -R or chown -R system directories**. For an investigated file, use **dpkg -S /path**, stat and hash. Restore only verified incorrect mode/owner from a recorded baseline.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🧠 Interpretation:** /etc/shadow should not be readable by ordinary users, but exact Debian/Ubuntu mode/group may differ. SUID files such as passwd can be legitimate. **Do not chmod -R or chown -R system directories**. For an investigated file, use **dpkg -S /path**, stat and hash. Restore only verified incorrect mode/owner from a recorded baseline.
 
 ### 4.6 Package and service-specific verification
 
@@ -645,11 +684,13 @@ Some Ubuntu installations use **journald** without a separate auth.log; rsyslog 
 <a id="research-report-expansion-u-r5--apparmor-security-update-timers-and-apt-integrity"></a>
 ### 📦 AppArmor, security update timers and apt integrity
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 📦 AppArmor, security update timers and apt integrity**
 
-**📚 Evidence:** Ubuntu vendor-backed LSM/update behavior and community practice. Missing tools are not automatically a scored issue.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** Ubuntu vendor-backed LSM/update behavior and community practice. Missing tools are not automatically a scored issue.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo aa-status
@@ -662,9 +703,11 @@ apt-mark showhold
 sudo dpkg --audit
 ~~~
 
-**What to look for:** Unexpected AppArmor disabled status, suspicious manual complain-mode profiles, update timer intentionally disabled, untrusted APT sources/PPAs or held security packages. A missing audit rule/profile or timer may be deliberate; inspect the required setup.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **What to look for:** Unexpected AppArmor disabled status, suspicious manual complain-mode profiles, update timer intentionally disabled, untrusted APT sources/PPAs or held security packages. A missing audit rule/profile or timer may be deliberate; inspect the required setup.
 
-**Typing (fix only if the installed AppArmor service is required and was disabled):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo systemctl enable --now apparmor
@@ -680,16 +723,20 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 
 **✅ Verification:** Repeat **aa-status**, confirm relevant profiles and required application behavior, inspect **/etc/apt/apt.conf.d/20auto-upgrades** and apt timer/log behavior. An active timer may have an inactive oneshot service between runs; that is normal.
 
-**↩️ Undo:** Restore a specific AppArmor profile mode or APT configuration from its recorded baseline. Never disable AppArmor globally or delete system update logs to hide one DENIED message.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore a specific AppArmor profile mode or APT configuration from its recorded baseline. Never disable AppArmor globally or delete system update logs to hide one DENIED message.
 
 <a id="research-report-expansion-u-r6--cron-systemd-shell-startup-permissions-and-unwanted-apps"></a>
 ### 🧰 Cron, systemd, shell startup, permissions and unwanted apps
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 🧰 Cron, systemd, shell startup, permissions and unwanted apps**
 
-**📚 Evidence:** Shared community training topics, not verified secret scoring items.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** Shared community training topics, not verified secret scoring items.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 sudo cat /etc/crontab
@@ -720,16 +767,20 @@ Check **snap list** only if Snap exists; Ubuntu Firefox may be a Snap rather tha
 
 **✅ Verification:** Re-run individual searches, test authorized applications and service clients, confirm update state and scoring report.
 
-**↩️ Undo:** Restore the old unit/cron line/hosts mapping, file mode, or original package and application configuration; never bulk-delete media files, services or all SUID bits.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the old unit/cron line/hosts mapping, file mode, or original package and application configuration; never bulk-delete media files, services or all SUID bits.
 
 <a id="research-report-expansion-u-r7--critical-service-recovery-and-scoring-regression-triage"></a>
 ### 🧰 Critical-service recovery and scoring regression triage
 
-- [ ] Done
+- [ ] **🎯 DO THIS — 🧰 Critical-service recovery and scoring regression triage**
 
-**📚 Evidence:** CyberPatriot required-service principle and standard systemd administration.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **📚 Evidence:** CyberPatriot required-service principle and standard systemd administration.
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 systemctl list-units --type=service --state=running
@@ -757,7 +808,9 @@ sudo journalctl -u EXAMPLE_REQUIRED.service -n 50 --no-pager
 
 Then test its real authorized client transaction (for example SSH login, HTTPS request, SMB share, DNS lookup or DB connection). A green systemctl status alone does not prove it fulfills its application task.
 
-**↩️ Undo:** Return that specific unit to the recorded prior state when a change was incorrect, keeping the required service operational. Do not force every service Automatic or purge a server simply because a general checklist listed it as risky.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Return that specific unit to the recorded prior state when a change was incorrect, keeping the required service operational. Do not force every service Automatic or purge a server simply because a general checklist listed it as risky.
 
 **Scoring drop:** Compare the **one most recent modification** against the previously working state, restore it if it broke a required service, repeat functionality tests, then refresh the official scoring report. Preserve scoring data rather than editing or deleting it.
 
@@ -774,7 +827,7 @@ Then test its real authorized client transaction (for example SSH login, HTTPS r
 
 ### 5.1 Netplan versus NetworkManager
 
-- [ ] Before network configuration changes, identify which renderer actually owns the interface.
+- [ ] **🎯 DO THIS —** Before network configuration changes, identify which renderer actually owns the interface.
 
 ~~~bash
 ip -br address
@@ -785,9 +838,11 @@ networkctl status
 nmcli general status
 ~~~
 
-**🧠 Interpretation:** Ubuntu Server often uses **systemd-networkd via Netplan**; Ubuntu Desktop often uses **NetworkManager**. Either may differ. A correct YAML file is not proof its routing/DNS behavior works.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🧠 Interpretation:** Ubuntu Server often uses **systemd-networkd via Netplan**; Ubuntu Desktop often uses **NetworkManager**. Either may differ. A correct YAML file is not proof its routing/DNS behavior works.
 
-**🖱️ GUI:** GNOME **Settings → Network** or **Wi-Fi**, when NetworkManager is installed. On server, inspect the real network YAML and interface name before changing it.
+**⭐ EASIEST WAY — GUI (when available):** GNOME **Settings → Network** or **Wi-Fi**, when NetworkManager is installed. On server, inspect the real network YAML and interface name before changing it.
 
 **Safe procedure:** Back up only the actual edited YAML file, preserve local console/recovery, verify indentation/schema, and use a controlled supported **netplan try** workflow when available rather than abruptly applying network changes over the only SSH session. Verify gateway, DNS lookup and required service clients before confirming. Never overwrite the whole YAML file from a generic sample.
 
@@ -804,7 +859,7 @@ sudo grep -RnsE 'net.ipv4|net.ipv6|kernel.randomize_va_space' /etc/sysctl.conf /
 
 ### 5.3 Auditing, logs and account-lockout policy cautions
 
-**🔎 Typing (check):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 systemctl status auditd rsyslog systemd-journald --no-pager
@@ -812,7 +867,9 @@ sudo grep -RnsE 'pam_faillock|pam_pwhistory|pam_pwquality|pam_unix' /etc/pam.d 2
 sudo journalctl -b -p err --no-pager
 ~~~
 
-**💡 Why:** PAM changes are among the easiest ways to lose logins; audit configuration can fill disks or create excessive events if indiscriminately enabled. Use supported Ubuntu PAM profiles and record actual modules before adding or modifying a policy. Keep a working root/console recovery path. Audit event presence depends on enabled logging and retention.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why:** PAM changes are among the easiest ways to lose logins; audit configuration can fill disks or create excessive events if indiscriminately enabled. Use supported Ubuntu PAM profiles and record actual modules before adding or modifying a policy. Keep a working root/console recovery path. Audit event presence depends on enabled logging and retention.
 
 ### 5.4 Original Ubuntu-specific release and desktop reference
 
@@ -822,14 +879,14 @@ The following existing Ubuntu guidance is retained as a reference. **The full se
 ### Differences from Linux Mint
 
 #### Users: GNOME Settings instead of "Users and Groups"
-- [ ] Done
+- [ ] **🎯 DO THIS — Users: GNOME Settings instead of "Users and Groups"**
 
 **Settings → Users** → **Unlock**. Add or remove users, and toggle **Administrator**. The terminal commands are the same as Mint section 2.
 
 #### Updates: "Software & Updates" instead of "Update Manager"
-- [ ] Done
+- [ ] **🎯 DO THIS — Updates: "Software & Updates" instead of "Update Manager"**
 
-**🖱️ Clicking:** open **Software & Updates** → **Updates** tab:
+**⭐ EASIEST WAY — GUI (when available):** open **Software & Updates** → **Updates** tab:
 - **Subscribed to:** All updates
 - **Automatically check for updates:** **Daily**
 - **When there are security updates:** **Download and install automatically**
@@ -842,7 +899,7 @@ On the **Other Software** tab, untick any PPA the README doesn't need.
 > Ubuntu 24.04 keeps its sources in **`/etc/apt/sources.list.d/ubuntu.sources`** (a newer format with `URIs:` and `Suites:` lines) instead of `/etc/apt/sources.list`.
 
 #### Firefox (and other apps) are "snaps"
-- [ ] Done
+- [ ] **🎯 DO THIS — Firefox (and other apps) are "snaps"**
 
 On Ubuntu 22.04+, Firefox is a **snap** package, so `apt` doesn't update it:
 ```bash
@@ -852,12 +909,12 @@ sudo snap remove steam          # remove a prohibited snap app: change steam to 
 ```
 
 #### Firewall: UFW is installed but OFF
-- [ ] Done
+- [ ] **🎯 DO THIS — Firewall: UFW is installed but OFF**
 
 Use [the firewall ownership and recovery procedure](linux-mint.md#174-ufw-and-nftables-one-firewall-owner). If GUFW is already installed it provides a UFW GUI; it is not necessary to install it for manual terminal configuration.
 
 #### Login screen: GDM instead of LightDM
-- [ ] Done
+- [ ] **🎯 DO THIS — Login screen: GDM instead of LightDM**
 
 **Settings → Users** → turn off **Automatic Login**. Or edit `/etc/gdm3/custom.conf` (Ubuntu's name for it), under `[daemon]`:
 ```
@@ -867,7 +924,7 @@ TimedLoginEnable=false
 To inspect or change the login-screen user list, review `/etc/gdm3/greeter.dconf-defaults` and the version-specific procedure in [Debian step 8.3](debian.md#83-hide-the-list-of-users-on-the-login-screen).
 
 #### Screen lock: GNOME settings
-- [ ] Done
+- [ ] **🎯 DO THIS (only if authorized) — Screen lock: GNOME settings**
 
 **Settings → Privacy (& Security) → Screen** (or **Screen Lock**): **Automatic Screen Lock: On**, **Blank Screen Delay: 5 minutes**.
 ```bash
@@ -875,12 +932,12 @@ gsettings get org.gnome.desktop.screensaver lock-enabled      # true
 ```
 
 #### Remote access: GNOME "Sharing"
-- [ ] Done
+- [ ] **🎯 DO THIS — Remote access: GNOME "Sharing"**
 
 **Settings → Sharing** (24.04: **Settings → System → Remote Desktop / Secure Shell**). Turn off **Screen Sharing / Remote Desktop**, **Remote Login** (SSH), and **Media Sharing** unless the README needs them.
 
 #### SSH on Ubuntu 22.10 and newer
-- [ ] Done
+- [ ] **🎯 DO THIS — SSH on Ubuntu 22.10 and newer**
 
 SSH may be started **on demand** by `ssh.socket`. To turn it off completely:
 ```bash
@@ -890,12 +947,12 @@ systemctl is-enabled ssh.socket ssh.service      # both should say "disabled"
 If the README needs SSH and you change `Port` or `ListenAddress` in `sshd_config`, the socket decides the port, so also run `sudo systemctl daemon-reload && sudo systemctl restart ssh.socket`.
 
 #### Ubuntu 20.04: inspect available PAM modules
-- [ ] Done
+- [ ] **🎯 DO THIS — Ubuntu 20.04: inspect available PAM modules**
 
 Inspect installed PAM modules and use [the supported PAM procedure](linux-mint.md#172-password-aging-pam-and-lockout-without-breaking-login); do not select pam_tally2 solely because the image is Ubuntu 20.04.
 
 #### Default games and apps
-- [ ] Done
+- [ ] **🎯 DO THIS — Default games and apps**
 
 A normal Ubuntu desktop install includes **AisleRiot Solitaire, Mahjongg, Mines, Sudoku** and **Transmission** (torrents). Remove them unless the README needs them:
 ```bash
@@ -906,62 +963,86 @@ sudo apt purge aisleriot gnome-mahjongg gnome-mines gnome-sudoku transmission-gt
 
 #### U.1 Establish release, desktop and authentication recovery
 
-- [ ] Done
+- [ ] **🎯 DO THIS — U.1 Establish release, desktop and authentication recovery**
 
-**🎯 What:** Identify Ubuntu's release and installed desktop before following shared Linux procedures.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Identify Ubuntu's release and installed desktop before following shared Linux procedures.
 
-**💡 Why it matters:** Ubuntu 20.04, 22.04 and 24.04 differ in support, configuration defaults and service activation. Mint's Cinnamon paths do not configure GNOME.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** Ubuntu 20.04, 22.04 and 24.04 differ in support, configuration defaults and service activation. Mint's Cinnamon paths do not configure GNOME.
 
-**🛑 Before changing anything:** Read the README, answer forensics and keep console access. Use [Mint 17.1–17.2](linux-mint.md#17-detailed-manual-safety-and-verification-procedures) for the complete account backup, sudo and PAM recovery steps; those APT/PAM concepts apply here, but inspect installed module versions first.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Read the README, answer forensics and keep console access. Use [Mint 17.1–17.2](linux-mint.md#17-detailed-manual-safety-and-verification-procedures) for the complete account backup, sudo and PAM recovery steps; those APT/PAM concepts apply here, but inspect installed module versions first.
 
-**🖱️ Clicking (GUI):** **Settings → About** identifies the OS. **Settings → Users → Unlock** shows human users and account types. Open **Activities**, search **Terminal**, and launch it. `Ctrl+Alt+T` usually opens Terminal.
+**⭐ EASIEST WAY — GUI (when available):** **Settings → About** identifies the OS. **Settings → Users → Unlock** shows human users and account types. Open **Activities**, search **Terminal**, and launch it. `Ctrl+Alt+T` usually opens Terminal.
 
-**🔎 Typing (check):**
-
-```bash
-cat /etc/os-release
-systemctl status display-manager --no-pager
-id
-sudo -v
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> cat /etc/os-release
+> systemctl status display-manager --no-pager
+> id
+> sudo -v
+> ```
+>
 Expected: the actual release codename/version, the display-manager unit, your user/group list, and successful sudo validation. A server image may have no display manager.
 
-**🛠️ Typing (fix, only when appropriate):** Reconcile users and privileges through the GUI or shared 17.1 procedure. Apply password expiration individually with `sudo chage`, not by assuming edits to login.defs updated existing users. Keep a separate root console during PAM changes.
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
 **✅ Check it worked:** Test a new ordinary-user login and an authorized sudo session. Confirm no required service identity was removed.
 
-**↩️ Undo:** Restore the recorded membership/account state and modified PAM files using the recovery console, as described in the linked procedure.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the recorded membership/account state and modified PAM files using the recovery console, as described in the linked procedure.
 
-**⚠️ Warnings:** Do not install Cinnamon tools to make a Mint screenshot match. Ubuntu 20.04 standard maintenance has ended; expanded support depends on its support arrangement. Do not perform a major release upgrade during a round.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Do not install Cinnamon tools to make a Mint screenshot match. Ubuntu 20.04 standard maintenance has ended; expanded support depends on its support arrangement. Do not perform a major release upgrade during a round.
 
 #### U.2 APT sources and supported security updates
 
-- [ ] Done
+- [ ] **🎯 DO THIS — U.2 APT sources and supported security updates**
 
-**🎯 What:** Inspect repositories in their actual format and install supported updates.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Inspect repositories in their actual format and install supported updates.
 
-**💡 Why it matters:** Ubuntu 24.04 commonly uses `/etc/apt/sources.list.d/ubuntu.sources` (DEB822); older images commonly use `/etc/apt/sources.list`. Replacing either with an old internet list can mix releases.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** Ubuntu 24.04 commonly uses `/etc/apt/sources.list.d/ubuntu.sources` (DEB822); older images commonly use `/etc/apt/sources.list`. Replacing either with an old internet list can mix releases.
 
-**🛑 Before changing anything:** Back up `/etc/apt` following [Mint 17.5](linux-mint.md#175-package-sources-updates-and-vulnerability-triage). Record required applications and existing third-party sources.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Back up `/etc/apt` following [Mint 17.5](linux-mint.md#175-package-sources-updates-and-vulnerability-triage). Record required applications and existing third-party sources.
 
-**🖱️ Clicking (GUI):** **Software & Updates → Ubuntu Software / Other Software**; compare enabled sources with the installed release. **Software Updater** checks and installs updates. Do not enable a PPA merely because it promises a newer version.
+**⭐ EASIEST WAY — GUI (when available):** **Software & Updates → Ubuntu Software / Other Software**; compare enabled sources with the installed release. **Software Updater** checks and installs updates. Do not enable a PPA merely because it promises a newer version.
 
-**🔎 Typing (check):**
-
-```bash
-apt-cache policy
-sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Signed-By:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> apt-cache policy
+> sudo grep -RHE '^(deb |Types:|URIs:|Suites:|Signed-By:)' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null
+> ```
+>
 `Suites` must match the installed codename and its legitimate updates/security pockets. Signing keys should be repository-scoped.
 
-**🛠️ Typing (fix, only when appropriate):** Correct the specific unauthorized/mismatched entry through the GUI or `sudo nano` on that source file. Then:
-
-```bash
-sudo apt update
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> sudo apt update
+> ```
+>
 Continue only after reviewing all errors:
 
 ```bash
@@ -976,40 +1057,54 @@ sudo apt upgrade
 
 **✅ Check it worked:** `sudo dpkg --audit`, `apt list --upgradable`, and the Updater should agree about incomplete/pending work. Open the required applications. Check whether a restart is requested with `test -f /var/run/reboot-required && cat /var/run/reboot-required`.
 
-**↩️ Undo:** Restore only the source file changed and refresh metadata. A package update needs its own supported rollback; the source backup does not undo installed versions.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore only the source file changed and refresh metadata. A package update needs its own supported rollback; the source backup does not undo installed versions.
 
-**⚠️ Warnings:** Do not use `--allow-unauthenticated`, disable TLS validation or switch suites to bypass an error. Check the actual source, network and release support first.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Do not use `--allow-unauthenticated`, disable TLS validation or switch suites to bypass an error. Check the actual source, network and release support first.
 
 #### U.3 SSH socket activation on newer Ubuntu
 
-- [ ] Done
+- [ ] **🎯 DO THIS — U.3 SSH socket activation on newer Ubuntu**
 
-**🎯 What:** Inspect both SSH daemon configuration and the systemd socket that may own the listening port.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Inspect both SSH daemon configuration and the systemd socket that may own the listening port.
 
-**💡 Why it matters:** On newer Ubuntu installations, stopping `ssh.service` may leave `ssh.socket` able to start it again. Socket behavior varies with packaging and upgrades.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** On newer Ubuntu installations, stopping `ssh.service` may leave `ssh.socket` able to start it again. Socket behavior varies with packaging and upgrades.
 
-**🛑 Before changing anything:** Preserve `/etc/ssh` and any `/etc/systemd/system/ssh.socket.d` overrides. Keep the console and one existing connection open. Use [Mint 17.3](linux-mint.md#173-ssh-effective-configuration-and-a-second-session-test) for the full authentication procedure.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Preserve `/etc/ssh` and any `/etc/systemd/system/ssh.socket.d` overrides. Keep the console and one existing connection open. Use [Mint 17.3](linux-mint.md#173-ssh-effective-configuration-and-a-second-session-test) for the full authentication procedure.
 
-**🖱️ Clicking (GUI):** Use the VM console. GNOME remote desktop settings do not control OpenSSH.
+**⭐ EASIEST WAY — GUI (when available):** Use the VM console. GNOME remote desktop settings do not control OpenSSH.
 
-**🔎 Typing (check):**
-
-```bash
-systemctl status ssh.service ssh.socket --no-pager
-systemctl cat ssh.socket
-systemctl show ssh.socket -p Listen -p FragmentPath -p DropInPaths
-sudo /usr/sbin/sshd -T | grep -E '^(port|listenaddress) '
-sudo ss -ltnp
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> systemctl status ssh.service ssh.socket --no-pager
+> systemctl cat ssh.socket
+> systemctl show ssh.socket -p Listen -p FragmentPath -p DropInPaths
+> sudo /usr/sbin/sshd -T | grep -E '^(port|listenaddress) '
+> sudo ss -ltnp
+> ```
+>
 A running socket unit may be the listener even while the daemon is idle. Inspect drop-ins and generated configuration; do not assume every 22.04 image uses socket activation.
 
-**🛠️ Typing (fix, only when appropriate):** For required SSH edit and validate the actual sshd config as in 17.3. If changing only authentication, reload the running daemon. If changing the socket's port/address, review the installed Ubuntu OpenSSH packaging instructions and actual unit drop-ins, then from the console:
-
-```bash
-sudo /usr/sbin/sshd -t
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> sudo /usr/sbin/sshd -t
+> ```
+>
 After success, when the observed setup uses a socket:
 
 ```bash
@@ -1029,43 +1124,61 @@ A missing socket unit is normal on some installations; do not install one merely
 
 **✅ Check it worked:** Compare `ss`, `systemctl show ssh.socket -p Listen` and `sshd -T`; test a **new** authorized SSH connection to the actual port. If disabled, no SSH listener should remain unless another instance exists; investigate its PID instead of killing it blindly.
 
-**↩️ Undo:** Restore the exact changed config/override, remove only new overrides, validate, daemon-reload and restore the original unit enabled/running states. Re-test from a second client.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore the exact changed config/override, remove only new overrides, validate, daemon-reload and restore the original unit enabled/running states. Re-test from a second client.
 
-**⚠️ Warnings:** An existing SSH session is not a test of a new listener. Do not restart networking to repair a socket configuration error.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** An existing SSH session is not a test of a new listener. Do not restart networking to repair a socket configuration error.
 
 #### U.4 GNOME desktop, firewall and services
 
-- [ ] Done
+- [ ] **🎯 DO THIS — U.4 GNOME desktop, firewall and services**
 
-**🎯 What:** Configure the actual desktop user's screen lock and complete the shared Linux service checks.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🎯 What:** Configure the actual desktop user's screen lock and complete the shared Linux service checks.
 
-**💡 Why it matters:** `sudo gsettings` targets the wrong user; a secure desktop does not compensate for an open server.
+> [!NOTE]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **💡 Why it matters:** `sudo gsettings` targets the wrong user; a secure desktop does not compensate for an open server.
 
-**🛑 Before changing anything:** Record the user's current values and inspect installed schemas. Use [Mint 17.4–17.9](linux-mint.md#174-ufw-and-nftables-one-firewall-owner) for firewall, package, permissions, persistence, kernel/AppArmor, log and recovery procedures, and [service hardening](linux-mint.md#20-complete-linux-critical-service-hardening-procedures-embedded) for each installed required daemon.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **🛑 Before changing anything:** Record the user's current values and inspect installed schemas. Use [Mint 17.4–17.9](linux-mint.md#174-ufw-and-nftables-one-firewall-owner) for firewall, package, permissions, persistence, kernel/AppArmor, log and recovery procedures, and [service hardening](linux-mint.md#20-complete-linux-critical-service-hardening-procedures-embedded) for each installed required daemon.
 
-**🖱️ Clicking (GUI):** **Settings → Privacy → Screen Lock** on older GNOME, or **Privacy & Security → Screen Lock** on newer versions. Enable automatic locking and require a password; disable automatic login in **Users** if unauthorized. **Files → Preferences** contains removable-media behavior on some releases; other versions use **Settings → Removable Media**.
+**⭐ EASIEST WAY — GUI (when available):** **Settings → Privacy → Screen Lock** on older GNOME, or **Privacy & Security → Screen Lock** on newer versions. Enable automatic locking and require a password; disable automatic login in **Users** if unauthorized. **Files → Preferences** contains removable-media behavior on some releases; other versions use **Settings → Removable Media**.
 
-**🔎 Typing (check):** In the logged-in desktop user's terminal, without sudo:
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> gsettings get org.gnome.desktop.session idle-delay
+> gsettings get org.gnome.desktop.screensaver lock-enabled
+> gsettings get org.gnome.desktop.screensaver lock-delay
+> ```
 
-```bash
-gsettings get org.gnome.desktop.session idle-delay
-gsettings get org.gnome.desktop.screensaver lock-enabled
-gsettings get org.gnome.desktop.screensaver lock-delay
-```
-
-**🛠️ Typing (fix, only when appropriate):** If these schemas/keys exist and the README permits:
-
-```bash
-gsettings set org.gnome.desktop.session idle-delay 300
-gsettings set org.gnome.desktop.screensaver lock-enabled true
-gsettings set org.gnome.desktop.screensaver lock-delay 0
-```
-
+> [!NOTE]
+> **🔁 ALTERNATE METHOD — Terminal commands.** Use when the GUI is unavailable or a precise setting requires it. The GUI and CLI are **not two separate tasks**.
+>
+>
+> ```bash
+> gsettings set org.gnome.desktop.session idle-delay 300
+> gsettings set org.gnome.desktop.screensaver lock-enabled true
+> gsettings set org.gnome.desktop.screensaver lock-delay 0
+> ```
+>
 **✅ Check it worked:** Query the same keys, lock/unlock as that user, then test authorized service transactions. On Ubuntu Server skip desktop settings and inspect server roles instead.
 
-**↩️ Undo:** Restore each recorded key value or original GUI value. If a key is not writable, inspect organizational dconf policy instead of overriding it by force.
+> [!WARNING]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **↩️ Undo:** Restore each recorded key value or original GUI value. If a key is not writable, inspect organizational dconf policy instead of overriding it by force.
 
-**⚠️ Warnings:** Do not restart GDM to test settings while work is unsaved. Do not remove required DNS/SSH/database/web services simply because the image is called a workstation.
+> [!CAUTION]
+> **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
+> **⚠️ Warnings:** Do not restart GDM to test settings while work is unsaved. Do not remove required DNS/SSH/database/web services simply because the image is called a workstation.
 
 
 ---
@@ -1077,19 +1190,19 @@ gsettings set org.gnome.desktop.screensaver lock-delay 0
 > ✅ **Finish strong:** Verify the final configuration, required functionality, and saved evidence.
 
 
-- [ ] Every forensic question has an evidence-supported answer and was saved in the required format.
-- [ ] Authorized users and sudo privileges match the image README; a second authorized login works.
-- [ ] Password aging/PAM changes (if any) have been tested without locking out users.
-- [ ] Firewall/UFW/native rules permit every required inbound service, no more than needed.
-- [ ] APT and Snap updates are checked and packages come from legitimate signed sources.
-- [ ] Firefox/required browsers, GNOME lock, login screen and remote access match the scenario.
-- [ ] SSH, database, web, DNS, DHCP, Samba, FTP/mail and other explicitly required services work from authorized clients.
-- [ ] Suspicious cron, systemd, file permissions, new services, prohibited packages and media were reviewed without evidence destruction.
-- [ ] Logs and AppArmor state are understood; no unrelated broad scripts or destructive commands were run.
-- [ ] Changes are recorded with old state, final state, verification and a specific rollback plan.
-- [ ] Final score refreshed; no unexpected reboot or last-minute mass cleanup.
+- [ ] **🎯 DO THIS —** Every forensic question has an evidence-supported answer and was saved in the required format.
+- [ ] **🎯 DO THIS —** Authorized users and sudo privileges match the image README; a second authorized login works.
+- [ ] **🎯 DO THIS —** Password aging/PAM changes (if any) have been tested without locking out users.
+- [ ] **🎯 DO THIS —** Firewall/UFW/native rules permit every required inbound service, no more than needed.
+- [ ] **🎯 DO THIS —** APT and Snap updates are checked and packages come from legitimate signed sources.
+- [ ] **🎯 DO THIS —** Firefox/required browsers, GNOME lock, login screen and remote access match the scenario.
+- [ ] **🎯 DO THIS —** SSH, database, web, DNS, DHCP, Samba, FTP/mail and other explicitly required services work from authorized clients.
+- [ ] **🎯 DO THIS —** Suspicious cron, systemd, file permissions, new services, prohibited packages and media were reviewed without evidence destruction.
+- [ ] **🎯 DO THIS —** Logs and AppArmor state are understood; no unrelated broad scripts or destructive commands were run.
+- [ ] **🎯 DO THIS —** Changes are recorded with old state, final state, verification and a specific rollback plan.
+- [ ] **🎯 DO THIS —** Final score refreshed; no unexpected reboot or last-minute mass cleanup.
 
-**Typing (final read-only checks):**
+**⭐ EASIEST WAY — Terminal command(s):**
 
 ~~~bash
 cat /etc/os-release
