@@ -7,9 +7,9 @@
 
 | Image | Searchable handbook | Useful Ctrl+F terms |
 |---|---|---|
-| Windows 10 / Windows 11 | [Windows forensics](../../Windows/forensics.md) | Base64, ROT13, Caesar, XOR, encryption, BitLocker, file signature, alternate data stream, event log, registry, port, hash |
-| Windows Server / Active Directory | [Server forensics](../../Server/forensics.md) | domain user, SID, group, Group Policy, DNS, DHCP, IIS, SMB, certificate, CMS, DPAPI, AES, event log |
-| Debian / Mint / Ubuntu | [Linux forensics](../../Linux/forensics.md) | GPG, OpenSSL, ROT13, Base64, hex, ELF, UID, GID, chmod, sudo, SSH, cron, journalctl, PCAP |
+| Windows 10 / Windows 11 | [Windows forensics](../Windows/forensics.md) | Base64, ROT13, Caesar, XOR, encryption, BitLocker, file signature, alternate data stream, event log, registry, port, hash |
+| Windows Server / Active Directory | [Server forensics](../Server/forensics.md) | domain user, SID, group, Group Policy, DNS, DHCP, IIS, SMB, certificate, CMS, DPAPI, AES, event log |
+| Debian / Mint / Ubuntu | [Linux forensics](../Linux/forensics.md) | GPG, OpenSSL, ROT13, Base64, hex, ELF, UID, GID, chmod, sudo, SSH, cron, journalctl, PCAP |
 
 ## If your question does not match a chapter
 
@@ -19,9 +19,9 @@
 4. **Preserve evidence first:** Record paths, timestamps and copies when appropriate. Do not delete suspicious files just because the question mentions them.
 5. **Verify the result:** Check that decoded text, a username, hash, or event timestamp actually answers the question.
 
-**Start:** Read [the image README](../General/reading-the-readme.md) and finish forensic question files before hardening. The platform guides above cover the detailed question types; the preserved cross-platform investigation procedures below cover safe collection, decoding, process correlation, and log verification.
+**Start:** Read [the image README](reading-the-readme.md) and finish forensic question files before hardening. The platform guides above cover the detailed question types; the preserved cross-platform investigation procedures below cover safe collection, decoding, process correlation, and log verification.
 
-[Complete file index](../INDEX.md) · [Repository home](../../README.md)
+[Complete file index](../README.md) · [Repository home](../README.md)
 
 ---
 
@@ -38,7 +38,7 @@ Forensics commands described as read-only still cause incidental shell history, 
 <a id="freebsd-quick-reference"></a>
 ## FreeBSD forensic quick reference (BSD, not Linux)
 
-The [FreeBSD handbook](../FreeBSD/freebsd.md) is a **separate** BSD-specific reference. Do **not** assume GNU `stat`, Linux `/proc`, `ss`, `systemctl`, or `sha256sum` are present. Use FreeBSD's native tools when the exercise involves FreeBSD.
+The [FreeBSD handbook](../Misc/FreeBSD/freebsd.md) is a **separate** BSD-specific reference. Do **not** assume GNU `stat`, Linux `/proc`, `ss`, `systemctl`, or `sha256sum` are present. Use FreeBSD's native tools when the exercise involves FreeBSD.
 
 | Question type | FreeBSD read-only starting point |
 |---|---|

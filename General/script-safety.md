@@ -9,16 +9,16 @@ The script source files **remain in their original directories**. This folder pr
 
 | Target | Source script | Beginner HOW-TO | After-script manual checks | Complete handbook |
 |---|---|---|---|---|
-| Windows 10/11 workstation | [windows-10-11.ps1](../../Windows/Scripts/windows-10-11.ps1) | [Run instructions](../../Windows/Scripts/HOW-TO-RUN.md) | [Manual tasks](../../Windows/Scripts/MANUAL-TASKS.md) | [Windows manual](../../Windows/windows-10-11.md) |
-| Windows Server 2016/2019/2022 | [windows-server.ps1](../../Server/Scripts/windows-server.ps1) | [Role-aware run instructions](../../Server/Scripts/HOW-TO-RUN.md) | [AD/roles manual tasks](../../Server/Scripts/MANUAL-TASKS.md) | [Server manual](../../Server/windows-server.md) |
-| Debian 12/13 | [debian.sh](../../Linux/Debian/Scripts/debian.sh) | [Bash run instructions](../../Linux/Debian/Scripts/HOW-TO-RUN.md) | [Manual tasks](../../Linux/Debian/Scripts/MANUAL-TASKS.md) | [Debian manual](../../Linux/Debian/debian.md) |
+| Windows 10/11 workstation | [windows-10-11.ps1](../Windows/Scripts/windows-10-11.ps1) | [Run instructions](../Windows/Scripts/HOW-TO-RUN.md) | [Manual tasks](../Windows/Scripts/MANUAL-TASKS.md) | [Windows manual](../Windows/windows-10-11.md) |
+| Windows Server 2016/2019/2022 | [windows-server.ps1](../Server/Scripts/windows-server.ps1) | [Role-aware run instructions](../Server/Scripts/HOW-TO-RUN.md) | [AD/roles manual tasks](../Server/Scripts/MANUAL-TASKS.md) | [Server manual](../Server/windows-server.md) |
+| Debian 12/13 | [debian.sh](../Linux/Debian/Scripts/debian.sh) | [Bash run instructions](../Linux/Debian/Scripts/HOW-TO-RUN.md) | [Manual tasks](../Linux/Debian/Scripts/MANUAL-TASKS.md) | [Debian manual](../Linux/Debian/debian.md) |
 
-**Mint, Ubuntu, and FreeBSD:** Use their [manual guides](../../Linux/README.md); do not assume the Debian script supports these operating systems.
+**Mint, Ubuntu, and FreeBSD:** Use their [manual guides](../README.md); do not assume the Debian script supports these operating systems.
 
 ## Safe order of work
 
 1. Read the image README for required accounts, services, ports, software, and restrictions.
-2. Preserve and answer relevant [forensics questions](../Forensics/README.md) before modifying evidence.
+2. Preserve and answer relevant [forensics questions](forensics-workflows.md) before modifying evidence.
 3. Review the script and its matching HOW-TO; verify the operating system and role.
 4. Run the documented **Audit** mode if permitted; inspect the findings.
 5. Configure only explicitly authorized changes. Do not copy assumptions from a different image.
@@ -27,7 +27,7 @@ The script source files **remain in their original directories**. This folder pr
 
 **Historical external script names are not included in this repository.** The local file paths are the ones in the operating-system table above. The original upstream comparison and detailed safe-tool review workflow have been consolidated below.
 
-[Complete file index](../INDEX.md) · [Repository home](../../README.md)
+[Complete file index](../README.md) · [Repository home](../README.md)
 
 ---
 
@@ -35,9 +35,9 @@ The script source files **remain in their original directories**. This folder pr
 
 | Historical upstream family | Historical path | Current local manual |
 |---|---|---|
-| Linux | `scripts/linux/harden.sh` | [Mint](../../Linux/Mint/linux-mint.md), [Ubuntu](../../Linux/Ubuntu/ubuntu.md), [Debian](../../Linux/Debian/debian.md) |
-| Windows | `scripts/windows/Harden.ps1` | [Windows 10/11](../../Windows/windows-10-11.md), [Windows Server](../../Server/windows-server.md) |
-| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../FreeBSD/freebsd.md) |
+| Linux | `scripts/linux/harden.sh` | [Mint](../Linux/Mint/linux-mint.md), [Ubuntu](../Linux/Ubuntu/ubuntu.md), [Debian](../Linux/Debian/debian.md) |
+| Windows | `scripts/windows/Harden.ps1` | [Windows 10/11](../Windows/windows-10-11.md), [Windows Server](../Server/windows-server.md) |
+| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../Misc/FreeBSD/freebsd.md) |
 
 The historical toolkit's separate configuration builder is **not** part of this repository. Do not try historical paths as though they were in the local Git tree.
 
@@ -96,4 +96,4 @@ A hash identifies bytes; it establishes trust only when compared with a trusted 
 | SKIPPED / REVIEW | Make an explicit README-based decision |
 | FAILED | Read the error and use the relevant manual procedure |
 
-Keep logs private and note the time of each change. See [forensics](../Forensics/README.md) before collecting or altering potential evidence.
+Keep logs private and note the time of each change. See [forensics](forensics-workflows.md) before collecting or altering potential evidence.

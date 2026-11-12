@@ -6,10 +6,10 @@ The PDFs are black-and-white-friendly, **US Letter (8.5 x 11 in), portrait**. Pr
 
 | Platform | Printable PDF | GitHub-progress Markdown | Individual tasks | PDF pages |
 |---|---|---|---:|---:|
-| Windows 10 / 11 | [Print Windows checklist](../../Windows/Checklists/windows-10-11-checklist.pdf) | [Track Windows completion](../../Windows/Checklists/windows-10-11-checklist.md) | 175 | 8 |
-| Windows Server | [Print Windows Server checklist](../../Server/Checklists/windows-server-checklist.pdf) | [Track Server completion](../../Server/Checklists/windows-server-checklist.md) | 246 | 10 |
-| Debian | [Print Debian checklist](../../Linux/Debian/Checklists/debian-checklist.pdf) | [Track Debian completion](../../Linux/Debian/Checklists/debian-checklist.md) | 223 | 9 |
-| Cisco Packet Tracer | [Print Cisco checklist](../../Cisco/Checklists/cisco-packet-tracer-checklist.pdf) | [Track Packet Tracer completion](../../Cisco/Checklists/cisco-packet-tracer-checklist.md) | 229 | 10 |
+| Windows 10 / 11 | [Print Windows checklist](../Windows/Checklists/windows-10-11-checklist.pdf) | [Track Windows completion](../Windows/Checklists/windows-10-11-checklist.md) | 175 | 8 |
+| Windows Server | [Print Windows Server checklist](../Server/Checklists/windows-server-checklist.pdf) | [Track Server completion](../Server/Checklists/windows-server-checklist.md) | 246 | 10 |
+| Debian | [Print Debian checklist](../Linux/Debian/Checklists/debian-checklist.pdf) | [Track Debian completion](../Linux/Debian/Checklists/debian-checklist.md) | 223 | 9 |
+| Cisco Packet Tracer | [Print Cisco checklist](../Cisco/Checklists/cisco-packet-tracer-checklist.pdf) | [Track Packet Tracer completion](../Cisco/Checklists/cisco-packet-tracer-checklist.md) | 229 | 10 |
 
 **Total: 873 independently numbered checkboxes.**
 
@@ -30,10 +30,10 @@ For team collaboration, each member can edit an assigned section on a feature br
 
 ## Original full guides (unchanged)
 
-- [Windows 10 / 11](../../Windows/windows-10-11.md)
-- [Windows Server](../../Server/windows-server.md)
-- [Debian](../../Linux/Debian/debian.md)
-- [Cisco Packet Tracer](../../Cisco/packet-tracer.md)
+- [Windows 10 / 11](../Windows/windows-10-11.md)
+- [Windows Server](../Server/windows-server.md)
+- [Debian](../Linux/Debian/debian.md)
+- [Cisco Packet Tracer](../Cisco/packet-tracer.md)
 
 > [!IMPORTANT]
 > **The image README or Packet Tracer activity is authoritative.** These are practice checklists and cannot predict individual secret scoring items. Do not blindly apply a change merely to complete a checkbox. All PDFs are provided solely for printing; the Markdown trackers are the editable GitHub progress records.
@@ -42,4 +42,4 @@ For team collaboration, each member can edit an assigned section on a feature br
 
 ## Return to the detailed instructions
 
-[Complete file index](../INDEX.md) · [Forensics hub](../Forensics/README.md) · [Optional script instructions](../Scripts/README.md). The original guides and all PDF/Markdown checklist pairs remain unchanged.
+[Complete file index](../README.md) · [Forensics hub](forensics-workflows.md) · [Optional script instructions](script-safety.md). The original guides and all PDF/Markdown checklist pairs remain unchanged.
