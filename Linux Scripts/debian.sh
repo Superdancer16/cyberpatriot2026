@@ -625,3 +625,154 @@ do_logging() {
     capture 'journal-errors' journalctl -p err -n 40 --no-pager
 }
 
+do_software() {
+    local pkg simulation count
+    while IFS= read -r pkg; do
+        safe_pkg "$pkg" || { status REVIEW "Invalid package: $pkg"; continue; }
+        if is_required_package "$pkg"; then status SKIPPED "Required package protected: $pkg"; continue; fi
+        if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q 'ok installed'; then
+            status OK "Package not installed: $pkg"; continue
+        fi
+        guard_removal "Remove prohibited package $pkg" || continue
+        simulation="$BACKUPS/apt-purge-simulation-$pkg.txt"
+        apt-get -s purge "$pkg" > "$simulation" 2>&1 || { status REVIEW "APT removal simulation failed for $pkg"; continue; }
+        count=$(grep -Ec '^(Remv|Purg) ' "$simulation" || true)
+        if [[ "$count" != 1 ]]; then
+            status REVIEW "Package $pkg would remove $count packages; inspect $simulation and remove manually."
+            continue
+        fi
+        change "Purge exact prohibited package $pkg" env DEBIAN_FRONTEND=noninteractive apt-get purge -y "$pkg"
+    done < <(list RemovePackages)
+}
+do_files() {
+    local requested actual
+    while IFS= read -r requested; do
+        [[ "$requested" == /* && -f "$requested" && ! -L "$requested" ]] || {
+            status REVIEW "File absent, symlink or unsafe: $requested"; continue
+        }
+        actual=$(realpath -e -- "$requested") || continue
+        case "$actual" in
+            /home/*|/tmp/*|/var/tmp/*|/opt/*|/srv/*) ;;
+            *) status SKIPPED "System/credential path requires manual review: $actual"; continue ;;
+        esac
+        [[ "$actual" != "$BACKUPS"* && "$actual" != "$ROOT"* ]] || { status SKIPPED "Cannot remove script report: $actual"; continue; }
+        guard_removal "Delete prohibited file $actual" || continue
+        if [[ "$MODE" == apply ]]; then
+            sha256sum "$actual" >> "$BACKUPS/file-deletion-hashes.txt" || true
+            stat -c '%a %U:%G %s %n' "$actual" >> "$BACKUPS/file-deletion-hashes.txt" || true
+        fi
+        change "Delete exact prohibited file $actual" rm -f -- "$actual"
+    done < <(list RemoveFiles)
+}
+cron_remove_line() {
+    local user="$1" line="$2" src="$BACKUPS/cron-before-$user.txt" new="$BACKUPS/cron-after-$user.txt"
+    crontab -u "$user" -l > "$src" 2>/dev/null || return 1
+    grep -Fqx -- "$line" "$src" || return 1
+    grep -Fvx -- "$line" "$src" > "$new" || true
+    crontab -u "$user" "$new"
+}
+do_persistence() {
+    local user line unit
+    while IFS=$'\t' read -r user line; do
+        [[ -n "$line" ]] || continue
+        if [[ "$user" != root ]] && ! safe_user "$user"; then status REVIEW "Unsafe cron owner $user"; continue; fi
+        user_present "$user" || { status REVIEW "Cron user absent: $user"; continue; }
+        if [[ "$line" == \#* || "$line" == *$'\n'* ]]; then status REVIEW 'Cron entry must be a single exact executable line'; continue; fi
+        if ! crontab -u "$user" -l 2>/dev/null | grep -Fqx -- "$line"; then
+            status OK "Target cron entry absent for $user"; continue
+        fi
+        change "Remove exact unauthorized cron entry for $user" cron_remove_line "$user" "$line"
+    done < <(records RemoveCronLines)
+    while IFS= read -r unit; do
+        safe_unit "$unit" || { status REVIEW "Unsafe unit name $unit"; continue; }
+        unit="${unit%.service}.service"
+        if service_needed "$unit" || [[ "$unit" == systemd* || "$unit" == dbus* || "$unit" == ssh.service ]]; then
+            status SKIPPED "Protected/required unit $unit"; continue
+        fi
+        if unit_present "$unit"; then
+            if [[ "$MODE" == apply ]]; then systemctl cat "$unit" > "$BACKUPS/unit-before-$unit.txt" 2>&1 || true; fi
+            change "Disable confirmed malicious systemd unit $unit" systemctl disable --now "$unit"
+        else status OK "Unit absent: $unit"; fi
+    done < <(list DisableUnits)
+    status REVIEW 'Inspect user crontabs, systemd user units, shell startup, at jobs and unexpected listeners.'
+}
+hosts_remove_line() {
+    local line="$1" path=/etc/hosts
+    backup "$path"
+    python3 - "$path" "$line" <<'PY'
+import sys
+p,target=sys.argv[1:]
+lines=open(p,encoding='utf-8').readlines()
+with open(p,'w',encoding='utf-8') as f:
+    for line in lines:
+        if line.rstrip('\r\n')!=target: f.write(line)
+PY
+}
+do_hosts() {
+    local entry
+    while IFS= read -r entry; do
+        [[ -n "$entry" ]] || continue
+        if ! grep -Fxq -- "$entry" /etc/hosts; then status OK "Hosts entry absent: $entry"; continue; fi
+        if [[ "$entry" == *localhost* || "$entry" == *127.0.0.1* || "$entry" == *::1* ]]; then
+            status REVIEW "Hosts entry may be system-required: $entry"; continue
+        fi
+        change "Remove exact unauthorized hosts mapping" hosts_remove_line "$entry"
+    done < <(list RemoveHostsLines)
+}
+gdm_disable_autologin() {
+    local file=/etc/gdm3/daemon.conf
+    backup "$file"
+    python3 - "$file" <<'PY'
+import re,sys
+path=sys.argv[1]
+lines=open(path,encoding='utf-8').readlines()
+out=[];in_daemon=False;seen=False;had_section=False
+for line in lines:
+    m=re.match(r'^\s*\[([^\]]+)\]',line)
+    if m:
+        if in_daemon and not seen: out.append('AutomaticLoginEnable=false\n');seen=True
+        in_daemon=m.group(1).lower()=='daemon'
+        had_section=had_section or in_daemon
+    if in_daemon and re.match(r'^\s*#?\s*AutomaticLoginEnable\s*=',line):
+        if not seen: out.append('AutomaticLoginEnable=false\n');seen=True
+        continue
+    if in_daemon and re.match(r'^\s*#?\s*AutomaticLogin\s*=',line):
+        continue
+    out.append(line)
+if had_section and in_daemon and not seen: out.append('AutomaticLoginEnable=false\n')
+if not had_section: out+=['\n[daemon]\n','AutomaticLoginEnable=false\n']
+open(path,'w',encoding='utf-8').writelines(out)
+PY
+}
+do_desktop() {
+    if [[ "$(scalar Desktop.DisableGdmAutologin)" != true ]]; then return; fi
+    if [[ ! -f /etc/gdm3/daemon.conf || ! -d /etc/gdm3 ]]; then
+        status REVIEW 'GDM3 is not installed; use the actual desktop/login manager.'; return
+    fi
+    change 'Disable GDM3 automatic login in daemon.conf' gdm_disable_autologin
+    status REVIEW 'Check GDM3 settings and new authorized login at a safe checkpoint; do not restart display manager mid-round.'
+}
+chromium_policy() {
+    local file=/etc/chromium/policies/managed/90-cp-security.json
+    mkdir -p "$(dirname "$file")"
+    backup "$file"
+    python3 - "$file" <<'PY'
+import json,os,sys
+p=sys.argv[1]; obj={}
+if os.path.exists(p):
+    with open(p,encoding='utf-8') as f: obj=json.load(f)
+obj['DefaultPopupsSetting']=2
+with open(p,'w',encoding='utf-8') as f: json.dump(obj,f,indent=2);f.write('\n')
+PY
+    chmod 644 "$file"
+}
+do_browsers() {
+    if [[ "$(scalar Browsers.ChromiumBlockPopups)" == true ]]; then
+        if command -v chromium >/dev/null 2>&1 || dpkg-query -W chromium >/dev/null 2>&1; then
+            change 'Set Chromium default pop-up block policy' chromium_policy
+            status REVIEW 'Verify actual installed Chromium policy path with chrome://policy and required websites.'
+        else status REVIEW 'Chromium absent; do not install a browser that README does not require.'; fi
+    fi
+    status REVIEW 'Check Firefox ESR/Chromium browser versions, extensions, required default browser and pop-up settings in their GUIs.'
+}
+
