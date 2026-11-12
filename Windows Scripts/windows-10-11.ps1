@@ -1001,7 +1001,6 @@ function Invoke-AutoAudit {
 }
 
 
-
 function Invoke-AutoFirewallRules {
     $names = Names (Get-Value $script:Cfg 'DisableFirewallRules')
     if (-not $names.Count) { return }
@@ -1048,378 +1047,43 @@ function Invoke-AutoFirewallRules {
     }
     Write-Result 'REVIEW' 'Retest all README-required network services after firewall-rule changes.'
 }
+
+
 function Invoke-AutoAuditSubcategories {
     $requested = Get-Value $script:Cfg 'AuditSubcategories'
     if (-not $requested) { return }
     $entries = @($requested.PSObject.Properties)
     if (-not $entries.Count) { return }
     if ($script:domainJoined) {
-        Write-Result 'REVIEW' 'Domain policy can override advanced auditing; no local subcategory edits made.'
+        Write-Result 'REVIEW' 'Domain policy can override advanced auditing; skipped local edits.'
         return
     }
     $backup = Join-Path $script:BackupDir 'audit-policy-before.csv'
-    & auditpol.exe /backup /file:$backup | Out-Null
+    & auditpol.exe /backup "/file:$backup" | Out-Null
     if ($LASTEXITCODE -ne 0) {
-        Write-Result 'FAILED' 'Cannot back up audit subcategories; no changes made.'
+        Write-Result 'FAILED' 'Audit-policy backup failed; no advanced audit changes made.'
         return
     }
     foreach ($entry in $entries) {
         $name = [string]$entry.Name
         $value = [string]$entry.Value
-        if ($name -notmatch '^[a-zA-Z0-9 ._-]{3,80}
-    $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','Appinfo','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time')
-    foreach ($name in (Names (Get-Value $script:Cfg 'DisableServices'))) {
-        if ($name -in $protected -or (Is-Listed $name $script:RequiredServices)) {
-            Write-Result 'SKIPPED' "Service $name protected or required by README."
+        if ($name -notmatch '^[a-zA-Z0-9 ._-]{3,80}$') {
+            Write-Result 'REVIEW' "Invalid audit subcategory: $name"
             continue
-        }
-        if ($name -in @('TermService','WinRM','W3SVC','FTPSVC','Spooler','sshd','RemoteAccess','SharedAccess')) {
-            Write-Result 'REVIEW' "High-impact service $name needs manual dependency/role verification; not stopped automatically."
-            continue
-        }
-        $svc = Get-Service -Name $name -ErrorAction SilentlyContinue
-        if (-not $svc) { Write-Result 'OK' "Service not installed: $name"; continue }
-        $dependents = @($svc.DependentServices | Where-Object { $_.Status -eq 'Running' })
-        if ($dependents.Count) {
-            Write-Result 'SKIPPED' ("Service $name has running dependencies: " + ($dependents.Name -join ', '))
-            continue
-        }
-        $unneeded = $svc.Status -ne 'Stopped' -or $svc.StartType -ne 'Disabled'
-        Decide "Stop and disable unneeded service $name" $unneeded {
-            $detail = Get-CimInstance Win32_Service -Filter ("Name='" + $name.Replace("'","''") + "'")
-            $detail | Select-Object Name,State,StartMode,StartName,PathName |
-                Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("service-" + $name + ".xml"))
-            if ($svc.Status -eq 'Running') { Stop-Service -Name $name -ErrorAction Stop }
-            Set-Service -Name $name -StartupType Disabled -ErrorAction Stop
-        }
-    }
-    foreach ($name in (Names (Get-Value $script:Cfg 'RequiredServices'))) {
-        $svc = Get-Service -Name $name -ErrorAction SilentlyContinue
-        if (-not $svc) { Write-Result 'REVIEW' "README-required service is absent: $name"; continue }
-        if ($svc.Status -ne 'Running') {
-            Write-Result 'REVIEW' "README-required service $name is $($svc.Status); check expected start mode/dependencies."
-        } else { Write-Result 'OK' "Required service running: $name" }
-    }
-}
-function Invoke-AutoFeatures {
-    $allowed = @('SMB1Protocol','MicrosoftWindowsPowerShellV2','TelnetClient','TFTP','SimpleTCP','SNMP','WindowsMediaPlayer')
-    foreach ($name in (Names (Get-Value $script:Cfg 'DisableFeatures'))) {
-        if ($name -notin $allowed) { Write-Result 'REVIEW' "Optional feature $name not on supported disable list."; continue }
-        if (Is-Listed $name $script:RequiredServices) { Write-Result 'SKIPPED' "Feature required: $name"; continue }
-        $item = Get-WindowsOptionalFeature -Online -FeatureName $name -ErrorAction SilentlyContinue
-        if (-not $item) { Write-Result 'OK' "Optional feature absent: $name"; continue }
-        Decide "Disable optional feature $name (restart may be needed)" ($item.State -eq 'Enabled') {
-            $item | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("feature-" + $name + ".xml"))
-            Disable-WindowsOptionalFeature -Online -FeatureName $name -NoRestart -ErrorAction Stop | Out-Null
-        }
-    }
-}
-function Invoke-AutoTasks {
-    foreach ($full in (Names (Get-Value $script:Cfg 'DisableScheduledTasks'))) {
-        if (-not $full.StartsWith('\')) {
-            Write-Result 'REVIEW' "Task path must begin with a backslash: $full"
-            continue
-        }
-        $index = $full.LastIndexOf('\')
-        if ($index -lt 0 -or $index -eq $full.Length - 1) {
-            Write-Result 'REVIEW' "Invalid task name: $full"
-            continue
-        }
-        $taskName = $full.Substring($index + 1)
-        $taskPath = $full.Substring(0, $index + 1)
-        if ($taskPath -like '\Microsoft\Windows\*') {
-            Write-Result 'SKIPPED' "Protected Microsoft scheduled task: $full"
-            continue
-        }
-        $task = Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName -ErrorAction SilentlyContinue
-        if (-not $task) { Write-Result 'OK' "Scheduled task absent: $full"; continue }
-        Decide "Disable confirmed unauthorized scheduled task $full" ($task.State -ne 'Disabled') {
-            $xml = Export-ScheduledTask -TaskName $taskName -TaskPath $taskPath
-            $xml | Set-Content -LiteralPath (Join-Path $script:BackupDir ("task-" + [Guid]::NewGuid().ToString('N') + '.xml'))
-            Disable-ScheduledTask -TaskPath $taskPath -TaskName $taskName | Out-Null
-        }
-    }
-    $other = @(Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {
-        $_.TaskPath -notlike '\Microsoft\*' -and $_.State -ne 'Disabled'
-    } | Select-Object -First 50 TaskPath,TaskName,State)
-    $other | Export-Csv -Path (Join-Path $script:BackupDir 'task-inventory.csv') -NoTypeInformation
-    Write-Result 'REVIEW' "Review non-Microsoft scheduled tasks ($($other.Count) sampled) for unauthorized persistence."
-}
-function Invoke-AutoShares {
-    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveShares'))) {
-        if (-not $AllowRemovals) { Write-Result 'REVIEW' "Share removal needs -AllowRemovals: $name"; continue }
-        if (Is-Listed $name $script:RequiredShares) { Write-Result 'SKIPPED' "Required share: $name"; continue }
-        $share = Get-SmbShare -Name $name -ErrorAction SilentlyContinue
-        if (-not $share) { Write-Result 'OK' "Share already absent: $name"; continue }
-        if ($share.Special -or $name -in @('ADMIN$','C$','IPC$','print$')) {
-            Write-Result 'SKIPPED' "System/administrative share is protected: $name"
-            continue
-        }
-        Decide "Remove unauthorized custom share $name" $true {
-            $backup = Join-Path $script:BackupDir ("share-" + $name.Replace('$','_') + ".txt")
-            ($share | Format-List * | Out-String) | Set-Content -LiteralPath $backup
-            (Get-SmbShareAccess -Name $name | Format-Table -AutoSize | Out-String) | Add-Content -LiteralPath $backup
-            Remove-SmbShare -Name $name -Force -Confirm:$false
-        }
-    }
-}
-
-
-function Invoke-AutoApps {
-    $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
-    $installed = @()
-    try {
-        $paths = @('HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
-                   'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*',
-                   'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*')
-        $installed = @(Get-ItemProperty -Path $paths -ErrorAction SilentlyContinue |
-            Where-Object DisplayName | Select-Object DisplayName,DisplayVersion,Publisher,InstallLocation)
-        $installed | Export-Csv -LiteralPath (Join-Path $script:BackupDir 'installed-programs-before.csv') -NoTypeInformation
-    } catch { Write-Result 'REVIEW' 'Installed-app inventory unavailable.' }
-    foreach ($name in (Names (Get-Value $script:Cfg 'RequiredSoftware'))) {
-        if (-not @($installed | Where-Object { $_.DisplayName -ilike ("*" + $name + "*") }).Count) {
-            Write-Result 'REVIEW' "README-required software not found in standard uninstall list: $name"
-        }
-    }
-    if (-not $winget) {
-        if ((Names (Get-Value $script:Cfg 'UpdatePrograms')).Count -or (Names (Get-Value $script:Cfg 'RemovePrograms')).Count) {
-            Write-Result 'REVIEW' 'winget is unavailable; use the approved installer or Installed apps UI.'
-        }
-        return
-    }
-    foreach ($id in (Names (Get-Value $script:Cfg 'UpdatePrograms'))) {
-        if ($id -notmatch '^[A-Za-z0-9_.+-]+$') { Write-Result 'REVIEW' "Invalid winget package id: $id"; continue }
-        try {
-            & winget.exe upgrade --id $id --exact --source winget --accept-source-agreements --accept-package-agreements
-            if ($LASTEXITCODE -ne 0) { throw "winget exit $LASTEXITCODE" }
-            Write-Result 'CHANGED' "winget update attempted for $id; verify installed version and path."
-        } catch { Write-Result 'REVIEW' ("Update $id: " + $_.Exception.Message) }
-    }
-    foreach ($id in (Names (Get-Value $script:Cfg 'RemovePrograms'))) {
-        if (-not $AllowRemovals) { Write-Result 'REVIEW' "Package removal needs -AllowRemovals: $id"; continue }
-        if (Is-Listed $id $script:RequiredSoftware) { Write-Result 'SKIPPED' "Required software: $id"; continue }
-        if ($id -notmatch '^[A-Za-z0-9_.+-]+$') { Write-Result 'REVIEW' "Invalid winget package id: $id"; continue }
-        try {
-            & winget.exe uninstall --id $id --exact --source winget --accept-source-agreements
-            if ($LASTEXITCODE -ne 0) { throw "winget exit $LASTEXITCODE" }
-            Write-Result 'CHANGED' "winget uninstall attempted for $id; confirm exact package is gone."
-        } catch { Write-Result 'REVIEW' ("Remove $id: " + $_.Exception.Message) }
-    }
-}
-function Invoke-AutoFiles {
-    foreach ($path in (Names (Get-Value $script:Cfg 'RemoveFiles'))) {
-        if (-not $AllowRemovals) { Write-Result 'REVIEW' "File removal needs -AllowRemovals: $path"; continue }
-        $file = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
-        if (-not $file) { Write-Result 'OK' "File not found: $path"; continue }
-        if ($file.PSIsContainer) { Write-Result 'SKIPPED' "Refusing to delete directory: $path"; continue }
-        $protectedRoots = @($env:WINDIR,$env:ProgramFiles,([Environment]::GetEnvironmentVariable('ProgramFiles(x86)')),$root) | Where-Object { $_ }
-        $blocked = $false
-        foreach ($folder in $protectedRoots) {
-            if ($file.FullName.StartsWith(($folder.TrimEnd('\') + '\'),[StringComparison]::OrdinalIgnoreCase)) { $blocked=$true }
-        }
-        if ($file.FullName -match '(?i)\\CyberPatriot(\\|$)' -or $file.FullName -eq $PSCommandPath) { $blocked=$true }
-        if ($blocked) { Write-Result 'SKIPPED' "Protected path requires manual review: $($file.FullName)"; continue }
-        Decide "Delete confirmed prohibited file $($file.FullName)" $true {
-            $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
-            Note "Deleting $($file.FullName) SHA256=$hash (not automatically reversible)."
-            Remove-Item -LiteralPath $file.FullName -Force
-            if (Test-Path -LiteralPath $file.FullName) { throw 'File remained after deletion.' }
-        }
-    }
-}
-function Invoke-AutoBrowsers {
-    if ([bool](Get-Value $script:Sec 'ChromeBlockPopups' $false)) {
-        Put-RegDword 'HKLM:\SOFTWARE\Policies\Google\Chrome' 'DefaultPopupsSetting' 2
-    }
-    if ([bool](Get-Value $script:Sec 'EdgeBlockPopups' $false)) {
-        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Edge' 'DefaultPopupsSetting' 2
-    }
-    Write-Result 'REVIEW' 'Verify Chrome, Edge, Firefox and required application updates in Help > About and site settings.'
-}
-function Invoke-AutoWindowsUpdate {
-    $choice = [string](Get-Value $script:Sec 'WindowsUpdate' 'Scan')
-    if ($choice -eq 'None') { Write-Result 'SKIPPED' 'Windows Update configured as None'; return }
-    if ($choice -notin @('Scan','Install')) { Write-Result 'REVIEW' 'WindowsUpdate must be Scan, Install, or None'; return }
-    try {
-        $session = New-Object -ComObject Microsoft.Update.Session
-        $searcher = $session.CreateUpdateSearcher()
-        $found = $searcher.Search("IsInstalled=0 and IsHidden=0 and Type='Software'")
-        Write-Result 'REVIEW' ("Windows Update: $($found.Updates.Count) software update(s) detected.")
-        if ($choice -ne 'Install') { return }
-        $updates = New-Object -ComObject Microsoft.Update.UpdateColl
-        foreach ($item in $found.Updates) {
-            if ($item.InstallationBehavior.CanRequestUserInput) { continue }
-            if (-not $item.EulaAccepted) { $item.AcceptEula() }
-            [void]$updates.Add($item)
-        }
-        if (-not $updates.Count) { Write-Result 'OK' 'No unattended updates eligible for install.'; return }
-        $downloader = $session.CreateUpdateDownloader()
-        $downloader.Updates = $updates
-        $downloadResult = $downloader.Download()
-        if ($downloadResult.ResultCode -notin @(2,3)) { throw "Download result $($downloadResult.ResultCode)" }
-        $installer = $session.CreateUpdateInstaller()
-        $installer.Updates = $updates
-        $result = $installer.Install()
-        if ($result.ResultCode -notin @(2,3)) { throw "Install result $($result.ResultCode)" }
-        Write-Result 'CHANGED' "Windows Update installed or partially installed $($updates.Count) updates; verify in Settings."
-        if ($result.RebootRequired) { Write-Result 'REVIEW' 'Restart pending; the script will not reboot automatically.' }
-    } catch {
-        Write-Result 'REVIEW' ('Windows Update unavailable or incomplete: ' + $_.Exception.Message)
-    }
-}
-
-
-function Run-Automation {
-    Load-ReadmeConfig
-    Check-Workstation
-    $script:Results = New-Object System.Collections.ArrayList
-    $script:BackupDir = Join-Path $root "backups-$stamp"
-    New-Item -ItemType Directory -Path $script:BackupDir -Force | Out-Null
-
-    if (-not $Yes) {
-        Write-Host 'This performs all applicable steps from image-config.json in one run.' -ForegroundColor Yellow
-        Write-Host 'Read the README and preserve forensics before changing anything.'
-        Write-Host 'Account, file, share and program deletion also requires -AllowRemovals.'
-        $answer = Read-Host 'Type APPLY to start, or anything else to cancel'
-        if ($answer -cne 'APPLY') { Note 'Canceled before changing the system.'; return }
-    }
-    $modules = @(
-        @{ Name='accounts';  Fn='Invoke-AutoAccounts' },
-        @{ Name='passwords'; Fn='Invoke-AutoPasswordPolicy' },
-        @{ Name='rights';    Fn='Invoke-AutoUserRights' },
-        @{ Name='security';  Fn='Invoke-AutoSecurity' },
-        @{ Name='defender';  Fn='Invoke-AutoDefender' },
-        @{ Name='firewall';  Fn='Invoke-AutoFirewall' },
-        @{ Name='firewallrules'; Fn='Invoke-AutoFirewallRules' },
-        @{ Name='smb';       Fn='Invoke-AutoSMB' },
-        @{ Name='audit';     Fn='Invoke-AutoAudit' },
-        @{ Name='auditdetails'; Fn='Invoke-AutoAuditSubcategories' },
-        @{ Name='services';  Fn='Invoke-AutoServices' },
-        @{ Name='features';  Fn='Invoke-AutoFeatures' },
-        @{ Name='tasks';     Fn='Invoke-AutoTasks' },
-        @{ Name='shares';    Fn='Invoke-AutoShares' },
-        @{ Name='browsers';  Fn='Invoke-AutoBrowsers' },
-        @{ Name='apps';      Fn='Invoke-AutoApps' },
-        @{ Name='files';     Fn='Invoke-AutoFiles' },
-        @{ Name='updates';   Fn='Invoke-AutoWindowsUpdate' }
-    )
-    Write-Host ''
-    Write-Host ("Starting full run: " + $env:COMPUTERNAME) -ForegroundColor Cyan
-    Write-Host ("Selected sections: " + $(if ($Only) { $Only -join ', ' } else { 'all' }))
-    Write-Host ("Authorized admins: " + (($script:Cfg.AuthorizedAdmins) -join ', '))
-    Write-Host ("Required services: " + (($script:RequiredServices) -join ', '))
-    Write-Host ''
-    try {
-        Audit
-        Copy-Item -LiteralPath $report -Destination (Join-Path $script:BackupDir 'audit-before.txt') -Force
-    } catch { Write-Result 'REVIEW' ('Initial audit unavailable: ' + $_.Exception.Message) }
-    foreach ($entry in $modules) {
-        if ($Only -and $entry.Name -notin $Only) { continue }
-        Write-Host ("---- " + $entry.Name.ToUpper() + " ----") -ForegroundColor Cyan
-        try { & $entry.Fn }
-        catch { Write-Result 'FAILED' ($entry.Name + ' section failed: ' + $_.Exception.Message) }
-    }
-    try {
-        Audit
-        Copy-Item -LiteralPath $report -Destination (Join-Path $script:BackupDir 'audit-after.txt') -Force
-    } catch { Write-Result 'REVIEW' ('Final audit unavailable: ' + $_.Exception.Message) }
-    Write-Result 'REVIEW' 'Check Scoring Report, forensic answers, working admin login, required apps and remote access.'
-    Show-AutomationSummary
-}
-
-function Quick {
-    Run-Task 'Baseline audit' { Audit }
-    Run-Task 'Firewall' { Firewall }
-    Run-Task 'Defender' { Defender }
-    Run-Task 'Defender signatures' { SignatureUpdate }
-    Run-Task 'Guest' { Guest }
-    Run-Task 'Security options' { SecurityOptions }
-    Run-Task 'SMB signing' { SMBSigning }
-    Run-Task 'Unneeded services' { Disable-Services -QuickOnly }
-    Run-Task 'Final audit' { Audit }
-}
-function Menu {
-    do {
-        Write-Host "`nWindows 10/11 Security Menu" -ForegroundColor Cyan
-        Write-Host '0 Audit only          Q Quick review (asks before each fix)'
-        Write-Host '1 Firewall            2 Defender                3 Update Defender signatures'
-        Write-Host '4 Disable Guest       5 Local password policy    6 Create group'
-        Write-Host '7 Add group members   8 Create authorized user  9 Change user password'
-        Write-Host '10 Demote admin       11 Security options        12 SMB client signing'
-        Write-Host '13 Disable RDP        14 Disable services        15 Disable SMB1'
-        Write-Host '16 Credential audit   17 Disable a user          18 Delete a user'
-        Write-Host '19 Remove group member  20 Password expiration   21 Remove share'
-        Write-Host '22 Remove Defender exclusion   23 Defender quick scan'
-        Write-Host '24 Update exact program        25 Uninstall exact program'
-        Write-Host '26 Delete exact prohibited file  27 Open Windows Update'
-        Write-Host '28 Disable Remote Assistance  29 PowerShell logging'
-        Write-Host 'X Exit'
-        $choice = (Read-Host 'Choose').Trim().ToUpperInvariant()
-        switch ($choice) {
-            '0'  { Run-Task 'Audit' { Audit } }
-            'Q'  { Quick }
-            '1'  { Run-Task 'Firewall' { Firewall } }
-            '2'  { Run-Task 'Defender' { Defender } }
-            '3'  { Run-Task 'Defender signatures' { SignatureUpdate } }
-            '4'  { Run-Task 'Guest' { Guest } }
-            '5'  { Run-Task 'Password policy' { PasswordPolicy } }
-            '6'  { Run-Task 'Local group' { LocalGroup } }
-            '7'  { Run-Task 'Group members' { GroupMembers } }
-            '8'  { Run-Task 'New user' { Add-User } }
-            '9'  { Run-Task 'Password reset' { UserPassword } }
-            '10' { Run-Task 'Admin membership' { Remove-Admin } }
-            '11' { Run-Task 'Security options' { SecurityOptions } }
-            '12' { Run-Task 'SMB signing' { SMBSigning } }
-            '13' { Run-Task 'RDP' { Disable-RDP } }
-            '14' { Run-Task 'Services' { Disable-Services } }
-            '15' { Run-Task 'SMB1' { Disable-SMB1 } }
-            '16' { Run-Task 'Credential Validation audit' { CredentialAudit } }
-            '17' { Run-Task 'Disable user' { Disable-User } }
-            '18' { Run-Task 'Delete user' { Delete-User } }
-            '19' { Run-Task 'Remove group member' { Remove-GroupMember } }
-            '20' { Run-Task 'Password expiration' { ExpiringPassword } }
-            '21' { Run-Task 'Remove share' { Remove-Share } }
-            '22' { Run-Task 'Remove Defender exclusion' { DefenderExclusion } }
-            '23' { Run-Task 'Defender quick scan' { Start-Scan } }
-            '24' { Run-Task 'Software update' { Program-Update } }
-            '25' { Run-Task 'Uninstall program' { Program-Remove } }
-            '26' { Run-Task 'Delete prohibited file' { TargetFile } }
-            '27' { Run-Task 'Open Windows Update' { WindowsUpdate } }
-            '28' { Run-Task 'Remote Assistance' { RemoteAssistance } }
-            '29' { Run-Task 'PowerShell logging' { ScriptLogging } }
-            'X'  { Note 'Exiting.' }
-            default { Write-Host 'Choose a listed number, Q, or X.' }
-        }
-    } until ($choice -eq 'X')
-}
-
-Note "Started: $env:COMPUTERNAME, mode=$Mode, domainJoined=$script:domainJoined"
-if ($InitConfig) {
-    Initialize-ReadmeConfig
-} else {
-    switch ($Mode) {
-        'Audit' { Audit }
-        'Quick' { Quick }
-        'Apply' { Run-Automation }
-        default { Menu }
-    }
-}
-Write-Host "Change log: $log" -ForegroundColor Green
-
-) {
-            Write-Result 'REVIEW' "Invalid audit subcategory: $name"; continue
         }
         if ($value -notin @('Success','Failure','SuccessAndFailure')) {
-            Write-Result 'REVIEW' "Audit value for $name must be Success, Failure or SuccessAndFailure."; continue
+            Write-Result 'REVIEW' "Audit $name value must be Success, Failure or SuccessAndFailure."
+            continue
         }
         $success = if ($value -in @('Success','SuccessAndFailure')) { 'enable' } else { 'disable' }
         $failure = if ($value -in @('Failure','SuccessAndFailure')) { 'enable' } else { 'disable' }
-        if ($Mode -eq 'Audit') { Write-Result 'WOULD' "Audit $name => $value"; continue }
         try {
             & auditpol.exe /set "/subcategory:$name" "/success:$success" "/failure:$failure" | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw 'auditpol returned an error; check localization and policy scope' }
-            Write-Result 'CHANGED' "Audit $name requested as $value; verify with auditpol /get."
-        } catch { Write-Result 'FAILED' ("Audit " + $name + ": " + $_.Exception.Message) }
+            if ($LASTEXITCODE -ne 0) { throw 'auditpol returned error; check policy scope and localization' }
+            Write-Result 'CHANGED' "Audit $name set to $value; verify effective policy."
+        } catch {
+            Write-Result 'FAILED' ("Audit " + $name + ": " + $_.Exception.Message)
+        }
     }
 }
 
@@ -1647,8 +1311,10 @@ function Run-Automation {
         @{ Name='security';  Fn='Invoke-AutoSecurity' },
         @{ Name='defender';  Fn='Invoke-AutoDefender' },
         @{ Name='firewall';  Fn='Invoke-AutoFirewall' },
+        @{ Name='firewallrules'; Fn='Invoke-AutoFirewallRules' },
         @{ Name='smb';       Fn='Invoke-AutoSMB' },
         @{ Name='audit';     Fn='Invoke-AutoAudit' },
+        @{ Name='auditdetails'; Fn='Invoke-AutoAuditSubcategories' },
         @{ Name='services';  Fn='Invoke-AutoServices' },
         @{ Name='features';  Fn='Invoke-AutoFeatures' },
         @{ Name='tasks';     Fn='Invoke-AutoTasks' },
