@@ -1569,9 +1569,16 @@ function Run-Automation {
         @{ Name='files';     Fn='Invoke-AutoFiles' },
         @{ Name='updates';   Fn='Invoke-AutoWindowsUpdate' }
     )
+    $selected = @()
+    if ($Only) { $selected = @(($Only -join ',') -split '[,\s]+' | Where-Object { $_ }) }
+    $valid = @($modules | ForEach-Object { $_.Name })
+    $invalid = @($selected | Where-Object { $_ -notin $valid })
+    if ($invalid.Count) {
+        throw "Unknown -Only sections: $($invalid -join ', '). Allowed: $($valid -join ', ')"
+    }
     Write-Host ''
     Write-Host ("Starting full run: " + $env:COMPUTERNAME) -ForegroundColor Cyan
-    Write-Host ("Selected sections: " + $(if ($Only) { $Only -join ', ' } else { 'all' }))
+    Write-Host ("Selected sections: " + $(if ($selected.Count) { $selected -join ', ' } else { 'all' }))
     Write-Host ("Authorized admins: " + (($script:Cfg.AuthorizedAdmins) -join ', '))
     Write-Host ("Required services: " + (($script:RequiredServices) -join ', '))
     Write-Host ''
@@ -1580,7 +1587,7 @@ function Run-Automation {
         Copy-Item -LiteralPath $report -Destination (Join-Path $script:BackupDir 'audit-before.txt') -Force
     } catch { Write-Result 'REVIEW' ('Initial audit unavailable: ' + $_.Exception.Message) }
     foreach ($entry in $modules) {
-        if ($Only -and $entry.Name -notin $Only) { continue }
+        if ($selected.Count -and $entry.Name -notin $selected) { continue }
         Write-Host ("---- " + $entry.Name.ToUpper() + " ----") -ForegroundColor Cyan
         try { & $entry.Fn }
         catch { Write-Result 'FAILED' ($entry.Name + ' section failed: ' + $_.Exception.Message) }
