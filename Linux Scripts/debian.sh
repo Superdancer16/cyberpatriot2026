@@ -306,3 +306,158 @@ do_groups() {
     done < <(pairs RemoveGroupMembers)
 }
 
+set_file_value() {
+    local file="$1" key="$2" value="$3" style="$4"
+    backup "$file"
+    python3 - "$file" "$key" "$value" "$style" <<'PY'
+import re,sys,os
+path,key,value,style=sys.argv[1:]
+lines=open(path,encoding="utf-8").read().splitlines(keepends=True) if os.path.exists(path) else []
+pat=re.compile(r'^\s*#?\s*'+re.escape(key)+r'\s*(?:=|\s)\s*.*$')
+found=False
+out=[]
+for ln in lines:
+    if pat.match(ln):
+        if not found:
+            out.append(f"{key}{' = ' if style=='equals' else '  '}{value}\n")
+            found=True
+    else: out.append(ln)
+if not found: out.append(f"{key}{' = ' if style=='equals' else '  '}{value}\n")
+with open(path,'w',encoding='utf-8') as f: f.writelines(out)
+PY
+}
+user_age_rows() {
+    python3 - "$CONFIG" <<'PY'
+import json,sys
+c=json.load(open(sys.argv[1],encoding='utf-8'))
+for name,props in c.get('UserAging',{}).items():
+    if isinstance(props,dict):
+        print(str(name)+'\t'+str(props.get('max',''))+'\t'+str(props.get('min',''))+'\t'+str(props.get('warn','')))
+PY
+}
+do_passwords() {
+    local key value user max min warn
+    while IFS=$'\t' read -r key value; do
+        case "$key" in PASS_MIN_DAYS|PASS_MAX_DAYS|PASS_WARN_AGE) ;; *) status REVIEW "Unknown login.defs policy: $key"; continue ;; esac
+        [[ "$value" =~ ^[0-9]{1,4}$ ]] || { status REVIEW "Invalid numeric password age: $key=$value"; continue; }
+        change "Default password policy $key=$value" set_file_value /etc/login.defs "$key" "$value" space
+    done < <(pairs PasswordAging)
+    while IFS=$'\t' read -r user max min warn; do
+        safe_user "$user" && user_present "$user" || { status REVIEW "Aging target not found/valid: $user"; continue; }
+        is_authorized "$user" || { status SKIPPED "Password aging target not authorized: $user"; continue; }
+        if [[ -n "$max" && ! "$max" =~ ^[0-9]{1,4}$ ]] || [[ -n "$min" && ! "$min" =~ ^[0-9]{1,4}$ ]] || [[ -n "$warn" && ! "$warn" =~ ^[0-9]{1,4}$ ]]; then
+            status REVIEW "Invalid aging numbers for $user"; continue
+        fi
+        local args=()
+        [[ -n "$max" ]] && args+=(-M "$max")
+        [[ -n "$min" ]] && args+=(-m "$min")
+        [[ -n "$warn" ]] && args+=(-W "$warn")
+        ((${#args[@]})) || continue
+        if [[ "$MODE" == apply ]]; then chage -l "$user" > "$BACKUPS/chage-before-$user.txt" || true; fi
+        change "Set recorded password aging for $user" chage "${args[@]}" "$user"
+    done < <(user_age_rows)
+}
+remove_pam_nullok() {
+    local file=/etc/pam.d/common-auth
+    backup "$file"
+    python3 - "$file" <<'PY'
+import re,sys
+path=sys.argv[1]
+data=open(path,encoding='utf-8').read().splitlines(keepends=True)
+out=[]
+for line in data:
+    if not line.lstrip().startswith('#') and 'pam_unix.so' in line:
+        line=re.sub(r'(?<!\S)nullok(?!\S)','',line)
+    out.append(line)
+with open(path,'w',encoding='utf-8') as f: f.writelines(out)
+PY
+    ! grep -E 'pam_unix\.so.*[[:space:]]nullok([[:space:]]|$)' "$file" >/dev/null
+}
+do_pam() {
+    local key value
+    if [[ "$(scalar RemovePAMNullok)" == true ]]; then
+        if grep -E 'pam_unix\.so.*[[:space:]]nullok([[:space:]]|$)' /etc/pam.d/common-auth >/dev/null; then
+            change 'Disallow nullok in common-auth (retain console access)' remove_pam_nullok
+            status REVIEW 'PAM changed: test a new authorized login and sudo before closing the current session.'
+        else status OK 'PAM common-auth has no active nullok on pam_unix'; fi
+    fi
+    if [[ -z "$(pairs PasswordQuality)" ]]; then return; fi
+    if ! grep -q 'pam_pwquality.so' /etc/pam.d/common-password; then
+        status REVIEW 'Password quality requested but pam_pwquality.so is absent from common-password. Install/configure libpam-pwquality manually first.'
+        return
+    fi
+    while IFS=$'\t' read -r key value; do
+        case "$key" in minlen|difok|maxrepeat|ucredit|lcredit|dcredit|ocredit|dictcheck|usercheck) ;; *) status REVIEW "Unsupported quality option: $key"; continue ;; esac
+        [[ "$value" =~ ^-?[0-9]{1,3}$ ]] || { status REVIEW "Non-numeric quality value for $key"; continue; }
+        change "Configure pwquality $key=$value" set_file_value /etc/security/pwquality.conf "$key" "$value" equals
+    done < <(pairs PasswordQuality)
+    status REVIEW 'After PAM/pwquality changes, test real password change and another authorized login. Failed-login lockout and password-history module ordering require manual review.'
+}
+do_firewall() {
+    local port num proto
+    if [[ "$(scalar EnableUFW)" != true ]]; then status SKIPPED 'UFW enablement not selected'; return; fi
+    if ! command -v ufw >/dev/null 2>&1; then
+        if [[ "$(scalar InstallUFW)" == true ]]; then
+            if [[ "$MODE" == apply ]]; then apt-get update -qq || { status FAILED 'APT update for UFW'; return; }; fi
+            change 'Install missing UFW package' apt-get install -y ufw
+        else status REVIEW 'UFW not installed; set InstallUFW if approved'; return; fi
+    fi
+    if ! command -v ufw >/dev/null 2>&1; then return; fi
+    if systemctl is-active --quiet nftables && [[ "$(ufw status 2>/dev/null | head -1)" == *inactive* ]]; then
+        status REVIEW 'Native nftables manager is active; investigate firewall ownership before enabling UFW.'
+        return
+    fi
+    if [[ "$MODE" == apply ]]; then
+        mkdir -p "$BACKUPS/firewall"
+        cp -a /etc/ufw "$BACKUPS/firewall/ufw-before" 2>/dev/null || true
+        ufw status verbose > "$BACKUPS/firewall/status-before.txt" 2>&1 || true
+    fi
+    local ports=()
+    mapfile -t ports < <(list RequiredPorts)
+    local extra=()
+    mapfile -t extra < <(list FirewallAllowPorts)
+    ports+=("${extra[@]}")
+    for port in "${ports[@]}"; do
+        [[ "$port" =~ ^[0-9]{1,5}(/(tcp|udp))?$ ]] || { status REVIEW "Invalid firewall port/protocol $port"; continue; }
+        num="${port%%/*}"
+        ((10#$num > 0 && 10#$num <= 65535)) || { status REVIEW "Port out of range: $port"; continue; }
+        change "Allow README-required firewall port $port" ufw allow "$port"
+    done
+    if [[ -n "${SSH_CONNECTION:-}" ]]; then
+        local sshport
+        sshport=$(printf '%s' "$SSH_CONNECTION" | awk '{print $4}')
+        if ! member "$sshport" "${ports[@]}" && ! member "$sshport/tcp" "${ports[@]}"; then
+            status REVIEW "Current SSH connection uses port $sshport not allowed in JSON. UFW will NOT be enabled."
+            return
+        fi
+    fi
+    if [[ "$MODE" == audit ]]; then status WOULD 'Enable UFW'; return; fi
+    if ufw --force enable; then
+        if ufw status | grep -q '^Status: active'; then status CHANGED 'UFW enabled'; else status FAILED 'UFW not active'; fi
+    else status FAILED 'UFW enablement'; fi
+    status REVIEW 'Verify required SSH/web/database connections from a second authorized client.'
+}
+do_updates() {
+    local pkg
+    if [[ "$(scalar EnableDailyUpdateRefresh)" == true ]]; then
+        change 'Enable daily APT package list updates' set_file_value /etc/apt/apt.conf.d/20auto-upgrades 'APT::Periodic::Update-Package-Lists' '"1";' space
+    fi
+    if [[ "$(scalar UpdatePackageLists)" != true && "$(scalar UpgradePackages)" != true && -z "$(list UpdatePackages)" ]]; then
+        status SKIPPED 'APT update/upgrade not selected'; return
+    fi
+    if [[ "$MODE" == audit ]]; then status WOULD 'Update APT package lists'; return; fi
+    if ! apt-get update; then status FAILED 'apt-get update (inspect repositories)'; return; fi
+    status CHANGED 'Refreshed APT package lists'
+    if [[ "$(scalar UpgradePackages)" == true ]]; then
+        status REVIEW 'Full APT upgrade requested. Check package removal/configuration prompts and required services.'
+        change 'Install reviewed Debian package updates' env DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -o Dpkg::Options::=--force-confold
+    fi
+    while IFS= read -r pkg; do
+        safe_pkg "$pkg" || { status REVIEW "Invalid package target: $pkg"; continue; }
+        if dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q 'ok installed'; then
+            change "Update approved package $pkg" env DEBIAN_FRONTEND=noninteractive apt-get install -y --only-upgrade "$pkg"
+        else status REVIEW "Required package update target not installed: $pkg"; fi
+    done < <(list UpdatePackages)
+    status REVIEW 'Verify Chromium/OpenSSH and any required application still run; inspect reboot requirements.'
+}
+
