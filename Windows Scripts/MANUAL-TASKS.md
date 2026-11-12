@@ -1,37 +1,48 @@
-# Manual tasks and checks after the one-run script
+# Checks the script cannot decide for you
 
-The [one-run PowerShell script](windows-10-11.ps1) processes all configured sections automatically. These tasks still require human judgement, a prompt for a secret, or an application-specific interface. The **README and scoring report always override generic hardening advice**.
+The [one-run script](windows-10-11.ps1) now automates more settings and produces detailed inventory files. It **does not identify which vulnerability earns points** on your image. Use the actual README, scoring report, and [Windows 10/11 handbook](../Windows/windows-10-11.md) to make the final decisions.
 
-## Before running
+## Before any fixes
 
-- [ ] Read the image README and confirm authorized users/admins, services, groups, software, file shares, and any prohibited items. [Before changing anything](../Windows/windows-10-11.md#0-before-you-touch-anything).
-- [ ] Complete/preserve forensic answers before modifying user accounts, files or suspicious executables. [Forensics](../Windows/windows-10-11.md#1-forensics-questions-first).
-- [ ] Record initial score and recovery access. If permitted, create a checkpoint. [Initial steps](../Windows/windows-10-11.md#0-before-you-touch-anything).
+- [ ] Read the current image README and list **authorized users/admins, required services, software, groups, shares and ports**. [First steps](../Windows/windows-10-11.md#0-before-you-touch-anything)
+- [ ] Answer or preserve all required forensic evidence **before deleting users, files or software**. [Forensics](../Windows/windows-10-11.md#1-forensics-questions-first)
+- [ ] Record the original score, test a working administrator account and keep console/recovery access. Snapshots are only for rounds where the rules permit them.
 
-## Accounts and policies
+## What the updated script can do
 
-| Needs manual judgement | Why | Full guide |
+| Type | Automated only when configured | Still check afterward |
 |---|---|---|
-| Authorized local account passwords, new-user passwords | The unattended run refuses to store passwords in JSON; run without `-Yes` for secure prompts or set them in the GUI | [Users and groups](../Windows/windows-10-11.md#2-users-and-groups) |
-| Confirm exact authorized users and administrator membership | Account names and service-account exceptions come from the active image README, not an inventory alone | [Account review](../Windows/windows-10-11.md#2-users-and-groups) |
-| Confirm required group membership | Script creates only the `Groups` entries in JSON; verify every member visually | [Create group](../Windows/windows-10-11.md#29-create-a-required-custom-local-group) · [Add members](../Windows/windows-10-11.md#210-add-the-specified-users-to-the-required-group) |
-| Verify password/lockout values and effective GPO | An imported local value may be overridden by domain policy; numeric requirements vary by image | [Password Policy](../Windows/windows-10-11.md#31-password-policy) · [Account Lockout](../Windows/windows-10-11.md#32-account-lockout-policy) |
-| User-rights assignment and granular audit policy | The script can remove **specified** `SeSecurityPrivilege` and `SeTakeOwnershipPrivilege` principals and enable Credential Validation success auditing. Other rights and domain-managed policy need GUI review | [User Rights](../Windows/windows-10-11.md#42-user-rights-assignment) · [Audit Policy](../Windows/windows-10-11.md#41-audit-policy-record-security-events) |
+| Accounts | Guest, exact users/groups/memberships, password-expiration flags, authorized password resets with a prompt | Required users remain, correct administrator group and actual login work |
+| Policies | Local password/lockout, selected user rights, audit subcategories, UAC, network security and logging | The image's intended effective values and domain GPO precedence |
+| Firewall/SMB | Enable firewall, disable exact unwanted inbound Allow rules, SMB signing, optional SMBv1 | Required ports, clients, shares and actual network traffic |
+| Defender | Real-time/PUA, updates, exact exclusions, optional quick scan after forensics | Whether exclusions are legitimate and anything was quarantined |
+| Services/features | Disable exact unneeded services/features, check critical services | IIS, FTP, print, SSH, RDP and other dependencies |
+| Startup threats | Inventory startup keys/tasks/IFEO, remove explicitly named Run values and debugger overrides | Whether a binary, task or listener is truly malicious |
+| Apps/files | Inspect Store apps/programs/file candidates; remove exact IDs/paths with `-AllowRemovals` | No required app or data was lost |
+| Sharing | Remove exact custom share or share account permission with `-AllowRemovals` | Both share and NTFS permissions, authorized user access |
 
-## Applications, services and threats
+## Tasks requiring a human decision
 
-| Needs manual judgement | Why | Full guide |
+| Task | Why it stays manual or partially manual | Full handbook |
 |---|---|---|
-| Confirm Chrome, Notepad++, Edge and Firefox versions, install paths, default browser and site exceptions | `winget` cannot safely identify every vendor build or required user profile; browser policies may be managed elsewhere | [Application updates](../Windows/windows-10-11.md#73-update-the-other-programs) · [Browsers](../Windows/windows-10-11.md#16-web-browsers) |
-| Inspect Windows Update and pending restarts | The default JSON scans; `WindowsUpdate: Install` may install unattended updates, but the script never reboots or resolves every compatibility prompt | [Windows Update](../Windows/windows-10-11.md#7-windows-update) |
-| Verify Defender exclusions, detection history, third-party antivirus and compatibility | A named exclusion can be removed, but the script cannot determine every legitimate exception or malware verdict | [Defender](../Windows/windows-10-11.md#5-microsoft-defender-antivirus) |
-| Check inbound firewall rules and actual connectivity | Enabling profiles is not enough to prove a server/client works or that an allow rule is unwanted | [Firewall](../Windows/windows-10-11.md#6-firewall) · [Rule inspection](../Windows/windows-10-11.md#62-check-the-inbound-rules) |
-| Validate Windows services, remote access, IIS/FTP/printing and SSH/WinRM dependencies | High-impact services are deliberately not auto-disabled even if listed; preserve critical services and admin connection | [Services](../Windows/windows-10-11.md#8-services) · [Remote access](../Windows/windows-10-11.md#10-remote-access) · [Critical services](../Windows/windows-10-11.md#17-critical-services) |
-| Inspect scheduled tasks, unusual startup commands and backdoors | Script only disables exact scheduled tasks listed in JSON; unknown programs need path/signature/process/forensic investigation | [Backdoors](../Windows/windows-10-11.md#14-backdoors-and-malware) · [Scheduled tasks](../Windows/windows-10-11.md#142-scheduled-tasks) |
-| Decide on prohibited archives, media, portable tools and applications | Removes only exact JSON paths/IDs with `-AllowRemovals`; it will not discover, purge or execute suspect files automatically | [Prohibited software](../Windows/windows-10-11.md#12-prohibited-software) · [Prohibited files](../Windows/windows-10-11.md#13-prohibited-files) |
-| Validate SMB signing/SMB1, shares and NTFS permissions | Required file sharing may depend on legacy clients; backup/share ACLs need targeted inspection | [Shared folders](../Windows/windows-10-11.md#11-shared-folders) · [SMB and NTFS](../Windows/windows-10-11.md#197-smb-share-permissions-and-ntfs-permissions) |
-| Check screen locking, UAC, PrintNightmare, NetBIOS and other system-specific settings | User-specific policies and driver/legacy compatibility require an accurate Windows version and local context | [Other settings](../Windows/windows-10-11.md#15-other-settings) · [Print spooler](../Windows/windows-10-11.md#83-printer-drivers-printnightmare-fixes) |
+| **Determine who is authorized** | A username absent from the README may still be a required service identity; never guess | [Users and groups](../Windows/windows-10-11.md#2-users-and-groups) |
+| **Create accounts or reset passwords in a `-Yes` run** | The script refuses to store plaintext passwords; rerun without `-Yes` for secure prompts | [Create users](../Windows/windows-10-11.md#23-create-users-the-readme-says-should-exist) · [Passwords](../Windows/windows-10-11.md#28-give-users-strong-passwords) |
+| **Confirm requested group memberships** | A JSON group list creates exactly those members, not an inferred membership | [Create groups](../Windows/windows-10-11.md#29-create-a-required-custom-local-group) · [Add members](../Windows/windows-10-11.md#210-add-the-specified-users-to-the-required-group) |
+| **Check effective policies and advanced rights** | Local policy may be overridden; only named, supported privileges are changed | [Password and lockout](../Windows/windows-10-11.md#3-account-policies-passwords-and-lockout) · [Rights](../Windows/windows-10-11.md#42-user-rights-assignment) |
+| **Assess unknown firewall rules** | Script saves inbound-Allow inventory but disables only exact rule names in the JSON | [Firewall rules](../Windows/windows-10-11.md#62-check-the-inbound-rules) · [Advanced verification](../Windows/windows-10-11.md#195-firewall-rule-inspection-and-required-ports) |
+| **Assess suspicious network listeners** | An open port or unusual executable path alone does not establish a backdoor | [Backdoors and malware](../Windows/windows-10-11.md#14-backdoors-and-malware) · [Service checks](../Windows/windows-10-11.md#143-services-that-run-strange-programs) |
+| **Inspect the hosts file** | The script exports hosts entries but does not automatically delete them | [Hosts file](../Windows/windows-10-11.md#145-the-hosts-file) |
+| **Verify app and browser updates** | `winget` and browser policies cannot guarantee a compatible app version or its location | [Application updates](../Windows/windows-10-11.md#73-update-the-other-programs) · [Browsers](../Windows/windows-10-11.md#16-web-browsers) |
+| **Review Store apps and prohibited content** | Scan reports are candidates, not a definitive scoring list; removals require confirmed IDs/paths | [Prohibited software](../Windows/windows-10-11.md#12-prohibited-software) · [Prohibited files](../Windows/windows-10-11.md#13-prohibited-files) |
+| **Check Defender findings** | A scan may quarantine useful evidence; review its detection history and legitimate exclusions | [Defender](../Windows/windows-10-11.md#5-microsoft-defender-antivirus) |
+| **Verify printer/RDP/security compatibility** | Tightening NTLM, UAC, driver restrictions or remote logon may break legitimate applications | [Remote access](../Windows/windows-10-11.md#10-remote-access) · [Print driver restrictions](../Windows/windows-10-11.md#83-printer-drivers-printnightmare-fixes) |
+| **Validate SMB and NTFS permissions** | Share-level access is not the same as underlying folder ACLs | [Shares](../Windows/windows-10-11.md#11-shared-folders) · [SMB and NTFS](../Windows/windows-10-11.md#197-smb-share-permissions-and-ntfs-permissions) |
+| **Recover accidental changes** | Registry/policy backups support targeted restoration, but deleted files and users may be unrecoverable | [Recovery](../Windows/windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps) |
 
-## After the script
+## After the full run
 
-Open the latest `summary-...csv`, `changes-...txt`, and before/after audits in **Documents → WindowsSecurityWork**. Work through all `REVIEW`/`FAILED` items. Check the image score, and verify that approved administrator logins, required browsers, websites, shares, services, networking and applications still function. Revert only the last confirmed bad change using recorded values; do not guess a rollback or restore a whole VM without checking competition rules. [Final checklist](../Windows/windows-10-11.md#18-final-checks).
+1. Open **Documents → WindowsSecurityWork** and inspect the most recent `summary-...csv`, `changes-...txt`, `audit-...txt`, and `backups-.../review-...csv` files. `REVIEW` and `FAILED` need human attention.
+2. Open the **Scoring Report**, compare to the original score, and double-check every change that may have broken a required service.
+3. Verify all authorized users can log in, required browsers/apps remain, and network access, printing, shares and approved remote access still work. Use the [final checklist](../Windows/windows-10-11.md#18-final-checks).
+
+The script does not reboot automatically, does not guarantee points, and has not been tested in a Windows VM in this session.
