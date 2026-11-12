@@ -22,3 +22,14 @@ jobs:
           grep -q '^run_all() {' 'Linux Scripts/debian.sh'
           grep -q '^do_groups() {' 'Linux Scripts/debian.sh'
           grep -q '^do_ssh() {' 'Linux Scripts/debian.sh'
+      - name: Check help and list
+        run: |
+          bash 'Linux Scripts/debian.sh' --help | grep -q 'Debian 12/13'
+          bash 'Linux Scripts/debian.sh' --list | grep -qx verify
+      - name: ShellCheck errors (if installed)
+        run: |
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck --severity=error 'Linux Scripts/debian.sh'
+          else
+            echo 'ShellCheck is not installed; bash -n already passed.'
+          fi
