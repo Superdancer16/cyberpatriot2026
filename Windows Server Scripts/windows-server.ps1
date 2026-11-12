@@ -539,3 +539,152 @@ function Invoke-LocalGroups {
     }
 }
 
+function Check-DomainWrites {
+    $cfg = Value $script:Cfg 'DomainChanges'
+    if (-not $script:IsDC) { Record 'SKIPPED' 'Active Directory writes are for confirmed Domain Controllers only.'; return $false }
+    if (-not $EnableDomainChanges -or -not [bool](Value $cfg 'Allowed' $false)) {
+        Record 'REVIEW' 'AD changes disabled. Both -EnableDomainChanges and DomainChanges.Allowed=true are required.'
+        return $false
+    }
+    if ((Value $script:Cfg 'DomainName' '') -ine $script:DomainName) {
+        Record 'FAILED' 'Configured AD domain does not match detected domain.'
+        return $false
+    }
+    if (-not (Get-Module -ListAvailable ActiveDirectory)) { Record 'FAILED' 'Active Directory PowerShell module is unavailable.'; return $false }
+    Import-Module ActiveDirectory -ErrorAction Stop
+    return $true
+}
+function ProtectedADUser($User) {
+    if (-not $User) { return $true }
+    if ($User.SamAccountName -in @('krbtgt','Administrator')) { return $true }
+    if ($User.SID.Value -match '-(500|501|502)$') { return $true }
+    if ($User.adminCount -eq 1) { return $true }
+    if (@($User.ServicePrincipalName).Count) { return $true }
+    if (Listed $User.SamAccountName $script:RequiredAccounts) { return $true }
+    return $false
+}
+function Check-ADGroup([string]$Name) {
+    $group = Get-ADGroup -Identity $Name -Properties adminCount,IsCriticalSystemObject -ErrorAction Stop
+    if ($group.adminCount -eq 1 -or $group.IsCriticalSystemObject) { return $null }
+    if ($group.SID.Value -match '-(512|518|519|520|544|548|549|550|551|552)$') { return $null }
+    if ($group.Name -in @('Domain Admins','Enterprise Admins','Schema Admins','Administrators','Account Operators','Backup Operators','Server Operators','Print Operators','DnsAdmins','Group Policy Creator Owners')) { return $null }
+    return $group
+}
+function Invoke-ADAccounts {
+    if (-not $script:IsDC) { Record 'SKIPPED' 'AD account module not applicable to a non-DC server.'; return }
+    if (-not (Check-DomainWrites)) { return }
+    $settings = Value $script:Cfg 'DomainChanges'
+    $domainSuffix = 'DC=' + ($script:DomainName -split '\.' -join ',DC=')
+    foreach ($name in (Values (Value $settings 'DisableUsers'))) {
+        if ($name -notmatch '^[A-Za-z][A-Za-z0-9._-]{0,63}$') { Record 'REVIEW' "Invalid AD username $name"; continue }
+        try {
+            $user = Get-ADUser -Identity $name -Properties adminCount,ServicePrincipalName -ErrorAction Stop
+            if (ProtectedADUser $user) { Record 'SKIPPED' "Protected AD user $name cannot be disabled."; continue }
+            Change "Disable confirmed unauthorized AD account $name" ([bool]$user.Enabled) {
+                $user | Select-Object SamAccountName,DistinguishedName,SID,Enabled | Export-Clixml (Join-Path $backups ("ad-user-" + $name + "-before.xml"))
+                Disable-ADAccount -Identity $user -ErrorAction Stop
+                if ((Get-ADUser -Identity $user).Enabled) { throw 'AD account remains enabled' }
+            }
+        } catch { Record 'REVIEW' "AD user $name could not be reviewed: $($_.Exception.Message)" }
+    }
+    foreach ($entry in @(Value $settings 'NewUsers' @())) {
+        $sam = [string](Value $entry 'SamAccountName' '')
+        $ou = [string](Value $entry 'OU' '')
+        $name = [string](Value $entry 'Name' $sam)
+        if ($sam -notmatch '^[A-Za-z][A-Za-z0-9._-]{0,63}$' -or -not $ou.EndsWith($domainSuffix,[StringComparison]::OrdinalIgnoreCase)) {
+            Record 'REVIEW' "New AD user $sam requires exact SamAccountName and an OU inside the current domain."
+            continue
+        }
+        if (-not (Listed $sam (Value $script:Cfg 'AuthorizedDomainUsers')) -and -not (Listed $sam (Value $script:Cfg 'AuthorizedDomainAdmins'))) {
+            Record 'SKIPPED' "New AD user $sam is not in authorized domain account lists."; continue
+        }
+        if (Get-ADUser -Filter "SamAccountName -eq '$sam'" -ErrorAction SilentlyContinue) { Record 'OK' "Domain user already exists: $sam"; continue }
+        try { Get-ADOrganizationalUnit -Identity $ou -ErrorAction Stop | Out-Null }
+        catch { Record 'REVIEW' "OU for new AD user not found: $ou"; continue }
+        if ($Yes) { Record 'REVIEW' "Create AD user $sam interactively: secret password is required."; continue }
+        if ($Mode -eq 'Audit') { Record 'WOULD' "Create authorized domain user $sam in $ou"; continue }
+        $password = Read-Host "Initial AD password for $sam" -AsSecureString
+        Change "Create authorized domain account $sam in $ou" $true {
+            New-ADUser -Name $name -SamAccountName $sam -Path $ou -AccountPassword $password -Enabled $true -ErrorAction Stop
+            Get-ADUser -Identity $sam -ErrorAction Stop | Out-Null
+        }
+        Record 'REVIEW' "Verify the new AD user's OU, UPN, group memberships, resultant password policy and authorized login."
+    }
+    foreach ($name in (Values (Value $settings 'ExpirePasswords'))) {
+        if (-not (Listed $name (Value $script:Cfg 'AuthorizedDomainUsers')) -and -not (Listed $name (Value $script:Cfg 'AuthorizedDomainAdmins'))) {
+            Record 'SKIPPED' "AD password-expiry user not in authorized list: $name"; continue
+        }
+        try {
+            $user = Get-ADUser -Identity $name -Properties adminCount,ServicePrincipalName -ErrorAction Stop
+            if (ProtectedADUser $user) { Record 'SKIPPED' "Protected service/privileged AD account cannot be changed: $name"; continue }
+            Change "Require AD password change at next logon: $name" $true {
+                Set-ADUser -Identity $user -ChangePasswordAtLogon $true -ErrorAction Stop
+            }
+        } catch { Record 'REVIEW' "AD user $name not available for expiry: $($_.Exception.Message)" }
+    }
+    foreach ($name in (Values (Value $settings 'ResetPasswords'))) {
+        if (-not (Listed $name (Value $script:Cfg 'AuthorizedDomainUsers'))) { Record 'SKIPPED' "AD reset user not in authorized ordinary-user list: $name"; continue }
+        try {
+            $user = Get-ADUser -Identity $name -Properties adminCount,ServicePrincipalName -ErrorAction Stop
+            if (ProtectedADUser $user) { Record 'SKIPPED' "Cannot reset protected AD account $name"; continue }
+            if ($Yes) { Record 'REVIEW' "Reset AD password for $name interactively; unattended secret storage disabled."; continue }
+            if ($Mode -eq 'Audit') { Record 'WOULD' "Reset password for AD user $name"; continue }
+            $pw = Read-Host "New AD password for $name" -AsSecureString
+            Change "Reset authorized domain user's password: $name" $true {
+                Set-ADAccountPassword -Identity $user -Reset -NewPassword $pw -ErrorAction Stop
+            }
+        } catch { Record 'REVIEW' "AD password reset for $name: $($_.Exception.Message)" }
+    }
+}
+function Invoke-ADGroups {
+    if (-not $script:IsDC) { return }
+    if (-not (Check-DomainWrites)) { return }
+    $cfg = Value $script:Cfg 'DomainChanges'
+    $domainSuffix = 'DC=' + ($script:DomainName -split '\.' -join ',DC=')
+    foreach ($item in @(Value $cfg 'NewGroups' @())) {
+        $name = [string](Value $item 'Name' '')
+        $ou = [string](Value $item 'OU' '')
+        $scope = [string](Value $item 'Scope' 'Global')
+        if ($name -notmatch '^[A-Za-z][A-Za-z0-9 _.-]{0,63}$' -or $scope -notin @('Global','DomainLocal','Universal') -or -not $ou.EndsWith($domainSuffix,[StringComparison]::OrdinalIgnoreCase)) {
+            Record 'REVIEW' "New AD group must have exact Name/OU/Scope in the current domain: $name"; continue
+        }
+        try { if (Get-ADGroup -Identity $name -ErrorAction SilentlyContinue) { Record 'OK' "AD group already exists: $name"; continue } }
+        catch { Record 'REVIEW' "AD group lookup failed for $name"; continue }
+        Change "Create specifically authorized AD group $name" $true {
+            New-ADGroup -Name $name -SamAccountName $name -GroupCategory Security -GroupScope $scope -Path $ou -ErrorAction Stop
+        }
+    }
+    foreach ($entry in @((Value $cfg 'AddGroupMembers').PSObject.Properties)) {
+        $name = [string]$entry.Name
+        try { $group = Check-ADGroup $name } catch { Record 'REVIEW' "AD group not found $name"; continue }
+        if (-not $group) { Record 'SKIPPED' "Privileged or system AD group requires manual review: $name"; continue }
+        foreach ($userName in (Values $entry.Value)) {
+            if (-not (Listed $userName (Value $script:Cfg 'AuthorizedDomainUsers')) -and -not (Listed $userName (Value $script:Cfg 'AuthorizedDomainAdmins'))) {
+                Record 'SKIPPED' "AD group member not authorized: $userName"; continue
+            }
+            try {
+                $user = Get-ADUser -Identity $userName -ErrorAction Stop
+                $existing = @($user | Get-ADPrincipalGroupMembership | Where-Object { $_.DistinguishedName -eq $group.DistinguishedName }).Count
+                Change "Add authorized AD user $userName to $name" ($existing -eq 0) {
+                    Add-ADGroupMember -Identity $group -Members $user -ErrorAction Stop
+                }
+            } catch { Record 'REVIEW' "AD membership change $name/$userName: $($_.Exception.Message)" }
+        }
+    }
+    foreach ($entry in @((Value $cfg 'RemoveGroupMembers').PSObject.Properties)) {
+        $name = [string]$entry.Name
+        try { $group = Check-ADGroup $name } catch { Record 'REVIEW' "AD group not found $name"; continue }
+        if (-not $group) { Record 'SKIPPED' "Privileged AD group must be reviewed manually: $name"; continue }
+        foreach ($userName in (Values $entry.Value)) {
+            if (Listed $userName $script:RequiredAccounts) { Record 'SKIPPED' "Protected account membership cannot be removed: $userName"; continue }
+            try {
+                $user = Get-ADUser -Identity $userName -ErrorAction Stop
+                $member = @($user | Get-ADPrincipalGroupMembership | Where-Object { $_.DistinguishedName -eq $group.DistinguishedName }).Count
+                Change "Remove exact unauthorized AD group member $userName from $name" ($member -gt 0) {
+                    Remove-ADGroupMember -Identity $group -Members $user -Confirm:$false -ErrorAction Stop
+                }
+            } catch { Record 'REVIEW' "AD member removal $name/$userName: $($_.Exception.Message)" }
+        }
+    }
+}
+
