@@ -43,10 +43,10 @@ For **XOR**, CyberChef can accept a supplied key; set **key encoding (hex, Base6
 | AES, RSA, PGP, CMS, DPAPI, encrypted file, secret | [Real encryption](#real-encryption-cms-dpapi-aes-and-keys) |
 | password-protected ZIP, 7z, archive, encrypted ZIP | [Archives](#password-protected-archives) |
 | SHA-256, RIPEMD-160, MD5, digest, hash, NTLM | [Hashes](#file-hashes-ripemd160-and-hash-versus-password) |
-| member server, Domain Controller, standalone | [Identify role](#identify-the-server-role-first) |
+| member server, Domain Controller, standalone | [Identify role](#first-three-minutes-identify-the-server-role-first) |
 | domain user, disabled account, SID, RID, UPN, OU | [AD users](#active-directory-users-sids-and-organizational-units) |
 | Domain Admins, Enterprise Admins, nested group | [Privileged groups](#active-directory-groups-and-privileged-membership) |
-| logon, failed password, Kerberos, KDC, NTLM, lockout | [Authentication events](#authentication-and-domain-event-ids) |
+| logon, failed password, Kerberos, KDC, NTLM, lockout | [Authentication events](#event-viewer-windows-logs-and-timestamps) |
 | GPO, Group Policy, resultant policy, linked GPO, FGPP | [GPO](#group-policy-and-resultant-password-policy) |
 | DNS, CNAME, alias, `ns`, A record, PTR, SRV, TXT | [DNS](#dns-zones-aliases-cname-a-ptr-srv-and-txt) |
 | DNS zone transfer, secure updates, DNS changes | [DNS](#dns-zones-aliases-cname-a-ptr-srv-and-txt) |
