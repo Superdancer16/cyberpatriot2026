@@ -85,7 +85,10 @@ Read the README, preserve forensics and determine the server's exact domain role
 - [ ] **🎯 DO THIS —** Done — Preserve the evidence and answer **all forensics questions** before user deletion, malware cleanup, log changes, or installation.
 - [ ] **🎯 DO THIS —** Done — Record a recovery/VM-console path and create a snapshot only if competition rules permit. A rollback loses later changes.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI (Desktop Experience):** Open **Server Manager → Local Server** to identify Windows version/domain/remote-management status; **Manage → Add Roles and Features** (inspect only) for server roles; **Tools → Computer Management → Services** for running dependencies; **Event Viewer** for recent errors. Do not make changes during inventory.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell diagnostics (or Server Core):**
 
 ~~~powershell
 Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,ProductType
@@ -173,7 +176,10 @@ A server's exact DomainRole, installed role, and running NTDS service are comple
 
 **Before:** Complete forensics, record necessary user logins and each required role. Confirm management access from VM console if remote access changes fail.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI:** **Server Manager → Local Server** for network/status, **Win + R → `wf.msc`** for firewall profiles, **Win + R → `services.msc`** for service states and startup types, **Win + R → `taskschd.msc`** for tasks. Write down each original state before any change.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell inventory:**
 
 ~~~powershell
 Get-NetIPConfiguration
@@ -340,7 +346,12 @@ Check the members of each group. Remove anyone the README doesn't say should be 
 | **DnsAdmins** | Can make the DNS server run any program (easy path to domain admin) |
 | **Group Policy Creator Owners** | Create Group Policies |
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI:** **Win + R → `dsa.msc` → Active Directory Users and Computers → View → Advanced Features** → expand **Users** and the relevant OUs → double-click each privileged group (**Domain Admins**, **Enterprise Admins**, **Schema Admins**, **Administrators**, **DNSAdmins**, etc.) → **Members**. Review nested groups as well. Remove only a **confirmed unauthorized** member → Apply → OK; preserve all built-in, service and authorized roles.
+
+**✅ VERIFY:** Reopen the group, check the direct/nested members and test necessary directory/domain services. **↩️ UNDO:** Re-add only a mistakenly removed member based on its recorded original membership.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell (also for Server Core or remote administration):**
 ```powershell
 foreach ($g in 'Domain Admins','Enterprise Admins','Schema Admins','Administrators','Account Operators','Backup Operators','Server Operators','Print Operators','DnsAdmins','Group Policy Creator Owners') {
   "--- $g"; (Get-ADGroupMember $g -ErrorAction SilentlyContinue).SamAccountName }
@@ -1036,7 +1047,12 @@ On a Domain Controller, leave **NETLOGON** and **SYSVOL** alone.
 > [!NOTE]
 > **💡 Why it matters:** These old encryption versions have known breaks. Websites (IIS), FTP over SSL, Remote Desktop and LDAPS should all use TLS 1.2 or newer. Server 2016-2022 still allow TLS 1.0 and 1.1 unless you turn them off.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI (Desktop Experience, only if explicitly required and compatible):** **Win + R → `regedit` → `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols`**. **Export the existing Protocols key** first. For a specifically prohibited legacy protocol, open its **Server** subkey and set/create **DWORD `Enabled` = 0** and **`DisabledByDefault` = 1**. Preserve other protocol keys and verify required clients support TLS 1.2+. Do not blanket-disable a protocol used by a required server role.
+
+**✅ VERIFY:** Inspect only the changed key; test approved HTTPS/LDAPS/FTP/RDP clients after an authorized restart. **↩️ UNDO:** Restore original registry values or their absence from backup, then retest.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell (use only for supported, explicitly-required changes or Server Core):**
 ```powershell
 foreach ($p in 'SSL 2.0', 'SSL 3.0', 'TLS 1.0', 'TLS 1.1') {
   $k = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\$p\Server"
@@ -1284,7 +1300,10 @@ These tasks are **fully supported here** by the role-aware commands below and th
 - [ ] **🎯 DO THIS —** Done — Check browsers used by required IIS/app management tools and their approved updates/extension policies.
 - [ ] **🎯 DO THIS —** Done — Review role-compatible UAC, SMB signing, anonymous access, NTLM/LM, auditing, PowerShell logging, screen locking and removable-media policies.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI:** **Win + R → `appwiz.cpl`** (installed applications), **Ctrl+Shift+Esc → Startup apps**, **Win + R → `taskschd.msc`**, **`services.msc`** and **`fsmgmt.msc`** (shares). On a DC, preserve service accounts, SYSVOL, directory and DNS dependencies. Inspect and remove only the README-confirmed prohibited items.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell investigation:**
 
 ~~~powershell
 Get-Package | Select-Object Name,Version,ProviderName | Sort-Object Name
@@ -1321,7 +1340,10 @@ Get-AuthenticodeSignature -LiteralPath 'C:\Users\Example\Documents\suspect.exe' 
 | SMB file server | File and Storage Services, Get-SmbShare | Correct user can access required share |
 | RDP / WinRM | Remote Desktop settings / winrm config | Approved management connection still works |
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI:** Use **Server Manager → Tools** for **Active Directory Users and Computers**, **DNS**, **DHCP**, **IIS Manager**, and **File and Storage Services → Shares** as installed. For each required role, verify an authorized client transaction before changing settings.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell read-only inspection:**
 
 ~~~powershell
 Get-SmbShare | Select-Object Name,Path,Special
@@ -1451,7 +1473,10 @@ Get-ChildItem 'C:\inetpub\wwwroot' -Recurse -File -Include *.asp,*.aspx,*.php,*.
 > [!NOTE]
 > **📚 Evidence:** Official scenario/service-preservation principle; role-specific command behavior is vendor-backed.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**⭐ EASIEST WAY — GUI:** **Server Manager → Local Server / Tools → Services** (or **Win + R → `services.msc`**) → inspect exact required service and record its original **Startup type**, **Status** and **Dependencies**. If it was wrongly disabled, restore **Properties → Startup type**, click **Start** only if previously running, and test the role.
+
+> [!NOTE]
+> **🔁 ALTERNATE — PowerShell service inspection (or Server Core):**
 
 ~~~powershell
 Get-Service NTDS,Kdc,DNS,Netlogon,DFSR,W32Time,W3SVC,DHCPServer,LanmanServer -ErrorAction SilentlyContinue |
@@ -2016,32 +2041,31 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 
 **⭐ EASIEST WAY — Click through the GUI:** **Win + R** → `secpol.msc` → **Account Policies**.
 
-##### WS.3.1 Password Policy
-- [ ] **🎯 DO THIS — WS.3.1 Password Policy**
+##### WS.3.1 Password Policy (standalone/member-server reference)
+- [ ] **🎯 Configure only the required local password policy (not a Domain Controller's domain policy).**
 
-| Setting | Set to |
+**⭐ EASIEST WAY — GUI (Desktop Experience):** **Win + R → \`secpol.msc\` → Account Policies → Password Policy** → double-click **Minimum password length**, **Password must meet complexity requirements**, **Store passwords using reversible encryption**, **Enforce password history** and any image-required password ages → enter the exact requested value → **Apply → OK**.
+
+| Item | Intended action when applicable |
 |---|---|
-| Enforce password history | **24** passwords remembered |
-| Maximum password age | **90** days (or what the README says) |
-| Minimum password age | **1** day |
-| Minimum password length | **12** characters |
-| Password must meet complexity requirements | **Enabled** |
-| Store passwords using reversible encryption | **Disabled** |
+| [ ] Minimum length | Match the README; 12 is only one example |
+| [ ] Complexity | Enable if required |
+| [ ] Reversible encryption | Disable unless a critical documented dependency requires otherwise |
+| [ ] Password history | Match the README; **do not assume 24** |
+| [ ] Age | Match the scenario for minimum / maximum |
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
-```powershell
-net accounts /uniquepw:24 /maxpwage:90 /minpwage:1 /minpwlen:12
-```
+**✅ VERIFY:** Reopen each field, test permitted login/password changes, and check for an overriding domain GPO. **↩️ UNDO:** Restore only the original recorded values.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
-```powershell
-secedit /export /cfg $env:TEMP\secpol.inf /areas SECURITYPOLICY
-(Get-Content $env:TEMP\secpol.inf) -replace 'PasswordComplexity = 0', 'PasswordComplexity = 1' -replace 'ClearTextPassword = 1', 'ClearTextPassword = 0' | Set-Content $env:TEMP\secpol.inf -Encoding Unicode
-secedit /configure /db $env:TEMP\secpol.sdb /cfg $env:TEMP\secpol.inf /areas SECURITYPOLICY
-secedit /export /cfg $env:TEMP\check.inf /areas SECURITYPOLICY; Select-String 'PasswordComplexity|ClearTextPassword' $env:TEMP\check.inf
-```
-
-**✅ Check it worked:** `net accounts` shows the numbers, and the last line above shows `PasswordComplexity = 1` and `ClearTextPassword = 0`.
+> [!NOTE]
+> **🔁 ALTERNATE — read-only PowerShell/CMD, or Server Core where GUI is unavailable:**
+>
+> \`\`\`powershell
+> net accounts
+> secedit /export /cfg "$env:TEMP\cp-server-policy.inf" /areas SECURITYPOLICY
+> Select-String 'MinimumPasswordLength|PasswordComplexity|ClearTextPassword|PasswordHistorySize' "$env:TEMP\cp-server-policy.inf"
+> \`\`\`
+>
+> **On a Domain Controller**, use **\`gpmc.msc\`** to edit the appropriate domain-root-linked password policy or use AD Administrative Center for fine-grained policy; local \`secpol.msc\` is not the correct control for domain users.
 
 ##### WS.3.2 Account Lockout Policy
 - [ ] **🎯 DO THIS — WS.3.2 Account Lockout Policy**
@@ -2053,10 +2077,17 @@ secedit /export /cfg $env:TEMP\check.inf /areas SECURITYPOLICY; Select-String 'P
 | Reset account lockout counter after | **30** minutes |
 | Allow Administrator account lockout (only on updated systems; skip it if it isn't in the list) | **Enabled** |
 
-```powershell
-net accounts /lockoutthreshold:5 /lockoutduration:30 /lockoutwindow:30
-net accounts                     # check everything
-```
+**⭐ EASIEST WAY — GUI:** **Win + R → `secpol.msc` → Account Policies → Account Lockout Policy** → open **Account lockout threshold**, **duration** and **reset account lockout counter after**, set the values required by the image, then **Apply → OK**. On a Domain Controller, review the domain GPO instead.
+
+**✅ VERIFY:** Reopen each entry, confirm the effective policy and that a permitted administrator can still log in.
+
+> [!NOTE]
+> **🔁 ALTERNATE — command-line inspection only:**
+>
+> ```powershell
+> net accounts
+> ```
+
 
 > [!CAUTION]
 > Never set **Account lockout duration** to **0**: that means a locked account stays locked until an admin unlocks it. Don't set the threshold below 3 either: a few typos would lock real users out.
@@ -2699,19 +2730,19 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 > [!WARNING]
 > **Do not turn on BitLocker** on a practice image. Without the recovery key you can lock yourself out of the whole VM.
 
-##### WS.15.6 WDigest off (no plain-text passwords in memory)
-- [ ] **🎯 DO THIS — WS.15.6 WDigest off (no plain-text passwords in memory)**
+###### WS.15.6 WDigest off (avoid plaintext password caching)
+- [ ] **🎯 Inspect the \`UseLogonCredential\` policy if appropriate to the installed Server release.**
+
+**⭐ EASIEST WAY — GUI (Desktop Experience):** **Win + R → \`regedit\` → \`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest\`**. If the DWORD **\`UseLogonCredential\`** exists and equals **1**, export the key and set it to **0**. If absent, verify default behavior before adding any value.
+
+**✅ VERIFY:** Value is **0** if configured, and legitimate logon still works. **↩️ UNDO:** Restore only an accidental registry change from the saved key.
 
 > [!NOTE]
-> **💡 Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
-
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
-```powershell
-$k = 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest'
-if (-not (Test-Path $k)) { New-Item -Path $k | Out-Null }
-Set-ItemProperty $k -Name UseLogonCredential -Value 0 -Type DWord
-Get-ItemProperty $k | Select-Object UseLogonCredential   # must be 0
-```
+> **🔁 ALTERNATE — PowerShell read-only check (Server Core):**
+>
+> \`\`\`powershell
+> Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' -Name UseLogonCredential -ErrorAction SilentlyContinue
+> \`\`\`
 
 ##### WS.15.7 NetBIOS over TCP/IP off
 - [ ] **🎯 DO THIS — WS.15.7 NetBIOS over TCP/IP off**
