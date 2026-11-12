@@ -30,7 +30,7 @@
 ## First Things to Do
 
 1. Open the image README and record required users, roles, server services, ports, passwords or accounts that **must not be changed**.
-2. Open and answer forensic questions **before changing evidence**. Use the new Ctrl+F guides: [Windows](../../Forensics/windows.md) · [Linux](../../Forensics/linux.md) · [Windows Server](../../Forensics/windows-server.md); or the [cross-platform evidence workflows](../../Forensics/README.md#repeatable-investigation-procedures).
+2. Open and answer forensic questions **before changing evidence**. Use the new Ctrl+F guides: [Windows](../../Windows/forensics.md) · [Linux](../../Linux/forensics.md) · [Windows Server](../../Server/forensics.md); or the [cross-platform evidence workflows](../Forensics/README.md#repeatable-investigation-procedures).
 3. Establish working administrative and VM recovery access, and record the initial scoring report.
 4. Start the **platform-specific priority guide** below. Use its inspection commands before modifications.
 5. After every change, verify both the security setting and required application/service behavior.
@@ -46,11 +46,11 @@ For team coordination use the [Round Game Plan](round-game-plan.md) and [Mentor/
 | Guide | Content | CP-19 (2026–27) published scope |
 |---|---|---|
 | [Windows 10 / 11](../../Windows/windows-10-11.md) | Workstation users, Defender, firewall, policies, persistence | Windows 11 in scored Round 1 and Round 2; Windows 10 training |
-| [Windows Server](../../Windows/windows-server.md) | AD, DNS, DHCP, IIS, file shares and role-aware security | Server 2022 in Round 2, State, Semifinals; Server 2019 in some later/training images |
-| [Linux Mint](../../Linux/linux-mint.md) | Cinnamon/LightDM, APT/Flatpak, sudo, services | Mint 21 in Round 1, Round 2, State, Semifinals |
-| [Ubuntu](../../Linux/ubuntu.md) | Ubuntu 22/24, GNOME, Snap, SSH sockets, Netplan | Ubuntu 24 State; Ubuntu 22 training |
-| [Debian](../../Linux/debian.md) | Debian PAM, root/sudo, signed APT, nftables, critical services | Primarily legacy/practice reference; do not assume listed as a scored image in CP-19 |
-| [FreeBSD](../../Linux/freebsd.md) | FreeBSD-native accounts, rc services, pf/ipfw | Legacy/advanced reference; verify the active round |
+| [Windows Server](../../Server/windows-server.md) | AD, DNS, DHCP, IIS, file shares and role-aware security | Server 2022 in Round 2, State, Semifinals; Server 2019 in some later/training images |
+| [Linux Mint](../../Linux/Mint/linux-mint.md) | Cinnamon/LightDM, APT/Flatpak, sudo, services | Mint 21 in Round 1, Round 2, State, Semifinals |
+| [Ubuntu](../../Linux/Ubuntu/ubuntu.md) | Ubuntu 22/24, GNOME, Snap, SSH sockets, Netplan | Ubuntu 24 State; Ubuntu 22 training |
+| [Debian](../../Linux/Debian/debian.md) | Debian PAM, root/sudo, signed APT, nftables, critical services | Primarily legacy/practice reference; do not assume listed as a scored image in CP-19 |
+| [FreeBSD](../FreeBSD/freebsd.md) | FreeBSD-native accounts, rc services, pf/ipfw | Legacy/advanced reference; verify the active round |
 | [Cisco Packet Tracer](../../Cisco/packet-tracer.md) | Lab setup, VLANs, routing, DHCP, ACLs, SSH, troubleshooting | Module coverage varies by round |
 | [Cisco Quiz](../../Cisco/cisco-quiz.md) | **385 original short-answer study questions** and vocabulary | Official NetAcad Content Course modules vary by round |
 
@@ -73,19 +73,19 @@ These categories are **prioritization aids inferred from educational checklists*
 <a id="topic-5"></a>
 ## Advanced Investigations, Recovery and Sources
 
-- **Searchable forensics and decryption:** [Windows](../../Forensics/windows.md) · [Linux](../../Forensics/linux.md) · [Windows Server/AD](../../Forensics/windows-server.md). Each guide has a Ctrl+F index, website options and local commands.
-- [Forensics investigation procedures](../../Forensics/README.md#repeatable-investigation-procedures)
+- **Searchable forensics and decryption:** [Windows](../../Windows/forensics.md) · [Linux](../../Linux/forensics.md) · [Windows Server/AD](../../Server/forensics.md). Each guide has a Ctrl+F index, website options and local commands.
+- [Forensics investigation procedures](../Forensics/README.md#repeatable-investigation-procedures)
 - [Windows effective policy, events, persistence and recovery](../../Windows/windows-10-11.md#21-advanced-windows-investigations--included-in-this-checklist)
-- [Windows Server role-aware investigation](../../Windows/windows-server.md#12-role-aware-manual-procedures-and-recovery)
-- [Debian complete service hardening](../../Linux/debian.md#16-critical-services-complete-manual-procedures)
-- [Linux Mint advanced investigation reference](../../Linux/linux-mint.md#21-advanced-linux-manual-investigations-embedded)
+- [Windows Server role-aware investigation](../../Server/windows-server.md#12-role-aware-manual-procedures-and-recovery)
+- [Debian complete service hardening](../../Linux/Debian/debian.md#16-critical-services-complete-manual-procedures)
+- [Linux Mint advanced investigation reference](../../Linux/Mint/linux-mint.md#21-advanced-linux-manual-investigations-embedded)
 - [Cisco Packet Tracer detailed CLI references](../../Cisco/packet-tracer.md#21-expanded-original-configuration-reference)
 - [Sources, attribution and maintenance](sources-and-attribution.md)
 
-**Forensics guides are documentation, not executable tools.** Separate optional platform scripts are linked from the [repository home](../../README.md); the [current script index and historical external-tool notes](../../Scripts/README.md) are available.
+**Forensics guides are documentation, not executable tools.** Separate optional platform scripts are linked from the [repository home](../../README.md); the [current script index and historical external-tool notes](../Scripts/README.md) are available.
 
 ---
 
 ## More ways to browse without moving files
 
-[Complete file index](../../INDEX.md) · [Forensics hub](../../Forensics/README.md) · [Optional script hub](../../Scripts/README.md) · [Printable checklists](../../Printable%20Checklists/README.md)
+[Complete file index](../INDEX.md) · [Forensics hub](../Forensics/README.md) · [Optional script hub](../Scripts/README.md) · [Printable checklists](../Checklists/README.md)

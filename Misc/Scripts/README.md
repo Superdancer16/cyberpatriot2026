@@ -9,11 +9,11 @@ The script source files **remain in their original directories**. This folder pr
 
 | Target | Source script | Beginner HOW-TO | After-script manual checks | Complete handbook |
 |---|---|---|---|---|
-| Windows 10/11 workstation | [windows-10-11.ps1](../Windows%20Scripts/windows-10-11.ps1) | [Run instructions](../Windows%20Scripts/HOW-TO-RUN.md) | [Manual tasks](../Windows%20Scripts/MANUAL-TASKS.md) | [Windows manual](../Windows/windows-10-11.md) |
-| Windows Server 2016/2019/2022 | [windows-server.ps1](../Windows%20Server%20Scripts/windows-server.ps1) | [Role-aware run instructions](../Windows%20Server%20Scripts/HOW-TO-RUN.md) | [AD/roles manual tasks](../Windows%20Server%20Scripts/MANUAL-TASKS.md) | [Server manual](../Windows/windows-server.md) |
-| Debian 12/13 | [debian.sh](../Linux%20Scripts/debian.sh) | [Bash run instructions](../Linux%20Scripts/HOW-TO-RUN.md) | [Manual tasks](../Linux%20Scripts/MANUAL-TASKS.md) | [Debian manual](../Linux/debian.md) |
+| Windows 10/11 workstation | [windows-10-11.ps1](../../Windows/Scripts/windows-10-11.ps1) | [Run instructions](../../Windows/Scripts/HOW-TO-RUN.md) | [Manual tasks](../../Windows/Scripts/MANUAL-TASKS.md) | [Windows manual](../../Windows/windows-10-11.md) |
+| Windows Server 2016/2019/2022 | [windows-server.ps1](../../Server/Scripts/windows-server.ps1) | [Role-aware run instructions](../../Server/Scripts/HOW-TO-RUN.md) | [AD/roles manual tasks](../../Server/Scripts/MANUAL-TASKS.md) | [Server manual](../../Server/windows-server.md) |
+| Debian 12/13 | [debian.sh](../../Linux/Debian/Scripts/debian.sh) | [Bash run instructions](../../Linux/Debian/Scripts/HOW-TO-RUN.md) | [Manual tasks](../../Linux/Debian/Scripts/MANUAL-TASKS.md) | [Debian manual](../../Linux/Debian/debian.md) |
 
-**Mint, Ubuntu, and FreeBSD:** Use their [manual guides](../Linux/README.md); do not assume the Debian script supports these operating systems.
+**Mint, Ubuntu, and FreeBSD:** Use their [manual guides](../../Linux/README.md); do not assume the Debian script supports these operating systems.
 
 ## Safe order of work
 
@@ -27,7 +27,7 @@ The script source files **remain in their original directories**. This folder pr
 
 **Historical external script names are not included in this repository.** The local file paths are the ones in the operating-system table above. The original upstream comparison and detailed safe-tool review workflow have been consolidated below.
 
-[Complete file index](../INDEX.md) · [Repository home](../README.md)
+[Complete file index](../INDEX.md) · [Repository home](../../README.md)
 
 ---
 
@@ -35,9 +35,9 @@ The script source files **remain in their original directories**. This folder pr
 
 | Historical upstream family | Historical path | Current local manual |
 |---|---|---|
-| Linux | `scripts/linux/harden.sh` | [Mint](../Linux/linux-mint.md), [Ubuntu](../Linux/ubuntu.md), [Debian](../Linux/debian.md) |
-| Windows | `scripts/windows/Harden.ps1` | [Windows 10/11](../Windows/windows-10-11.md), [Windows Server](../Windows/windows-server.md) |
-| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../Linux/freebsd.md) |
+| Linux | `scripts/linux/harden.sh` | [Mint](../../Linux/Mint/linux-mint.md), [Ubuntu](../../Linux/Ubuntu/ubuntu.md), [Debian](../../Linux/Debian/debian.md) |
+| Windows | `scripts/windows/Harden.ps1` | [Windows 10/11](../../Windows/windows-10-11.md), [Windows Server](../../Server/windows-server.md) |
+| FreeBSD | `scripts/freebsd/harden.sh` | [FreeBSD](../FreeBSD/freebsd.md) |
 
 The historical toolkit's separate configuration builder is **not** part of this repository. Do not try historical paths as though they were in the local Git tree.
 

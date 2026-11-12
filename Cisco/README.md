@@ -17,4 +17,4 @@ Both Cisco guides follow **Basics / Information Needed → First Things to Do �
 
 ## Related resources
 
-[Printable Packet Tracer PDF](../Printable%20Checklists/cisco-packet-tracer-checklist.pdf) · [Editable Cisco checklist](../Printable%20Checklists/cisco-packet-tracer-checklist.md) · [Complete file index](../INDEX.md)
+[Printable Packet Tracer PDF](Checklists/cisco-packet-tracer-checklist.pdf) · [Editable Cisco checklist](Checklists/cisco-packet-tracer-checklist.md) · [Complete file index](../Misc/INDEX.md)
