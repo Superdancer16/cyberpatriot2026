@@ -7,6 +7,8 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
+**Forensics first — searchable question solver:** [Windows Server/Active Directory forensic guide](../Forensics/windows-server.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+
 Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competition's actual image README and official round materials. **Version and support (November 2026):** Server 2016 extended support ends in January 2027, Server 2019 in January 2029, and Server 2022 in October 2031. Confirm the exact lifecycle date for the installed edition in Microsoft's current lifecycle documentation. Server 2022 moved to extended support in October 2026 but still receives monthly security updates. Never perform a release upgrade to earn speculative points. See [Microsoft's Windows Server release information](https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info).
 
 **This is a self-contained Windows Server guide.** It includes the local-server, domain-member and Domain Controller procedures, plus a complete server-adapted Windows security reference in Part 5. You do **not** need to open the Windows workstation guide. Domain/role requirements take precedence over generic workstation hardening.
