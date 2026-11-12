@@ -32,7 +32,7 @@ The JSON template is generated automatically and must be edited before Apply mod
 |---|---|
 | `AuthorizedUsers`, `AuthorizedAdmins` | People who must remain active; never guess these lists |
 | `RequiredServices`, `RequiredShares`, `RequiredSoftware` | Items the script must protect |
-| `Groups` | Required local groups and their exact member usernames |
+| `Groups`, `RemoveGroupMembers`, `RemoveUserRights` | Required groups/members plus exact unauthorized privilege assignments, such as `SeSecurityPrivilege` or `SeTakeOwnershipPrivilege` |
 | `NewUsers`, `DemoteAdmins`, `PasswordExpiresUsers` | Named user/group changes |
 | `DisableUsers`, `RemoveUsers` | Exact unauthorized accounts, not a guessed list |
 | `PasswordPolicy` | Only the numeric/password fields the image actually requires |
@@ -53,7 +53,7 @@ Only after reviewing **every applicable field**, change `"ConfirmedReadme": fals
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json" -Yes
 ```
 
-**That is the all-in-one command.** It performs an initial audit, processes all 15 sections in order, runs the final audit, and writes a summary. `-Yes` skips the initial confirmation; it does **not** bypass protections for required services, built-in users, or missing passwords.
+**That is the all-in-one command.** It performs an initial audit, processes all 16 sections in order, runs the final audit, and writes a summary. `-Yes` skips the initial confirmation; it does **not** bypass protections for required services, built-in users, or missing passwords.
 
 For exact names/files/apps that the README explicitly requires you to **remove**, and only after preserving necessary evidence, use:
 
@@ -66,7 +66,7 @@ Without `-AllowRemovals`, permanent account/file/share/software removals are lis
 ## 5. What runs in one pass
 
 1. Account and group reconciliation: Guest, required local groups, members, specifically named unauthorized users/admin rights, password-expiry flags and authorized-user creation when a secure password can be entered.
-2. Configured local password and lockout policy, with an original policy export for recovery.
+2. Configured local password and lockout policy plus specified User Rights Assignment removals, with original security-policy exports for recovery.
 3. Windows security options: SmartScreen, blank-password network restriction, AutoPlay, optional LLMNR, remote assistance, WDigest, automatic-update policy, optional administrator enumeration restrictions, and screen lock controls.
 4. Defender protection/signature updates, firewall profiles, SMB signing/SMB1 and Credential Validation success auditing.
 5. Named unnecessary services and Windows features, selected scheduled tasks and custom SMB shares.
