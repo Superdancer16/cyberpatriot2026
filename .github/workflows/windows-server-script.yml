@@ -2,13 +2,13 @@ name: Windows Server script syntax
 on:
   push:
     branches:
-      - feature/windows-server-one-run-hardening-20261111
+      - main
     paths:
-      - 'Windows Server Scripts/windows-server.ps1'
+      - 'Server/Scripts/windows-server.ps1'
       - '.github/workflows/windows-server-script.yml'
   pull_request:
     paths:
-      - 'Windows Server Scripts/windows-server.ps1'
+      - 'Server/Scripts/windows-server.ps1'
       - '.github/workflows/windows-server-script.yml'
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
       - name: Parse in Windows PowerShell 5.1
         shell: powershell
         run: |
-          $path = (Resolve-Path 'Windows Server Scripts/windows-server.ps1').Path
+          $path = (Resolve-Path 'Server/Scripts/windows-server.ps1').Path
           $tokens = $null
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
@@ -32,7 +32,7 @@ jobs:
       - name: Check list and configuration template
         shell: powershell
         run: |
-          $file = '.\Windows Server Scripts\windows-server.ps1'
+          $file = '.\Server\Scripts\windows-server.ps1'
           $sections = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $file -List)
           if ('verify' -notin $sections -or 'dns' -notin $sections -or 'adusers' -notin $sections) { throw 'Missing server sections' }
           $config = Join-Path $env:RUNNER_TEMP 'server-template.json'
@@ -44,7 +44,7 @@ jobs:
       - name: Smoke-test read-only audit on Windows runner
         shell: powershell
         run: |
-          $file = '.\Windows Server Scripts\windows-server.ps1'
+          $file = '.\Server\Scripts\windows-server.ps1'
           & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $file -Mode Audit
           if ($LASTEXITCODE -ne 0) { throw 'Audit-mode command failed' }
           $output = Join-Path $env:ProgramData 'ServerSecurityWork'

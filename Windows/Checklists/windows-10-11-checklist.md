@@ -1,6 +1,6 @@
 # 🪟 Windows 10/11 — Printable Checklist & GitHub Progress Tracker
 
-> **Source:** [Full Windows 10/11 guide](../Windows/windows-10-11.md). This tracker is a **separate companion**; the original guide is not changed.
+> **Source:** [Full Windows 10/11 guide](../windows-10-11.md). This tracker is a **separate companion**; the original guide is not changed.
 >
 > **How to track:** Print the matching PDF and mark the square beside each small task. For GitHub tracking, click **Edit** on this Markdown file, change `[ ]` to `[x]` as tasks are completed, and commit the change. If an item does not apply, append `(N/A — reason)` to its text in your own progress copy. GitHub Markdown checkboxes do not automatically save themselves when clicked.
 >
@@ -13,7 +13,7 @@
 **Legend:** ☐ not done · ☑ complete · N/A not applicable · Check the full guide before changing any setting.
 
 ## 01. Read the image instructions and prepare safely  
-*Full guide: [Part 2](../Windows/windows-10-11.md#stage-2)*
+*Full guide: [Part 2](../windows-10-11.md#stage-2)*
 
 - [ ] **W001** — Read the complete image README before making any change
 - [ ] **W002** — Record the current Windows version, edition and build
@@ -31,7 +31,7 @@
 - [ ] **W014** — Record every changed setting and its original value
 
 ## 02. Forensic questions and evidence  
-*Full guide: [Part 2](../Windows/windows-10-11.md#stage-2)*
+*Full guide: [Part 2](../windows-10-11.md#stage-2)*
 
 - [ ] **W015** — Find every Forensics Question file supplied with the image
 - [ ] **W016** — Read each complete question and required answer format
@@ -46,7 +46,7 @@
 - [ ] **W025** — Reopen unanswered questions after other safe investigations
 
 ## 03. Users, Guest account and administrators  
-*Full guide: [Part 3](../Windows/windows-10-11.md#stage-3)*
+*Full guide: [Part 3](../windows-10-11.md#stage-3)*
 
 - [ ] **W026** — List all local users, including disabled and built-in accounts
 - [ ] **W027** — Compare human users with the README authorization list
@@ -67,7 +67,7 @@
 - [ ] **W042** — Test a second authorized administrator sign-in
 
 ## 04. Passwords, lockout and effective policy  
-*Full guide: [Part 3](../Windows/windows-10-11.md#stage-3)*
+*Full guide: [Part 3](../windows-10-11.md#stage-3)*
 
 - [ ] **W043** — Record current local account password policy with net accounts
 - [ ] **W044** — Inspect minimum password length
@@ -86,7 +86,7 @@
 - [ ] **W057** — Test an authorized normal-user login after policy changes
 
 ## 05. Defender and endpoint protection  
-*Full guide: [Part 3](../Windows/windows-10-11.md#stage-3)*
+*Full guide: [Part 3](../windows-10-11.md#stage-3)*
 
 - [ ] **W058** — Identify which antivirus provider is active
 - [ ] **W059** — Check Microsoft Defender antivirus and real-time protection state
@@ -105,7 +105,7 @@
 - [ ] **W072** — Verify protection state and required software still work
 
 ## 06. Firewall and network exposure  
-*Full guide: [Part 3](../Windows/windows-10-11.md#stage-3)*
+*Full guide: [Part 3](../windows-10-11.md#stage-3)*
 
 - [ ] **W073** — Check Domain firewall profile Enabled state
 - [ ] **W074** — Check Private firewall profile Enabled state
@@ -124,7 +124,7 @@
 - [ ] **W087** — Verify firewall state and record any rollback needed
 
 ## 07. Updates and Windows features  
-*Full guide: [Part 3](../Windows/windows-10-11.md#stage-3)*
+*Full guide: [Part 3](../windows-10-11.md#stage-3)*
 
 - [ ] **W088** — Open Windows Update and inspect pending updates
 - [ ] **W089** — Check Windows Update service configuration
@@ -142,7 +142,7 @@
 - [ ] **W101** — Verify disabled feature state and any reboot requirement
 
 ## 08. Services, remote access and sharing  
-*Full guide: [Part 4](../Windows/windows-10-11.md#stage-4)*
+*Full guide: [Part 4](../windows-10-11.md#stage-4)*
 
 - [ ] **W102** — Inventory installed services and startup types
 - [ ] **W103** — Map unexpected service executables to actual file paths
@@ -162,7 +162,7 @@
 - [ ] **W117** — Restore any required service accidentally disabled
 
 ## 09. Prohibited software, files and browser security  
-*Full guide: [Part 4](../Windows/windows-10-11.md#stage-4)*
+*Full guide: [Part 4](../windows-10-11.md#stage-4)*
 
 - [ ] **W118** — Inspect installed desktop programs and app packages
 - [ ] **W119** — Inspect Microsoft Store apps when relevant
@@ -179,7 +179,7 @@
 - [ ] **W130** — Confirm prohibited items were handled without affecting needed apps
 
 ## 10. Startup persistence and malicious changes  
-*Full guide: [Part 4](../Windows/windows-10-11.md#stage-4)*
+*Full guide: [Part 4](../windows-10-11.md#stage-4)*
 
 - [ ] **W131** — Inspect Startup apps for unknown executables
 - [ ] **W132** — Inspect HKLM Run startup registry entries
@@ -198,7 +198,7 @@
 - [ ] **W145** — Retest required logins and applications
 
 ## 11. Audit, user rights and advanced safeguards  
-*Full guide: [Part 5](../Windows/windows-10-11.md#stage-5)*
+*Full guide: [Part 5](../windows-10-11.md#stage-5)*
 
 - [ ] **W146** — Inspect current audit policy categories
 - [ ] **W147** — Check account logon auditing where required
@@ -219,7 +219,7 @@
 - [ ] **W162** — Restore exact recorded policy if access breaks
 
 ## 12. Final verification and handoff  
-*Full guide: [Part 6](../Windows/windows-10-11.md#stage-6)*
+*Full guide: [Part 6](../windows-10-11.md#stage-6)*
 
 - [ ] **W163** — Reopen and save all forensic answer files
 - [ ] **W164** — Recheck the complete authorized user and admin list

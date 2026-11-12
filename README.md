@@ -1,37 +1,76 @@
-# 🛡️ CyberPatriot 2026–2027 — Prioritized Security Handbooks
+# 🛡️ CyberPatriot 2026–2027 — Complete Security Handbook
 
-> [!TIP]
-> **🧭 Quick start:** Follow the category links and open the most relevant guide. Look for **🔎 Check**, **🛠️ Fix**, **✅ Verify**, **↩️ Undo**, and **⚠️ Caution** throughout.
+**One README. Four platform areas. One shared General library.** Choose the image you are working on below, then use **Ctrl+F** within its guide. Every platform guide emphasizes **🔎 Check → 🛠️ Fix → ✅ Verify → ↩️ Undo** and clearly flags risky changes.
 
+> [!IMPORTANT]
+> **The active competition image README and current round rules take priority.** Identify authorized accounts and required services, preserve forensic evidence, retain administrative access, and verify the scoring report after changes. Sample settings are not guaranteed scoring items. Only use automation or external sites when permitted.
 
-**Start with basics. Protect the README-required system. Work from common tasks to advanced investigation.**
+## 🚀 Start here — choose your platform
 
-Every major guide follows the same study and competition workflow:
+| Image / activity | Complete handbook | Searchable forensics | Optional scripts / tracking |
+|---|---|---|---|
+| 🪟 **Windows 10 / 11** | [Windows workstation](Windows/windows-10-11.md) | [Windows forensics](Windows/forensics.md) | [Script HOW-TO](Windows/Scripts/HOW-TO-RUN.md) · [Manual tasks](Windows/Scripts/MANUAL-TASKS.md) · [Checklist PDF](Windows/Checklists/windows-10-11-checklist.pdf) |
+| 🖥️ **Windows Server / AD** | [Standalone Server guide](Server/windows-server.md) | [Server forensics](Server/forensics.md) | [Server script HOW-TO](Server/Scripts/HOW-TO-RUN.md) · [Manual tasks](Server/Scripts/MANUAL-TASKS.md) · [Checklist PDF](Server/Checklists/windows-server-checklist.pdf) |
+| 🌐 **Cisco Packet Tracer / quiz** | [Packet Tracer](Cisco/packet-tracer.md) · [Networking quiz](Cisco/cisco-quiz.md) | Use activity tasks / topology first | [Cisco checklist PDF](Cisco/Checklists/cisco-packet-tracer-checklist.pdf) |
+| 🐧 **Debian 12/13** | [Debian handbook](Linux/Debian/debian.md) | [Linux forensics](Linux/forensics.md) | [Debian script HOW-TO](Linux/Debian/Scripts/HOW-TO-RUN.md) · [Manual tasks](Linux/Debian/Scripts/MANUAL-TASKS.md) · [Checklist PDF](Linux/Debian/Checklists/debian-checklist.pdf) |
+| 🌿 **Linux Mint** | [Linux Mint handbook](Linux/Mint/linux-mint.md) | [Linux forensics](Linux/forensics.md) | Manual guide (Debian automation is not Mint automation) |
+| 🟠 **Ubuntu** | [Ubuntu handbook](Linux/Ubuntu/ubuntu.md) | [Linux forensics](Linux/forensics.md) | Manual guide (Debian automation is not Ubuntu automation) |
+| 🐡 **FreeBSD** | [FreeBSD handbook](Misc/FreeBSD/freebsd.md) | [BSD-specific forensic quick reference](General/forensics-workflows.md#freebsd-quick-reference) | FreeBSD commands differ from Linux |
 
-**Basics / Information Needed → First Things to Do → Commonly Assessed Checks → Services and Software → Advanced Troubleshooting → Final Verification.**
+## 🗂️ Repository layout
 
-| Category | Full Guides |
-|---|---|
-| **[General / All](General/All/README.md)** | README, forensics, round strategy, glossary and source references |
-| **Forensics — Ctrl+F quick lookup** | [Windows 10/11](Forensics/windows.md) · [Linux (Debian/Mint/Ubuntu)](Forensics/linux.md) · [Windows Server / AD](Forensics/windows-server.md); step-by-step cipher/decoding, evidence searches and websites |
-| **[Windows](Windows/README.md)** | Windows 10/11 and Windows Server, including PowerShell and domain-aware guidance |
-| **[Linux](Linux/README.md)** | Complete Debian, Mint and Ubuntu guides; FreeBSD reference |
-| **[Cisco](Cisco/README.md)** | Packet Tracer step-by-step handbook and 385-question networking Q&A |
+```text
+README.md                              ← The only README / master directory
+Windows/
+  windows-10-11.md
+  forensics.md
+  Scripts/      HOW-TO-RUN.md · MANUAL-TASKS.md · windows-10-11.ps1
+  Checklists/   windows-10-11-checklist.md · windows-10-11-checklist.pdf
+Server/
+  windows-server.md
+  forensics.md
+  Scripts/      HOW-TO-RUN.md · MANUAL-TASKS.md · windows-server.ps1
+  Checklists/   windows-server-checklist.md · windows-server-checklist.pdf
+Cisco/
+  packet-tracer.md · cisco-quiz.md
+  Checklists/   cisco-packet-tracer-checklist.md · cisco-packet-tracer-checklist.pdf
+Linux/
+  forensics.md
+  Debian/
+    debian.md
+    Scripts/    HOW-TO-RUN.md · MANUAL-TASKS.md · debian.sh
+    Checklists/ debian-checklist.md · debian-checklist.pdf
+  Mint/         linux-mint.md
+  Ubuntu/       ubuntu.md
+General/                             ← Cross-platform study, safety and reference
+  what-is-cyberpatriot.md · reading-the-readme.md
+  round-game-plan.md · glossary.md · things-that-lose-points.md
+  forensics-workflows.md · script-safety.md · checklist-printing.md
+Misc/
+  FreeBSD/      freebsd.md
+.github/workflows/                    ← Automated script checks
+```
 
-**Non-negotiable:** Read the competition image README and preserve forensic evidence before deleting users/files or disabling services. Retain administrative access, verify every required function and keep rollback notes.
+## 📚 General — shared instructions
 
-**One-run scripts:** [Windows 10/11 PowerShell](Windows%20Scripts/HOW-TO-RUN.md) · [Windows Server PowerShell](Windows%20Server%20Scripts/HOW-TO-RUN.md) · [Debian 12/13 Bash](Linux%20Scripts/HOW-TO-RUN.md). Linux Mint, Ubuntu and other handbooks remain manual references. The image README and current competition rules take priority. See [sources and attribution](General/All/sources-and-attribution.md); original documentation reuse permission is noted there.
+- **Getting started:** [What is CyberPatriot?](General/what-is-cyberpatriot.md) · [How to read the image README](General/reading-the-readme.md) · [Round game plan](General/round-game-plan.md)
+- **Common reference:** [Security glossary](General/glossary.md) · [Things that lose points](General/things-that-lose-points.md)
+- **Evidence and questions:** [Cross-platform forensics workflows](General/forensics-workflows.md) — safe preservation, hashes, logs, process correlation and FreeBSD-specific commands
+- **Automation:** [Script safety, historical references and rollback](General/script-safety.md) — current scripts, review precautions, and warnings about unrelated upstream scripts
+- **Printing:** [Printable checklist instructions](General/checklist-printing.md) — how to track progress on paper and in Markdown
 
----
+## 📝 Editable checklist trackers
 
-## 🚦 Browse by task — original files kept in place
+The checklist PDFs above are for printing; use the matching Markdown when you want to record checkboxes in a branch.
 
-| I need to… | Open this first | Next step |
-|---|---|---|
-| Find any file quickly | **[Complete repository index](INDEX.md)** | Browse every original guide, script, PDF, and workflow |
-| Answer a forensics question | **[Forensics hub](Forensics/README.md)** | Choose Windows, Windows Server, or Linux and use Ctrl+F |
-| Work with a script | **[Script hub](Scripts/README.md)** | Start with Audit and the matching HOW-TO; respect round rules |
-| Print/check off tasks | **[Printable checklists](Printable%20Checklists/README.md)** | Choose PDF for paper or Markdown for tracking |
-| Start a scoring image safely | **[Reading the image README](General/All/reading-the-readme.md)** | Then follow the [round game plan](General/All/round-game-plan.md) |
+[Windows 10/11](Windows/Checklists/windows-10-11-checklist.md) · [Windows Server](Server/Checklists/windows-server-checklist.md) · [Debian](Linux/Debian/Checklists/debian-checklist.md) · [Cisco](Cisco/Checklists/cisco-packet-tracer-checklist.md)
 
-**Consolidation:** Full operating-system manuals, automation scripts, PDFs, and GitHub workflows retain their paths. Three superseded general-forensics and historical-script Markdown pages were merged into the [forensics](Forensics/README.md) and [script](Scripts/README.md) hubs; previous versions remain in Git history.
+## ⚙️ Optional script source and validation
+
+The three script entrypoints are [Windows 10/11 PowerShell](Windows/Scripts/windows-10-11.ps1), [Windows Server PowerShell](Server/Scripts/windows-server.ps1), and [Debian Bash](Linux/Debian/Scripts/debian.sh). **Do not run a platform's script on a different operating system.** Read the matching HOW-TO, run Audit mode first, and apply only image-specific, authorized changes.
+
+GitHub Actions: [Debian syntax workflow](.github/workflows/debian-script-syntax.yml) · [Windows Server syntax workflow](.github/workflows/windows-server-script.yml).
+
+## 📜 Reference and reuse notice
+
+Some original documentation was reproduced with permission from [Ripper1004/CyberPatriot-Toolkit](https://github.com/Ripper1004/CyberPatriot-Toolkit/tree/main/docs). That permission should not be presumed to cover unrelated scripts or assets. Earlier source research and removed files remain in this repository's Git history. Official competition rules and vendor documentation, not community checklists, govern current requirements.

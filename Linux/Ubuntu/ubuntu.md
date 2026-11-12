@@ -7,7 +7,7 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
-**Forensics first — searchable question solver:** [Linux forensic guide](../Forensics/linux.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+**Forensics first — searchable question solver:** [Linux forensic guide](../forensics.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
 
 **Ubuntu workstation and server practice for Ubuntu 22.04 and 24.04, with legacy 20.04 notes.** This is a comprehensive documentation-only guide, not an auto-hardening script. It places **Basics / Information Needed → First Things to Do → Commonly Assessed Checks → Services and Software → Advanced Topics → Final Verification** in increasing complexity.
 
@@ -878,7 +878,7 @@ sudo snap remove steam          # remove a prohibited snap app: change steam to 
 #### Firewall: UFW is installed but OFF
 - [ ] **🎯 DO THIS — Firewall: UFW is installed but OFF**
 
-Use [the firewall ownership and recovery procedure](linux-mint.md#174-ufw-and-nftables-one-firewall-owner). If GUFW is already installed it provides a UFW GUI; it is not necessary to install it for manual terminal configuration.
+Use [the firewall ownership and recovery procedure](../Mint/linux-mint.md#174-ufw-and-nftables-one-firewall-owner). If GUFW is already installed it provides a UFW GUI; it is not necessary to install it for manual terminal configuration.
 
 #### Login screen: GDM instead of LightDM
 - [ ] **🎯 DO THIS — Login screen: GDM instead of LightDM**
@@ -888,7 +888,7 @@ Use [the firewall ownership and recovery procedure](linux-mint.md#174-ufw-and-nf
 AutomaticLoginEnable=false
 TimedLoginEnable=false
 ```
-To inspect or change the login-screen user list, review `/etc/gdm3/greeter.dconf-defaults` and the version-specific procedure in [Debian step 8.3](debian.md#83-hide-the-list-of-users-on-the-login-screen).
+To inspect or change the login-screen user list, review `/etc/gdm3/greeter.dconf-defaults` and the version-specific procedure in [Debian step 8.3](../Debian/debian.md#83-hide-the-list-of-users-on-the-login-screen).
 
 #### Screen lock: GNOME settings
 - [ ] **🎯 DO THIS (only if authorized) — Screen lock: GNOME settings**
@@ -916,7 +916,7 @@ If the README needs SSH and you change `Port` or `ListenAddress` in `sshd_config
 #### Ubuntu 20.04: inspect available PAM modules
 - [ ] **🎯 DO THIS — Ubuntu 20.04: inspect available PAM modules**
 
-Inspect installed PAM modules and use [the supported PAM procedure](linux-mint.md#172-password-aging-pam-and-lockout-without-breaking-login); do not select pam_tally2 solely because the image is Ubuntu 20.04.
+Inspect installed PAM modules and use [the supported PAM procedure](../Mint/linux-mint.md#172-password-aging-pam-and-lockout-without-breaking-login); do not select pam_tally2 solely because the image is Ubuntu 20.04.
 
 #### Default games and apps
 - [ ] **🎯 DO THIS — Default games and apps**
@@ -939,7 +939,7 @@ sudo apt purge aisleriot gnome-mahjongg gnome-mines gnome-sudoku transmission-gt
 > **💡 Why it matters:** Ubuntu 20.04, 22.04 and 24.04 differ in support, configuration defaults and service activation. Mint's Cinnamon paths do not configure GNOME.
 
 > [!CAUTION]
-> **🛑 Before changing anything:** Read the README, answer forensics and keep console access. Use [Mint 17.1–17.2](linux-mint.md#17-detailed-manual-safety-and-verification-procedures) for the complete account backup, sudo and PAM recovery steps; those APT/PAM concepts apply here, but inspect installed module versions first.
+> **🛑 Before changing anything:** Read the README, answer forensics and keep console access. Use [Mint 17.1–17.2](../Mint/linux-mint.md#17-detailed-manual-safety-and-verification-procedures) for the complete account backup, sudo and PAM recovery steps; those APT/PAM concepts apply here, but inspect installed module versions first.
 
 **⭐ EASIEST WAY — GUI (when available):** **Settings → About** identifies the OS. **Settings → Users → Unlock** shows human users and account types. Open **Activities**, search **Terminal**, and launch it. `Ctrl+Alt+T` usually opens Terminal.
 
@@ -979,7 +979,7 @@ Expected: the actual release codename/version, the display-manager unit, your us
 > **💡 Why it matters:** Ubuntu 24.04 commonly uses `/etc/apt/sources.list.d/ubuntu.sources` (DEB822); older images commonly use `/etc/apt/sources.list`. Replacing either with an old internet list can mix releases.
 
 > [!CAUTION]
-> **🛑 Before changing anything:** Back up `/etc/apt` following [Mint 17.5](linux-mint.md#175-package-sources-updates-and-vulnerability-triage). Record required applications and existing third-party sources.
+> **🛑 Before changing anything:** Back up `/etc/apt` following [Mint 17.5](../Mint/linux-mint.md#175-package-sources-updates-and-vulnerability-triage). Record required applications and existing third-party sources.
 
 **⭐ EASIEST WAY — GUI (when available):** **Software & Updates → Ubuntu Software / Other Software**; compare enabled sources with the installed release. **Software Updater** checks and installs updates. Do not enable a PPA merely because it promises a newer version.
 
@@ -1033,7 +1033,7 @@ sudo apt upgrade
 > **💡 Why it matters:** On newer Ubuntu installations, stopping `ssh.service` may leave `ssh.socket` able to start it again. Socket behavior varies with packaging and upgrades.
 
 > [!CAUTION]
-> **🛑 Before changing anything:** Preserve `/etc/ssh` and any `/etc/systemd/system/ssh.socket.d` overrides. Keep the console and one existing connection open. Use [Mint 17.3](linux-mint.md#173-ssh-effective-configuration-and-a-second-session-test) for the full authentication procedure.
+> **🛑 Before changing anything:** Preserve `/etc/ssh` and any `/etc/systemd/system/ssh.socket.d` overrides. Keep the console and one existing connection open. Use [Mint 17.3](../Mint/linux-mint.md#173-ssh-effective-configuration-and-a-second-session-test) for the full authentication procedure.
 
 **⭐ EASIEST WAY — GUI (when available):** Use the VM console. GNOME remote desktop settings do not control OpenSSH.
 
@@ -1095,7 +1095,7 @@ A missing socket unit is normal on some installations; do not install one merely
 > **💡 Why it matters:** `sudo gsettings` targets the wrong user; a secure desktop does not compensate for an open server.
 
 > [!CAUTION]
-> **🛑 Before changing anything:** Record the user's current values and inspect installed schemas. Use [Mint 17.4–17.9](linux-mint.md#174-ufw-and-nftables-one-firewall-owner) for firewall, package, permissions, persistence, kernel/AppArmor, log and recovery procedures, and [service hardening](linux-mint.md#20-complete-linux-critical-service-hardening-procedures-embedded) for each installed required daemon.
+> **🛑 Before changing anything:** Record the user's current values and inspect installed schemas. Use [Mint 17.4–17.9](../Mint/linux-mint.md#174-ufw-and-nftables-one-firewall-owner) for firewall, package, permissions, persistence, kernel/AppArmor, log and recovery procedures, and [service hardening](../Mint/linux-mint.md#20-complete-linux-critical-service-hardening-procedures-embedded) for each installed required daemon.
 
 **⭐ EASIEST WAY — GUI (when available):** **Settings → Privacy → Screen Lock** on older GNOME, or **Privacy & Security → Screen Lock** on newer versions. Enable automatic locking and require a password; disable automatic login in **Users** if unauthorized. **Files → Preferences** contains removable-media behavior on some releases; other versions use **Settings → Removable Media**.
 

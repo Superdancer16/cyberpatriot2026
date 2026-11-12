@@ -7,9 +7,9 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
-**Forensics first — searchable question solver:** [Linux forensic guide](../Forensics/linux.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+**Forensics first — searchable question solver:** [Linux forensic guide](../forensics.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
 
-Linux Mint is in **Round 1, the State round, and the Semifinals** this season. It is built on Ubuntu, so almost everything here also works on Ubuntu (see the [Ubuntu checklist](ubuntu.md) for the few differences).
+Linux Mint is in **Round 1, the State round, and the Semifinals** this season. It is built on Ubuntu, so almost everything here also works on Ubuntu (see the [Ubuntu checklist](../Ubuntu/ubuntu.md) for the few differences).
 
 **How to use this page**
 - Work **top to bottom**. The order matches where points usually are.
@@ -70,7 +70,7 @@ Open the README, record users/required services, preserve forensics answers and 
 #### 0.1 Read the README
 - [ ] **🎯 DO THIS — 0.1 Read the README**
 
-Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/All/reading-the-readme.md).
+Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../../General/reading-the-readme.md).
 
 #### 0.2 Take a snapshot
 - [ ] **🎯 DO THIS — 0.2 Take a snapshot**
@@ -118,7 +118,7 @@ sha256sum /path/to/file                            # hash of a file
 echo 'aGVsbG8=' | base64 -d                        # decode base64
 sudo grep -E 'Accepted|Failed' /var/log/auth.log   # who logged in / failed to
 ```
-More techniques: [Linux forensics guide](../Forensics/linux.md).
+More techniques: [Linux forensics guide](../forensics.md).
 
 > [!WARNING]
 > Answers must be **exact**: right spelling, capitals, and full paths when asked. Don't delete the "ANSWER:" line.
@@ -151,7 +151,7 @@ More techniques: [Linux forensics guide](../Forensics/linux.md).
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../../General/script-safety.md) for the limits of external tools.
 
 ---
 
@@ -1005,7 +1005,7 @@ If the README doesn't mention SSH or remote logins:
 sudo systemctl disable --now ssh
 sudo apt purge openssh-server
 ```
-On **Mint 22**, SSH can also be started on demand by `ssh.socket`; if you keep the package, turn that off too (see [SSH on Ubuntu 22.10 and newer](ubuntu.md#ssh-on-ubuntu-2210-and-newer)).
+On **Mint 22**, SSH can also be started on demand by `ssh.socket`; if you keep the package, turn that off too (see [SSH on Ubuntu 22.10 and newer](../Ubuntu/ubuntu.md#ssh-on-ubuntu-2210-and-newer)).
 
 #### 9.2 Needed? Make it safe.
 - [ ] **🎯 DO THIS — 9.2 Needed? Make it safe.**
@@ -2594,7 +2594,7 @@ Unexpected recent or world-writable files need comparison with a trusted package
 
 The original practical text and copyable command blocks are retained here for self-contained study. For a Debian image, use Debian-specific explanations in Sections 0–19 before changing a setting.
 
-> Use alongside [Linux Mint](linux-mint.md), [Ubuntu](ubuntu.md), [Debian](debian.md), and [critical service hardening](linux-mint.md#20-complete-linux-critical-service-hardening-procedures-embedded). This page assumes **Ubuntu / Debian / Linux Mint using systemd**; consult the [FreeBSD checklist](freebsd.md) for FreeBSD-specific commands. **Read the image README and preserve forensics evidence first.**
+> Use alongside [Linux Mint](linux-mint.md), [Ubuntu](../Ubuntu/ubuntu.md), [Debian](../Debian/debian.md), and [critical service hardening](linux-mint.md#20-complete-linux-critical-service-hardening-procedures-embedded). This page assumes **Ubuntu / Debian / Linux Mint using systemd**; consult the [FreeBSD checklist](../../Misc/FreeBSD/freebsd.md) for FreeBSD-specific commands. **Read the image README and preserve forensics evidence first.**
 
 These are individually copyable terminal commands. **Inspection is not the same as permission to modify.** Run modifications only after verifying accounts, critical services, connectivity and backups.
 

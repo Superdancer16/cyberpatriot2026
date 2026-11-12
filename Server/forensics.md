@@ -4,7 +4,7 @@ For CyberPatriot-style **Windows Server 2016, 2019 and 2022**, including **stand
 
 **Read/answer every desktop Forensics Question before changing users, groups, shares, DNS, GPO, TLS, services, certificates or files.** Submit the exact requested answer after `ANSWER:` in the original question file, save, and check the Scoring Report. Historical answers shown by a training walkthrough are **not** answers for this VM.
 
-The script, if used, should be run **after** this evidence pass. [Server hardening handbook](../Windows/windows-server.md) · [Windows workstation forensics](windows.md) · [Linux forensics](linux.md).
+The script, if used, should be run **after** this evidence pass. [Server hardening handbook](windows-server.md) · [Windows workstation forensics](../Windows/forensics.md) · [Linux forensics](../Linux/forensics.md).
 
 ## ⭐ Easiest websites for decoding and investigating
 
@@ -748,7 +748,7 @@ Personal scratch template: `exact question | role | artifact/zone/user | read-on
 
 Built from the supplied **CyberPatriot Forensics Question Research Report**, **CP19 Windows 11 Training Round 2 Answer Key**, and **CP19 Round 1 category summary**, plus general Microsoft Server investigation methods. Historical Server 2019/2022 examples in the research report are school/team records, **not proof of every past official question**.
 
-- [Windows Server role-aware handbook](../Windows/windows-server.md).
+- [Windows Server role-aware handbook](windows-server.md).
 - [Microsoft Learn — Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent).
 - [Microsoft Learn — Get-DnsServerResourceRecord](https://learn.microsoft.com/en-us/powershell/module/dnsserver/get-dnsserverresourcerecord).
 - [Microsoft Learn — Get-SmbShare](https://learn.microsoft.com/en-us/powershell/module/smbshare/get-smbshare).

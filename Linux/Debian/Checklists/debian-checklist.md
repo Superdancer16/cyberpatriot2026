@@ -1,6 +1,6 @@
 # 🐧 Debian — Printable Checklist & GitHub Progress Tracker
 
-> **Source:** [Complete Debian guide](../Linux/debian.md). This is a **new companion tracker**; no original guides are changed.
+> **Source:** [Complete Debian guide](../debian.md). This is a **new companion tracker**; no original guides are changed.
 >
 > **Print:** Use `debian-checklist.pdf` in this folder and mark each individual square.
 >
@@ -13,7 +13,7 @@
 **Starting score:** __________  **Final score:** __________  **Reviewer:** __________________
 
 ## 01. Identify Debian and establish recovery  
-*Full guide: [Part 1](../Linux/debian.md#stage-1)*
+*Full guide: [Part 1](../debian.md#stage-1)*
 
 - [ ] **D001** — Read the actual README and any special competition constraints
 - [ ] **D002** — Check Debian version and codename in /etc/os-release
@@ -31,7 +31,7 @@
 - [ ] **D014** — Create private change notes and record original values
 
 ## 02. Forensic evidence before remediation  
-*Full guide: [Part 2](../Linux/debian.md#stage-2)*
+*Full guide: [Part 2](../debian.md#stage-2)*
 
 - [ ] **D015** — Open every forensic question and note the exact answer format
 - [ ] **D016** — Locate requested files before deleting or updating anything
@@ -47,7 +47,7 @@
 - [ ] **D026** — Confirm evidence was preserved and unanswered questions are noted
 
 ## 03. Human accounts, root, and administrator groups  
-*Full guide: [Part 3](../Linux/debian.md#stage-3)*
+*Full guide: [Part 3](../debian.md#stage-3)*
 
 - [ ] **D027** — Inventory /etc/passwd entries and likely human users
 - [ ] **D028** — Compare local human accounts with the README
@@ -69,7 +69,7 @@
 - [ ] **D044** — Open a second authorized login after privilege changes
 
 ## 04. Password aging, quality, and PAM  
-*Full guide: [Part 3](../Linux/debian.md#stage-3)*
+*Full guide: [Part 3](../debian.md#stage-3)*
 
 - [ ] **D045** — Inspect login.defs password-aging defaults
 - [ ] **D046** — Inspect each authorized user's actual aging with chage -l
@@ -93,7 +93,7 @@
 - [ ] **D064** — Restore the exact PAM backup if authentication fails
 
 ## 05. Signed APT sources, packages and updates  
-*Full guide: [Part 3](../Linux/debian.md#stage-3)*
+*Full guide: [Part 3](../debian.md#stage-3)*
 
 - [ ] **D065** — Record the installed Debian release codename
 - [ ] **D066** — Inspect active .list and deb822 .sources entries
@@ -113,7 +113,7 @@
 - [ ] **D080** — Recheck package state and required application functionality
 
 ## 06. Firewall and exposed network services  
-*Full guide: [Part 3](../Linux/debian.md#stage-3)*
+*Full guide: [Part 3](../debian.md#stage-3)*
 
 - [ ] **D081** — Inventory listening TCP services with ss
 - [ ] **D082** — Inventory listening UDP services with ss
@@ -133,7 +133,7 @@
 - [ ] **D096** — Restore the old specific rule/config if access breaks
 
 ## 07. SSH authentication, ports and authorized keys  
-*Full guide: [Part 4](../Linux/debian.md#stage-4)*
+*Full guide: [Part 4](../debian.md#stage-4)*
 
 - [ ] **D097** — Check whether openssh-server is installed and required
 - [ ] **D098** — Check ssh service status and startup state
@@ -155,7 +155,7 @@
 - [ ] **D114** — Restore backup from VM console if SSH access breaks
 
 ## 08. Required and unnecessary services  
-*Full guide: [Part 4](../Linux/debian.md#stage-4)*
+*Full guide: [Part 4](../debian.md#stage-4)*
 
 - [ ] **D115** — Inventory running systemd services
 - [ ] **D116** — Inventory enabled service units
@@ -176,7 +176,7 @@
 - [ ] **D131** — Restore the original startup/running state if needed
 
 ## 09. Software, games, media and installed applications  
-*Full guide: [Part 4](../Linux/debian.md#stage-4)*
+*Full guide: [Part 4](../debian.md#stage-4)*
 
 - [ ] **D132** — Inventory installed packages for explicitly prohibited software
 - [ ] **D133** — Inspect games installed as GNOME packages if present
@@ -192,7 +192,7 @@
 - [ ] **D143** — Restore a mistakenly removed app with its configuration
 
 ## 10. File ownership, permissions and capabilities  
-*Full guide: [Part 4](../Linux/debian.md#stage-4)*
+*Full guide: [Part 4](../debian.md#stage-4)*
 
 - [ ] **D144** — Inspect /etc/passwd owner/group and file permissions
 - [ ] **D145** — Inspect /etc/group owner/group and file permissions
@@ -210,7 +210,7 @@
 - [ ] **D157** — Verify needed programs and normal login still work
 
 ## 11. Scheduled tasks, startup and persistence  
-*Full guide: [Part 4](../Linux/debian.md#stage-4)*
+*Full guide: [Part 4](../debian.md#stage-4)*
 
 - [ ] **D158** — Inspect root crontab
 - [ ] **D159** — Inspect system crontab
@@ -230,7 +230,7 @@
 - [ ] **D173** — Restore any required job or service mistakenly disabled
 
 ## 12. Logging, AppArmor and kernel security  
-*Full guide: [Part 5](../Linux/debian.md#stage-5)*
+*Full guide: [Part 5](../debian.md#stage-5)*
 
 - [ ] **D174** — Inspect journald boot history and log retention
 - [ ] **D175** — Check relevant authentication events
@@ -249,7 +249,7 @@
 - [ ] **D188** — Verify required services after AppArmor/sysctl changes
 
 ## 13. Critical-server role checks (when required)  
-*Full guide: [Part 5](../Linux/debian.md#stage-5)*
+*Full guide: [Part 5](../debian.md#stage-5)*
 
 - [ ] **D189** — Record required server roles before changing their configurations
 - [ ] **D190** — Back up actual configuration for each required role
@@ -273,7 +273,7 @@
 - [ ] **D208** — Restore only a changed service config if a client test fails
 
 ## 14. Desktop and final verification  
-*Full guide: [Part 6](../Linux/debian.md#stage-6)*
+*Full guide: [Part 6](../debian.md#stage-6)*
 
 - [ ] **D209** — Identify current display manager and desktop environment
 - [ ] **D210** — Check GNOME or actual desktop automatic login setting

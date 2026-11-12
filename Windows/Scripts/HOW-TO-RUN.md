@@ -1,6 +1,6 @@
 # Windows 10/11 — download and run inside the VM
 
-The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings based on the [complete handbook](../Windows/windows-10-11.md). One Apply command runs all configured sections. The **image README determines which accounts, services, applications and files are authorized**.
+The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings based on the [complete handbook](../windows-10-11.md). One Apply command runs all configured sections. The **image README determines which accounts, services, applications and files are authorized**.
 
 ## 1. Sign in to GitHub inside the virtual machine
 
@@ -8,7 +8,7 @@ The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings b
 2. On the VM desktop, open **Microsoft Edge** or the installed browser.
 3. In the address bar, go to **https://github.com/login**. Sign in to your GitHub account and complete any requested verification. The repository is **public**, so signing in is optional; you can open it without an account if permitted.
 4. Open **https://github.com/Superdancer16/cyberpatriot2026**. Check that the repository name is correct and the branch selector says **main**.
-5. Click **Windows Scripts**, then **windows-10-11.ps1**.
+5. Click **Windows → Scripts → windows-10-11.ps1**.
 6. Click **Raw** above the file. If it opens as text, press **Ctrl+S**. If it downloads automatically, open the browser's **Downloads** panel.
 7. In the VM's **Save As** dialog, choose **Downloads**, set **Save as type: All files** if necessary, and name it **windows-10-11.ps1**. Do not save the GitHub preview as an HTML page.
 8. Open **File Explorer → Downloads**. In Windows 11 choose **View → Show → File name extensions**; in Windows 10 choose **View → File name extensions**. Make sure the file is **windows-10-11.ps1**, not **windows-10-11.ps1.txt**.
@@ -129,7 +129,7 @@ Open **File Explorer → Documents → WindowsSecurityWork**. Inspect the latest
 
 `CHANGED` means the command reported a change, **not** that CyberPatriot awarded points. Review every `REVIEW` and `FAILED` result and compare the Scoring Report to your original score. Confirm authorized administrative login, required apps, RDP/SSH, printers, shares and networking still work.
 
-Some settings need a restart, but **the script does not reboot the VM**. If a necessary service fails or the score drops, restore only the changed setting using the original value or exported backup; deleted users/files may not be recoverable. Use [MANUAL-TASKS.md](MANUAL-TASKS.md) and the [handbook recovery steps](../Windows/windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps).
+Some settings need a restart, but **the script does not reboot the VM**. If a necessary service fails or the score drops, restore only the changed setting using the original value or exported backup; deleted users/files may not be recoverable. Use [MANUAL-TASKS.md](MANUAL-TASKS.md) and the [handbook recovery steps](../windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps).
 
 ## Troubleshooting
 

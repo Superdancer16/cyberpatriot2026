@@ -1,6 +1,6 @@
 # 🌐 Cisco Packet Tracer — Printable Checklist & GitHub Progress Tracker
 
-> **Source:** [Complete Cisco Packet Tracer guide](../Cisco/packet-tracer.md). This is a **separate tracking tool**, not a replacement for that guide.
+> **Source:** [Complete Cisco Packet Tracer guide](../packet-tracer.md). This is a **separate tracking tool**, not a replacement for that guide.
 >
 > **Print:** Use `cisco-packet-tracer-checklist.pdf` and mark each small task as completed.
 >
@@ -13,7 +13,7 @@
 **Initial result:** __________  **Final result:** __________  **Reviewer:** ___________________
 
 ## 01. Read and preserve the Packet Tracer activity  
-*Full guide: [Part 2](../Cisco/packet-tracer.md#stage-2)*
+*Full guide: [Part 2](../packet-tracer.md#stage-2)*
 
 - [ ] **C001** — Read the entire Packet Tracer activity instruction pane
 - [ ] **C002** — Identify required PKA/PKT file type and submission method
@@ -30,7 +30,7 @@
 - [ ] **C013** — Keep a task list with each device and interface
 
 ## 02. Inspect topology, IP plan and endpoints  
-*Full guide: [Part 2](../Cisco/packet-tracer.md#stage-2)*
+*Full guide: [Part 2](../packet-tracer.md#stage-2)*
 
 - [ ] **C014** — Identify all routers and their model/IOS capabilities
 - [ ] **C015** — Identify all switches and model/port numbering
@@ -48,7 +48,7 @@
 - [ ] **C027** — Record each network service to test at the end
 
 ## 03. Cisco IOS basics and safe baseline  
-*Full guide: [Part 2](../Cisco/packet-tracer.md#stage-2)*
+*Full guide: [Part 2](../packet-tracer.md#stage-2)*
 
 - [ ] **C028** — Open the CLI on each relevant router and switch
 - [ ] **C029** — Identify user EXEC and privileged EXEC prompt
@@ -66,7 +66,7 @@
 - [ ] **C041** — Do not run erase startup-config or reload as a shortcut
 
 ## 04. Physical links and interface state  
-*Full guide: [Part 3](../Cisco/packet-tracer.md#stage-3)*
+*Full guide: [Part 3](../packet-tracer.md#stage-3)*
 
 - [ ] **C042** — Check every required cable connects correct ports
 - [ ] **C043** — Check cable/media compatibility and interface modules
@@ -82,7 +82,7 @@
 - [ ] **C053** — Record and resolve unexpected link failure before continuing
 
 ## 05. PC, server and network addressing  
-*Full guide: [Part 3](../Cisco/packet-tracer.md#stage-3)*
+*Full guide: [Part 3](../packet-tracer.md#stage-3)*
 
 - [ ] **C054** — Open each PC Desktop IP Configuration
 - [ ] **C055** — Check static versus DHCP choice
@@ -100,7 +100,7 @@
 - [ ] **C067** — Restore exact originally assigned IP data if needed
 
 ## 06. VLANs, access ports and trunks  
-*Full guide: [Part 3](../Cisco/packet-tracer.md#stage-3)*
+*Full guide: [Part 3](../packet-tracer.md#stage-3)*
 
 - [ ] **C068** — Inspect existing VLAN IDs and names
 - [ ] **C069** — Create only the missing task-required VLANs
@@ -121,7 +121,7 @@
 - [ ] **C084** — Restore accidentally pruned VLAN or wrong port mode
 
 ## 07. VLAN gateways and inter-VLAN routing  
-*Full guide: [Part 3](../Cisco/packet-tracer.md#stage-3)*
+*Full guide: [Part 3](../packet-tracer.md#stage-3)*
 
 - [ ] **C085** — Identify router-on-a-stick versus Layer 3 switch design
 - [ ] **C086** — Verify router physical interface for VLAN trunk is enabled
@@ -138,7 +138,7 @@
 - [ ] **C097** — Restore previously correct subinterface/SVI settings if needed
 
 ## 08. Static, default and dynamic routing  
-*Full guide: [Part 3](../Cisco/packet-tracer.md#stage-3)*
+*Full guide: [Part 3](../packet-tracer.md#stage-3)*
 
 - [ ] **C098** — Inspect connected routes on each router
 - [ ] **C099** — List all required remote destination networks
@@ -160,7 +160,7 @@
 - [ ] **C115** — Undo only one incorrect route/protocol setting
 
 ## 09. DHCP pools, relay and DNS  
-*Full guide: [Part 3](../Cisco/packet-tracer.md#stage-3)*
+*Full guide: [Part 3](../packet-tracer.md#stage-3)*
 
 - [ ] **C116** — Identify the actual DHCP server device
 - [ ] **C117** — Inspect DHCP pool network and subnet mask
@@ -180,7 +180,7 @@
 - [ ] **C131** — Restore only an incorrect pool/helper/DNS record
 
 ## 10. Application/server tasks  
-*Full guide: [Part 4](../Cisco/packet-tracer.md#stage-4)*
+*Full guide: [Part 4](../packet-tracer.md#stage-4)*
 
 - [ ] **C132** — Check required Packet Tracer server service list
 - [ ] **C133** — Check HTTP or HTTPS enabled if required
@@ -198,7 +198,7 @@
 - [ ] **C145** — Restore service/record data if a client test fails
 
 ## 11. Cisco device login and SSH  
-*Full guide: [Part 4](../Cisco/packet-tracer.md#stage-4)*
+*Full guide: [Part 4](../packet-tracer.md#stage-4)*
 
 - [ ] **C146** — Check intended hostname and domain name
 - [ ] **C147** — Check enable secret requirement
@@ -216,7 +216,7 @@
 - [ ] **C159** — Save device configuration after verified changes
 
 ## 12. ACLs, port security and STP  
-*Full guide: [Part 4](../Cisco/packet-tracer.md#stage-4)*
+*Full guide: [Part 4](../packet-tracer.md#stage-4)*
 
 - [ ] **C160** — List traffic flows that must be allowed
 - [ ] **C161** — List traffic flows that must be denied
@@ -238,7 +238,7 @@
 - [ ] **C177** — Restore accidental ACL/port-security/STP disruption
 
 ## 13. EtherChannel, NAT, wireless and IPv6  
-*Full guide: [Part 5](../Cisco/packet-tracer.md#stage-5)*
+*Full guide: [Part 5](../packet-tracer.md#stage-5)*
 
 - [ ] **C178** — Check whether EtherChannel is actually required
 - [ ] **C179** — Check EtherChannel member ports and modes
@@ -261,7 +261,7 @@
 - [ ] **C196** — Restore specific bad advanced configuration if needed
 
 ## 14. Troubleshooting and simulation  
-*Full guide: [Part 5](../Cisco/packet-tracer.md#stage-5)*
+*Full guide: [Part 5](../packet-tracer.md#stage-5)*
 
 - [ ] **C197** — Test problem from lower layers upward
 - [ ] **C198** — Check physical cable and interface first
@@ -282,7 +282,7 @@
 - [ ] **C213** — Verify a changed setting with actual client traffic
 
 ## 15. Final review, saving and submission  
-*Full guide: [Part 6](../Cisco/packet-tracer.md#stage-6)*
+*Full guide: [Part 6](../packet-tracer.md#stage-6)*
 
 - [ ] **C214** — Recheck all task-required interface statuses
 - [ ] **C215** — Recheck all PC/server IP and gateway settings

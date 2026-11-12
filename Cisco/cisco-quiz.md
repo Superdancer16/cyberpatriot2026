@@ -2137,7 +2137,7 @@ Review all missed terms, official course modules and the permitted reference pol
 
 - [Cisco CLI, concepts and Packet Tracer](packet-tracer.md)
 - [Cisco switching, routing and troubleshooting](packet-tracer.md#22-consolidated-troubleshooting-reference)
-- [Cisco folder index](README.md)
+- [Cisco folder index](../README.md)
 
 ---
 

@@ -58,7 +58,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 - [ ] **🎯 DO THIS —** Read the README; write down admins, users, critical services.
 - [ ] **🎯 DO THIS —** Take a VMware snapshot.
 - [ ] **🎯 DO THIS —** Become root: `su -` (or `sudo -i` / `doas -s` if those are installed), then type `sh` (see the box above).
-- [ ] **🎯 DO THIS —** Answer the forensics questions ([FreeBSD forensic quick reference](../Forensics/README.md#freebsd-quick-reference)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
+- [ ] **🎯 DO THIS —** Answer the forensics questions ([FreeBSD forensic quick reference](../../General/forensics-workflows.md#freebsd-quick-reference)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
 
 ### 0.1 Fast path: run the hardening script
 - [ ] **🎯 DO THIS — 0.1 Fast path: run the hardening script**
@@ -93,7 +93,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../../General/script-safety.md) for the limits of external tools.
 
 ---
 
@@ -289,7 +289,7 @@ Only if SSH is critical; otherwise `sysrc sshd_enable=NO; service sshd stop`.
 ```bash
 ee /etc/ssh/sshd_config
 ```
-Same settings as the [Linux Mint SSH table](linux-mint.md#92-needed-make-it-safe), plus `UseBlacklist yes`. Then:
+Same settings as the [Linux Mint SSH table](../../Linux/Mint/linux-mint.md#92-needed-make-it-safe), plus `UseBlacklist yes`. Then:
 ```bash
 sshd -t && service sshd reload
 sysrc blacklistd_enable=YES && service blacklistd start      # blocks password guessing
@@ -759,7 +759,7 @@ After no errors:
 service sshd reload
 ```
 
-For another installed server, use the table to identify its file, copy it privately with `cp -p`, open it with `ee`, review defensively relevant concepts in [the Debian service hardening appendix] (and adapt **only** those actually supported by FreeBSD), rather than directly applying Linux directives described in [service hardening](debian.md#16-critical-services-complete-manual-procedures), then use its actual validation command. Read `service NAME` usage to confirm reload support; use a scheduled restart only when needed. Never assume a Linux package/unit/path applies.
+For another installed server, use the table to identify its file, copy it privately with `cp -p`, open it with `ee`, review defensively relevant concepts in [the Debian service hardening appendix] (and adapt **only** those actually supported by FreeBSD), rather than directly applying Linux directives described in [service hardening](../../Linux/Debian/debian.md#16-critical-services-complete-manual-procedures), then use its actual validation command. Read `service NAME` usage to confirm reload support; use a scheduled restart only when needed. Never assume a Linux package/unit/path applies.
 
 **✅ Check it worked:** `service sshd status`, `/usr/sbin/sshd -T` and `sockstat -4 -6 -l`; test a fresh authorized SSH session. For each other service test its actual authorized client operation, not merely its rc status. Inspect `/var/log/messages`, `/var/log/auth.log` and the daemon's configured log.
 
@@ -839,4 +839,4 @@ For an unauthorized cron entry, back up the user's crontab and use `crontab -u b
 
 ## FreeBSD forensic-question command reference
 
-The former cross-platform forensics overview has been consolidated into the [Forensics hub's FreeBSD quick reference](../Forensics/README.md#freebsd-quick-reference), which covers hashes, file metadata, account IDs, sockets/processes, audit logs, and preservation. Follow that alongside this FreeBSD-specific handbook. Do not substitute Linux-only commands for BSD utilities.
+The former cross-platform forensics overview has been consolidated into the [Forensics hub's FreeBSD quick reference](../../General/forensics-workflows.md#freebsd-quick-reference), which covers hashes, file metadata, account IDs, sockets/processes, audit logs, and preservation. Follow that alongside this FreeBSD-specific handbook. Do not substitute Linux-only commands for BSD utilities.

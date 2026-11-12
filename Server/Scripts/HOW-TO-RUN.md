@@ -1,6 +1,6 @@
 # Windows Server — download and run inside the VM
 
-Use [windows-server.ps1](windows-server.ps1) with the [Windows Server handbook](../Windows/windows-server.md). The script works with Windows Server 2016, 2019 and 2022 roles described in the handbook. It does not assume a Domain Controller is the same as a standalone server.
+Use [windows-server.ps1](windows-server.ps1) with the [Windows Server handbook](../windows-server.md). The script works with Windows Server 2016, 2019 and 2022 roles described in the handbook. It does not assume a Domain Controller is the same as a standalone server.
 
 Read the image README and save necessary forensic answers before making changes. The script executes only the configuration you approve, not every example in the handbook.
 
@@ -11,7 +11,7 @@ For a Windows Server **Desktop Experience** image:
 1. Start the Windows Server VM and sign in using the assigned Windows administrator account.
 2. **Inside the VM**, open an installed browser such as Microsoft Edge or Chrome. Do not run the script on your personal host computer.
 3. Go to **https://github.com/login** and sign in if you want to use your GitHub account. Because the repo is public, signing in is optional. Never save a personal GitHub password inside a competition VM.
-4. Open **https://github.com/Superdancer16/cyberpatriot2026**, verify the branch is **main**, and open **Windows Server Scripts → windows-server.ps1**.
+4. Open **https://github.com/Superdancer16/cyberpatriot2026**, verify the branch is **main**, and open **Server → Scripts → windows-server.ps1**.
 5. Click **Raw** above the code, then **Ctrl+S** if raw text opens in the browser.
 6. Save as **Downloads\windows-server.ps1**. In the Save dialog select **All files**, not Text Documents. Verify in File Explorer that the filename is not `windows-server.ps1.txt` or `.html`.
 7. Sign out of GitHub in the VM after downloading, and decline browser offers to remember credentials.

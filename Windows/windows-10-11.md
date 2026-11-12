@@ -7,7 +7,7 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
-**Forensics first — searchable question solver:** [Windows 10/11 forensic guide](../Forensics/windows.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+**Forensics first — searchable question solver:** [Windows 10/11 forensic guide](forensics.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
 
 **Version note (November 2026):** Windows 10 mainstream support ended October 14, 2025; use only the specific security-update/ESU support arrangements available to your image, and never substitute an OS upgrade for an authorized CyberPatriot task. Windows 11 editions, policy behavior, features and installed roles can differ; check `winver` and the actual README.
 
@@ -71,7 +71,7 @@ Read the image README, preserve answers to forensic questions, confirm the initi
 #### 0.1 Read the README
 - [ ] **🎯 DO THIS — 0.1 Read the README**
 
-Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/All/reading-the-readme.md).
+Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/reading-the-readme.md).
 
 #### 0.2 Take a VMware snapshot
 - [ ] **🎯 DO THIS — 0.2 Take a VMware snapshot**
@@ -104,7 +104,7 @@ Get-ChildItem C:\Users -Recurse -Force -Filter *secret* -ErrorAction SilentlyCon
 Get-ChildItem C:\Users -Recurse -File -Force -Include *.txt,*.csv,*.log,*.ps1,*.bat -ErrorAction SilentlyContinue | Select-String -Pattern "password"   # find text inside files
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aGVsbG8='))   # decode base64
 ```
-More: [Windows forensics guide](../Forensics/windows.md).
+More: [Windows forensics guide](forensics.md).
 
 - **Additional forensic technique:** Decode Base64, ROT13, or reversed text one layer at a time with an approved offline tool; never execute decoded text or upload evidence to a website.
 
@@ -136,7 +136,7 @@ More: [Windows forensics guide](../Forensics/windows.md).
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../General/script-safety.md) for the limits of external tools.
 
 ---
 
@@ -1394,7 +1394,7 @@ Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled=TRUE" | Sel
 
 ### 17. Critical services
 
-If the README says this computer runs a website, FTP or file shares, harden them instead of removing them. See the IIS/FTP sections of the [Windows Server checklist](windows-server.md#9-critical-server-roles-only-if-the-readme-lists-them). They work the same on Windows 10/11.
+If the README says this computer runs a website, FTP or file shares, harden them instead of removing them. See the IIS/FTP sections of the [Windows Server checklist](../Server/windows-server.md#9-critical-server-roles-only-if-the-readme-lists-them). They work the same on Windows 10/11.
 
 ---
 
@@ -2208,7 +2208,7 @@ Expected: `original value`. This file restore does not model account/password re
 
 ### 21. Advanced Windows investigations — included in this checklist
 
-> **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
+> **Use after:** [Windows workstation checklist](windows-10-11.md) or [Windows Server checklist](../Server/windows-server.md). These are **manual procedures**—not a script. Commands below are examples for an authorized practice image. **Read its README and answer/preserve forensics questions first.**
 
 This supplement draws topic ideas from public CyberPatriot checklists and verifies key methods with Microsoft documentation. A generic checklist cannot tell you which accounts, shares, or services are authorized on *your* image.
 

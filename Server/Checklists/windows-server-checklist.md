@@ -1,6 +1,6 @@
 # 🪟 Windows Server — Printable Checklist & GitHub Progress Tracker
 
-> **Source:** [Complete standalone Windows Server guide](../Windows/windows-server.md). This companion file **does not replace or modify** the main guide.
+> **Source:** [Complete standalone Windows Server guide](../windows-server.md). This companion file **does not replace or modify** the main guide.
 >
 > **Print:** Use `windows-server-checklist.pdf` in this folder. Mark one box for each completed inspection, permitted fix or verification.
 >
@@ -13,7 +13,7 @@
 **Starting score:** __________  **Final score:** __________  **Reviewer:** ___________________
 
 ## 01. Identify Server version, role and access  
-*Full guide: [Part 1](../Windows/windows-server.md#stage-1)*
+*Full guide: [Part 1](../windows-server.md#stage-1)*
 
 - [ ] **S001** — Read complete image README, role notes and forensics instructions
 - [ ] **S002** — Record Windows Server version and build
@@ -32,7 +32,7 @@
 - [ ] **S015** — Open elevated PowerShell and Server Manager when available
 
 ## 02. Forensics and role-aware backups  
-*Full guide: [Part 2](../Windows/windows-server.md#stage-2)*
+*Full guide: [Part 2](../windows-server.md#stage-2)*
 
 - [ ] **S016** — Find each Forensics Question file and required answer format
 - [ ] **S017** — Preserve evidence before account or software cleanup
@@ -50,7 +50,7 @@
 - [ ] **S029** — Maintain a private change log with old/new values
 
 ## 03. Standalone and domain member local accounts  
-*Full guide: [Part 3](../Windows/windows-server.md#stage-3)*
+*Full guide: [Part 3](../windows-server.md#stage-3)*
 
 - [ ] **S030** — Determine whether local SAM user tools apply
 - [ ] **S031** — List local accounts with Get-LocalUser when applicable
@@ -70,7 +70,7 @@
 - [ ] **S045** — Do not use local SAM cmdlets for DC domain users
 
 ## 04. Domain accounts, privileged groups and service users  
-*Full guide: [Part 3](../Windows/windows-server.md#stage-3)*
+*Full guide: [Part 3](../windows-server.md#stage-3)*
 
 - [ ] **S046** — Confirm ActiveDirectory module availability and permissions
 - [ ] **S047** — Open ADUC and enable Advanced Features if DC/AD tools exist
@@ -96,7 +96,7 @@
 - [ ] **S067** — Check that needed service accounts still run tasks and apps
 
 ## 05. Local and domain password/account policies  
-*Full guide: [Part 3](../Windows/windows-server.md#stage-3)*
+*Full guide: [Part 3](../windows-server.md#stage-3)*
 
 - [ ] **S068** — Record net accounts output for local-account scope
 - [ ] **S069** — Identify effective domain password policy owner
@@ -118,7 +118,7 @@
 - [ ] **S085** — Restore only incorrectly changed policy values if needed
 
 ## 06. Defender, security updates and baseline  
-*Full guide: [Part 3](../Windows/windows-server.md#stage-3)*
+*Full guide: [Part 3](../windows-server.md#stage-3)*
 
 - [ ] **S086** — Identify active antivirus provider and any passive Defender state
 - [ ] **S087** — Check Windows Defender Antivirus feature when applicable
@@ -137,7 +137,7 @@
 - [ ] **S100** — Verify DNS/AD/IIS/database/other required roles after updates
 
 ## 07. Server firewall and management access  
-*Full guide: [Part 3](../Windows/windows-server.md#stage-3)*
+*Full guide: [Part 3](../windows-server.md#stage-3)*
 
 - [ ] **S101** — Identify active Domain/Private/Public firewall profile
 - [ ] **S102** — Check each firewall profile Enabled state
@@ -158,7 +158,7 @@
 - [ ] **S117** — Restore a specific changed rule if service access breaks
 
 ## 08. Group Policy, auditing and LDAP  
-*Full guide: [Part 3](../Windows/windows-server.md#stage-3)*
+*Full guide: [Part 3](../windows-server.md#stage-3)*
 
 - [ ] **S118** — Inventory applicable GPO links and precedence
 - [ ] **S119** — Check whether the server is DC, member or standalone
@@ -181,7 +181,7 @@
 - [ ] **S136** — Restore one scoped policy if services break
 
 ## 09. Domain Controller and DNS health  
-*Full guide: [Part 4](../Windows/windows-server.md#stage-4)*
+*Full guide: [Part 4](../windows-server.md#stage-4)*
 
 - [ ] **S137** — Confirm NTDS role and service health if this is a DC
 - [ ] **S138** — Check KDC and Netlogon operational state
@@ -203,7 +203,7 @@
 - [ ] **S154** — Restore only a changed DNS zone/record setting if required
 
 ## 10. DHCP server configuration and clients  
-*Full guide: [Part 4](../Windows/windows-server.md#stage-4)*
+*Full guide: [Part 4](../windows-server.md#stage-4)*
 
 - [ ] **S155** — Verify DHCP server role is installed only if required
 - [ ] **S156** — Inspect DHCP authorization in domain if applicable
@@ -224,7 +224,7 @@
 - [ ] **S171** — Restore the exact prior DHCP option/reservation if wrong
 
 ## 11. IIS and FTP if the server requires them  
-*Full guide: [Part 4](../Windows/windows-server.md#stage-4)*
+*Full guide: [Part 4](../windows-server.md#stage-4)*
 
 - [ ] **S172** — Confirm IIS web role and required site list
 - [ ] **S173** — Record IIS site bindings and hostname/port
@@ -248,7 +248,7 @@
 - [ ] **S191** — Restore only a changed IIS/FTP setting if needed
 
 ## 12. SMB, roles, services and print spooler  
-*Full guide: [Part 4](../Windows/windows-server.md#stage-4)*
+*Full guide: [Part 4](../windows-server.md#stage-4)*
 
 - [ ] **S192** — List all SMB shares including special administrative shares
 - [ ] **S193** — Preserve required SYSVOL and NETLOGON on DCs
@@ -272,7 +272,7 @@
 - [ ] **S211** — Verify all required roles still work after changes
 
 ## 13. Remote access, persistence and miscellaneous  
-*Full guide: [Part 5](../Windows/windows-server.md#stage-5)*
+*Full guide: [Part 5](../windows-server.md#stage-5)*
 
 - [ ] **S212** — Check RDP allowed/denied state
 - [ ] **S213** — Check Network Level Authentication when RDP is required
@@ -294,7 +294,7 @@
 - [ ] **S229** — Restore specific unauthorized or mistakenly changed items
 
 ## 14. Final server-role validation  
-*Full guide: [Part 6](../Windows/windows-server.md#stage-6)*
+*Full guide: [Part 6](../windows-server.md#stage-6)*
 
 - [ ] **S230** — Verify all forensic answers saved and complete
 - [ ] **S231** — Verify correct standalone/member/DC role

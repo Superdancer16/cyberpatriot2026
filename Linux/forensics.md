@@ -6,7 +6,7 @@ For CyberPatriot-style **Debian 12/13, Linux Mint and Ubuntu** images. Keep this
 
 This is a **method handbook**, not an answer list for another image. Filenames, users, keys, and timestamps below are samples. Do not install tools or upload private evidence to websites unless the round and coach allow it.
 
-Also see [Windows forensics](windows.md), [Windows Server forensics](windows-server.md), the [Debian handbook](../Linux/debian.md), [Linux Mint handbook](../Linux/linux-mint.md), and [Ubuntu handbook](../Linux/ubuntu.md).
+Also see [Windows forensics](../Windows/forensics.md), [Windows Server forensics](../Server/forensics.md), the [Debian handbook](Debian/debian.md), [Linux Mint handbook](Mint/linux-mint.md), and [Ubuntu handbook](Ubuntu/ubuntu.md).
 
 ## ⭐ Easiest websites for decoding and investigating
 
@@ -677,7 +677,7 @@ Notes template: `question wording | requested answer type | file/user/PID | comm
 
 Created from the supplied **CyberPatriot Forensics Question Research Report**, **CP19 Debian 12 Training Round 2 Answer Key**, and **CP19 Round 1 categories**. Examples show methods rather than publishing a complete current-season answer key. The presence of a technique here does **not** establish that it appeared in an official past round.
 
-- [Debian handbook](../Linux/debian.md) · [Mint handbook](../Linux/linux-mint.md) · [Ubuntu handbook](../Linux/ubuntu.md).
+- [Debian handbook](Debian/debian.md) · [Mint handbook](Mint/linux-mint.md) · [Ubuntu handbook](Ubuntu/ubuntu.md).
 - [systemd journalctl documentation](https://www.freedesktop.org/software/systemd/man/latest/journalctl.html).
 - [Debian dpkg-query manual](https://manpages.debian.org/dpkg-query).
 - [CyberChef open-source project](https://github.com/gchq/CyberChef) for approved offline layered decoding.
