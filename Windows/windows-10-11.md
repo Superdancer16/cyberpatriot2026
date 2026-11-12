@@ -269,6 +269,8 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > net user bob /passwordreq:yes
 > ```
 
+- [ ] **🎯 Check password expiration for authorized users:** **Win + R → `lusrmgr.msc` → Users → double-click the required account → Properties → General → uncheck "Password never expires" → Apply → OK.** Reopen to verify the account's password expires; preserve required service identities and undo only the changed property if mistaken.
+
 #### 2.8 Give users strong passwords
 - [ ] **🎯 DO THIS — 2.8 Give users strong passwords**
 
@@ -295,8 +297,6 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 - **✅ Verify:** Reopen the group and compare its **Members** list against the README **one user at a time**. **↩️ Undo:** Remove only an accidentally added member, not the group or unrelated accounts.
 > [!NOTE]
 > **ℹ️ Example:** If the README specifies group `SpiderVerse` and members `esther;wyatt;turner;tina`, **create** that group and then **add** those four members as separate checked tasks. Names and memberships always come from the active README.
-
-- [ ] **🎯 Check password expiration for authorized users:** **Win + R → `lusrmgr.msc` → Users → double-click the required account → Properties → General → uncheck "Password never expires" → Apply → OK.** Reopen to verify the account's password expires; preserve required service identities and undo only the changed property if mistaken.
 
 ### 3. Account policies (passwords and lockout)
 
