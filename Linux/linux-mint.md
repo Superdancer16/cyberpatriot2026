@@ -121,7 +121,7 @@ More techniques: [Forensics questions guide](../General/All/forensics-questions.
 > [!WARNING]
 > Answers must be **exact**: right spelling, capitals, and full paths when asked. Don't delete the "ANSWER:" line.
 
-#### 1.2 Fast path: run the hardening script
+#### 1.2 Manual security baseline (no hardening script)
 - [ ] **🎯 DO THIS — 1.2 Fast path: run the hardening script**
 
 > [!NOTE]
@@ -217,6 +217,18 @@ Prioritize account privileges, password policy, firewall and signed updates befo
 > sudo adduser erin             # asks for a password and details
 > ```
 
+#### 2.3a Create an authorized administrator account
+- [ ] **🎯 Create a new admin only if the README requires one:** **Menu → Administration → Users and Groups → Add (+)** → enter the exact new username, set a secure password, and choose **Administrator** as the account type.
+- **✅ VERIFY:** New account appears; open it and confirm **Administrator**. In Terminal, `id EXAMPLE_ADMIN` should show `sudo` membership. Keep at least one previously authorized working admin account.
+> [!NOTE]
+> **🔁 ALTERNATE — Terminal if GUI is unavailable:** `sudo adduser EXAMPLE_ADMIN` then `sudo usermod -aG sudo EXAMPLE_ADMIN`. Verify with `id EXAMPLE_ADMIN`. Do not run both methods or append the same membership twice.
+
+#### 2.3b Require the new administrator to change password at next login
+- [ ] **🎯 Require first-login password change:** After creating the **README-required** administrator and assigning an initial secure password, run **`sudo passwd -e EXAMPLE_ADMIN`** in Terminal. This expires the **password**, not the account. The Mint account-management GUI may not expose this specific flag.
+- **✅ VERIFY:** Run `sudo chage -l EXAMPLE_ADMIN` and confirm password change is required at the next successful login; test a new authorized login when safe. **↩️ UNDO:** To reverse a mistaken change, restore the recorded prior password-aging state with `chage`, never guess.
+> [!NOTE]
+> **🔁 ALTERNATE — Terminal:** `sudo chage -d 0 EXAMPLE_ADMIN` has the same first-login password-change intent. Use **only one** method.
+
 #### 2.4 Fix who is an administrator
 - [ ] **🎯 DO THIS — 2.4 Fix who is an administrator**
 
@@ -236,6 +248,8 @@ Prioritize account privileges, password policy, firewall and signed updates befo
 > ```
 >
 **✅ Check it worked:** `getent group sudo` lists only the README admins.
+
+- [ ] **🎯 Demote a user who should remain Standard:** **Users and Groups → select the exact user → Account type → Standard**. **✅ VERIFY:** Reopen account and check `id EXAMPLE_USER` no longer shows `sudo`. **↩️ UNDO:** Restore prior group only if README-authorized. This does not delete the user.
 
 #### 2.5 Look for hidden root accounts and hidden users
 - [ ] **🎯 DO THIS — 2.5 Look for hidden root accounts and hidden users**
@@ -292,6 +306,8 @@ sudo gpasswd -d carol shadow
 
 > [!WARNING]
 > **Don't change your own password** unless the README asks. If you do, you must remember it, because the screen lock and `sudo` will ask for it.
+
+- [ ] **🎯 Correct a weak authorized password:** **Users and Groups → select the specified person → Password → set and confirm a strong unique password**, then verify a fresh authorized login. **🔁 Alternate:** `sudo passwd EXAMPLE_USER`; never publish or reuse an example credential.
 
 #### 2.8 Lock the root account
 - [ ] **🎯 DO THIS (only if authorized) — 2.8 Lock the root account**
@@ -351,6 +367,8 @@ PASS_WARN_AGE   14
 Save with **Ctrl+O, Enter**, exit with **Ctrl+X**.
 
 **✅ Check it worked:** `grep ^PASS_ /etc/login.defs`
+
+- [ ] **🎯 Minimum password age (when required):** Record the initial `PASS_MIN_DAYS` from `/etc/login.defs`, then set it to the **image-required** number. **7 days is an example, not universal.** Reopen the file to verify. This default applies only to **new** accounts; section 3.2 covers existing users. **↩️ UNDO:** Restore the original recorded setting.
 
 #### 3.2 Apply aging to the users who already exist
 - [ ] **🎯 DO THIS — 3.2 Apply aging to the users who already exist**
@@ -496,6 +514,9 @@ Look for odd ports like 4444, 1337, 31337, 6667, or "ALLOW Anywhere" on a port n
 > sudo apt full-upgrade -y
 > ```
 
+- [ ] **🎯 Install required security updates:** **Update Manager → Refresh → Install Updates**, including the important security packages listed for this image. Review prompts and do not accept removal of required apps.
+- [ ] **🎯 Update systemd when listed:** In **Update Manager**, look for the **systemd** package and apply its approved update through the GUI. **✅ VERIFY:** Refresh again; no approved systemd update remains pending, and required login/network/services work. **🔁 Alternate terminal check:** `apt-cache policy systemd` / `dpkg-query -W systemd`. Do not force a release upgrade or reboot without an approved checkpoint.
+
 #### 5.2 Turn on automatic updates
 - [ ] **🎯 DO THIS — 5.2 Turn on automatic updates**
 
@@ -521,6 +542,9 @@ systemctl is-enabled mintupdate-automation-upgrade.timer   # prints "enabled" wh
 > APT::Periodic::Download-Upgradeable-Packages "1";
 > APT::Periodic::AutocleanInterval "7";
 > ```
+
+- [ ] **🎯 Ensure the system automatically refreshes available updates:** **Update Manager → Edit → Preferences → Options / Automation** (labels vary) → enable **Refresh the list of updates automatically**. If using APT periodic configuration, verify `APT::Periodic::Update-Package-Lists "1";` in the installed configuration.
+  - **✅ VERIFY:** Reopen Update Manager settings or inspect `/etc/apt/apt.conf.d/20auto-upgrades`. Enabling scheduled refresh is distinct from installing pending security updates.
 
 #### 5.3 Check the software sources
 - [ ] **🎯 DO THIS — 5.3 Check the software sources**
@@ -562,6 +586,11 @@ If Update Manager never offers an update for a program, open **Update Manager �
 ---
 
 <a id="research-expansion-flatpak-desktop-login-and-cinnamon-security"></a>
+
+- [ ] **🎯 Update required Chromium:** **Update Manager → Refresh → available updates** → select the installed Chromium browser package and install the approved update. Mint package labels differ by release; inspect the actual installed package before assuming it is `chromium`.
+  - **✅ VERIFY:** Open **Chromium → ⋮ → Help → About Chromium** to inspect its version, confirm it launches and remains the required browser. **🔁 Alternate:** `apt-cache policy chromium chromium-browser` (inspection only); update through the installed package manager, not an unrelated binary.
+- [ ] **🎯 Update OpenSSH (when required):** **Update Manager → Refresh** → install the available **openssh-client / openssh-server** security updates for the installed packages. **✅ VERIFY:** `dpkg-query -W openssh-server openssh-client`, then confirm a working authorized SSH login. **⚠️** Preserve README-required SSH, host keys, custom config and remote access; a daemon update is not permission to disable SSH.
+
 ### 🧰 Flatpak, desktop login and Cinnamon security
 
 - [ ] **🎯 DO THIS —** Review installed software through **both APT and Flatpak** when applicable.
@@ -791,6 +820,9 @@ sudo apt purge vsftpd                      # remove it completely (if the README
 > [!CAUTION]
 > **Never** turn off a service the README lists as critical. Disabling a critical service is a penalty on almost every image.
 
+- [ ] **🎯 Disable unneeded Apache2 (only if README says it is not required):** **Menu → Administration → Services** if the installed Mint desktop provides a service manager; otherwise use Terminal: `systemctl is-enabled apache2` and `systemctl is-active apache2` to record the old state, then `sudo systemctl disable --now apache2`.
+  - **✅ VERIFY:** `systemctl is-enabled apache2` / `systemctl is-active apache2` show disabled/inactive, and all required sites still work. **↩️ UNDO:** Restore only the previously recorded enable/start state (`sudo systemctl enable --now apache2` if it was both enabled and running). Do not purge a critical web server.
+
 #### 6.3 Make sure the critical services are running
 - [ ] **🎯 DO THIS — 6.3 Make sure the critical services are running**
 
@@ -816,6 +848,13 @@ sudo systemctl enable --now ssh  # start it if it isn't
 > sudo apt purge nmap wireshark john hydra
 > sudo apt autoremove
 > ```
+
+**Two explicit prohibited-software checks (not universal removal instructions):**
+- [ ] **🎯 Remove prohibited Nmap:** **Menu → Administration → Synaptic Package Manager** → search **nmap** → confirm exact installed package and absence from required README software → **Mark for Complete Removal → Apply**. 
+- [ ] **🎯 Remove prohibited ophcrack:** Same Synaptic workflow → search **ophcrack** → remove only if explicitly prohibited.
+  - **✅ VERIFY:** Synaptic shows neither targeted package installed; alternative check `dpkg-query -W nmap ophcrack 2>/dev/null`. **↩️ UNDO:** Reinstall an erroneously removed required package using its approved repository; preserve dependencies.
+> [!CAUTION]
+> Never run a mass `apt purge` of every program listed in a generic security-tool search. Scan the README for required diagnostic utilities first.
 
 #### 7.2 Games
 - [ ] **🎯 DO THIS — 7.2 Games**
@@ -1259,6 +1298,12 @@ Then open **≡ → Add-ons and themes → Extensions** and remove any you don't
 ---
 
 <a id="research-report-expansion-m-r4--lightdm-guest-sessions-and-automatic-login"></a>
+#### 17.2 Chromium security settings (if installed or README-required)
+- [ ] **🎯 Block Chromium pop-ups and redirects:** Open **Chromium → ⋮ → Settings → Privacy and security → Site settings → Pop-ups and redirects** → choose **Don't allow sites to send pop-ups or use redirects**. Remove unauthorized sites from any "Allowed" exception list; retain explicitly necessary exceptions.
+- **✅ VERIFY:** Reopen the same settings page; blocking remains selected and there are no unauthorized allowed sites. Test README-required websites and login flows. **↩️ UNDO:** Restore only documented required exceptions if they were removed.
+> [!NOTE]
+> **ℹ️ This is a per-browser setting.** Firefox's pop-up blocker does not configure Chromium. Use the GUI; command-line policy overrides are only needed when the browser is centrally managed.
+
 ### 🧰 LightDM guest sessions and automatic login
 
 - [ ] **🎯 DO THIS — 🧰 LightDM guest sessions and automatic login**
