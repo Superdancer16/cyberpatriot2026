@@ -818,3 +818,215 @@ function Invoke-AdvancedAuditing {
     }
 }
 
+function Invoke-ServerSecurity {
+    $cfg = Value $script:Cfg 'Security'
+    if (-not $cfg) { return }
+    if ([bool](Value $cfg 'SmartScreen' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System' 'EnableSmartScreen' 1
+    }
+    if ([bool](Value $cfg 'RestrictBlankPasswords' $false)) {
+        Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'LimitBlankPasswordUse' 1
+    }
+    if ([bool](Value $cfg 'HideLastSignedIn' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'DontDisplayLastUserName' 1
+    }
+    if ([bool](Value $cfg 'DisableAutoplay' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer' 'NoDriveTypeAutoRun' 255
+    }
+    if ([bool](Value $cfg 'DisableLLMNR' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' 'EnableMulticast' 0
+    }
+    if ([bool](Value $cfg 'PowerShellLogging' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' 'EnableScriptBlockLogging' 1
+    }
+    if ([bool](Value $cfg 'EnableUAC' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'EnableLUA' 1
+        Set-Dword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'ConsentPromptBehaviorAdmin' 2
+        Set-Dword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'PromptOnSecureDesktop' 1
+        Record 'REVIEW' 'UAC changes may require a restart. Test approved administrative elevation first.'
+    }
+    if ([bool](Value $cfg 'RequireNTLMv2' $false)) {
+        if (-not $AllowCompatibilityChanges) { Record 'REVIEW' 'NTLMv2-only requires -AllowCompatibilityChanges and client compatibility review.' }
+        else {
+            Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'NoLMHash' 1
+            Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'LmCompatibilityLevel' 5
+            Record 'REVIEW' 'Test legacy LDAP/SMB/AD clients after NTLM policy change.'
+        }
+    }
+    if ([bool](Value $cfg 'RestrictAnonymous' $false)) {
+        if ($script:IsDC -and -not $AllowCompatibilityChanges) { Record 'REVIEW' 'Anonymous access restrictions on a DC need a verified compatibility preflight.' }
+        else {
+            Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'RestrictAnonymousSAM' 1
+            Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'RestrictAnonymous' 1
+        }
+    }
+    if ([bool](Value $cfg 'PrintDriverAdminOnly' $false)) {
+        Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'RestrictDriverInstallationToAdministrators' 1
+        Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'NoWarningNoElevationOnInstall' 0
+        Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'UpdatePromptSettings' 0
+        Record 'REVIEW' 'Test required printing and signed driver installation.'
+    }
+    if ([bool](Value $cfg 'DisableRemoteAssistance' $false)) {
+        Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance' 'fAllowToGetHelp' 0
+    }
+    if ([bool](Value $cfg 'RequireRdpNLA' $false)) {
+        if (-not (Listed 'TermService' $script:RequiredServices)) {
+            Record 'REVIEW' 'RDP NLA selected but TermService not listed as required; confirm remote access role.'
+        } else {
+            Set-Dword 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' 'UserAuthentication' 1
+            Record 'REVIEW' 'Test an authorized RDP connection with Network Level Authentication.'
+        }
+    }
+    if ([bool](Value $cfg 'DisableUnencryptedWinRM' $false) -or [bool](Value $cfg 'DisableBasicWinRM' $false)) {
+        $service = Get-Service -Name WinRM -ErrorAction SilentlyContinue
+        if (-not $service -or -not (Get-PSDrive -Name WSMan -ErrorAction SilentlyContinue)) {
+            Record 'REVIEW' 'WinRM/WSMan provider unavailable; use Group Policy Management if required.'
+        } else {
+            $before = & winrm.exe get winrm/config/service 2>&1 | Out-String
+            $before | Set-Content -LiteralPath (Join-Path $backups 'winrm-service-before.txt') -Encoding UTF8
+            if ([bool](Value $cfg 'DisableUnencryptedWinRM' $false)) {
+                Change 'Disable WinRM unencrypted traffic' $true {
+                    Set-Item -Path WSMan:\localhost\Service\AllowUnencrypted -Value $false -ErrorAction Stop
+                }
+            }
+            if ([bool](Value $cfg 'DisableBasicWinRM' $false)) {
+                Change 'Disable WinRM Basic authentication' $true {
+                    Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $false -ErrorAction Stop
+                }
+            }
+            Record 'REVIEW' 'Test approved remote PowerShell/Server Manager connectivity after WinRM changes.'
+        }
+    }
+}
+function Invoke-ServerDefender {
+    $cfg = Value $script:Cfg 'Defender'
+    if (-not (Get-Command Get-MpComputerStatus -ErrorAction SilentlyContinue)) {
+        Record 'REVIEW' 'Defender is not available through these cmdlets. Review installed antivirus provider.'
+        return
+    }
+    if ([bool](Value $cfg 'Enable' $false)) {
+        $state = Get-MpComputerStatus
+        Change 'Enable Defender real-time protection' (-not [bool]$state.RealTimeProtectionEnabled) {
+            Set-MpPreference -DisableRealtimeMonitoring $false -ErrorAction Stop
+        }
+        $pref = Get-MpPreference
+        Change 'Enable Defender potentially unwanted application blocking' ($pref.PUAProtection -ne 1) {
+            Set-MpPreference -PUAProtection Enabled -ErrorAction Stop
+        }
+    }
+    if ([bool](Value $cfg 'UpdateSignatures' $false)) {
+        Change 'Update Defender security intelligence definitions' $true {
+            Update-MpSignature -ErrorAction Stop
+        }
+    }
+    foreach ($spec in @(
+        @{Key='RemovePathExclusions';Property='ExclusionPath';Arg='ExclusionPath'},
+        @{Key='RemoveProcessExclusions';Property='ExclusionProcess';Arg='ExclusionProcess'},
+        @{Key='RemoveExtensionExclusions';Property='ExclusionExtension';Arg='ExclusionExtension'}
+    )) {
+        foreach ($name in (Values (Value $cfg $spec.Key))) {
+            $pref = Get-MpPreference
+            $current = @($pref.($spec.Property))
+            if (Listed $name $script:RequiredApps) { Record 'SKIPPED' "Required exclusion entry: $name"; continue }
+            Change "Remove exact Defender $($spec.Property) exclusion: $name" ($name -in $current) {
+                $parameters = @{}
+                $parameters[$spec.Arg] = $name
+                Remove-MpPreference @parameters -ErrorAction Stop
+            }
+        }
+    }
+    if ([bool](Value $cfg 'QuickScan' $false)) {
+        if (-not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
+            Record 'REVIEW' 'Defender quick scan skipped until forensic evidence is preserved.'
+        } else {
+            Change 'Run Defender quick scan' $true { Start-MpScan -ScanType QuickScan -ErrorAction Stop }
+            Record 'REVIEW' 'Inspect Defender Protection History and quarantine after scanning.'
+        }
+    }
+}
+function Invoke-ServerFirewall {
+    $cfg = Value $script:Cfg 'Firewall'
+    if (-not $cfg) { return }
+    if ([bool](Value $cfg 'EnableProfiles' $false)) {
+        $existing = @(Get-NetFirewallProfile)
+        $disabled = @($existing | Where-Object { -not $_.Enabled })
+        if ($disabled.Count) {
+            if ($env:SESSIONNAME -like 'RDP*' -and
+                -not (Listed '3389' (Value $script:Cfg 'RequiredPorts')) -and
+                -not (Listed '3389/tcp' (Value $script:Cfg 'RequiredPorts'))) {
+                Record 'SKIPPED' 'Enabling firewall over RDP requires explicit protection for the current management port.'
+            } else {
+                Change 'Enable Windows Firewall for Domain, Private and Public' $true {
+                    $existing | Export-Clixml -LiteralPath (Join-Path $backups 'firewall-profiles-before.xml')
+                    Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True -ErrorAction Stop
+                    if (@(Get-NetFirewallProfile | Where-Object { -not $_.Enabled }).Count) { throw 'At least one firewall profile remains disabled' }
+                }
+                Record 'REVIEW' 'Test DNS/DHCP/AD/IIS/SMB/remote administration from an authorized client.'
+            }
+        } else { Record 'OK' 'All firewall profiles are already enabled.' }
+    }
+    $names = Values (Value $cfg 'DisableRules')
+    if (-not $names.Count) { return }
+    $dest = Join-Path $backups 'firewall-policy-before.wfw'
+    & netsh.exe advfirewall export $dest | Out-Null
+    if ($LASTEXITCODE -ne 0) { Record 'FAILED' 'Could not export firewall policy; no rule changes.'; return }
+    foreach ($name in $names) {
+        if ($name -match '[*?]') { Record 'REVIEW' "Specify exact firewall rule internal Name, not wildcard $name"; continue }
+        $rules = @(Get-NetFirewallRule -Name $name -ErrorAction SilentlyContinue)
+        if ($rules.Count -ne 1) { Record 'REVIEW' "Firewall Name $name is not unique or is absent."; continue }
+        $rule = $rules[0]
+        if ($rule.Direction -ne 'Inbound' -or $rule.Action -ne 'Allow') {
+            Record 'REVIEW' "Not an inbound Allow rule: $name"; continue
+        }
+        $protectedGroup = [string]$rule.DisplayGroup
+        if ($script:IsDC -and $protectedGroup -match 'Active Directory|Kerberos|DNS|DFS|Remote Procedure|RPC|File and Printer|Netlogon') {
+            Record 'SKIPPED' "DC role-group firewall rule protected: $name"; continue
+        }
+        if ((Listed 'DNS' $script:RequiredRoles) -and $protectedGroup -match 'DNS') { Record 'SKIPPED' "Required DNS firewall rule: $name"; continue }
+        if ((Listed 'DHCP' $script:RequiredRoles) -and $protectedGroup -match 'DHCP') { Record 'SKIPPED' "Required DHCP firewall rule: $name"; continue }
+        if ((Listed 'IIS' $script:RequiredRoles) -and $protectedGroup -match 'World Wide Web|Web Server') { Record 'SKIPPED' "Required IIS firewall rule: $name"; continue }
+        $needed = $false
+        foreach ($filter in @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $rule -ErrorAction SilentlyContinue)) {
+            foreach ($port in (Values (Value $script:Cfg 'RequiredPorts'))) {
+                if ([string]$filter.LocalPort -eq $port -or [string]$filter.LocalPort -eq ($port -split '/')[0]) { $needed=$true }
+            }
+        }
+        if ($needed) { Record 'SKIPPED' "Rule $name protects a configured required port."; continue }
+        Change "Disable exact unauthorized inbound firewall rule $name" ($rule.Enabled -eq 'True') {
+            $rule | Export-Clixml -LiteralPath (Join-Path $backups ("firewall-rule-" + [guid]::NewGuid().ToString('N') + ".xml"))
+            Disable-NetFirewallRule -Name $name -ErrorAction Stop
+        }
+    }
+}
+function Invoke-ServerSMB {
+    $cfg = Value $script:Cfg 'SMB'
+    if ([bool](Value $cfg 'RequireServerSigning' $false)) {
+        $old = Get-SmbServerConfiguration
+        Change 'Require SMB server signing' (-not $old.RequireSecuritySignature) {
+            $old | Select-Object RequireSecuritySignature,EnableSMB1Protocol | Export-Clixml -LiteralPath (Join-Path $backups 'smb-server-before.xml')
+            Set-SmbServerConfiguration -RequireSecuritySignature $true -Confirm:$false -ErrorAction Stop
+        }
+    }
+    if ([bool](Value $cfg 'RequireClientSigning' $false)) {
+        $old = Get-SmbClientConfiguration
+        Change 'Require SMB client signing' (-not $old.RequireSecuritySignature) {
+            $old | Select-Object RequireSecuritySignature | Export-Clixml -LiteralPath (Join-Path $backups 'smb-client-before.xml')
+            Set-SmbClientConfiguration -RequireSecuritySignature $true -Confirm:$false -ErrorAction Stop
+        }
+    }
+    if ([bool](Value $cfg 'DisableSMB1' $false)) {
+        if ($script:IsDC -and -not $AllowCompatibilityChanges) {
+            Record 'REVIEW' 'SMB1 change on a Domain Controller requires verified client compatibility.'
+            return
+        }
+        $feature = Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction SilentlyContinue
+        if ($feature) {
+            Change 'Disable legacy SMB1 (may require restart)' ($feature.State -eq 'Enabled') {
+                $feature | Export-Clixml -LiteralPath (Join-Path $backups 'smb1-before.xml')
+                Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart -ErrorAction Stop | Out-Null
+            }
+        } else { Record 'REVIEW' 'SMB1 optional feature absent; inspect installed Server version.' }
+    }
+    Record 'REVIEW' 'Test required SMB clients, SYSVOL/NETLOGON and authorized file shares.'
+}
+
