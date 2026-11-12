@@ -688,3 +688,133 @@ function Invoke-ADGroups {
     }
 }
 
+function Invoke-LocalPasswordPolicy {
+    if ($script:IsDC) { Record 'SKIPPED' 'Local SAM password policy is not the domain password policy on a DC.'; return }
+    $settings = Value $script:Cfg 'LocalPasswordPolicy'
+    if (-not $settings -or -not @($settings.PSObject.Properties).Count) { Record 'SKIPPED' 'No exact local password rules in JSON.'; return }
+    $names = @('MinimumPasswordLength','PasswordHistorySize','MinimumPasswordAge','MaximumPasswordAge','PasswordComplexity','ClearTextPassword','LockoutBadCount','LockoutDuration','ResetLockoutCount')
+    $updates = @()
+    foreach ($prop in $settings.PSObject.Properties) {
+        if ($prop.Name -notin $names) { Record 'REVIEW' "Unknown local policy key $($prop.Name)"; continue }
+        $value = 0
+        if (-not [int]::TryParse([string]$prop.Value,[ref]$value) -or $value -lt 0 -or $value -gt 9999) {
+            Record 'REVIEW' "Invalid local password policy value: $($prop.Name)"; continue
+        }
+        if ($prop.Name -in @('PasswordComplexity','ClearTextPassword') -and $value -notin @(0,1)) {
+            Record 'REVIEW' "$($prop.Name) must be 0 or 1"; continue
+        }
+        $updates += "$($prop.Name) = $value"
+    }
+    if (-not $updates.Count) { return }
+    if ($script:IsDomainJoined) { Record 'REVIEW' 'Local policy may be superseded by domain GPO; verify resultant policy.' }
+    Change ("Configure explicitly requested local account policy: " + ($updates -join '; ')) $true {
+        $original = Join-Path $backups 'local-account-policy-before.inf'
+        & secedit.exe /export /cfg $original /areas SECURITYPOLICY | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'Could not back up local security policy.' }
+        $file = Join-Path $backups 'local-account-policy-requested.inf'
+        $db = Join-Path $backups 'local-account-policy.sdb'
+        @('[Unicode]','Unicode=yes','','[System Access]') + $updates +
+            @('','[Version]','signature="$CHICAGO$"','Revision=1') |
+            Set-Content -LiteralPath $file -Encoding Unicode
+        & secedit.exe /configure /db $db /cfg $file /areas SECURITYPOLICY /quiet | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'Local account policy import failed; inspect secedit logs.' }
+    }
+}
+function Invoke-DomainPasswordPolicy {
+    if (-not $script:IsDC) { return }
+    $settings = Value $script:Cfg 'DomainChanges'
+    if (-not [bool](Value $settings 'ChangeDefaultPasswordPolicy' $false)) { Record 'SKIPPED' 'Domain password policy remains manual.'; return }
+    if (-not (Check-DomainWrites)) { return }
+    $requested = Value $settings 'DefaultPasswordPolicy'
+    if (-not $requested -or -not @($requested.PSObject.Properties).Count) {
+        Record 'REVIEW' 'No explicit domain password policy fields supplied.'
+        return
+    }
+    $known = @('MinPasswordLength','PasswordHistoryCount','ComplexityEnabled','ReversibleEncryptionEnabled','LockoutThreshold','LockoutDurationMinutes','LockoutObservationWindowMinutes','MinPasswordAgeDays','MaxPasswordAgeDays')
+    $args = @{Identity=$script:DomainName;ErrorAction='Stop'}
+    foreach ($prop in $requested.PSObject.Properties) {
+        $name = $prop.Name
+        if ($name -notin $known) { Record 'REVIEW' "Unsupported AD policy field $name"; continue }
+        if ($name -in @('ComplexityEnabled','ReversibleEncryptionEnabled')) {
+            if ($prop.Value -isnot [bool]) { Record 'REVIEW' "AD policy $name must be true/false"; continue }
+            $args[$name] = [bool]$prop.Value
+            continue
+        }
+        $value = 0
+        if (-not [int]::TryParse([string]$prop.Value,[ref]$value) -or $value -lt 0 -or $value -gt 3650) {
+            Record 'REVIEW' "Invalid AD policy value: $name"; continue
+        }
+        switch ($name) {
+            'LockoutDurationMinutes' { $args['LockoutDuration'] = [TimeSpan]::FromMinutes($value) }
+            'LockoutObservationWindowMinutes' { $args['LockoutObservationWindow'] = [TimeSpan]::FromMinutes($value) }
+            'MinPasswordAgeDays' { $args['MinPasswordAge'] = [TimeSpan]::FromDays($value) }
+            'MaxPasswordAgeDays' { $args['MaxPasswordAge'] = [TimeSpan]::FromDays($value) }
+            default { $args[$name] = $value }
+        }
+    }
+    if ($args.Count -le 2) { return }
+    Change "Update explicitly requested AD default password policy for $script:DomainName" $true {
+        $old = Get-ADDefaultDomainPasswordPolicy -ErrorAction Stop
+        $old | Export-Clixml -LiteralPath (Join-Path $backups 'domain-password-policy-before.xml')
+        Set-ADDefaultDomainPasswordPolicy @args
+        Get-ADDefaultDomainPasswordPolicy | Export-Clixml -LiteralPath (Join-Path $backups 'domain-password-policy-after.xml')
+    }
+    Record 'REVIEW' 'Check GPMC/domain-root GPO and fine-grained resultant policy; verify authorized domain login.'
+}
+function Invoke-UserRights {
+    if ($script:IsDC) { Record 'REVIEW' 'DC user rights come from domain-linked GPO; review in GPMC instead of local secedit.'; return }
+    $wanted = Value $script:Cfg 'RemoveUserRights'
+    if (-not $wanted -or -not @($wanted.PSObject.Properties).Count) { return }
+    $allowed = @('SeSecurityPrivilege','SeTakeOwnershipPrivilege','SeDebugPrivilege','SeBackupPrivilege','SeRestorePrivilege')
+    $original = Join-Path $backups 'user-rights-before.inf'
+    & secedit.exe /export /cfg $original /areas USER_RIGHTS | Out-Null
+    if ($LASTEXITCODE -ne 0) { Record 'FAILED' 'Could not export user rights; no changes made'; return }
+    foreach ($entry in $wanted.PSObject.Properties) {
+        if ($entry.Name -notin $allowed) { Record 'REVIEW' "Unsupported user right $($entry.Name)"; continue }
+        foreach ($name in (Values $entry.Value)) {
+            if (Listed $name $script:RequiredAccounts) { Record 'SKIPPED' "Protected user right: $name"; continue }
+            try { $sid = (New-Object Security.Principal.NTAccount -ArgumentList $name).Translate([Security.Principal.SecurityIdentifier]).Value }
+            catch { Record 'REVIEW' "Unresolvable user-rights principal: $name"; continue }
+            if ($sid -match '^S-1-5-32-' -or $sid -match '-(500|501|502|503|504)$') { Record 'SKIPPED' "Built-in right protected: $name"; continue }
+            $raw = Get-Content -LiteralPath $original -Raw
+            $pattern = '(?m)^\s*' + [regex]::Escape($entry.Name) + '\s*=\s*(.*)$'
+            $match = [regex]::Match($raw,$pattern)
+            if (-not $match.Success) { Record 'REVIEW' "Right not in exported policy: $($entry.Name)"; continue }
+            $current = @($match.Groups[1].Value -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+            $after = @($current | Where-Object { $_ -ne ("*" + $sid) -and $_ -ne $sid -and $_ -ine $name })
+            if ($after.Count -eq $current.Count) { Record 'OK' "Right $($entry.Name) does not list $name"; continue }
+            if (-not $after.Count) { Record 'SKIPPED' "Cannot empty right $($entry.Name)"; continue }
+            Change "Remove exact $name from $($entry.Name)" $true {
+                $file = Join-Path $backups ("rights-" + [guid]::NewGuid().ToString('N') + ".inf")
+                $db = Join-Path $backups ("rights-" + [guid]::NewGuid().ToString('N') + ".sdb")
+                @('[Unicode]','Unicode=yes','','[Privilege Rights]',($entry.Name + ' = ' + ($after -join ',')),'','[Version]','signature="$CHICAGO$"','Revision=1') |
+                    Set-Content -LiteralPath $file -Encoding Unicode
+                & secedit.exe /configure /db $db /cfg $file /areas USER_RIGHTS /quiet | Out-Null
+                if ($LASTEXITCODE -ne 0) { throw 'User rights change failed' }
+            }
+        }
+    }
+}
+function Invoke-AdvancedAuditing {
+    $requested = Value $script:Cfg 'AuditSubcategories'
+    if (-not $requested -or -not @($requested.PSObject.Properties).Count) { return }
+    if ($script:IsDC -and -not $EnableDomainChanges) { Record 'REVIEW' 'DC advanced auditing is domain-managed; use GPMC or explicit domain authorization.'; return }
+    $original = Join-Path $backups 'audit-before.csv'
+    & auditpol.exe /backup ("/file:" + $original) | Out-Null
+    if ($LASTEXITCODE -ne 0) { Record 'FAILED' 'Could not back up audit policy; skipping.'; return }
+    foreach ($entry in $requested.PSObject.Properties) {
+        $name = [string]$entry.Name
+        $value = [string]$entry.Value
+        if ($name -notmatch '^[A-Za-z0-9 ._-]{3,80}$' -or $value -notin @('Success','Failure','SuccessAndFailure')) {
+            Record 'REVIEW' "Unsupported audit subcategory/value $name = $value"; continue
+        }
+        $arguments = @('/set',("/subcategory:" + $name))
+        if ($value -in @('Success','SuccessAndFailure')) { $arguments += '/success:enable' }
+        if ($value -in @('Failure','SuccessAndFailure')) { $arguments += '/failure:enable' }
+        Change "Audit $name : $value" $true {
+            & auditpol.exe @arguments | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw 'auditpol exited with an error (check localization and GPO)' }
+        }
+    }
+}
+
