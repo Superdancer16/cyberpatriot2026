@@ -1531,6 +1531,16 @@ function Invoke-AutoWindowsUpdate {
 }
 
 
+
+function Run-ReadOnlyAudit {
+    $script:Results = New-Object System.Collections.ArrayList
+    $script:BackupDir = Join-Path $root "audit-details-$stamp"
+    New-Item -ItemType Directory -Path $script:BackupDir -Force | Out-Null
+    Audit
+    Invoke-AutoDiscovery
+    Show-AutomationSummary
+}
+
 function Run-Automation {
     Load-ReadmeConfig
     Check-Workstation
@@ -1671,7 +1681,7 @@ if ($InitConfig) {
     Initialize-ReadmeConfig
 } else {
     switch ($Mode) {
-        'Audit' { Audit }
+        'Audit' { Run-ReadOnlyAudit }
         'Quick' { Quick }
         'Apply' { Run-Automation }
         default { Menu }
