@@ -303,7 +303,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 #### 3.1 Password Policy
 - [ ] **🎯 Configure the image-required password-policy settings (local workstation)**
 
-**⭐ EASIEST WAY — GUI:** **Win + R → \`secpol.msc\` → Account Policies → Password Policy**. Double-click each applicable field, set the exact image-required value and select **Apply → OK**.
+**⭐ EASIEST WAY — GUI:** **Win + R → `secpol.msc` → Account Policies → Password Policy**. Double-click each applicable field, set the exact image-required value and select **Apply → OK**.
 
 | Check | What to do in the GUI |
 |---|---|
@@ -320,13 +320,13 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > [!NOTE]
 > **🔁 ALTERNATE — optional PowerShell/CMD inspection, not another fix:**
 >
-> \`\`\`powershell
+> ```powershell
 > net accounts
 > secedit /export /cfg "$env:TEMP\cp-password-policy.inf" /areas SECURITYPOLICY
 > Select-String 'MinimumPasswordLength|PasswordComplexity|ClearTextPassword|PasswordHistorySize' "$env:TEMP\cp-password-policy.inf"
-> \`\`\`
+> ```
 >
-> Prefer the GUI over importing a generic \`secedit\` template. Check every actual scoring requirement against the README.
+> Prefer the GUI over importing a generic `secedit` template. Check every actual scoring requirement against the README.
 
 #### 3.2 Account Lockout Policy
 - [ ] **🎯 DO THIS — 3.2 Account Lockout Policy**
@@ -1372,18 +1372,18 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 
 
 #### 15.6 WDigest off (avoid plaintext password caching)
-- [ ] **🎯 Inspect \`UseLogonCredential\` when applicable**
+- [ ] **🎯 Inspect `UseLogonCredential` when applicable**
 
-**⭐ EASIEST WAY — GUI:** **Win + R → \`regedit\` → \`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest\`** → inspect \`UseLogonCredential\`. If the DWORD exists and equals **1**, export the key before editing, then change **Value data to 0**. On a patched system with the key/value absent, check the effective OS default; do not blindly create it.
+**⭐ EASIEST WAY — GUI:** **Win + R → `regedit` → `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest`** → inspect `UseLogonCredential`. If the DWORD exists and equals **1**, export the key before editing, then change **Value data to 0**. On a patched system with the key/value absent, check the effective OS default; do not blindly create it.
 
 **✅ VERIFY:** A configured value of **0** disables WDigest plaintext caching; keep authorized login working. **↩️ UNDO:** Restore the recorded previous state only if mistaken; never re-enable plaintext caching without explicit necessity.
 
 > [!NOTE]
 > **🔁 ALTERNATE — PowerShell read-only verification:**
 >
-> \`\`\`powershell
+> ```powershell
 > Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' -Name UseLogonCredential -ErrorAction SilentlyContinue
-> \`\`\`
+> ```
 
 #### 15.7 NetBIOS over TCP/IP off
 - [ ] **🎯 DO THIS — 15.7 NetBIOS over TCP/IP off**
