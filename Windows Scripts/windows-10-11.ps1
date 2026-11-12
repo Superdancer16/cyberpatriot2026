@@ -549,6 +549,297 @@ function Show-AutomationSummary {
     Write-Host "Backups: $script:BackupDir"
 }
 
+
+function Invoke-AutoAccounts {
+    if ($script:domainJoined) {
+        Write-Result 'REVIEW' 'Domain-joined: review local/domain accounts with the Windows handbook.'
+        return
+    }
+    $guest = Get-LocalUser | Where-Object { $_.SID.Value -match '-501$' } | Select-Object -First 1
+    if ($guest) {
+        Decide ("Disable built-in Guest " + $guest.Name) ([bool]$guest.Enabled) {
+            Disable-LocalUser -Name $guest.Name
+        }
+    }
+    $adminGroup = Get-LocalGroup | Where-Object { $_.SID.Value -eq 'S-1-5-32-544' } | Select-Object -First 1
+    if (-not $adminGroup) { throw 'Built-in Administrators group not found.' }
+    foreach ($name in (Names (Get-Value $script:Cfg 'NewUsers'))) {
+        if (-not (Is-Listed $name $script:Authorized)) {
+            Write-Result 'SKIPPED' "New user $name is not in AuthorizedUsers/AuthorizedAdmins."
+            continue
+        }
+        if (Get-LocalUser -Name $name -ErrorAction SilentlyContinue) {
+            Write-Result 'OK' "User already exists: $name"
+            continue
+        }
+        if ($Yes) {
+            Write-Result 'REVIEW' "Create $name manually: a password is required and is never stored in JSON."
+            continue
+        }
+        $pass = Read-Host "New secure initial password for $name" -AsSecureString
+        Decide "Create authorized user $name" $true {
+            New-LocalUser -Name $name -Password $pass -ErrorAction Stop | Out-Null
+            if (Is-Listed $name (Get-Value $script:Cfg 'AuthorizedAdmins')) {
+                Add-LocalGroupMember -Group $adminGroup.Name -Member $name
+            }
+        }
+    }
+    $groups = Get-Value $script:Cfg 'Groups'
+    if ($groups) {
+        foreach ($entry in $groups.PSObject.Properties) {
+            $group = [string]$entry.Name
+            if ([string]::IsNullOrWhiteSpace($group)) { continue }
+            if (-not (Get-LocalGroup -Name $group -ErrorAction SilentlyContinue)) {
+                Decide "Create local group $group" $true {
+                    New-LocalGroup -Name $group | Out-Null
+                }
+            }
+            foreach ($name in (Names $entry.Value)) {
+                if (-not (Get-LocalUser -Name $name -ErrorAction SilentlyContinue)) {
+                    Write-Result 'REVIEW' "Group $group: member $name does not exist."
+                    continue
+                }
+                $members = @()
+                try { $members = @(Get-LocalGroupMember -Group $group -ErrorAction Stop | ForEach-Object { $_.Name }) }
+                catch { Write-Result 'REVIEW' "Group $group contains an unresolved member; check lusrmgr.msc." }
+                $present = @($members | Where-Object { $_ -ieq $name -or $_ -like ("*\" + $name) }).Count -gt 0
+                Decide "Add $name to $group" (-not $present) {
+                    Add-LocalGroupMember -Group $group -Member $name
+                }
+            }
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'DemoteAdmins'))) {
+        if ((Is-Listed $name (Get-Value $script:Cfg 'AuthorizedAdmins')) -or $name -ieq $env:USERNAME) {
+            Write-Result 'SKIPPED' "Refusing to demote an authorized or current administrator: $name"
+            continue
+        }
+        $members = @(Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue)
+        $target = @($members | Where-Object { $_.Name -ieq $name -or $_.Name -like ("*\" + $name) })
+        if ($target.Count -eq 0) { Write-Result 'OK' "Not an administrator: $name"; continue }
+        if ($members.Count -le 1) { Write-Result 'SKIPPED' 'Refusing to remove last administrator'; continue }
+        Decide "Remove admin membership: $name" $true {
+            Remove-LocalGroupMember -Group $adminGroup.Name -Member $name
+        }
+    }
+    $removeMembers = Get-Value $script:Cfg 'RemoveGroupMembers'
+    if ($removeMembers) {
+        foreach ($entry in $removeMembers.PSObject.Properties) {
+            $group = [string]$entry.Name
+            foreach ($name in (Names $entry.Value)) {
+                if (($group -ieq $adminGroup.Name) -and ($name -ieq $env:USERNAME)) {
+                    Write-Result 'SKIPPED' "Cannot remove current administrator $name"
+                    continue
+                }
+                $members = @(Get-LocalGroupMember -Group $group -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
+                $exists = @($members | Where-Object { $_ -ieq $name -or $_ -like ("*\" + $name) }).Count -gt 0
+                Decide "Remove $name from $group" $exists {
+                    Remove-LocalGroupMember -Group $group -Member $name
+                }
+            }
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'PasswordExpiresUsers'))) {
+        if (-not (Get-LocalUser -Name $name -ErrorAction SilentlyContinue)) {
+            Write-Result 'REVIEW' "Password expiry: user not found: $name"
+            continue
+        }
+        Decide "Require password expiration for $name" $true {
+            Set-LocalUser -Name $name -PasswordNeverExpires $false
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'ResetPasswords'))) {
+        if (-not (Get-LocalUser -Name $name -ErrorAction SilentlyContinue)) {
+            Write-Result 'REVIEW' "Password reset: user not found: $name"
+            continue
+        }
+        if ($Yes) {
+            Write-Result 'REVIEW' "Reset password for $name manually; script will not store or generate a shared plaintext password."
+            continue
+        }
+        $pass = Read-Host "Enter new secure password for $name" -AsSecureString
+        Decide "Reset authorized password for $name" $true {
+            Set-LocalUser -Name $name -Password $pass
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'DisableUsers'))) {
+        $user = Get-LocalUser -Name $name -ErrorAction SilentlyContinue
+        if (-not $user) { Write-Result 'OK' "Disable user: absent $name"; continue }
+        if ((Is-Listed $name $script:Authorized) -or $name -ieq $env:USERNAME -or $user.SID.Value -match '-(500|501|503|504)$') {
+            Write-Result 'SKIPPED' "Refusing to disable protected/authorized account $name"
+            continue
+        }
+        Decide "Disable unauthorized user $name" ([bool]$user.Enabled) {
+            Note "Original user state: $name SID=$($user.SID.Value) enabled=$($user.Enabled)"
+            Disable-LocalUser -Name $name
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveUsers'))) {
+        if (-not $AllowRemovals) { Write-Result 'REVIEW' "User removal pending -AllowRemovals: $name"; continue }
+        $user = Get-LocalUser -Name $name -ErrorAction SilentlyContinue
+        if (-not $user) { Write-Result 'OK' "User already absent: $name"; continue }
+        if ((Is-Listed $name $script:Authorized) -or $name -ieq $env:USERNAME -or $user.SID.Value -match '-(500|501|503|504)$') {
+            Write-Result 'SKIPPED' "Refusing to delete protected/authorized account $name"
+            continue
+        }
+        $members = @(Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue)
+        if ($members.Count -le 1 -and @($members | Where-Object { $_.SID.Value -eq $user.SID.Value }).Count) {
+            Write-Result 'SKIPPED' "Cannot remove last administrator: $name"
+            continue
+        }
+        Decide "Delete unauthorized user $name (profile stays)" $true {
+            Note "Deleting user $name SID=$($user.SID.Value); account deletion is not reversible."
+            Remove-LocalUser -Name $name
+        }
+    }
+}
+function Invoke-AutoPasswordPolicy {
+    if ($script:domainJoined) { Write-Result 'REVIEW' 'Password policy belongs to effective domain GPO. Skipped local import.'; return }
+    $obj = Get-Value $script:Cfg 'PasswordPolicy'
+    if (-not $obj) { Write-Result 'SKIPPED' 'No image-specific password policy set in JSON.'; return }
+    $allowed = @('MinimumPasswordLength','PasswordHistorySize','MinimumPasswordAge','MaximumPasswordAge','PasswordComplexity','ClearTextPassword','LockoutBadCount','LockoutDuration','ResetLockoutCount')
+    $wanted = @()
+    foreach ($prop in $obj.PSObject.Properties) {
+        if ($prop.Name -notin $allowed) { Write-Result 'REVIEW' "Unknown password policy key $($prop.Name)"; continue }
+        $n = 0
+        if (-not [int]::TryParse(([string]$prop.Value),[ref]$n)) { Write-Result 'REVIEW' "Invalid policy number: $($prop.Name)"; continue }
+        if ($n -lt 0 -or $n -gt 9999) { Write-Result 'REVIEW' "Out of range policy number: $($prop.Name)"; continue }
+        if ($prop.Name -in @('PasswordComplexity','ClearTextPassword') -and $n -notin @(0,1)) {
+            Write-Result 'REVIEW' "Binary policy must be 0 or 1: $($prop.Name)"
+            continue
+        }
+        $wanted += "$($prop.Name) = $n"
+    }
+    if (-not $wanted.Count) { Write-Result 'SKIPPED' 'No valid numeric password settings supplied.'; return }
+    if ($Mode -eq 'Audit') { Write-Result 'WOULD' ('Set password policy: ' + ($wanted -join '; ')); return }
+    try {
+        $before = Join-Path $script:BackupDir 'account-policy-before.inf'
+        & secedit.exe /export /cfg $before /areas SECURITYPOLICY | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'Could not export current account policy' }
+        $file = Join-Path $script:BackupDir 'account-policy-requested.inf'
+        $db = Join-Path $script:BackupDir 'account-policy.sdb'
+        $content = @('[Unicode]','Unicode=yes','','[System Access]') + $wanted +
+            @('','[Version]','signature="$CHICAGO$"','Revision=1')
+        $content | Set-Content -LiteralPath $file -Encoding Unicode
+        & secedit.exe /configure /db $db /cfg $file /areas SECURITYPOLICY /quiet | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'secedit reported failure; consult secedit log' }
+        Write-Result 'CHANGED' ('Requested password policy applied; confirm in secpol.msc: ' + ($wanted -join ', '))
+    } catch { Write-Result 'FAILED' ('Password policy: ' + $_.Exception.Message) }
+}
+function Invoke-AutoSecurity {
+    $sec = $script:Sec
+    if ([bool](Get-Value $sec 'RestrictBlankPasswordNetwork' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'LimitBlankPasswordUse' 1
+    }
+    if ([bool](Get-Value $sec 'SmartScreen' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System' 'EnableSmartScreen' 1
+    }
+    if ([bool](Get-Value $sec 'DisableAutoPlay' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer' 'NoDriveTypeAutoRun' 255
+    }
+    if ([bool](Get-Value $sec 'DisableLLMNR' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' 'EnableMulticast' 0
+    }
+    if ([bool](Get-Value $sec 'HideLastSignedIn' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'DontDisplayLastUserName' 1
+    }
+    if ([bool](Get-Value $sec 'DisableWDigest' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' 'UseLogonCredential' 0
+    }
+    $seconds = Get-Value $sec 'LockScreenSeconds'
+    if ($null -ne $seconds) {
+        if ([int]$seconds -lt 60 -or [int]$seconds -gt 86400) {
+            Write-Result 'REVIEW' 'LockScreenSeconds must be between 60 and 86400.'
+        } else {
+            Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'InactivityTimeoutSecs' ([int]$seconds)
+        }
+    }
+    if ([bool](Get-Value $sec 'DisableRemoteAssistance' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Remote Assistance' 'fAllowToGetHelp' 0
+    }
+    if ([bool](Get-Value $sec 'PowerShellLogging' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' 'EnableScriptBlockLogging' 1
+    }
+    if ([bool](Get-Value $sec 'DisableRDP' $false)) {
+        if ($env:SESSIONNAME -like 'RDP*' -or (Is-Listed 'TermService' $script:RequiredServices)) {
+            Write-Result 'SKIPPED' 'Remote Desktop required or script running from RDP; cannot disable.'
+        } else {
+            Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' 'fDenyTSConnections' 1
+        }
+    }
+}
+function Invoke-AutoDefender {
+    if (-not (Get-Command Get-MpComputerStatus -ErrorAction SilentlyContinue)) {
+        Write-Result 'REVIEW' 'Microsoft Defender cmdlets unavailable; check Windows Security.'
+        return
+    }
+    if ([bool](Get-Value $script:Sec 'Defender' $false)) {
+        $status = Get-MpComputerStatus
+        Decide 'Enable Microsoft Defender realtime protection' (-not $status.RealTimeProtectionEnabled) {
+            Set-MpPreference -DisableRealtimeMonitoring $false -ErrorAction Stop
+        }
+        $pref = Get-MpPreference
+        Decide 'Enable Defender potentially unwanted application blocking' ($pref.PUAProtection -ne 1) {
+            Set-MpPreference -PUAProtection Enabled -ErrorAction Stop
+        }
+    }
+    if ([bool](Get-Value $script:Sec 'DefenderSignatures' $false)) {
+        try {
+            Update-MpSignature -ErrorAction Stop
+            Write-Result 'CHANGED' 'Defender signature update requested; verify antivirus age.'
+        } catch { Write-Result 'REVIEW' ('Defender signatures could not update: ' + $_.Exception.Message) }
+    }
+    if ([bool](Get-Value $script:Sec 'DefenderQuickScan' $false)) {
+        Write-Result 'REVIEW' 'Defender quick scan can quarantine evidence; execute separately after forensics are saved.'
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusions'))) {
+        $paths = @(Get-MpPreference).ExclusionPath
+        Decide "Remove exact Defender path exclusion $name" ($name -in $paths) {
+            Remove-MpPreference -ExclusionPath $name -ErrorAction Stop
+        }
+    }
+}
+function Invoke-AutoFirewall {
+    if (-not [bool](Get-Value $script:Sec 'Firewall' $false)) { return }
+    $profiles = @(Get-NetFirewallProfile)
+    $off = @($profiles | Where-Object { -not $_.Enabled })
+    Decide 'Enable Domain, Private and Public firewall profiles' ($off.Count -gt 0) {
+        $profiles | Export-Clixml -LiteralPath (Join-Path $script:BackupDir 'firewall-profiles-before.xml')
+        Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
+        $remaining = @(Get-NetFirewallProfile | Where-Object { -not $_.Enabled })
+        if ($remaining.Count) { throw "Firewall remains disabled on $($remaining.Name -join ', ')" }
+    }
+    Write-Result 'REVIEW' 'Firewall allow rules and required inbound application connectivity still need per-image review.'
+}
+function Invoke-AutoSMB {
+    if ([bool](Get-Value $script:Sec 'SMBClientSigning' $false)) {
+        $old = (Get-SmbClientConfiguration).RequireSecuritySignature
+        Decide 'Require SMB client signing' (-not $old) {
+            $old | Set-Content -LiteralPath (Join-Path $script:BackupDir 'smb-client-signing-before.txt')
+            Set-SmbClientConfiguration -RequireSecuritySignature $true -Confirm:$false
+        }
+    }
+    if ([bool](Get-Value $script:Sec 'DisableSMB1' $false)) {
+        $feature = Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction SilentlyContinue
+        if ($feature -and $feature.State -eq 'Enabled') {
+            Decide 'Disable legacy SMB1 (may need restart)' $true {
+                $feature | Export-Clixml -LiteralPath (Join-Path $script:BackupDir 'smb1-before.xml')
+                Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart | Out-Null
+            }
+        } else { Write-Result 'OK' 'SMB1 is already absent/disabled.' }
+    }
+}
+function Invoke-AutoAudit {
+    if (-not [bool](Get-Value $script:Sec 'CredentialAuditSuccess' $false)) { return }
+    try {
+        $before = (& auditpol.exe /get /subcategory:'Credential Validation' | Out-String)
+        $before | Set-Content -LiteralPath (Join-Path $script:BackupDir 'credential-audit-before.txt')
+        & auditpol.exe /set /subcategory:'Credential Validation' /success:enable | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'auditpol failed; check OS language or domain GPO.' }
+        Write-Result 'CHANGED' 'Credential Validation Success audit enabled; verify policy.'
+    } catch { Write-Result 'REVIEW' ('Credential Validation audit: ' + $_.Exception.Message) }
+}
+
 function Quick {
     Run-Task 'Baseline audit' { Audit }
     Run-Task 'Firewall' { Firewall }
