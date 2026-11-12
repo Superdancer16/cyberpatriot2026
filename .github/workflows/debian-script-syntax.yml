@@ -1,11 +1,5 @@
 name: Debian script syntax
 on:
-  push:
-    branches:
-      - feature/debian-one-run-hardening-20261111
-    paths:
-      - 'Linux Scripts/debian.sh'
-      - '.github/workflows/debian-script-syntax.yml'
   pull_request:
     paths:
       - 'Linux Scripts/debian.sh'
