@@ -102,6 +102,7 @@ Layered recipes worth trying *only when evidence points to them*: **Base64 → R
 
 An approved, local/offline [CyberChef](https://github.com/gchq/CyberChef) copy can chain these transforms. If online tools are permitted, avoid uploading private evidence to third-party websites.
 
+<a id="base64-then-rot13-layered-example"></a>
 ### Base64 then ROT13 — layered example
 
 **⭐ EASIEST WAY — website if permitted:** [CyberChef](https://gchq.github.io/CyberChef/) → paste the original Base64 text → **From Base64 → ROT13**. Or use [Cryptii](https://cryptii.com/) and chain **Base64 Decode → ROT13 Decode**. The answer is the **second** decoded output, not the intermediate ROT13 text.
@@ -359,6 +360,7 @@ openssl dgst -ripemd160 /path/file  # when supported by installed OpenSSL provid
 
 SHA-256 = 64 hex digits; MD5 = 32; SHA-1 and RIPEMD160 often = 40. Length alone cannot prove the algorithm. Recompute the same digest twice and check for changed bytes/paths. Hashes are for comparison/integrity, **not decryption**.
 
+<a id="less-common-puzzle-types-rot47-rail-fence-bacon-polybius-pigpen-a1z26-keyboard-shift"></a>
 ## Less common puzzle types — ROT47, Rail Fence, Bacon, Polybius, Pigpen, A1Z26, keyboard shift
 
 When Ctrl+F finds a **rare cipher name**, start with the clue, not a guessed key. [dCode Cipher Identifier](https://www.dcode.fr/cipher-identifier) can suggest likely cipher families for a **permitted, non-sensitive** ciphertext; use its **Clues/Keywords** box if you know a hint. [DenCode Cipher](https://dencode.com/en/cipher) has ROT47, Rail Fence, Bacon and other classical options; [CyberChef](https://gchq.github.io/CyberChef/) has ROT47, To/From Character Code, Morse and related operations. Results from an automatic identifier are **hypotheses**, not guaranteed plaintext.

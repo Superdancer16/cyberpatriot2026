@@ -2679,6 +2679,7 @@ Investigate existing sessions, processes, keys and services separately. If delet
 > [!CAUTION]
 > **⚠️ Warnings:** Never use `usermod -G sudo` without `-a` to add membership; it replaces supplementary groups. Do not lock root on Debian until a separate administrator and recovery path work. Service identities such as postgres may legitimately use a shell for maintenance.
 
+<a id="172-password-aging-pam-and-lockout-without-breaking-login"></a>
 #### 18.2 Password aging, PAM and lockout without breaking login
 
 - [ ] **🎯 DO THIS — 18.2 Password aging, PAM and lockout without breaking login**

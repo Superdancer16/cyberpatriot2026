@@ -91,6 +91,7 @@ Get-ChildItem -Path "$env:USERPROFILE\Desktop" -Force -File |
 
 For output you need later, copy *only allowed* evidence to an approved private notes directory, calculate SHA-256 first, and leave the original where it is. The image README and round rules decide whether copying evidence is permitted.
 
+<a id="decoding-decision-tree-read-first"></a>
 ## Decoding decision tree — read first
 
 **Encoding** changes representation and requires no secret key. **Encryption** requires a cipher and key. **Hashing** is one-way; a SHA-256 or NTLM hash cannot simply be "decoded" into the original password.
@@ -319,6 +320,7 @@ A ZIP begins with `50 4B` ("PK"). A renamed archive may still have a ZIP signatu
 
 If the prompt gives **no password/key**, search for other artifacts first. Do not claim that AES encryption can be reliably broken without the required credentials.
 
+<a id="less-common-puzzle-types-rot47-rail-fence-bacon-polybius-pigpen-a1z26-keyboard-shift"></a>
 ## Less common puzzle types — ROT47, Rail Fence, Bacon, Polybius, Pigpen, A1Z26, keyboard shift
 
 When Ctrl+F finds a **rare cipher name**, start with the clue, not a guessed key. [dCode Cipher Identifier](https://www.dcode.fr/cipher-identifier) can suggest likely cipher families for a **permitted, non-sensitive** ciphertext; use its **Clues/Keywords** box if you know a hint. [DenCode Cipher](https://dencode.com/en/cipher) has ROT47, Rail Fence, Bacon and other classical options; [CyberChef](https://gchq.github.io/CyberChef/) has ROT47, To/From Character Code, Morse and related operations. Results from an automatic identifier are **hypotheses**, not guaranteed plaintext.
