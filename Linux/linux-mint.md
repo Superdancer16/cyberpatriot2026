@@ -121,7 +121,7 @@ More techniques: [Forensics questions guide](../General/All/forensics-questions.
 > [!WARNING]
 > Answers must be **exact**: right spelling, capitals, and full paths when asked. Don't delete the "ANSWER:" line.
 
-#### 1.2 Manual security baseline (no hardening script)
+#### 1.2 Fast path: run the hardening script
 - [ ] **🎯 DO THIS — 1.2 Fast path: run the hardening script**
 
 > [!NOTE]
