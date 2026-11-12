@@ -7,6 +7,8 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
+**Forensics first — searchable question solver:** [Linux forensic guide](../Forensics/linux.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+
 **Ubuntu workstation and server practice for Ubuntu 22.04 and 24.04, with legacy 20.04 notes.** This is a comprehensive documentation-only guide, not an auto-hardening script. It places **Basics / Information Needed → First Things to Do → Commonly Assessed Checks → Services and Software → Advanced Topics → Final Verification** in increasing complexity.
 
 > [!IMPORTANT]

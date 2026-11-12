@@ -16,6 +16,8 @@ All three main Linux guides are now structured by learning stage and practical p
 - [Ubuntu — Comprehensive Standalone Handbook](ubuntu.md) — **expanded** Ubuntu 22/24 guide covering APT vs Snap, GNOME, UFW, SSH socket activation, Netplan/NetworkManager, systemd, AppArmor and critical services.
 - [FreeBSD](freebsd.md) — a separate BSD operating system, **not a Linux distribution**; use FreeBSD-specific commands.
 
+**New searchable Linux forensics guide:** [Debian / Mint / Ubuntu — Ctrl+F index, Base64 → ROT13, HEX/ELF, UID owners, logs, PCAP](../Forensics/linux.md), with CyberChef and offline commands.
+
 **Do first:** [Read the image README](../General/All/reading-the-readme.md) and preserve [forensics answers](../General/All/forensics-questions.md). Check the exact OS release and required users/daemons before modifying accounts, packages, firewall, login or authentication.
 
 **Debian 12/13 automation:** [debian.sh](../Linux%20Scripts/debian.sh) · [Beginner run instructions](../Linux%20Scripts/HOW-TO-RUN.md) · [Manual tasks after the script](../Linux%20Scripts/MANUAL-TASKS.md). Mint, Ubuntu and FreeBSD use their separate manual handbooks. The VM README takes priority.
