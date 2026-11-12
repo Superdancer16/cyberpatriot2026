@@ -1,0 +1,18 @@
+name: Debian script syntax
+on:
+  pull_request:
+    paths:
+      - 'Linux Scripts/debian.sh'
+      - '.github/workflows/debian-script-syntax.yml'
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Bash syntax
+        run: bash -n 'Linux Scripts/debian.sh'
+      - name: Check functions and entrypoint
+        run: |
+          grep -q '^run_all() {' 'Linux Scripts/debian.sh'
+          grep -q '^do_groups() {' 'Linux Scripts/debian.sh'
+          grep -q '^do_ssh() {' 'Linux Scripts/debian.sh'
