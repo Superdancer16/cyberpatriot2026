@@ -336,7 +336,7 @@ function Invoke-Audit {
                 try {
                     Get-ADGroupMember -Identity $name -Recursive -ErrorAction Stop |
                         ForEach-Object { [pscustomobject]@{Group=$name;Member=$_.SamAccountName;Class=$_.ObjectClass} }
-                } catch { Record 'REVIEW' "Cannot list group $name: $($_.Exception.Message)" }
+                } catch { Record 'REVIEW' "Cannot list group ${name}: $($_.Exception.Message)" }
             }
         }
         Save-Review 'domain-password-policies' {
@@ -636,7 +636,7 @@ function Invoke-ADAccounts {
             Change "Reset authorized domain user's password: $name" $true {
                 Set-ADAccountPassword -Identity $user -Reset -NewPassword $pw -ErrorAction Stop
             }
-        } catch { Record 'REVIEW' "AD password reset for $name: $($_.Exception.Message)" }
+        } catch { Record 'REVIEW' "AD password reset for ${name}: $($_.Exception.Message)" }
     }
 }
 function Invoke-ADGroups {
@@ -671,7 +671,7 @@ function Invoke-ADGroups {
                 Change "Add authorized AD user $userName to $name" ($existing -eq 0) {
                     Add-ADGroupMember -Identity $group -Members $user -ErrorAction Stop
                 }
-            } catch { Record 'REVIEW' "AD membership change $name/$userName: $($_.Exception.Message)" }
+            } catch { Record 'REVIEW' "AD membership change $name/${userName}: $($_.Exception.Message)" }
         }
     }
     foreach ($entry in @((Value $cfg 'RemoveGroupMembers').PSObject.Properties)) {
@@ -686,7 +686,7 @@ function Invoke-ADGroups {
                 Change "Remove exact unauthorized AD group member $userName from $name" ($member -gt 0) {
                     Remove-ADGroupMember -Identity $group -Members $user -Confirm:$false -ErrorAction Stop
                 }
-            } catch { Record 'REVIEW' "AD member removal $name/$userName: $($_.Exception.Message)" }
+            } catch { Record 'REVIEW' "AD member removal $name/${userName}: $($_.Exception.Message)" }
         }
     }
 }
@@ -1177,7 +1177,7 @@ function Invoke-IISSettings {
                 if ($after.Value) { throw 'Directory browsing still enabled' }
             }
             Record 'REVIEW' "Test required IIS site routes, HTTP status, authentication, application pool and bindings for $siteName."
-        } catch { Record 'REVIEW' "IIS site $siteName: $($_.Exception.Message)" }
+        } catch { Record 'REVIEW' "IIS site ${siteName}: $($_.Exception.Message)" }
     }
 }
 function Invoke-DNSSettings {
