@@ -1037,7 +1037,7 @@ function Invoke-ServerServices {
     $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time','Netlogon','NTDS','Kdc','DFSR','ADWS','DNS','DHCPServer','ClusSvc','W3SVC','FTPSVC','WinRM','TermService','sshd','RemoteAccess','SharedAccess','Spooler')
     foreach ($name in (Values (Value $script:Cfg 'DisableServices'))) {
         if ($name -match '[*?]' -or $name -notmatch '^[A-Za-z0-9_.-]+$') { Record 'REVIEW' "Service must have an exact safe Name: $name"; continue }
-        if ($name -in $protected -or Listed $name $script:RequiredServices) {
+        if ($name -in $protected -or (Listed $name $script:RequiredServices)) {
             Record 'SKIPPED' "Core/role-sensitive/README-required service $name requires manual role verification."
             continue
         }
@@ -1087,7 +1087,7 @@ function Invoke-ServerFeatures {
         }
     }
     foreach ($name in (Values (Value $script:Cfg 'UninstallWindowsFeatures'))) {
-        if ($name -notin $safeOptional -or $name -in $protected -or Listed $name $script:RequiredRoles) {
+        if ($name -notin $safeOptional -or $name -in $protected -or (Listed $name $script:RequiredRoles)) {
             Record 'SKIPPED' "Role/feature not in supported safe-removal set: $name"; continue
         }
         if (-not $AllowRemovals -or -not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
@@ -1125,10 +1125,10 @@ function Invoke-ServerShares {
         $shareName = [string](Value $item 'Share' '')
         $account = [string](Value $item 'Account' '')
         if (-not $shareName -or -not $account) { Record 'REVIEW' 'RemoveShareAccess needs exact Share and Account'; continue }
-        if ($shareName -in @('ADMIN$','IPC$','SYSVOL','NETLOGON','print$') -or $shareName -match '^[A-Za-z]\$$' -or Listed $shareName $script:RequiredShares) {
+        if ($shareName -in @('ADMIN$','IPC$','SYSVOL','NETLOGON','print$') -or $shareName -match '^[A-Za-z]\$$' -or (Listed $shareName $script:RequiredShares)) {
             Record 'SKIPPED' "System or required share ACL protected: $shareName"; continue
         }
-        if (Listed $account $script:RequiredAccounts -or $account -match '^(SYSTEM|BUILTIN\\Administrators|NT AUTHORITY\\SYSTEM)$') {
+        if ((Listed $account $script:RequiredAccounts) -or $account -match '^(SYSTEM|BUILTIN\\Administrators|NT AUTHORITY\\SYSTEM)$') {
             Record 'SKIPPED' "Required/system share principal protected: $account"; continue
         }
         if (-not $AllowRemovals) { Record 'REVIEW' "Share ACL removal $shareName/$account needs -AllowRemovals."; continue }
