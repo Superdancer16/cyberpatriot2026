@@ -1263,3 +1263,172 @@ function Invoke-LegacyTls {
     Record 'REVIEW' 'A controlled service/system restart may be required. Test required IIS, LDAPS, RDP, FTP, SQL and legacy clients.'
 }
 
+function Invoke-ServerPersistence {
+    foreach ($item in @(Value $script:Cfg 'RemoveStartupValues' @())) {
+        $path = [string](Value $item 'Path' '')
+        $name = [string](Value $item 'Name' '')
+        $allowed = @(
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
+        )
+        if ($path -notin $allowed -or -not $name -or $name -match '[*?]') {
+            Record 'REVIEW' 'Startup target must specify exact allowed Run/RunOnce registry Path and Name.'
+            continue
+        }
+        if ($script:IsDC -and $name -match '^(Windows|Microsoft|AD|Netlogon|DFSR|DNS|Security)') {
+            Record 'SKIPPED' "DC startup value $name might be critical; review manually."
+            continue
+        }
+        $current = Get-ItemProperty -Path $path -Name $name -ErrorAction SilentlyContinue
+        Change "Remove exact unauthorized Run/RunOnce value $name" ([bool]$current) {
+            Save-Registry $path
+            Remove-ItemProperty -Path $path -Name $name -ErrorAction Stop
+            if (Get-ItemProperty -Path $path -Name $name -ErrorAction SilentlyContinue) { throw 'Startup value still present' }
+        }
+    }
+    foreach ($name in (Values (Value $script:Cfg 'ClearAccessibilityDebuggers'))) {
+        if ($name -notin @('sethc.exe','utilman.exe','osk.exe','magnify.exe','narrator.exe')) {
+            Record 'REVIEW' "IFEO debugger target not supported: $name"; continue
+        }
+        $key = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\' + $name
+        $debugger = (Get-ItemProperty -Path $key -Name Debugger -ErrorAction SilentlyContinue).Debugger
+        Change "Remove exact accessibility debugger override $name" (-not [string]::IsNullOrWhiteSpace($debugger)) {
+            Save-Registry $key
+            Remove-ItemProperty -Path $key -Name Debugger -ErrorAction Stop
+        }
+    }
+    foreach ($full in (Values (Value $script:Cfg 'DisableScheduledTasks'))) {
+        if (-not $full.StartsWith('\') -or $full -like '\Microsoft\*') { Record 'REVIEW' "Use an exact non-Microsoft task path: $full"; continue }
+        $last = $full.LastIndexOf('\')
+        if ($last -lt 1 -or $last -eq $full.Length - 1) { Record 'REVIEW' "Invalid task identifier $full"; continue }
+        $path = $full.Substring(0,$last+1)
+        $name = $full.Substring($last+1)
+        $task = Get-ScheduledTask -TaskPath $path -TaskName $name -ErrorAction SilentlyContinue
+        if (-not $task) { Record 'OK' "Task absent: $full"; continue }
+        Change "Disable explicitly unauthorized scheduled task $full" ($task.State -ne 'Disabled') {
+            $xml = Export-ScheduledTask -TaskPath $path -TaskName $name -ErrorAction Stop
+            $xml | Set-Content -LiteralPath (Join-Path $backups ("task-" + [guid]::NewGuid().ToString('N') + ".xml"))
+            Disable-ScheduledTask -TaskPath $path -TaskName $name -ErrorAction Stop | Out-Null
+        }
+    }
+    $hosts = Join-Path $env:WINDIR 'System32\drivers\etc\hosts'
+    foreach ($line in (Values (Value $script:Cfg 'RemoveHostsEntries'))) {
+        if ($script:IsDC -or $line -match '(?i)localhost|127\.0\.0\.1|::1' -or -not $line.Trim()) {
+            Record 'REVIEW' 'Hosts file entry requires DNS/domain-role review; skipped automatic removal.'
+            continue
+        }
+        if (-not $AllowRemovals) { Record 'REVIEW' "Remove exact hosts entry only with -AllowRemovals: $line"; continue }
+        $matches = @((Get-Content -LiteralPath $hosts) | Where-Object { $_.Trim() -eq $line.Trim() })
+        Change "Remove exact malicious hosts entry $line" ($matches.Count -gt 0) {
+            Copy-Item -LiteralPath $hosts -Destination (Join-Path $backups 'hosts-before.txt') -Force
+            $entries = @(Get-Content -LiteralPath $hosts | Where-Object { $_.Trim() -ne $line.Trim() })
+            $entries | Set-Content -LiteralPath $hosts -Encoding ASCII
+        }
+    }
+}
+function Invoke-ServerFiles {
+    $paths = Values (Value $script:Cfg 'DiscoveryPaths')
+    Save-Review 'file-candidates' {
+        foreach ($folder in $paths) {
+            if (-not (Test-Path -LiteralPath $folder -PathType Container)) { continue }
+            $resolved = (Resolve-Path -LiteralPath $folder).Path
+            if ($resolved -notmatch '^(?i)[A-Z]:\\(Users\\|Temp\\|Public\\)') { continue }
+            Get-ChildItem -LiteralPath $resolved -File -Recurse -Force -ErrorAction SilentlyContinue |
+                Where-Object { $_.Extension -in @('.exe','.dll','.ps1','.bat','.cmd','.zip','.7z','.rar','.pcap','.mp3','.mp4','.torrent') } |
+                Select-Object -First 250 FullName,Length,LastWriteTime
+        }
+    }
+    foreach ($path in (Values (Value $script:Cfg 'RemoveFiles'))) {
+        if (-not $AllowRemovals -or -not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
+            Record 'REVIEW' "Deleting $path requires -AllowRemovals and preserved forensic evidence."; continue
+        }
+        $item = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
+        if (-not $item) { Record 'OK' "Prohibited file already absent: $path"; continue }
+        if ($item.PSIsContainer) { Record 'SKIPPED' "Never recursively delete a directory: $path"; continue }
+        $resolved = $item.FullName
+        if ($resolved -notmatch '^(?i)[A-Z]:\\(Users\\|Temp\\|Public\\)' -or
+            $resolved.StartsWith($root,[StringComparison]::OrdinalIgnoreCase) -or
+            $resolved -eq $PSCommandPath) {
+            Record 'SKIPPED' "System/role-sensitive path requires manual inspection: $resolved"; continue
+        }
+        Change "Delete exact confirmed prohibited file $resolved" $true {
+            $info = [pscustomobject]@{FullName=$resolved;Length=$item.Length;SHA256=(Get-FileHash -LiteralPath $resolved -Algorithm SHA256).Hash}
+            $info | Export-Csv -LiteralPath (Join-Path $backups ("deleted-file-" + [guid]::NewGuid().ToString('N') + ".csv")) -NoTypeInformation
+            Remove-Item -LiteralPath $resolved -Force -ErrorAction Stop
+            if (Test-Path -LiteralPath $resolved) { throw 'File still present' }
+        }
+    }
+}
+function Invoke-ServerSoftware {
+    $installed = @()
+    try {
+        $installed = @(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue |
+            Where-Object DisplayName |
+            Select-Object DisplayName,DisplayVersion,Publisher,InstallLocation)
+        $installed | Export-Csv -LiteralPath (Join-Path $backups 'installed-programs-before.csv') -NoTypeInformation
+    } catch { Record 'REVIEW' "Cannot inventory all installed programs: $($_.Exception.Message)" }
+    foreach ($name in $script:RequiredApps) {
+        if (-not @($installed | Where-Object { $_.DisplayName -ilike ("*" + $name + "*") }).Count) {
+            Record 'REVIEW' "Required software $name not found in standard installed-program registry."
+        }
+    }
+    if (-not (Get-Command winget.exe -ErrorAction SilentlyContinue)) {
+        if (@(Value $script:Cfg 'UpdatePrograms' @()).Count -or @(Value $script:Cfg 'UninstallPrograms' @()).Count) {
+            Record 'REVIEW' 'winget unavailable (normal on some Server builds); use approved vendor installers or Installed Programs.'
+        }
+        return
+    }
+    foreach ($id in (Values (Value $script:Cfg 'UpdatePrograms'))) {
+        if ($id -notmatch '^[A-Za-z0-9_.+-]+$') { Record 'REVIEW' "Invalid winget package ID $id"; continue }
+        Change "Update exact required program $id" $true {
+            & winget.exe upgrade --id $id --exact --source winget --accept-source-agreements --accept-package-agreements | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "winget upgrade exit $LASTEXITCODE" }
+        }
+        Record 'REVIEW' "Verify version, install path and required launch behavior for $id."
+    }
+    foreach ($id in (Values (Value $script:Cfg 'UninstallPrograms'))) {
+        if (Listed $id $script:RequiredApps) { Record 'SKIPPED' "Required program $id cannot be uninstalled."; continue }
+        if (-not $AllowRemovals -or -not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
+            Record 'REVIEW' "Removal of $id needs -AllowRemovals and preserved evidence."; continue
+        }
+        if ($id -notmatch '^[A-Za-z0-9_.+-]+$') { Record 'REVIEW' "Invalid winget package ID $id"; continue }
+        Change "Uninstall exact prohibited package $id" $true {
+            & winget.exe uninstall --id $id --exact --source winget --accept-source-agreements | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "winget uninstall exit $LASTEXITCODE" }
+        }
+    }
+}
+function Invoke-ServerUpdates {
+    $mode = [string](Value $script:Cfg 'WindowsUpdate' 'Scan')
+    if ($mode -eq 'None') { Record 'SKIPPED' 'Windows Update set to None'; return }
+    if ($mode -notin @('Scan','Install')) { Record 'REVIEW' "WindowsUpdate must be Scan, Install, or None; received $mode"; return }
+    try {
+        $session = New-Object -ComObject Microsoft.Update.Session
+        $searcher = $session.CreateUpdateSearcher()
+        $found = $searcher.Search("IsInstalled=0 and IsHidden=0 and Type='Software'")
+        Record 'REVIEW' ("Windows Update discovered " + $found.Updates.Count + " applicable updates.")
+        if ($mode -ne 'Install' -or $Mode -eq 'Audit') { return }
+        $updates = New-Object -ComObject Microsoft.Update.UpdateColl
+        foreach ($update in $found.Updates) {
+            if ($update.InstallationBehavior.CanRequestUserInput) { continue }
+            if (-not $update.EulaAccepted) { $update.AcceptEula() }
+            [void]$updates.Add($update)
+        }
+        if (-not $updates.Count) { Record 'OK' 'No unattended updates eligible for installation.'; return }
+        Change "Install $($updates.Count) reviewed Windows Server software updates without automatic reboot" $true {
+            $downloader = $session.CreateUpdateDownloader()
+            $downloader.Updates = $updates
+            $downloadResult = $downloader.Download()
+            if ($downloadResult.ResultCode -notin @(2,3)) { throw "Download result $($downloadResult.ResultCode)" }
+            $installer = $session.CreateUpdateInstaller()
+            $installer.Updates = $updates
+            $result = $installer.Install()
+            if ($result.ResultCode -notin @(2,3)) { throw "Install result $($result.ResultCode)" }
+            if ($result.RebootRequired) { Record 'REVIEW' 'Server restart required. Do not reboot until required roles and current task state are reviewed.' }
+        }
+    } catch { Record 'REVIEW' "Windows Update COM scan/install incomplete: $($_.Exception.Message)" }
+}
+
