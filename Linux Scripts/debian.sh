@@ -461,3 +461,167 @@ do_updates() {
     status REVIEW 'Verify Chromium/OpenSSH and any required application still run; inspect reboot requirements.'
 }
 
+service_needed() {
+    local name="${1%.service}" item
+    while IFS= read -r item; do
+        [[ "${item%.service}" == "$name" ]] && return 0
+    done < <(list RequiredServices)
+    return 1
+}
+do_services() {
+    local name current enabled
+    local protected=(sshd ssh systemd-journald systemd-logind dbus dbus-broker NetworkManager networking systemd-networkd systemd-resolved systemd-timesyncd cron rsyslog auditd udev systemd-udevd)
+    while IFS= read -r name; do
+        safe_unit "$name" || { status REVIEW "Unsafe systemd unit name: $name"; continue; }
+        if service_needed "$name" || member "${name%.service}" "${protected[@]}"; then
+            status SKIPPED "Protected/required service not disabled: $name"; continue
+        fi
+        if [[ "$name" == *.socket || "$name" == *.target ]]; then status SKIPPED "Only service units are supported: $name"; continue; fi
+        name="${name%.service}.service"
+        if ! unit_present "$name"; then status OK "Unit missing: $name"; continue; fi
+        enabled=$(systemctl is-enabled "$name" 2>/dev/null || true)
+        current=$(systemctl is-active "$name" 2>/dev/null || true)
+        if [[ "$enabled" == disabled && "$current" == inactive ]]; then status OK "Already stopped/disabled $name"; continue; fi
+        if [[ "$MODE" == apply ]]; then
+            systemctl cat "$name" > "$BACKUPS/service-$name.txt" 2>&1 || true
+            printf 'state=%s enabled=%s\n' "$current" "$enabled" >> "$BACKUPS/service-$name.txt"
+        fi
+        change "Stop and disable explicitly unneeded service $name" systemctl disable --now "$name"
+    done < <(list DisableServices)
+    if [[ "$(scalar EnableRequiredServices)" == true ]]; then
+        while IFS= read -r name; do
+            safe_unit "$name" || continue
+            name="${name%.service}.service"
+            if ! unit_present "$name"; then status REVIEW "Required service missing: $name"; continue; fi
+            if systemctl is-active --quiet "$name"; then status OK "Required service active: $name"
+            else
+                if [[ "$name" == *mysql* || "$name" == *mariadb* || "$name" == *postgres* || "$name" == *dns* ]]; then
+                    status REVIEW "Database/DNS $name needs dependency check before starting"
+                else change "Start README-required service $name" systemctl start "$name"; fi
+            fi
+        done < <(list RequiredServices)
+    fi
+    status REVIEW 'Verify critical services with a real client (web page, SSH login, DNS lookup or FTP transfer).'
+}
+set_sshd_setting() {
+    local key="$1" value="$2" file=/etc/ssh/sshd_config
+    backup "$file"
+    python3 - "$file" "$key" "$value" <<'PY'
+import re,sys
+path,key,value=sys.argv[1:]
+lines=open(path,encoding='utf-8').readlines()
+out=[];seen=False
+for line in lines:
+    if re.match(r'^\s*Match\s+',line,re.I):
+        if not seen: out.append(f"{key} {value}\n");seen=True
+    if not seen and re.match(r'^\s*#?\s*'+re.escape(key)+r'\s+',line,re.I):
+        if not line.lstrip().startswith("#"):
+            if not seen: out.append(f"{key} {value}\n");seen=True
+            continue
+    out.append(line)
+if not seen: out.append(f"{key} {value}\n")
+open(path,'w',encoding='utf-8').writelines(out)
+PY
+}
+ssh_fix_one() {
+    local key="$1" expected="$2" file=/etc/ssh/sshd_config
+    set_sshd_setting "$key" "$expected"
+    if ! /usr/sbin/sshd -t; then
+        cp -a "$BACKUPS/originals$file" "$file"
+        return 1
+    fi
+    local got
+    got=$(/usr/sbin/sshd -T 2>/dev/null | awk -v k="${key,,}" '$1==k {print $2;exit}')
+    if [[ "$got" != "$expected" ]]; then
+        cp -a "$BACKUPS/originals$file" "$file"
+        status REVIEW "SSH $key is overridden by Include/Match; changed file restored."
+        return 1
+    fi
+    if systemctl is-active --quiet ssh.service; then
+        if ! systemctl reload ssh.service; then
+            cp -a "$BACKUPS/originals$file" "$file"
+            systemctl reload ssh.service || true
+            return 1
+        fi
+    fi
+}
+do_ssh() {
+    if [[ "$(scalar SSH.DisableRootLogin)" != true && "$(scalar SSH.DisableEmptyPasswords)" != true ]]; then
+        status SKIPPED 'No SSH settings requested'; return
+    fi
+    if [[ ! -x /usr/sbin/sshd || ! -f /etc/ssh/sshd_config ]]; then
+        status REVIEW 'SSH server not installed/configured; do not install it unless README requires.'
+        return
+    fi
+    if [[ "$MODE" == apply ]]; then /usr/sbin/sshd -t || { status FAILED 'Baseline SSH syntax invalid; no changes'; return; }; fi
+    if [[ "$(scalar SSH.DisableRootLogin)" == true ]]; then
+        change 'Disable direct SSH root login' ssh_fix_one PermitRootLogin no
+    fi
+    if [[ "$(scalar SSH.DisableEmptyPasswords)" == true ]]; then
+        change 'Disable SSH empty passwords' ssh_fix_one PermitEmptyPasswords no
+    fi
+    status REVIEW 'Check sshd -T, drop-ins, Match rules, required SSH ports and a second authorized login.'
+}
+do_kernel() {
+    local key value previous
+    local allowed=(net.ipv4.tcp_syncookies net.ipv4.ip_forward kernel.randomize_va_space net.ipv4.conf.all.accept_redirects net.ipv4.conf.default.accept_redirects net.ipv4.conf.all.send_redirects net.ipv4.conf.default.send_redirects net.ipv4.conf.all.accept_source_route net.ipv6.conf.all.accept_redirects)
+    local file=/etc/sysctl.d/90-cp-debian.conf
+    while IFS=$'\t' read -r key value; do
+        member "$key" "${allowed[@]}" || { status REVIEW "Unsupported sysctl option: $key"; continue; }
+        [[ "$value" =~ ^[012]$ ]] || { status REVIEW "Invalid sysctl value $key=$value"; continue; }
+        if [[ "$key" == net.ipv4.ip_forward && "$value" == 0 ]]; then
+            status REVIEW 'IPv4 forwarding off can break a required router/VPN/container gateway. Confirm topology.'
+        fi
+        previous=$(sysctl -n "$key" 2>/dev/null || true)
+        if [[ "$previous" == "$value" ]] && grep -qF "$key = $value" "$file" 2>/dev/null; then status OK "$key already $value"; continue; fi
+        if [[ "$MODE" == audit ]]; then status WOULD "Set sysctl $key=$value"; continue; fi
+        backup "$file"
+        printf '%s = %s\n' "$key" "$previous" >> "$BACKUPS/sysctl-before.txt"
+        if set_file_value "$file" "$key" "$value" equals &&
+           sysctl -w "$key=$value" >/dev/null &&
+           [[ "$(sysctl -n "$key")" == "$value" ]]; then
+            status CHANGED "Set sysctl $key=$value"
+        else status FAILED "Could not apply sysctl $key=$value"; fi
+    done < <(pairs Sysctl)
+}
+do_permissions() {
+    if [[ "$(scalar FixShadowPermissions)" != true ]]; then status SKIPPED 'Shadow permission remediation not selected'; return; fi
+    local file perms
+    for file in /etc/shadow /etc/gshadow; do
+        [[ -f "$file" ]] || continue
+        perms=$(stat -c '%a' "$file")
+        if [[ "$MODE" == audit ]]; then status WOULD "Review $file mode $perms"; continue; fi
+        backup "$file"
+        chmod o-rwx,g-w "$file"
+        if [[ "$(stat -c %a "$file")" == "$perms" ]]; then status OK "$file permissions already restrictive"
+        else status CHANGED "Removed world access and group write from $file (was $perms)"; fi
+    done
+    status REVIEW 'Verify owner/group and authentication still work; do not change secure 000/600 modes to 640 blindly.'
+}
+do_apparmor() {
+    if ! command -v aa-status >/dev/null 2>&1; then
+        status REVIEW 'AppArmor tooling is missing; do not install/reconfigure blindly'; return
+    fi
+    capture 'apparmor-before' aa-status
+    local file
+    while IFS= read -r file; do
+        if [[ "$file" != /etc/apparmor.d/* || ! -f "$file" ]] || [[ "$file" == *..* ]]; then
+            status SKIPPED "AppArmor profile must be an existing /etc/apparmor.d file: $file"; continue
+        fi
+        command -v aa-enforce >/dev/null 2>&1 || { status REVIEW 'aa-enforce command absent'; continue; }
+        if [[ "$MODE" == apply ]]; then backup "$file"; fi
+        change "Set AppArmor profile enforce: $file" aa-enforce "$file"
+    done < <(list AppArmorProfiles)
+}
+do_logging() {
+    local name key
+    for name in auditd rsyslog; do
+        if [[ "$name" == auditd ]]; then key=Logging.EnableAuditd; else key=Logging.EnableRsyslog; fi
+        [[ "$(scalar "$key")" == true ]] || continue
+        if ! unit_present "$name.service"; then status REVIEW "Requested $name not installed"; continue; fi
+        if systemctl is-active --quiet "$name"; then status OK "$name running"
+        else change "Start required logging service $name" systemctl enable --now "$name"; fi
+    done
+    capture 'journal-errors' journalctl -p err -n 40 --no-pager
+}
+
