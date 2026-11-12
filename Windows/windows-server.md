@@ -2068,31 +2068,20 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > **On a Domain Controller**, use **`gpmc.msc`** to edit the appropriate domain-root-linked password policy or use AD Administrative Center for fine-grained policy; local `secpol.msc` is not the correct control for domain users.
 
 ##### WS.3.2 Account Lockout Policy
-- [ ] **🎯 DO THIS — WS.3.2 Account Lockout Policy**
+- [ ] **🎯 Check account lockout only when the image requires it.**
 
-| Setting | Set to |
-|---|---|
-| Account lockout threshold | **5** invalid attempts (set this first) |
-| Account lockout duration | **30** minutes |
-| Reset account lockout counter after | **30** minutes |
-| Allow Administrator account lockout (only on updated systems; skip it if it isn't in the list) | **Enabled** |
+**⭐ EASIEST WAY — GUI:** **Win + R → `secpol.msc` → Account Policies → Account Lockout Policy** → open each applicable setting. Set the exact README-required **threshold**, **duration** and **counter-reset window** (for example 5 attempts / 30 minutes / 30 minutes) → **Apply → OK**. If **Allow Administrator account lockout** exists and is specified, configure it separately.
 
-**⭐ EASIEST WAY — GUI:** **Win + R → `secpol.msc` → Account Policies → Account Lockout Policy** → open **Account lockout threshold**, **duration** and **reset account lockout counter after**, set the values required by the image, then **Apply → OK**. On a Domain Controller, review the domain GPO instead.
+**✅ VERIFY:** Reopen all changed settings and inspect actual effective values; test a permitted admin login safely.
 
-**✅ VERIFY:** Reopen each entry, confirm the effective policy and that a permitted administrator can still log in.
+**↩️ UNDO:** Restore individual recorded original policy values, not a generic template. **⚠️** Duration 0 can mean an account stays locked until an administrator unlocks it. Never intentionally lock out the only admin.
 
 > [!NOTE]
-> **🔁 ALTERNATE — command-line inspection only:**
+> **🔁 ALTERNATE — read-only CMD/PowerShell verification (not a second fix):**
 >
 > ```powershell
 > net accounts
 > ```
-
-
-> [!CAUTION]
-> Never set **Account lockout duration** to **0**: that means a locked account stays locked until an admin unlocks it. Don't set the threshold below 3 either: a few typos would lock real users out.
-
----
 
 #### WS.4. Local policies
 
