@@ -450,6 +450,8 @@ function Initialize-ReadmeConfig {
             PowerShellLogging = $false
             LockScreenSeconds = $null
             WindowsUpdate = 'Scan'
+            ChromeBlockPopups = $false
+            EdgeBlockPopups = $false
         }
     }
     $sample | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $dest -Encoding UTF8
@@ -936,6 +938,110 @@ function Invoke-AutoShares {
             (Get-SmbShareAccess -Name $name | Format-Table -AutoSize | Out-String) | Add-Content -LiteralPath $backup
             Remove-SmbShare -Name $name -Force -Confirm:$false
         }
+    }
+}
+
+
+function Invoke-AutoApps {
+    $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
+    $installed = @()
+    try {
+        $paths = @('HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+                   'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*',
+                   'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*')
+        $installed = @(Get-ItemProperty -Path $paths -ErrorAction SilentlyContinue |
+            Where-Object DisplayName | Select-Object DisplayName,DisplayVersion,Publisher,InstallLocation)
+        $installed | Export-Csv -LiteralPath (Join-Path $script:BackupDir 'installed-programs-before.csv') -NoTypeInformation
+    } catch { Write-Result 'REVIEW' 'Installed-app inventory unavailable.' }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RequiredSoftware'))) {
+        if (-not @($installed | Where-Object { $_.DisplayName -ilike ("*" + $name + "*") }).Count) {
+            Write-Result 'REVIEW' "README-required software not found in standard uninstall list: $name"
+        }
+    }
+    if (-not $winget) {
+        if ((Names (Get-Value $script:Cfg 'UpdatePrograms')).Count -or (Names (Get-Value $script:Cfg 'RemovePrograms')).Count) {
+            Write-Result 'REVIEW' 'winget is unavailable; use the approved installer or Installed apps UI.'
+        }
+        return
+    }
+    foreach ($id in (Names (Get-Value $script:Cfg 'UpdatePrograms'))) {
+        if ($id -notmatch '^[A-Za-z0-9_.+-]+$') { Write-Result 'REVIEW' "Invalid winget package id: $id"; continue }
+        try {
+            & winget.exe upgrade --id $id --exact --source winget --accept-source-agreements --accept-package-agreements
+            if ($LASTEXITCODE -ne 0) { throw "winget exit $LASTEXITCODE" }
+            Write-Result 'CHANGED' "winget update attempted for $id; verify installed version and path."
+        } catch { Write-Result 'REVIEW' ("Update $id: " + $_.Exception.Message) }
+    }
+    foreach ($id in (Names (Get-Value $script:Cfg 'RemovePrograms'))) {
+        if (-not $AllowRemovals) { Write-Result 'REVIEW' "Package removal needs -AllowRemovals: $id"; continue }
+        if (Is-Listed $id $script:RequiredSoftware) { Write-Result 'SKIPPED' "Required software: $id"; continue }
+        if ($id -notmatch '^[A-Za-z0-9_.+-]+$') { Write-Result 'REVIEW' "Invalid winget package id: $id"; continue }
+        try {
+            & winget.exe uninstall --id $id --exact --source winget --accept-source-agreements
+            if ($LASTEXITCODE -ne 0) { throw "winget exit $LASTEXITCODE" }
+            Write-Result 'CHANGED' "winget uninstall attempted for $id; confirm exact package is gone."
+        } catch { Write-Result 'REVIEW' ("Remove $id: " + $_.Exception.Message) }
+    }
+}
+function Invoke-AutoFiles {
+    foreach ($path in (Names (Get-Value $script:Cfg 'RemoveFiles'))) {
+        if (-not $AllowRemovals) { Write-Result 'REVIEW' "File removal needs -AllowRemovals: $path"; continue }
+        $file = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
+        if (-not $file) { Write-Result 'OK' "File not found: $path"; continue }
+        if ($file.PSIsContainer) { Write-Result 'SKIPPED' "Refusing to delete directory: $path"; continue }
+        $protectedRoots = @($env:WINDIR,$env:ProgramFiles,([Environment]::GetEnvironmentVariable('ProgramFiles(x86)')),$root) | Where-Object { $_ }
+        $blocked = $false
+        foreach ($folder in $protectedRoots) {
+            if ($file.FullName.StartsWith(($folder.TrimEnd('\') + '\'),[StringComparison]::OrdinalIgnoreCase)) { $blocked=$true }
+        }
+        if ($file.FullName -match '(?i)\\CyberPatriot(\\|$)' -or $file.FullName -eq $PSCommandPath) { $blocked=$true }
+        if ($blocked) { Write-Result 'SKIPPED' "Protected path requires manual review: $($file.FullName)"; continue }
+        Decide "Delete confirmed prohibited file $($file.FullName)" $true {
+            $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+            Note "Deleting $($file.FullName) SHA256=$hash (not automatically reversible)."
+            Remove-Item -LiteralPath $file.FullName -Force
+            if (Test-Path -LiteralPath $file.FullName) { throw 'File remained after deletion.' }
+        }
+    }
+}
+function Invoke-AutoBrowsers {
+    if ([bool](Get-Value $script:Sec 'ChromeBlockPopups' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Google\Chrome' 'DefaultPopupsSetting' 2
+    }
+    if ([bool](Get-Value $script:Sec 'EdgeBlockPopups' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Edge' 'DefaultPopupsSetting' 2
+    }
+    Write-Result 'REVIEW' 'Verify Chrome, Edge, Firefox and required application updates in Help > About and site settings.'
+}
+function Invoke-AutoWindowsUpdate {
+    $choice = [string](Get-Value $script:Sec 'WindowsUpdate' 'Scan')
+    if ($choice -eq 'None') { Write-Result 'SKIPPED' 'Windows Update configured as None'; return }
+    if ($choice -notin @('Scan','Install')) { Write-Result 'REVIEW' 'WindowsUpdate must be Scan, Install, or None'; return }
+    try {
+        $session = New-Object -ComObject Microsoft.Update.Session
+        $searcher = $session.CreateUpdateSearcher()
+        $found = $searcher.Search("IsInstalled=0 and IsHidden=0 and Type='Software'")
+        Write-Result 'REVIEW' ("Windows Update: $($found.Updates.Count) software update(s) detected.")
+        if ($choice -ne 'Install') { return }
+        $updates = New-Object -ComObject Microsoft.Update.UpdateColl
+        foreach ($item in $found.Updates) {
+            if ($item.InstallationBehavior.CanRequestUserInput) { continue }
+            if (-not $item.EulaAccepted) { $item.AcceptEula() }
+            [void]$updates.Add($item)
+        }
+        if (-not $updates.Count) { Write-Result 'OK' 'No unattended updates eligible for install.'; return }
+        $downloader = $session.CreateUpdateDownloader()
+        $downloader.Updates = $updates
+        $downloadResult = $downloader.Download()
+        if ($downloadResult.ResultCode -notin @(2,3)) { throw "Download result $($downloadResult.ResultCode)" }
+        $installer = $session.CreateUpdateInstaller()
+        $installer.Updates = $updates
+        $result = $installer.Install()
+        if ($result.ResultCode -notin @(2,3)) { throw "Install result $($result.ResultCode)" }
+        Write-Result 'CHANGED' "Windows Update installed or partially installed $($updates.Count) updates; verify in Settings."
+        if ($result.RebootRequired) { Write-Result 'REVIEW' 'Restart pending; the script will not reboot automatically.' }
+    } catch {
+        Write-Result 'REVIEW' ('Windows Update unavailable or incomplete: ' + $_.Exception.Message)
     }
 }
 
