@@ -264,3 +264,253 @@ try {
 
 Otherwise use an already-approved offline RIPEMD160 tool; never silently substitute SHA-1. Hash only the exact requested **original file** and verify by recomputing.
 
+## Active Directory, accounts and Group Policy
+
+### Active Directory users, SIDs and organizational units
+
+If **Domain Controller**, GUI: **Win+R → `dsa.msc` → Active Directory Users and Computers → View → Advanced Features**. Expand the actual domain's `Users` container and OUs.
+
+Check exact user name, enabled flag, OU, principal name, last-logon attribute, creation date, password-expiration status:
+
+```powershell
+Import-Module ActiveDirectory
+Get-ADUser -Filter * -Properties Enabled,WhenCreated,LastLogonDate,PasswordNeverExpires |
+  Select-Object SamAccountName,Enabled,WhenCreated,LastLogonDate,PasswordNeverExpires,DistinguishedName
+Get-ADUser -Identity 'exampleuser' -Properties * |
+  Format-List SamAccountName,UserPrincipalName,SID,Enabled,DistinguishedName,WhenCreated,MemberOf
+```
+
+**SID/RID:** `S-1-5-21-...-RID`: last numeric segment is RID. `SamAccountName` (`jsmith`) differs from UPN (`jsmith@example.test`) and display name. **An OU path is part of `DistinguishedName`**; the string starts with CN, then OU/DC components.
+
+On a **member server** where AD tools are unavailable, use authorized RSAT or query local identity:
+
+```powershell
+Get-CimInstance Win32_ComputerSystem | Select Name,Domain,PartOfDomain
+whoami /user
+whoami /groups
+```
+
+Do not make local SAM changes to "fix" an account that the question describes as a **domain** user. Domain account history may be present on a DC, member-server logs, or both.
+
+### Active Directory groups and privileged membership
+
+GUI: `dsa.msc` → locate group → **Properties → Members** (direct membership). To find nested groups, inspect group member objects recursively, and note whether the question asks **direct** versus **recursive** members.
+
+```powershell
+Import-Module ActiveDirectory
+Get-ADGroup -Filter * | Select-Object Name,SamAccountName,GroupScope,GroupCategory
+Get-ADGroupMember -Identity 'Domain Admins' |
+  Select-Object Name,SamAccountName,ObjectClass
+Get-ADGroupMember -Identity 'Domain Admins' -Recursive |
+  Select-Object Name,SamAccountName,ObjectClass
+Get-ADPrincipalGroupMembership -Identity 'exampleuser' |
+  Select-Object Name,SamAccountName
+```
+
+Privileged groups to check if the prompt hints at them: `Domain Admins`, `Enterprise Admins`, `Schema Admins`, `Administrators`, `Account Operators`, `Server Operators`, `Backup Operators`, `DnsAdmins`, `Group Policy Creator Owners`.
+
+**Pitfalls:** A user's `primaryGroupID` may not appear in the usual `memberOf` property. Domain local versus global versus universal group scopes also differ. Never remove a user from a privileged group just to answer who **was** in it.
+
+### Group Policy and resultant password policy
+
+GUI: **Win+R → `gpmc.msc`** → Forest → Domains → **actual domain** → Group Policy Objects. Identify policy links, inheritance, GPO status, scope and modification times.
+
+```powershell
+Import-Module GroupPolicy
+Get-GPO -All | Select-Object DisplayName,Id,CreationTime,ModificationTime,GpoStatus
+Get-GPInheritance -Target 'OU=Example,DC=example,DC=test'
+gpresult /h "$env:TEMP\rsop.html"
+```
+
+**Password policy:**
+
+```powershell
+Import-Module ActiveDirectory
+Get-ADDefaultDomainPasswordPolicy | Format-List *
+Get-ADFineGrainedPasswordPolicy -Filter * |
+  Select-Object Name,Precedence,MinPasswordLength,ComplexityEnabled
+Get-ADUserResultantPasswordPolicy -Identity 'exampleuser'
+```
+
+**Default Domain Policy ≠ automatically the effective policy for every user.** Fine-grained password policies (FGPP) may override the domain default. On a member server, local `secpol.msc` might be overridden by domain GPO. Find the **resultant** policy before answering which setting actually applies.
+
+Questions may ask for a GPO's **GUID**, display name, link location, modified time, setting, or security-filtering principal. These are different answer formats.
+
+### Domain Controller health, replication and time
+
+Search prompts: `replication partner`, `SYSVOL`, `NETLOGON`, `dcdiag`, `FSMO`, `time server`, `PDC emulator`, `domain controller`.
+
+```powershell
+repadmin /replsummary
+repadmin /showrepl
+dcdiag /test:Advertising /test:Services /test:NetLogons
+net share
+w32tm /query /status
+w32tm /query /source
+```
+
+List FSMO role holders (if AD module installed):
+
+```powershell
+Get-ADDomain | Select-Object PDCEmulator,RIDMaster,InfrastructureMaster
+Get-ADForest | Select-Object SchemaMaster,DomainNamingMaster
+```
+
+**Answer only what is asked:** replication status versus FSMO owner, time source versus the computer's hostname, SYSVOL share path versus GPO path. Failures may be due to a missing role, replication topology, firewall or wrong time; don't reconfigure AD to make a forensic report look clean.
+
+## DNS, DHCP, IIS, SMB and certificates
+
+### DNS zones, aliases (CNAME), A, PTR, SRV and TXT
+
+**GUI:** Win+R → `dnsmgmt.msc` → Forward Lookup Zones / Reverse Lookup Zones → the exact zone. Double-click a record to inspect its target/TTL.
+
+```powershell
+Import-Module DnsServer
+Get-DnsServerZone | Select-Object ZoneName,ZoneType,IsDsIntegrated,DynamicUpdate,SecureSecondaries
+Get-DnsServerResourceRecord -ZoneName 'example.test' |
+  Select-Object HostName,RecordType,RecordData,TimeToLive
+```
+
+To answer "which **CNAME aliases** point to `dc-01.example.test`":
+
+```powershell
+Get-DnsServerResourceRecord -ZoneName 'example.test' |
+  Where-Object { $_.RecordType -eq 'CNAME' } |
+  Select-Object HostName,@{Name='Target';Expression={$_.RecordData.HostNameAlias}}
+```
+
+**Important:** `CNAME` **alias name** (`ns`) differs from **target host** (`dc-01.example.test`). Normalize fully qualified targets with trailing dots when comparing; do not assume an alias has the same A record or IP as another host.
+
+Other questions:
+
+```powershell
+Get-DnsServerResourceRecord -ZoneName 'example.test' |
+  Where-Object { $_.RecordType -in @('A','AAAA','PTR','TXT','SRV','NS','MX') } |
+  Select-Object HostName,RecordType,RecordData
+Resolve-DnsName -Name 'www.example.test' -Type A
+Resolve-DnsName -Name '_ldap._tcp.dc._msdcs.example.test' -Type SRV
+```
+
+- **A/AAAA:** hostname → IPv4/IPv6.
+- **PTR:** reverse address → hostname.
+- **SRV:** service target and port (e.g. `_ldap._tcp`).
+- **TXT:** text/SPF-like data, possibly an encoded clue.
+- **NS:** authoritative nameserver.
+- **MX:** mail exchanger.
+- **Zone transfer:** property of zone; don't confuse it with ordinary DNS resolution.
+
+To inspect **zone transfer and dynamic update rules**, view **Zone Properties** and the actual secondary server list. **Secure-only dynamic updates require an AD-integrated zone**. Never disable transfers or edit a required record before answering the question.
+
+**Historical school-team report:** a Server-style question asked for two CNAME aliases of a named DC. The general technique is to enumerate CNAME entries and compare their targets; don't reuse historical alias names.
+
+### DHCP scopes, leases, reservations and options
+
+GUI: **Win+R → `dhcpmgmt.msc` → IPv4** → Scopes, Address Leases, Reservations, Scope Options, Server Options.
+
+```powershell
+Import-Module DhcpServer
+Get-DhcpServerv4Scope | Select-Object ScopeId,Name,StartRange,EndRange,State
+Get-DhcpServerv4OptionValue | Select-Object OptionId,Name,Value
+foreach ($scope in (Get-DhcpServerv4Scope)) {
+  Get-DhcpServerv4Reservation -ScopeId $scope.ScopeId |
+    Select-Object @{Name='Scope';Expression={$scope.ScopeId}},IPAddress,ClientId,Name
+}
+```
+
+For a specific scope:
+
+```powershell
+Get-DhcpServerv4Lease -ScopeId 192.0.2.0 |
+  Select-Object IPAddress,ClientId,HostName,AddressState,LeaseExpiryTime
+Get-DhcpServerv4OptionValue -ScopeId 192.0.2.0
+```
+
+Replace `192.0.2.0` with the real ScopeId. **Lease ≠ reservation**; a MAC/client identifier may be represented with hyphens or colons. DHCP option **003** is the router/gateway; **006** is DNS servers. Confirm whether the question asks **server options** or **scope options**—the latter can override the former.
+
+A DHCP server might be installed but not authorized in AD; check authorization separately if asked. Do not change scope options or reservations to answer a question about their previous values.
+
+### IIS websites, web roots, logs, FTP and app pools
+
+GUI: **Win+R → `inetmgr`** → server → Sites → select site → **Basic Settings**, **Bindings**, **Authentication**, **Logging**, **Directory Browsing**, **Application Pools**.
+
+```powershell
+Import-Module WebAdministration
+Get-Website | Select-Object Name,State,PhysicalPath,Bindings
+Get-WebBinding | Select-Object protocol,bindingInformation
+Get-WebApplication | Select-Object Path,PhysicalPath,ApplicationPool
+Get-ChildItem 'IIS:\AppPools' | Select-Object Name,State,ManagedRuntimeVersion
+```
+
+**What does a question want?**
+- **Physical path / web root:** `C:\inetpub\wwwroot` or site-specific configured directory.
+- **Host header / binding:** IP, TCP port, host name, protocol and certificate.
+- **App pool identity:** inspect **Advanced Settings → Identity** (not necessarily the app pool name).
+- **Directory browsing:** per-site config; not the same as Windows share permissions.
+- **Web shell:** look for unusual `.aspx`/`.asp`/`.php` file, suspicious command execution, newly modified script, not every script file.
+
+Read-only web-root inspection:
+
+```powershell
+Get-ChildItem 'C:\inetpub' -Recurse -Force -File -ErrorAction SilentlyContinue |
+  Where-Object { $_.Extension -in '.aspx','.asp','.php','.config' } |
+  Sort-Object LastWriteTime -Descending |
+  Select-Object -First 100 FullName,Length,LastWriteTime
+
+Get-ChildItem 'C:\inetpub' -Recurse -File -Include *.aspx,*.asp,*.php -ErrorAction SilentlyContinue |
+  Select-String -Pattern 'cmd.exe','Process.Start','FromBase64String','Invoke-Expression' -List -ErrorAction SilentlyContinue |
+  Select-Object Path,LineNumber
+```
+
+**IIS request logs** (site-numbered W3C folders):
+
+```powershell
+Get-ChildItem 'C:\inetpub\logs\LogFiles' -Force -ErrorAction SilentlyContinue
+Get-ChildItem 'C:\inetpub\logs\LogFiles' -Filter *.log -Recurse -File -ErrorAction SilentlyContinue |
+  Sort-Object LastWriteTime -Descending |
+  Select-Object -First 10 FullName,LastWriteTime,Length
+```
+
+W3C logs generally store **UTC timestamps**. Search `cs-uri-stem`, `c-ip`, HTTP status and user agent using the log header's `#Fields`; do not assume column order is fixed.
+
+**FTP:** In IIS Manager, inspect FTP site path, configured authentication, SSL/TLS, user isolation and passive port rules. For server-specific FTP request logs, inspect the actual IIS FTP log configuration. A client connection test can verify service behavior, but don't use the user's credentials in a pasted public log.
+
+### SMB shares, hidden shares and NTFS access
+
+GUI: **Win+R → `fsmgmt.msc` → Shared Folders → Shares**. On Server Core use PowerShell.
+
+```powershell
+Get-SmbShare | Select-Object Name,Path,Description,Special
+Get-SmbShareAccess -Name 'EXAMPLE_SHARE' |
+  Select-Object Name,AccountName,AccessControlType,AccessRight
+Get-Acl -LiteralPath 'C:\path\shared-folder' | Format-List Owner,AccessToString
+net share
+```
+
+**Name versus path:** a custom share like `greybeard` has a target **absolute directory**. The name might be the answer, or the backing path, depending on prompt wording. A hidden share ends with `$`; `IPC$`, `ADMIN$`, drive-letter shares, **SYSVOL/NETLOGON** on DCs can be normal.
+
+**Effective access = share permissions + NTFS permissions + user token/group membership.** Don't infer effective access from the share ACL alone. Inspect the mapped path and full account identities.
+
+**Historical Server 2019 training pattern:** ask the path of an unexpected share. The technique is `fsmgmt.msc → Shares` or `Get-SmbShare`, then report exactly the full `Path`, not the share name.
+
+### Certificates, thumbprints, EKU and SMB over QUIC
+
+GUI: **Win+R → `certlm.msc`** (local computer) or `certmgr.msc` (current user) → Personal → Certificates → double-click → **Details**.
+
+```powershell
+Get-ChildItem Cert:\LocalMachine\My |
+  Select-Object Subject,Issuer,Thumbprint,SerialNumber,NotBefore,NotAfter,HasPrivateKey,EnhancedKeyUsageList
+Get-ChildItem Cert:\CurrentUser\My |
+  Select-Object Subject,Issuer,Thumbprint,NotAfter
+```
+
+If question says "certificate intended for Server Authentication" (including **SMB over QUIC** on a supported server edition), inspect **Enhanced Key Usage (EKU)** for **Server Authentication**, plus Subject/SAN, expiration, issuer and private-key availability. Do not assume the feature is installed just because the question mentions it.
+
+```powershell
+Get-ChildItem Cert:\LocalMachine\My |
+  Where-Object { @($_.EnhancedKeyUsageList | ForEach-Object FriendlyName) -contains 'Server Authentication' } |
+  Format-List Subject,Issuer,Thumbprint,NotAfter,EnhancedKeyUsageList
+```
+
+**Thumbprint** is a certificate identifier (usually SHA-1 hex), not the same as SHA-256 hashing a file. If the prompt wants both **Subject and Thumbprint**, provide both exactly as displayed. Remove copy/paste whitespace only if the answer format requires it. **Do not export a private key** to answer a metadata question.
+
+If a cert file is supplied, `certutil -dump "C:\path\cert.cer"` can inspect metadata without installing it. For CMS encrypted to a certificate, see [real encryption](#real-encryption-cms-dpapi-aes-and-keys).
