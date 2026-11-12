@@ -6,6 +6,31 @@ For CyberPatriot-style **Windows Server 2016, 2019 and 2022**, including **stand
 
 The script, if used, should be run **after** this evidence pass. [Server hardening handbook](../Windows/windows-server.md) · [Windows workstation forensics](windows.md) · [Linux forensics](linux.md).
 
+## ⭐ Easiest websites for decoding and investigating
+
+**Only use websites if the round allows them.** Prefer the built-in commands below or an approved **offline CyberChef** copy when the material contains passwords, private keys, domain details, PCAP contents, sensitive filenames, or other nonpublic evidence. A browser site is not permission to disclose a file. **Never paste a real password or private key into a web decoder.**
+
+| Website | Best for | What to click / enter |
+|---|---|---|
+| **[CyberChef — GCHQ](https://gchq.github.io/CyberChef/)** | **Best overall:** Base64, hex, ROT13, reverse text, XOR, binary, hashes, URL, compression, multiple layers | Paste safe sample text into **Input** (top right), search an operation on the **left**, drag it to **Recipe** (middle), inspect **Output** (bottom right). Stack operations **in order**; hover for help, and use **Magic** only as a clue |
+| **[Cryptii](https://cryptii.com/)** | Simpler visual **Base64 → ROT13 → Reverse** chains, ASCII, Morse, Vigenère | Create conversion/cipher steps, choose **Decode**, put in the given text and compare each intermediate result |
+| **[dCode Affine](https://www.dcode.fr/affine-cipher)** | Affine cipher with `a`/`b` values | Paste ciphertext under **Affine Decoder**, enter exact `A` and `B`, click **Decrypt** |
+| **[dCode Vigenère](https://www.dcode.fr/vigenere-cipher)** | Vigenère keyword puzzles | Paste ciphertext, select **Knowing the Key/Password**, enter key, click **Decrypt** |
+| **[DenCode Cipher](https://dencode.com/en/cipher)** | Caesar, ROT13, Atbash, affine, Vigenère comparisons | Paste **practice or permitted** ciphertext and inspect the appropriate **Decoded** result |
+| **[HexEd.it](https://hexed.it/en/)** | View a file's **first five bytes**, magic number, and hex/ASCII columns | **Open file** in the browser editor, look at **offset `00000000`**, read first N bytes in the hex column; **do not edit/save over** the original |
+| **[VirusTotal Search](https://www.virustotal.com/gui/home/search)** | Look up whether a **known file hash** has been reported before | Enter **only a permitted SHA-256 hash** in **Search** (not Upload); a clean/unknown result proves neither safety nor that a file is authorized |
+| **[CyberChef source / offline copy](https://github.com/gchq/CyberChef)** | Work without internet after approved setup | Use a permitted local copy instead of relying on a live website; do not download outside tools against round rules |
+
+**CyberChef privacy detail:** Its project states processing happens locally in the browser, and HexEd.it makes a similar claim. Still, loaded data can be revealed if you **share a CyberChef URL containing input**, copy screenshots, use an untrusted browser, or install unwanted extensions. For confidential image content, prefer the offline copy or the exact commands below. Do not upload full VM images, credential databases, or private keys to other services.
+
+### Three fastest website recipes (Ctrl+F: website, online decoder, CyberChef, Cryptii)
+
+1. **Base64 → ROT13**: Open **CyberChef** → paste exact Base64 text in Input → search **From Base64** and add it to Recipe → search **ROT13** and add it **below** From Base64 → read final Output. In Cryptii use **Base64 Decode**, then **ROT13 Decode**. If the result looks like a phrase with weird casing, verify the final letter case against the question.
+2. **ROT13 → Reverse Text**: Paste scrambled text → apply **ROT13**, then **Reverse Text**. For example the intermediate text might become backwards-readable; add **Reverse Text** rather than changing the ROT alphabet. Watch whether the problem asks you to reverse *characters* versus *word order*.
+3. **Hex → ASCII**: Paste an even-length string of hex characters → apply **From Hex** (recognize bytes, not decimal numbers) → read Output as UTF-8/ASCII. If it shows garbage, switch to **To Hex/Hex view** and inspect magic bytes before interpreting as plain text.
+
+For **XOR**, CyberChef can accept a supplied key; set **key encoding (hex, Base64-derived bytes, or UTF-8 text)** and the exact mode indicated by the prompt. It is not the same as applying XOR to the literal characters of a hex string. For **AES/GPG**, the algorithm name is insufficient: you need the correct key plus mode/IV/salt/tag. For **password hashes**, no website can simply reverse arbitrary SHA-256/NTLM into plaintext.
+
 ## Ctrl+F quick question finder
 
 | Keywords in question | Start here |
@@ -91,6 +116,9 @@ You can use an approved offline [CyberChef](https://github.com/gchq/CyberChef) r
 
 ### Base64 and multiple layers
 
+**⭐ EASIEST WAY — website if permitted:** [CyberChef](https://gchq.github.io/CyberChef/) → paste Base64 ciphertext → **From Base64** → inspect Output and, only if indicated, add **ROT13**, **Reverse Text**, **From Hex** or another operation. Do **not** paste actual AD passwords, private keys or confidential server data into other public tools.
+
+
 ```powershell
 $encoded = 'SGVsbG8='
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($encoded))
@@ -110,6 +138,9 @@ If output is nonsensical text but looks like another encoding, try ROT13 or hex.
 **Base64URL:** uses `-` and `_`; it may lack padding. Don't strip arbitrary evidence characters just to make a decoder run.
 
 ### Hex, ASCII, binary, decimal and file signatures
+
+**⭐ WEBSITE OPTION:** [CyberChef](https://gchq.github.io/CyberChef/) → **From Hex**, **From Binary**, or **From Decimal** according to the prompt. For the first bytes of a named file use [HexEd.it](https://hexed.it/en/) and read offset zero without saving edits.
+
 
 PowerShell **5.1-compatible** hex decoding; do not assume `[Convert]::FromHexString` exists:
 
@@ -156,6 +187,9 @@ Other short codes:
 
 ### ROT13, reverse, Caesar, Atbash, affine and Vigenere
 
+**⭐ WEBSITE OPTION:** [CyberChef](https://gchq.github.io/CyberChef/) → **ROT13 → Reverse Text**, or use [dCode Affine](https://www.dcode.fr/affine-cipher) and [dCode Vigenère](https://www.dcode.fr/vigenere-cipher) for provided parameters. Do not use an online tool for secrets from a Domain Controller.
+
+
 ROT13:
 
 ```powershell
@@ -188,6 +222,9 @@ $chars = $decoded.ToCharArray()
 **Layer example:** ROT13 can produce another reversed English phrase. Record intermediate text, then reverse **characters** (not word order); preserve exact capitalization.
 
 ### XOR and one-time-pad puzzles
+
+**⭐ WEBSITE OPTION:** [CyberChef](https://gchq.github.io/CyberChef/) → decode the **ciphertext** into bytes first (`From Hex`/`From Base64`), then apply **XOR** using the provided **key** and its correct encoding. Verify equal byte lengths for a one-time-pad-style question. Do not share the recipe URL if it contains evidence.
+
 
 An OTP-style exercise may supply ciphertext and key as hex. XOR the corresponding **decoded bytes**, not the hex characters:
 
@@ -243,6 +280,9 @@ Get-ChildItem "$env:USERPROFILE\Desktop","$env:USERPROFILE\Downloads","C:\Users\
 Seek the authorized passphrase in adjacent evidence, clues, filenames or README. Inspect an archive copy and do not run unknown extracted executables. AES-encrypted ZIP variants may not work with Windows' built-in extractor.
 
 ### File hashes, RIPEMD160 and hash versus password
+
+**⭐ WEBSITE OPTION:** [CyberChef](https://gchq.github.io/CyberChef/) can calculate supported hashes for a permitted file in your browser; cross-check with the exact local algorithm below. [VirusTotal Search](https://www.virustotal.com/gui/home/search) can **look up** an existing hash, but does not calculate the scored file's correct digest or prove it is malicious.
+
 
 ```powershell
 Get-FileHash -LiteralPath 'C:\path\evidence.bin' -Algorithm SHA256
