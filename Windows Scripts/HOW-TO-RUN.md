@@ -1,83 +1,95 @@
-# Windows 10/11 script — setup and use
+# Windows 10/11 — one-run hardening
 
-The file `windows-10-11.ps1` can inspect the system and apply selected changes from the [Windows 10/11 guide](../Windows/windows-10-11.md). It does **not** know the image's scoring requirements. The image README takes priority over every suggestion in the script.
+`windows-10-11.ps1` runs the supported checks and configured fixes from the [Windows handbook](../Windows/windows-10-11.md) in a single pass. You do not have to choose 30 menu items. The image README determines authorized users, required groups, services, applications and policy values.
 
-The script starts in a menu and changes nothing until you choose a fix and confirm it. `Audit` is read-only. `Quick` runs an audit, presents several common fixes one at a time, and asks for `YES` before each change. Some actions are irreversible; read the confirmation and check your original score before using them.
+## 1. Put the files inside the Windows VM
 
-## 1. Get the file
+1. In GitHub open [windows-10-11.ps1](windows-10-11.ps1), select **Raw**, then save it inside the VM's **Downloads** folder. The file must end in `.ps1`, not `.ps1.txt`.
+2. Use the VM's own desktop, not your personal host computer. If Windows warns that the file came from the internet, verify that you downloaded the reviewed version from your repository.
+3. Before changing the VM, read its README and save any required forensic answers. Record the original score and working administrator account. Keep the VM console available; make a snapshot only if round rules permit it.
 
-1. Open the repository and go to **Windows Scripts → [windows-10-11.ps1](windows-10-11.ps1)**.
-2. Click **Raw**, then press **Ctrl+S**. Save the file in the Windows VM's **Downloads** folder as `windows-10-11.ps1` (not `windows-10-11.ps1.txt`).
-3. Open **File Explorer → Downloads**. Choose **View → Show → File name extensions** and confirm that the filename ends in `.ps1`.
-4. Run the script **inside the Windows 10/11 VM**, not on the host computer. If moving a downloaded file into a competition image, first check the current round's resource rules; the fact that a file is on GitHub does not make its use automatically authorized.
+## 2. Open an Administrator PowerShell window
 
-## 2. Before running it
-
-1. Open and read the image **README**. Write down authorized users, administrators, required groups, critical services, software to keep, and any prohibited items.
-2. Save any required forensic answers **before** deleting files, changing users, or removing suspicious processes.
-3. Open the Scoring Report and write down the current score. Keep the VM console accessible and take a snapshot only if the rules permit one.
-4. Do **not** run the script if you are unsure whether a change would disable a required service or remove an authorized account. Use the [manual guide](../Windows/windows-10-11.md) first.
-
-## 3. Open PowerShell and run an audit
-
-1. Click **Start**, type **Windows PowerShell**, right-click it, and choose **Run as administrator**.
-2. Click **Yes** if Windows asks whether to allow the application to make changes.
-3. Enter the following commands, one line at a time:
+Click **Start**, search **Windows PowerShell**, right-click **Run as administrator**, and select **Yes** for the Windows elevation prompt. Then enter:
 
 ```powershell
 cd "$env:USERPROFILE\Downloads"
 Get-Item .\windows-10-11.ps1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Audit
 ```
 
-The last command uses a process-specific execution-policy override; it does not permanently change your computer's execution policy. Only use it after reviewing the downloaded script and confirming its source.
+Do not run it until the exact file appears. The script supports Windows 10/11 with Windows PowerShell 5.1; it refuses to harden Windows Server or Domain Controllers automatically.
 
-4. Find the **Saved report:** path in the output. The report is stored under `Documents\WindowsSecurityWork` in the account that ran the script. Open the `audit-...txt` file in Notepad.
-5. Compare the results with the README. A suspicious account, enabled service, installed tool, or open port is only a finding—not proof it should be removed.
-
-If PowerShell says the file cannot be found, check the Downloads location and extension. If it says **Access denied** or an operation needs administrator rights, close that window and repeat **Run as administrator**.
-
-## 4. Open the interactive menu
-
-From the same Administrator PowerShell window, enter:
+## 3. Create the README-specific configuration once
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Menu
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -InitConfig -Config ".\image-config.json"
+notepad .\image-config.json
 ```
 
-Type one of the menu numbers and press **Enter**. For most fixes, type **YES** exactly when prompted. Typing anything else cancels that fix. To exit, choose `X`.
+The JSON template is generated automatically and must be edited before Apply mode works. Use the image README to fill in:
 
-Useful options:
-
-| Menu | Task |
+| Field | What it controls |
 |---|---|
-| `0` | Read-only audit of users, local groups, password settings, firewall, Defender, services, software, startup tasks, shares, and network listeners |
-| `1`, `2`, `3` | Enable firewall, review/enable Defender protection, update Defender signatures |
-| `4`, `5` | Disable Guest; configure explicit image-required local password and lockout values |
-| `6`, `7` | Create a required local group and add **only** the specified group members |
-| `8`, `9`, `10`, `20` | Create an authorized user, set a password, remove unauthorized admin privileges, allow password expiration |
-| `11`, `12`, `16`, `29` | Review security registry options, require SMB client signing, enable Credential Validation success auditing, enable PowerShell logging |
-| `13`, `14`, `15`, `28` | Disable RDP, selected unneeded services, SMB1, or Remote Assistance **only when permitted** |
-| `17`, `18`, `19`, `21`, `22` | Disable/delete one confirmed unauthorized user, remove group member, remove custom share, or remove one Defender exclusion |
-| `23`, `24`, `25`, `26`, `27` | Defender quick scan, update/uninstall one exact program via `winget` when available, delete one identified prohibited file, open Windows Update |
-| `Q` | Review common quick fixes with a confirmation before each one |
+| `AuthorizedUsers`, `AuthorizedAdmins` | People who must remain active; never guess these lists |
+| `RequiredServices`, `RequiredShares`, `RequiredSoftware` | Items the script must protect |
+| `Groups` | Required local groups and their exact member usernames |
+| `NewUsers`, `DemoteAdmins`, `PasswordExpiresUsers` | Named user/group changes |
+| `DisableUsers`, `RemoveUsers` | Exact unauthorized accounts, not a guessed list |
+| `PasswordPolicy` | Only the numeric/password fields the image actually requires |
+| `DisableServices`, `DisableFeatures`, `DisableScheduledTasks` | Only verified unnecessary components |
+| `RemoveShares`, `RemovePrograms`, `RemoveFiles` | Exact prohibited items |
+| `UpdatePrograms` | Exact installed `winget` IDs to update |
+| `Security` | Firewall, Defender, SMB, browser policies, RDP, audit, Windows Update |
 
-For an example custom group task: select `6`, enter the exact group name, confirm its creation, then select `7` to enter that same group and the exact member usernames separated by commas or semicolons. Reopen **Win + R → `lusrmgr.msc` → Groups** to confirm the result. Those are separate actions.
+Example group object inside the generated JSON: ``"Groups": { "SpiderVerse": ["esther", "wyatt", "turner", "tina"] }`. This would create the specified group and add the four users automatically if they already exist. Replace these examples with names from the current README.
 
-## 5. Use it to address scoring items quickly
+Only after reviewing **every applicable field**, change `"ConfirmedReadme": false` to `"ConfirmedReadme": true`. Do not set it to true just to make the script start. The sample template does not invent unauthorized users or prohibited files.
 
-1. Run **Audit** and read the **README**. Check which requirements are actually unmet before making changes.
-2. Select **Q** for a quick review. The script audits, then individually offers firewall, Defender, definition updates, Guest, registry security options, SMB signing, and two unneeded-service checks. **Only approve a step when you have confirmed it is appropriate.**
-3. Look at the Scoring Report after each approved change and give it time to refresh. A score can change later; no fix is guaranteed to award points.
-4. Use the menu for explicit README items, such as **password policy (`5`)**, **group creation (`6`)**, **group membership (`7`)**, **passwords (`9`)**, **password expiration (`20`)**, or **unwanted software (`25`)**. Never guess values or names based on another image.
-5. Perform anything in [MANUAL-TASKS.md](MANUAL-TASKS.md) using the linked sections of the main guide. End with a final audit (`0`) and test every README-required application and user login.
+**Password policy:** You can leave ``"PasswordPolicy": {}` empty if the README has no confirmed requirements. To set a required 12-character minimum and enable complexity, use ``"PasswordPolicy": {"MinimumPasswordLength": 12, "PasswordComplexity": 1}` within the existing JSON. Only use values confirmed for that image.
 
-## 6. Logs, mistakes, and limitations
+## 4. Run the whole workflow with one command
 
-Every run writes `changes-...txt` to `Documents\WindowsSecurityWork`. Audit mode writes `audit-...txt`; local password policy changes also preserve an exported `.inf` file. The log records some original settings, but **is not a full automatic rollback tool**. Password resets, user deletion, program removal, file deletion, and some policy changes may not be reversible without backups.
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json" -Yes
+```
 
-If the score falls, **stop**, open the latest log, identify the last approved change, and restore only that previous setting with the appropriate guide instructions. Do not use a whole-machine rollback unless permitted and necessary. Some Windows changes require a policy refresh or an approved reboot to take effect. Never restart the machine just to force a score refresh.
+**That is the all-in-one command.** It performs an initial audit, processes all 15 sections in order, runs the final audit, and writes a summary. `-Yes` skips the initial confirmation; it does **not** bypass protections for required services, built-in users, or missing passwords.
 
-Domain-joined machines, Windows Home editions, protected Defender settings, missing `winget`, and Group Policy controls can limit functionality. The script is written for **Windows PowerShell 5.1 on Windows 10/11** and has not been executed against an actual competition VM. Treat any script error as a reason to investigate manually, not as permission to disable another service.
+For exact names/files/apps that the README explicitly requires you to **remove**, and only after preserving necessary evidence, use:
 
-**Rules note:** CyberPatriot's published rules allow certain team-created scripts in online rounds but restrict sharing and publicly posting CyberPatriot-specific scripts. A public GitHub link is not team-private. Check your coach's current official rules before downloading, posting, or using this file in a scored round.
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json" -Yes -AllowRemovals
+```
+
+Without `-AllowRemovals`, permanent account/file/share/software removals are listed as **REVIEW** instead. This flag does not trigger broad or automatic discovery-based deletions: it only allows the exact entries in the JSON.
+
+## 5. What runs in one pass
+
+1. Account and group reconciliation: Guest, required local groups, members, specifically named unauthorized users/admin rights, password-expiry flags and authorized-user creation when a secure password can be entered.
+2. Configured local password and lockout policy, with an original policy export for recovery.
+3. Windows security options: SmartScreen, blank-password network restriction, AutoPlay, optional LLMNR, remote assistance, WDigest and screen lock controls.
+4. Defender protection/signature updates, firewall profiles, SMB signing/SMB1 and Credential Validation success auditing.
+5. Named unnecessary services and Windows features, selected scheduled tasks and custom SMB shares.
+6. Installed software inventory, exact `winget` application updates/removals, and exact prohibited files.
+7. Optional Chrome/Edge pop-up policies and Windows Update scan or installation (without a forced restart).
+8. Final audit and summary of changed, unchanged, skipped, failed and human-review items.
+
+On a normal `-Yes` run, new-user creation and password resets requiring a password are **not** silently performed, because the script never stores plaintext passwords in the JSON. Run again without `-Yes` for secure prompts, or use [the manual guide](MANUAL-TASKS.md).
+
+## 6. Results and quick competition review
+
+The script saves reports under **Documents → WindowsSecurityWork** for the administrator account. Every Apply run creates a timestamped `backups-...` folder containing available original policy exports, registry exports, service states, audit snapshots, and inventory; `summary-...csv` lists outcomes.
+
+| Result | Meaning |
+|---|---|
+| `CHANGED` | A requested setting/change was attempted and the module reported success |
+| `OK` | Already satisfied / not installed / absent |
+| `REVIEW` | Human decision or verification is still required |
+| `SKIPPED` | Protected, unspecified, incompatible or not permitted |
+| `FAILED` | The command failed; investigate before continuing |
+
+Open the Scoring Report **after** the full run, compare the before/after audit, then finish [MANUAL-TASKS.md](MANUAL-TASKS.md). If scoring drops or a critical application stops working, restore only the documented setting using the original value and the [recovery guide](../Windows/windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps). Password resets and deletions are not automatically reversible.
+
+To run only selected sections after fixing the JSON, add ``-Only users,passwords,firewall` to the Apply command. Audit without changes remains available with ``-Mode Audit`. The old ``-Mode Menu` and ``-Mode Quick` are retained as alternatives.
+
+**Limits:** No script can infer image-specific scoring rules, identify every backdoor with certainty, preserve every required application dependency, or guarantee points. There is no automatic reboot. This code has not been run against an actual CyberPatriot VM; verify its operation on a disposable practice VM first. A public GitHub repo is not team-private, so check the current competition rules on sharing and using scripts before a scored round.
