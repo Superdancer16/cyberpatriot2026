@@ -20,4 +20,4 @@ Every major guide follows the same study and competition workflow:
 
 **Non-negotiable:** Read the competition image README and preserve forensic evidence before deleting users/files or disabling services. Retain administrative access, verify every required function and keep rollback notes.
 
-**Windows 10/11 automation:** [One-run PowerShell script and instructions](Windows%20Scripts/HOW-TO-RUN.md). The other handbooks remain manual Markdown references. The image README and current competition rules take priority. See [sources and attribution](General/All/sources-and-attribution.md); original documentation reuse permission is noted there.
+**One-run scripts:** [Windows 10/11 PowerShell](Windows%20Scripts/HOW-TO-RUN.md) · [Debian 12/13 Bash](Linux%20Scripts/HOW-TO-RUN.md). Linux Mint, Ubuntu, Windows Server and other handbooks remain manual references. The image README and current competition rules take priority. See [sources and attribution](General/All/sources-and-attribution.md); original documentation reuse permission is noted there.

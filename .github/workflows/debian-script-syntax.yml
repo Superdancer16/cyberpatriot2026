@@ -1,0 +1,29 @@
+name: Debian script syntax
+on:
+  pull_request:
+    paths:
+      - 'Linux Scripts/debian.sh'
+      - '.github/workflows/debian-script-syntax.yml'
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Bash syntax
+        run: bash -n 'Linux Scripts/debian.sh'
+      - name: Check functions and entrypoint
+        run: |
+          grep -q '^run_all() {' 'Linux Scripts/debian.sh'
+          grep -q '^do_groups() {' 'Linux Scripts/debian.sh'
+          grep -q '^do_ssh() {' 'Linux Scripts/debian.sh'
+      - name: Check help and list
+        run: |
+          bash 'Linux Scripts/debian.sh' --help | grep -q 'Debian 12/13'
+          bash 'Linux Scripts/debian.sh' --list | grep -qx verify
+      - name: ShellCheck errors (if installed)
+        run: |
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck --severity=error 'Linux Scripts/debian.sh'
+          else
+            echo 'ShellCheck is not installed; bash -n already passed.'
+          fi
