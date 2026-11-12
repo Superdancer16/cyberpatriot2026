@@ -33,7 +33,7 @@ A good plan matters more than speed. Teams lose the most points by rushing and b
 | Time | What to do |
 |---|---|
 | **0:00–0:15** | Open your image. **Read the README twice** and write down admins, users, critical services and prohibited items ([how](reading-the-readme.md)). **Take a VMware snapshot** (VM menu → Snapshot → Take Snapshot). |
-| **0:15–0:45** | **Forensics questions.** Answer as many as you can *before* changing anything ([how](../../Forensics/README.md)). Skip any that take more than 10 minutes and come back later. |
+| **0:15–0:45** | **Forensics questions.** Answer as many as you can *before* changing anything ([how](../Forensics/README.md)). Skip any that take more than 10 minutes and come back later. |
 | **0:45–1:00** | **Start updates** (they're slow, so let them run in the background). Use native read-only inventories, then make reviewed manual changes. Check the Scoring Report. |
 | **1:00–2:30** | Work through the checklist from the top: users → passwords → firewall → services → software → files → OS settings → critical services. Verify every checklist item manually. **Check the Scoring Report after every few fixes.** |
 | **2:30–3:30** | Backdoor hunting, the harder checklist items, the leftover forensics questions, and application updates (Firefox etc.). |
@@ -66,13 +66,13 @@ A good plan matters more than speed. Teams lose the most points by rushing and b
 <a id="topic-5"></a>
 ## Using the scripts in a practice round
 
-Optional Windows, Windows Server and Debian scripts are included in the [script hub](../../Scripts/README.md), but they may only be used when competition rules and the image README permit them. Run the documented audit first and verify every outcome against the manual handbook.
+Optional Windows, Windows Server and Debian scripts are included in the [script hub](../Scripts/README.md), but they may only be used when competition rules and the image README permit them. Run the documented audit first and verify every outcome against the manual handbook.
 
 1. Inspect native OS settings first and preserve relevant evidence.
 2. Apply manual changes only after relevant forensic questions and README requirements have been reviewed.
 3. Open the manual checklist and verify every effective setting and required client function. Do not skip an item based on an external tool's status.
 
-See [Script safety, verification and rollback](../../Scripts/README.md#review-external-or-historical-tools-before-running).
+See [Script safety, verification and rollback](../Scripts/README.md#review-external-or-historical-tools-before-running).
 
 ---
 

@@ -81,7 +81,7 @@ Older practice images may also be Windows 10, Windows Server 2019, or Ubuntu. Th
 
 Open lesson 2, [Things that lose points](things-that-lose-points.md), then keep going through the lessons in order.
 
-Already know the basics and want to start on an image? Open your checklist: [Windows 10 / 11](../../Windows/windows-10-11.md) · [Windows Server](../../Windows/windows-server.md) · [Linux Mint](../../Linux/linux-mint.md) · [Debian](../../Linux/debian.md) · [FreeBSD](../../Linux/freebsd.md) · [Ubuntu](../../Linux/ubuntu.md). If a word confuses you, look it up in the [Glossary](glossary.md).
+Already know the basics and want to start on an image? Open your checklist: [Windows 10 / 11](../../Windows/windows-10-11.md) · [Windows Server](../../Server/windows-server.md) · [Linux Mint](../../Linux/Mint/linux-mint.md) · [Debian](../../Linux/Debian/debian.md) · [FreeBSD](../FreeBSD/freebsd.md) · [Ubuntu](../../Linux/Ubuntu/ubuntu.md). If a word confuses you, look it up in the [Glossary](glossary.md).
 
 ---
 

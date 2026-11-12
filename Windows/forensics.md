@@ -6,7 +6,7 @@ For CyberPatriot-style **Windows 10/11 workstation** images. Keep this open in G
 
 This is a **method handbook, not an answer key for a particular image**. Exact paths and sample strings are examples. All commands are read-only unless explicitly labeled otherwise; do not install tools or upload image data to websites unless your competition rules and coach allow it.
 
-Related: [Windows 10/11 hardening handbook](../Windows/windows-10-11.md) · [Linux forensics](linux.md) · [Windows Server forensics](windows-server.md).
+Related: [Windows 10/11 hardening handbook](windows-10-11.md) · [Linux forensics](../Linux/forensics.md) · [Windows Server forensics](../Server/forensics.md).
 
 ## ⭐ Easiest websites for decoding and investigating
 
@@ -628,6 +628,6 @@ This guide was built from the supplied **CyberPatriot Forensics Question Researc
 - [Microsoft Learn — Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent).
 - [Microsoft Learn — Get-SmbShare](https://learn.microsoft.com/en-us/powershell/module/smbshare/get-smbshare).
 - [CyberChef open-source project](https://github.com/gchq/CyberChef) for approved/offline multi-stage encoding practice.
-- [General forensic overview](README.md) · [Windows remediation handbook](../Windows/windows-10-11.md).
+- [General forensic overview](../Misc/Forensics/README.md) · [Windows remediation handbook](windows-10-11.md).
 
 Do not expect any document to cover **every possible future question**. This guide supplies starting workflows for broad question families; confirm the particular image's evidence before answering.

@@ -77,7 +77,7 @@ That is exactly what the scripts ask for when they start.
 
 <a id="topic-3"></a>
 ## After the README: the Forensics Questions
-Open each Forensics Question file and **answer them before fixing anything**. Fixing things can destroy evidence: deleting a user deletes the clue that was in their home folder. See [Forensics questions](../../Forensics/README.md).
+Open each Forensics Question file and **answer them before fixing anything**. Fixing things can destroy evidence: deleting a user deletes the clue that was in their home folder. See [Forensics questions](../Forensics/README.md).
 
 ---
 
