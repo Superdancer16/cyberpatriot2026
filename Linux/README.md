@@ -18,6 +18,6 @@ All three main Linux guides are now structured by learning stage and practical p
 
 **Do first:** [Read the image README](../General/All/reading-the-readme.md) and preserve [forensics answers](../General/All/forensics-questions.md). Check the exact OS release and required users/daemons before modifying accounts, packages, firewall, login or authentication.
 
-**No executable scripts are included.** All command examples remain in the Markdown guides for manual inspection, verification and controlled recovery.
+**Debian 12/13 automation:** [debian.sh](../Linux%20Scripts/debian.sh) · [Beginner run instructions](../Linux%20Scripts/HOW-TO-RUN.md) · [Manual tasks after the script](../Linux%20Scripts/MANUAL-TASKS.md). Mint, Ubuntu and FreeBSD use their separate manual handbooks. The VM README takes priority.
 
 [All categories](../README.md)
