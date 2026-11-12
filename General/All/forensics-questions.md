@@ -6,6 +6,8 @@
 > [!CAUTION]
 > **Preserve evidence first.** Record relevant artifacts and answers before changing accounts, logs, binaries, services, or files.
 
+**New detailed Ctrl+F guides:** [Windows 10/11](../../Forensics/windows.md) · [Linux — Debian/Mint/Ubuntu](../../Forensics/linux.md) · [Windows Server / Active Directory](../../Forensics/windows-server.md). Use these for step-by-step decoding (Base64, ROT13, reverse, hex, XOR, AES/keys), file searches, events, and optional CyberChef/cryptography websites. This page remains a shorter cross-platform introduction.
+
 ## 🧭 Quick links
 
 [How to answer](#topic-1) · [The common question types](#topic-2) · [Don't lose the evidence](#topic-3) · [Repeatable investigation procedures](#topic-4)
