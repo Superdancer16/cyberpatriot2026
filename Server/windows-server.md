@@ -7,7 +7,7 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
-**Forensics first — searchable question solver:** [Windows Server/Active Directory forensic guide](../Forensics/windows-server.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+**Forensics first — searchable question solver:** [Windows Server/Active Directory forensic guide](forensics.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
 
 Windows Server 2022 appears in multiple CyberPatriot XIX rounds; use the competition's actual image README and official round materials. **Version and support (November 2026):** Server 2016 extended support ends in January 2027, Server 2019 in January 2029, and Server 2022 in October 2031. Confirm the exact lifecycle date for the installed edition in Microsoft's current lifecycle documentation. Server 2022 moved to extended support in October 2026 but still receives monthly security updates. Never perform a release upgrade to earn speculative points. See [Microsoft's Windows Server release information](https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info).
 
@@ -1853,7 +1853,7 @@ WinRM should normally reject Basic authentication and unencrypted traffic. HTTP 
 ##### WS.0.1 Read the README
 - [ ] **🎯 DO THIS — WS.0.1 Read the README**
 
-Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/All/reading-the-readme.md).
+Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../Misc/General/reading-the-readme.md).
 
 ##### WS.0.2 Take a VMware snapshot
 - [ ] **🎯 DO THIS — WS.0.2 Take a VMware snapshot**
@@ -1886,7 +1886,7 @@ Get-ChildItem C:\Users -Recurse -Force -Filter *secret* -ErrorAction SilentlyCon
 Get-ChildItem C:\Users -Recurse -File -Force -Include *.txt,*.csv,*.log,*.ps1,*.bat -ErrorAction SilentlyContinue | Select-String -Pattern "password"   # find text inside files
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aGVsbG8='))   # decode base64
 ```
-More: [Windows Server forensics guide](../Forensics/windows-server.md).
+More: [Windows Server forensics guide](forensics.md).
 
 ##### WS.1.2 Manual security baseline (no hardening script)
 - [ ] **🎯 DO THIS — WS.1.2 Manual security baseline (no hardening script)**
@@ -1916,7 +1916,7 @@ More: [Windows Server forensics guide](../Forensics/windows-server.md).
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc/Scripts/README.md) for the limits of external tools.
 
 ---
 

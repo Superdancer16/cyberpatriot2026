@@ -1,6 +1,6 @@
 # Windows Server — download and run inside the VM
 
-Use [windows-server.ps1](windows-server.ps1) with the [Windows Server handbook](../Windows/windows-server.md). The script works with Windows Server 2016, 2019 and 2022 roles described in the handbook. It does not assume a Domain Controller is the same as a standalone server.
+Use [windows-server.ps1](windows-server.ps1) with the [Windows Server handbook](../windows-server.md). The script works with Windows Server 2016, 2019 and 2022 roles described in the handbook. It does not assume a Domain Controller is the same as a standalone server.
 
 Read the image README and save necessary forensic answers before making changes. The script executes only the configuration you approve, not every example in the handbook.
 

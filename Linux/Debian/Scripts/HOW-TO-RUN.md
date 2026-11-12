@@ -1,6 +1,6 @@
 # Debian 12/13 script — download and run inside the VM
 
-Use [debian.sh](debian.sh) with the [Debian handbook](../Linux/debian.md). Like the Windows script, it has an audit, image-specific JSON configuration, all-in-one Apply mode, logs and backups. The active image README always takes priority.
+Use [debian.sh](debian.sh) with the [Debian handbook](../debian.md). Like the Windows script, it has an audit, image-specific JSON configuration, all-in-one Apply mode, logs and backups. The active image README always takes priority.
 
 ## 1. Log in to GitHub inside the Debian VM
 

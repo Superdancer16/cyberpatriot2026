@@ -1,6 +1,6 @@
 # Windows 10/11 — download and run inside the VM
 
-The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings based on the [complete handbook](../Windows/windows-10-11.md). One Apply command runs all configured sections. The **image README determines which accounts, services, applications and files are authorized**.
+The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings based on the [complete handbook](../windows-10-11.md). One Apply command runs all configured sections. The **image README determines which accounts, services, applications and files are authorized**.
 
 ## 1. Sign in to GitHub inside the virtual machine
 
@@ -129,7 +129,7 @@ Open **File Explorer → Documents → WindowsSecurityWork**. Inspect the latest
 
 `CHANGED` means the command reported a change, **not** that CyberPatriot awarded points. Review every `REVIEW` and `FAILED` result and compare the Scoring Report to your original score. Confirm authorized administrative login, required apps, RDP/SSH, printers, shares and networking still work.
 
-Some settings need a restart, but **the script does not reboot the VM**. If a necessary service fails or the score drops, restore only the changed setting using the original value or exported backup; deleted users/files may not be recoverable. Use [MANUAL-TASKS.md](MANUAL-TASKS.md) and the [handbook recovery steps](../Windows/windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps).
+Some settings need a restart, but **the script does not reboot the VM**. If a necessary service fails or the score drops, restore only the changed setting using the original value or exported backup; deleted users/files may not be recoverable. Use [MANUAL-TASKS.md](MANUAL-TASKS.md) and the [handbook recovery steps](../windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps).
 
 ## Troubleshooting
 
