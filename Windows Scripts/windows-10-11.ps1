@@ -414,6 +414,15 @@ function Initialize-ReadmeConfig {
         RequiredServices = @()
         RequiredSoftware = @()
         RequiredShares = @()
+        RequiredPorts = @()
+        ForensicsComplete = $false
+        ScanPaths = @()
+        DisableFirewallRules = @()
+        RemoveAppxPackages = @()
+        RemoveStartupValues = @()
+        ClearIFEO = @()
+        RemoveShareAccess = @()
+        AuditSubcategories = [ordered]@{}
         DisableUsers = @()
         RemoveUsers = @()
         DemoteAdmins = @()
@@ -427,6 +436,8 @@ function Initialize-ReadmeConfig {
         DisableFeatures = @()
         RemoveShares = @()
         RemoveDefenderExclusions = @()
+        RemoveDefenderExclusionProcesses = @()
+        RemoveDefenderExclusionExtensions = @()
         DisableScheduledTasks = @()
         RemovePrograms = @()
         RemoveFiles = @()
@@ -438,6 +449,14 @@ function Initialize-ReadmeConfig {
             DefenderSignatures = $true
             DefenderQuickScan = $false
             SMBClientSigning = $false
+            SMBServerSigning = $false
+            RequireRdpNla = $false
+            EnableUAC = $false
+            RestrictAnonymous = $false
+            DisableLMHash = $false
+            RequireNTLMv2 = $false
+            ProtectPrintDrivers = $false
+            DisableNetBIOS = $false
             CredentialAuditSuccess = $true
             SmartScreen = $true
             DisableAutoPlay = $true
@@ -467,6 +486,10 @@ function Load-ReadmeConfig {
     $script:Cfg = Get-Content -LiteralPath $Config -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     if (-not [bool](Get-Value $script:Cfg 'ConfirmedReadme' $false)) {
         throw 'Set ConfirmedReadme=true only after reading the actual image README and checking authorized accounts/services.'
+    }
+    $adminNames = Names (Get-Value $script:Cfg 'AuthorizedAdmins')
+    if (-not $adminNames.Count) {
+        throw 'AuthorizedAdmins cannot be empty. List your actual authorized administrators from the image README.'
     }
     $script:Authorized = @(Names (Get-Value $script:Cfg 'AuthorizedUsers')) + @(Names (Get-Value $script:Cfg 'AuthorizedAdmins'))
     $script:RequiredServices = @(Names (Get-Value $script:Cfg 'RequiredServices'))
@@ -740,7 +763,7 @@ function Invoke-AutoUserRights {
     if ($script:domainJoined) { Write-Result 'REVIEW' 'User-rights policy may be managed by domain GPO; skipped.'; return }
     $desired = Get-Value $script:Cfg 'RemoveUserRights'
     if (-not $desired) { return }
-    $allowed = @('SeSecurityPrivilege','SeTakeOwnershipPrivilege')
+    $allowed = @('SeSecurityPrivilege','SeTakeOwnershipPrivilege','SeDebugPrivilege','SeBackupPrivilege','SeRestorePrivilege','SeLoadDriverPrivilege','SeRemoteInteractiveLogonRight')
     $currentPolicy = Join-Path $script:BackupDir 'user-rights-before.inf'
     & secedit.exe /export /cfg $currentPolicy /areas USER_RIGHTS | Out-Null
     if ($LASTEXITCODE -ne 0) { Write-Result 'FAILED' 'User rights export failed; no changes made.'; return }
@@ -845,6 +868,54 @@ function Invoke-AutoSecurity {
     if ([bool](Get-Value $sec 'PowerShellLogging' $false)) {
         Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' 'EnableScriptBlockLogging' 1
     }
+    if ([bool](Get-Value $sec 'EnableUAC' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'EnableLUA' 1
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'ConsentPromptBehaviorAdmin' 2
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'PromptOnSecureDesktop' 1
+        Write-Result 'REVIEW' 'UAC may require restarting Windows; test administrative elevation.'
+    }
+    if ([bool](Get-Value $sec 'RestrictAnonymous' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'RestrictAnonymousSAM' 1
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'RestrictAnonymous' 1
+    }
+    if ([bool](Get-Value $sec 'DisableLMHash' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'NoLMHash' 1
+    }
+    if ([bool](Get-Value $sec 'RequireNTLMv2' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'LmCompatibilityLevel' 5
+        Write-Result 'REVIEW' 'NTLMv2-only may break legacy clients; test required file shares/authentication.'
+    }
+    if ([bool](Get-Value $sec 'ProtectPrintDrivers' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'RestrictDriverInstallationToAdministrators' 1
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'NoWarningNoElevationOnInstall' 0
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'UpdatePromptSettings' 0
+        Write-Result 'REVIEW' 'Print-driver policy changed; verify required printers and driver installs.'
+    }
+    if ([bool](Get-Value $sec 'RequireRdpNla' $false)) {
+        if (Is-Listed 'TermService' $script:RequiredServices) {
+            Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' 'UserAuthentication' 1
+            Write-Result 'REVIEW' 'Verify authorized RDP clients still connect using NLA.'
+        } else {
+            Write-Result 'REVIEW' 'RDP NLA was requested, but TermService is not marked required in JSON.'
+        }
+    }
+    if ([bool](Get-Value $sec 'DisableNetBIOS' $false)) {
+        if ($script:RequiredShares.Count -gt 0 -or (Is-Listed 'LanmanServer' $script:RequiredServices)) {
+            Write-Result 'SKIPPED' 'NetBIOS change skipped because file sharing is listed as required.'
+        } else {
+            $adapters = @(Get-CimInstance Win32_NetworkAdapterConfiguration -Filter 'IPEnabled=True')
+            $adapters | Select-Object Description,Index,TcpipNetbiosOptions |
+                Export-Csv -LiteralPath (Join-Path $script:BackupDir 'netbios-before.csv') -NoTypeInformation
+            foreach ($adapter in $adapters) {
+                if ($adapter.TcpipNetbiosOptions -eq 2) { continue }
+                Decide "Disable NetBIOS on adapter $($adapter.Index)" $true {
+                    $result = Invoke-CimMethod -InputObject $adapter -MethodName SetTcpipNetbios -Arguments @{TcpipNetbiosOptions=2}
+                    if ($result.ReturnValue -notin @(0,1)) { throw "NetBIOS adapter result $($result.ReturnValue)" }
+                }
+            }
+            Write-Result 'REVIEW' 'Verify required connectivity after NetBIOS changes.'
+        }
+    }
     if ([bool](Get-Value $sec 'DisableRDP' $false)) {
         if ($env:SESSIONNAME -like 'RDP*' -or (Is-Listed 'TermService' $script:RequiredServices)) {
             Write-Result 'SKIPPED' 'Remote Desktop required or script running from RDP; cannot disable.'
@@ -875,7 +946,27 @@ function Invoke-AutoDefender {
         } catch { Write-Result 'REVIEW' ('Defender signatures could not update: ' + $_.Exception.Message) }
     }
     if ([bool](Get-Value $script:Sec 'DefenderQuickScan' $false)) {
-        Write-Result 'REVIEW' 'Defender quick scan can quarantine evidence; execute separately after forensics are saved.'
+        if (-not [bool](Get-Value $script:Cfg 'ForensicsComplete' $false)) {
+            Write-Result 'REVIEW' 'Defender quick scan blocked: set ForensicsComplete=true only after saving required evidence.'
+        } else {
+            try {
+                Start-MpScan -ScanType QuickScan -ErrorAction Stop
+                Write-Result 'CHANGED' 'Defender quick scan completed; review threat history and quarantine.'
+            } catch {
+                Write-Result 'FAILED' ('Defender quick scan: ' + $_.Exception.Message)
+            }
+        }
+    }
+    $pref = Get-MpPreference
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusionProcesses'))) {
+        Decide "Remove Defender process exclusion $name" ($name -in @($pref.ExclusionProcess)) {
+            Remove-MpPreference -ExclusionProcess $name -ErrorAction Stop
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusionExtensions'))) {
+        Decide "Remove Defender extension exclusion $name" ($name -in @($pref.ExclusionExtension)) {
+            Remove-MpPreference -ExclusionExtension $name -ErrorAction Stop
+        }
     }
     foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusions'))) {
         $paths = @(Get-MpPreference).ExclusionPath
@@ -904,6 +995,14 @@ function Invoke-AutoSMB {
             Set-SmbClientConfiguration -RequireSecuritySignature $true -Confirm:$false
         }
     }
+    if ([bool](Get-Value $script:Sec 'SMBServerSigning' $false)) {
+        $current = (Get-SmbServerConfiguration).RequireSecuritySignature
+        Decide 'Require SMB server signing' (-not $current) {
+            $current | Set-Content -LiteralPath (Join-Path $script:BackupDir 'smb-server-signing-before.txt')
+            Set-SmbServerConfiguration -RequireSecuritySignature $true -Confirm:$false
+        }
+        Write-Result 'REVIEW' 'Verify authorized SMB clients and file shares after requiring server signing.'
+    }
     if ([bool](Get-Value $script:Sec 'DisableSMB1' $false)) {
         $feature = Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction SilentlyContinue
         if ($feature -and $feature.State -eq 'Enabled') {
@@ -925,6 +1024,309 @@ function Invoke-AutoAudit {
     } catch { Write-Result 'REVIEW' ('Credential Validation audit: ' + $_.Exception.Message) }
 }
 
+
+function Invoke-AutoFirewallRules {
+    $names = Names (Get-Value $script:Cfg 'DisableFirewallRules')
+    if (-not $names.Count) { return }
+    $backup = Join-Path $script:BackupDir 'firewall-policy-before.wfw'
+    & netsh.exe advfirewall export $backup | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Result 'FAILED' 'Firewall policy backup failed; no rules will be disabled.'
+        return
+    }
+    foreach ($name in $names) {
+        if ($name.Contains('*') -or $name.Contains('?')) {
+            Write-Result 'REVIEW' "Use the exact internal firewall rule Name, not a wildcard: $name"
+            continue
+        }
+        $rules = @(Get-NetFirewallRule -Name $name -ErrorAction SilentlyContinue)
+        if ($rules.Count -ne 1) {
+            Write-Result 'REVIEW' "Firewall rule $name was not uniquely found (count=$($rules.Count))."
+            continue
+        }
+        $rule = $rules[0]
+        if ($rule.Action -ne 'Allow' -or $rule.Direction -ne 'Inbound') {
+            Write-Result 'REVIEW' "Not an inbound Allow rule: $name"
+            continue
+        }
+        if ($rule.DisplayGroup -match 'Remote Desktop|File and Printer|Windows Remote Management' -and
+            ((Is-Listed 'TermService' $script:RequiredServices) -or $script:RequiredShares.Count -gt 0)) {
+            Write-Result 'SKIPPED' "Rule belongs to a potentially required service group: $name"
+            continue
+        }
+        $filters = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $rule -ErrorAction SilentlyContinue)
+        $requiredPorts = Names (Get-Value $script:Cfg 'RequiredPorts')
+        $needed = $false
+        foreach ($filter in $filters) {
+            foreach ($p in $requiredPorts) {
+                if ([string]$filter.LocalPort -eq $p -or [string]$filter.RemotePort -eq $p) { $needed = $true }
+            }
+        }
+        if ($needed) { Write-Result 'SKIPPED' "Firewall rule $name includes a configured required port."; continue }
+        Decide "Disable exact inbound firewall rule $name ($($rule.DisplayName))" ($rule.Enabled -eq 'True') {
+            $rule | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("firewall-rule-" + [Guid]::NewGuid().ToString('N') + ".xml"))
+            Disable-NetFirewallRule -Name $name -ErrorAction Stop
+            if ((Get-NetFirewallRule -Name $name).Enabled -ne 'False') { throw 'Firewall rule still enabled' }
+        }
+    }
+    Write-Result 'REVIEW' 'Retest all README-required network services after firewall-rule changes.'
+}
+
+
+function Invoke-AutoAuditSubcategories {
+    $requested = Get-Value $script:Cfg 'AuditSubcategories'
+    if (-not $requested) { return }
+    $entries = @($requested.PSObject.Properties)
+    if (-not $entries.Count) { return }
+    if ($script:domainJoined) {
+        Write-Result 'REVIEW' 'Domain policy can override advanced auditing; skipped local edits.'
+        return
+    }
+    $backup = Join-Path $script:BackupDir 'audit-policy-before.csv'
+    & auditpol.exe /backup "/file:$backup" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Result 'FAILED' 'Audit-policy backup failed; no advanced audit changes made.'
+        return
+    }
+    foreach ($entry in $entries) {
+        $name = [string]$entry.Name
+        $value = [string]$entry.Value
+        if ($name -notmatch '^[a-zA-Z0-9 ._-]{3,80}$') {
+            Write-Result 'REVIEW' "Invalid audit subcategory: $name"
+            continue
+        }
+        if ($value -notin @('Success','Failure','SuccessAndFailure')) {
+            Write-Result 'REVIEW' "Audit $name value must be Success, Failure or SuccessAndFailure."
+            continue
+        }
+        $args = @('/set',("/subcategory:$name"))
+        if ($value -in @('Success','SuccessAndFailure')) { $args += '/success:enable' }
+        if ($value -in @('Failure','SuccessAndFailure')) { $args += '/failure:enable' }
+        try {
+            & auditpol.exe @args | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw 'auditpol returned error; check policy scope and localization' }
+            Write-Result 'CHANGED' "Audit $name set to $value; verify effective policy."
+        } catch {
+            Write-Result 'FAILED' ("Audit " + $name + ": " + $_.Exception.Message)
+        }
+    }
+}
+
+
+function Save-Discovery([string]$Name, [scriptblock]$Command) {
+    $file = Join-Path $script:BackupDir ("review-" + $Name + ".csv")
+    try {
+        $rows = @(& $Command)
+        if ($rows.Count) {
+            $rows | Export-Csv -LiteralPath $file -NoTypeInformation -Encoding UTF8
+        } else {
+            "No entries found for $Name" | Set-Content -LiteralPath $file -Encoding UTF8
+        }
+        Write-Result 'REVIEW' "Inspection saved: $file ($($rows.Count) entries)"
+    } catch {
+        Write-Result 'REVIEW' ("Inspection unavailable ($Name): " + $_.Exception.Message)
+    }
+}
+function Invoke-AutoDiscovery {
+    Save-Discovery 'startup-registry' {
+        foreach ($path in @(
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
+        )) {
+            if (-not (Test-Path -LiteralPath $path)) { continue }
+            $obj = Get-ItemProperty -LiteralPath $path
+            foreach ($prop in $obj.PSObject.Properties) {
+                if ($prop.Name -match '^PS(Path|ParentPath|ChildName|Drive|Provider)$') { continue }
+                [pscustomobject]@{Path=$path;Name=$prop.Name;Command=[string]$prop.Value}
+            }
+        }
+    }
+    Save-Discovery 'ifeo-debuggers' {
+        $base = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
+        foreach ($key in (Get-ChildItem $base -ErrorAction SilentlyContinue)) {
+            $debugger = (Get-ItemProperty -LiteralPath $key.PSPath -Name Debugger -ErrorAction SilentlyContinue).Debugger
+            if ($debugger) { [pscustomobject]@{Executable=$key.PSChildName;Debugger=$debugger;Key=$key.Name} }
+        }
+    }
+    Save-Discovery 'services-and-paths' {
+        Get-CimInstance Win32_Service | Select-Object Name,DisplayName,State,StartMode,StartName,PathName
+    }
+    Save-Discovery 'listening-processes' {
+        foreach ($conn in @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue)) {
+            $process = Get-Process -Id $conn.OwningProcess -ErrorAction SilentlyContinue
+            $procName = ''
+            $procPath = ''
+            if ($process) {
+                $procName = [string]$process.ProcessName
+                try { $procPath = [string]$process.Path } catch { $procPath = '' }
+            }
+            [pscustomobject]@{
+                Address=$conn.LocalAddress;Port=$conn.LocalPort;Pid=$conn.OwningProcess
+                Process=$procName;Executable=$procPath
+            }
+        }
+    }
+    Save-Discovery 'inbound-firewall-allow' {
+        Get-NetFirewallRule -Direction Inbound -Action Allow -Enabled True -ErrorAction SilentlyContinue |
+            Select-Object Name,DisplayName,DisplayGroup,Profile,Enabled
+    }
+    Save-Discovery 'installed-store-apps' {
+        Get-AppxPackage -AllUsers -ErrorAction Stop |
+            Select-Object Name,PackageFullName,Publisher,NonRemovable
+    }
+    Save-Discovery 'share-permissions' {
+        foreach ($share in (Get-SmbShare -ErrorAction SilentlyContinue)) {
+            foreach ($access in @(Get-SmbShareAccess -Name $share.Name -ErrorAction SilentlyContinue)) {
+                [pscustomobject]@{Share=$share.Name;Path=$share.Path;Account=$access.AccountName;Access=$access.AccessRight;Control=$access.AccessControlType}
+            }
+        }
+    }
+    Save-Discovery 'hosts-file' {
+        $hosts = Join-Path $env:WINDIR 'System32\drivers\etc\hosts'
+        $n = 0
+        foreach ($entry in (Get-Content -LiteralPath $hosts -ErrorAction Stop)) {
+            $n++
+            if ($entry.Trim() -and $entry.Trim() -notmatch '^#') {
+                [pscustomobject]@{Line=$n;Entry=$entry.Trim()}
+            }
+        }
+    }
+    Save-Discovery 'recent-security-events' {
+        Get-WinEvent -FilterHashtable @{LogName='Security';Id=4624,4625,4720,4732,1102} -MaxEvents 75 -ErrorAction Stop |
+            Select-Object TimeCreated,Id,ProviderName,LevelDisplayName,Message
+    }
+    Save-Discovery 'recent-service-installations' {
+        Get-WinEvent -FilterHashtable @{LogName='System';Id=7045} -MaxEvents 40 -ErrorAction Stop |
+            Select-Object TimeCreated,Id,ProviderName,Message
+    }
+    $roots = @(
+        (Join-Path $env:PUBLIC 'Downloads'),
+        (Join-Path $env:PUBLIC 'Desktop'),
+        (Join-Path $env:PUBLIC 'Documents'),
+        (Join-Path $env:USERPROFILE 'Downloads'),
+        (Join-Path $env:USERPROFILE 'Desktop'),
+        'C:\Temp'
+    ) + @(Names (Get-Value $script:Cfg 'ScanPaths'))
+    Save-Discovery 'suspicious-file-candidates' {
+        $extensions = @('.mp3','.mp4','.torrent','.zip','.7z','.rar','.pcap','.kdbx','.exe','.ps1','.bat')
+        $seen = @{}
+        foreach ($path in $roots) {
+            if (-not (Test-Path -LiteralPath $path -PathType Container)) { continue }
+            $folder = (Resolve-Path -LiteralPath $path).Path
+            if ($folder -eq [IO.Path]::GetPathRoot($folder)) { continue }
+            if ($folder -match '(?i)\\Windows\\|\\Program Files') { continue }
+            if ($seen.ContainsKey($folder)) { continue }
+            $seen[$folder] = $true
+            Get-ChildItem -LiteralPath $folder -File -Recurse -Force -ErrorAction SilentlyContinue |
+                Where-Object { $_.Extension -in $extensions } |
+                Select-Object -First 250 FullName,Length,LastWriteTime,Extension
+        }
+    }
+    Write-Result 'REVIEW' 'Discovery findings are leads, not proof of malware. Confirm against the active image README.'
+}
+function Invoke-AutoStartupAndIFEO {
+    $allowed = @(
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce',
+        'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+        'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
+    )
+    foreach ($item in @(Get-Value $script:Cfg 'RemoveStartupValues' @())) {
+        $path = [string](Get-Value $item 'Path' '')
+        $name = [string](Get-Value $item 'Name' '')
+        if ($path -notin $allowed -or [string]::IsNullOrWhiteSpace($name)) {
+            Write-Result 'REVIEW' "Invalid startup entry; supply exact allowed Run/RunOnce path and value Name."
+            continue
+        }
+        if ($name -match '^(SecurityHealth|WindowsDefender|OneDrive)' -or $name.Contains('*')) {
+            Write-Result 'SKIPPED' "Protected or wildcard startup entry: $name"
+            continue
+        }
+        $value = Get-ItemProperty -Path $path -Name $name -ErrorAction SilentlyContinue
+        if (-not $value) { Write-Result 'OK' "Startup value absent: $path $name"; continue }
+        Decide "Remove confirmed unauthorized startup value $name" $true {
+            Save-RegKey $path
+            Remove-ItemProperty -Path $path -Name $name -ErrorAction Stop
+            if (Get-ItemProperty -Path $path -Name $name -ErrorAction SilentlyContinue) {
+                throw 'Startup entry still exists'
+            }
+        }
+    }
+    $base = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
+    $allowedExecutables = @('sethc.exe','utilman.exe','osk.exe','magnify.exe','narrator.exe')
+    foreach ($file in (Names (Get-Value $script:Cfg 'ClearIFEO'))) {
+        if ($file -notin $allowedExecutables) {
+            Write-Result 'REVIEW' "IFEO target $file not in the guarded accessibility-executable allowlist."
+            continue
+        }
+        $path = Join-Path $base $file
+        $debugger = (Get-ItemProperty -Path $path -Name Debugger -ErrorAction SilentlyContinue).Debugger
+        if (-not $debugger) { Write-Result 'OK' "No IFEO Debugger for $file"; continue }
+        Decide "Remove configured IFEO debugger from $file" $true {
+            Save-RegKey $path
+            Remove-ItemProperty -Path $path -Name Debugger -ErrorAction Stop
+        }
+    }
+}
+
+
+function Invoke-AutoAppx {
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveAppxPackages'))) {
+        if (-not $AllowRemovals) {
+            Write-Result 'REVIEW' "Store app removal requires -AllowRemovals: $name"
+            continue
+        }
+        if ($name.Contains('*') -or $name.Contains('?') -or $name -match '^Microsoft\.(Windows|VCLibs|NET|UI|DesktopAppInstaller)') {
+            Write-Result 'SKIPPED' "Protected or wildcard Store app: $name"
+            continue
+        }
+        if (Is-Listed $name $script:RequiredSoftware) {
+            Write-Result 'SKIPPED' "Required Store app: $name"
+            continue
+        }
+        $packages = @(Get-AppxPackage -AllUsers -Name $name -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -ieq $name })
+        if (-not $packages.Count) { Write-Result 'OK' "Store app absent: $name"; continue }
+        foreach ($package in $packages) {
+            if ($package.NonRemovable) { Write-Result 'SKIPPED' "Non-removable Store app: $name"; continue }
+            Decide "Remove explicitly prohibited Store app $($package.PackageFullName)" $true {
+                $package | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("appx-" + [Guid]::NewGuid().ToString('N') + ".xml"))
+                Remove-AppxPackage -AllUsers -Package $package.PackageFullName -ErrorAction Stop
+            }
+        }
+        Write-Result 'REVIEW' "Check provisioned versions and per-user registration of $name separately."
+    }
+}
+function Invoke-AutoShareAccess {
+    foreach ($item in @(Get-Value $script:Cfg 'RemoveShareAccess' @())) {
+        $shareName = [string](Get-Value $item 'Share' '')
+        $account = [string](Get-Value $item 'Account' '')
+        if ([string]::IsNullOrWhiteSpace($shareName) -or [string]::IsNullOrWhiteSpace($account)) {
+            Write-Result 'REVIEW' 'RemoveShareAccess needs exact Share and Account properties.'
+            continue
+        }
+        if ($shareName -in @('ADMIN$','C$','IPC$','print$') -or $account -match '^(SYSTEM|Administrators)$') {
+            Write-Result 'SKIPPED' "Protected share or principal: $shareName / $account"
+            continue
+        }
+        if (-not $AllowRemovals) {
+            Write-Result 'REVIEW' "Share permission removal needs -AllowRemovals: $shareName / $account"
+            continue
+        }
+        $share = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
+        if (-not $share -or $share.Special) { Write-Result 'SKIPPED' "Share missing/protected: $shareName"; continue }
+        $acl = @(Get-SmbShareAccess -Name $shareName -ErrorAction Stop)
+        $target = @($acl | Where-Object { $_.AccountName -ieq $account })
+        if (-not $target.Count) { Write-Result 'OK' "No share permission found: $account on $shareName"; continue }
+        Decide "Revoke exact share permission $shareName / $account" $true {
+            $acl | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("share-acl-" + [Guid]::NewGuid().ToString('N') + ".xml"))
+            Revoke-SmbShareAccess -Name $shareName -AccountName $account -Force -Confirm:$false -ErrorAction Stop | Out-Null
+        }
+        Write-Result 'REVIEW' "Verify required users can still access share $shareName, and inspect NTFS ACL separately."
+    }
+}
 
 function Invoke-AutoServices {
     $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','Appinfo','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time')
@@ -1129,6 +1531,16 @@ function Invoke-AutoWindowsUpdate {
 }
 
 
+
+function Run-ReadOnlyAudit {
+    $script:Results = New-Object System.Collections.ArrayList
+    $script:BackupDir = Join-Path $root "audit-details-$stamp"
+    New-Item -ItemType Directory -Path $script:BackupDir -Force | Out-Null
+    Audit
+    Invoke-AutoDiscovery
+    Show-AutomationSummary
+}
+
 function Run-Automation {
     Load-ReadmeConfig
     Check-Workstation
@@ -1144,26 +1556,39 @@ function Run-Automation {
         if ($answer -cne 'APPLY') { Note 'Canceled before changing the system.'; return }
     }
     $modules = @(
+        @{ Name='discovery'; Fn='Invoke-AutoDiscovery' },
         @{ Name='accounts';  Fn='Invoke-AutoAccounts' },
         @{ Name='passwords'; Fn='Invoke-AutoPasswordPolicy' },
         @{ Name='rights';    Fn='Invoke-AutoUserRights' },
         @{ Name='security';  Fn='Invoke-AutoSecurity' },
         @{ Name='defender';  Fn='Invoke-AutoDefender' },
         @{ Name='firewall';  Fn='Invoke-AutoFirewall' },
+        @{ Name='firewallrules'; Fn='Invoke-AutoFirewallRules' },
         @{ Name='smb';       Fn='Invoke-AutoSMB' },
         @{ Name='audit';     Fn='Invoke-AutoAudit' },
+        @{ Name='auditdetails'; Fn='Invoke-AutoAuditSubcategories' },
         @{ Name='services';  Fn='Invoke-AutoServices' },
         @{ Name='features';  Fn='Invoke-AutoFeatures' },
         @{ Name='tasks';     Fn='Invoke-AutoTasks' },
+        @{ Name='startup';   Fn='Invoke-AutoStartupAndIFEO' },
         @{ Name='shares';    Fn='Invoke-AutoShares' },
+        @{ Name='shareaccess'; Fn='Invoke-AutoShareAccess' },
         @{ Name='browsers';  Fn='Invoke-AutoBrowsers' },
         @{ Name='apps';      Fn='Invoke-AutoApps' },
+        @{ Name='storeapps'; Fn='Invoke-AutoAppx' },
         @{ Name='files';     Fn='Invoke-AutoFiles' },
         @{ Name='updates';   Fn='Invoke-AutoWindowsUpdate' }
     )
+    $selected = @()
+    if ($Only) { $selected = @(($Only -join ',') -split '[,\s]+' | Where-Object { $_ }) }
+    $valid = @($modules | ForEach-Object { $_.Name })
+    $invalid = @($selected | Where-Object { $_ -notin $valid })
+    if ($invalid.Count) {
+        throw "Unknown -Only sections: $($invalid -join ', '). Allowed: $($valid -join ', ')"
+    }
     Write-Host ''
     Write-Host ("Starting full run: " + $env:COMPUTERNAME) -ForegroundColor Cyan
-    Write-Host ("Selected sections: " + $(if ($Only) { $Only -join ', ' } else { 'all' }))
+    Write-Host ("Selected sections: " + $(if ($selected.Count) { $selected -join ', ' } else { 'all' }))
     Write-Host ("Authorized admins: " + (($script:Cfg.AuthorizedAdmins) -join ', '))
     Write-Host ("Required services: " + (($script:RequiredServices) -join ', '))
     Write-Host ''
@@ -1172,7 +1597,7 @@ function Run-Automation {
         Copy-Item -LiteralPath $report -Destination (Join-Path $script:BackupDir 'audit-before.txt') -Force
     } catch { Write-Result 'REVIEW' ('Initial audit unavailable: ' + $_.Exception.Message) }
     foreach ($entry in $modules) {
-        if ($Only -and $entry.Name -notin $Only) { continue }
+        if ($selected.Count -and $entry.Name -notin $selected) { continue }
         Write-Host ("---- " + $entry.Name.ToUpper() + " ----") -ForegroundColor Cyan
         try { & $entry.Fn }
         catch { Write-Result 'FAILED' ($entry.Name + ' section failed: ' + $_.Exception.Message) }
@@ -1256,7 +1681,7 @@ if ($InitConfig) {
     Initialize-ReadmeConfig
 } else {
     switch ($Mode) {
-        'Audit' { Audit }
+        'Audit' { Run-ReadOnlyAudit }
         'Quick' { Quick }
         'Apply' { Run-Automation }
         default { Menu }
