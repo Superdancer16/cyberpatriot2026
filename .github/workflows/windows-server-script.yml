@@ -1,0 +1,51 @@
+name: Windows Server script syntax
+on:
+  push:
+    branches:
+      - feature/windows-server-one-run-hardening-20261111
+    paths:
+      - 'Windows Server Scripts/windows-server.ps1'
+      - '.github/workflows/windows-server-script.yml'
+  pull_request:
+    paths:
+      - 'Windows Server Scripts/windows-server.ps1'
+      - '.github/workflows/windows-server-script.yml'
+
+jobs:
+  parse:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse in Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $path = (Resolve-Path 'Windows Server Scripts/windows-server.ps1').Path
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) {
+            foreach ($e in $errors) {
+              Write-Host ("Line {0}, column {1}: {2} -- {3}" -f $e.Extent.StartLineNumber,$e.Extent.StartColumnNumber,$e.Message,$e.Extent.Text)
+            }
+            exit 1
+          }
+      - name: Check list and configuration template
+        shell: powershell
+        run: |
+          $file = '.\Windows Server Scripts\windows-server.ps1'
+          $sections = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $file -List)
+          if ('verify' -notin $sections -or 'dns' -notin $sections -or 'adusers' -notin $sections) { throw 'Missing server sections' }
+          $config = Join-Path $env:RUNNER_TEMP 'server-template.json'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $file -InitConfig -Config $config
+          if ($LASTEXITCODE -ne 0) { throw 'Config creation failed' }
+          $settings = Get-Content -LiteralPath $config -Raw | ConvertFrom-Json
+          if ($settings.ConfirmedReadme -ne $false -or $settings.ExpectedRole -ne 'StandaloneServer') { throw 'Unsafe default template' }
+          if ($settings.DomainChanges.Allowed -ne $false) { throw 'Domain edits must default to disabled' }
+      - name: Smoke-test read-only audit on Windows runner
+        shell: powershell
+        run: |
+          $file = '.\Windows Server Scripts\windows-server.ps1'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $file -Mode Audit
+          if ($LASTEXITCODE -ne 0) { throw 'Audit-mode command failed' }
+          $output = Join-Path $env:ProgramData 'ServerSecurityWork'
+          if (-not (Test-Path $output)) { throw 'Audit report folder missing' }
