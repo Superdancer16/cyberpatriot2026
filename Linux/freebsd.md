@@ -834,3 +834,9 @@ For an unauthorized cron entry, back up the user's crontab and use `crontab -u b
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
 > **⚠️ Warnings:** Securelevel can prevent repairs until reboot; leave optional hardening until core functionality is verified. Never clear logs, remove every privileged binary, or delete package-owned system files based on names alone.
+
+---
+
+## FreeBSD forensic-question command reference
+
+The former cross-platform forensics overview has been consolidated into the [Forensics hub's FreeBSD quick reference](../Forensics/README.md#freebsd-quick-reference), which covers hashes, file metadata, account IDs, sockets/processes, audit logs, and preservation. Follow that alongside this FreeBSD-specific handbook. Do not substitute Linux-only commands for BSD utilities.
