@@ -30,7 +30,7 @@
 ## First Things to Do
 
 1. Open the image README and record required users, roles, server services, ports, passwords or accounts that **must not be changed**.
-2. Open and answer forensic questions **before changing evidence**. Use the new Ctrl+F guides: [Windows](../../Forensics/windows.md) · [Linux](../../Forensics/linux.md) · [Windows Server](../../Forensics/windows-server.md); or the shorter [general introduction](forensics-questions.md).
+2. Open and answer forensic questions **before changing evidence**. Use the new Ctrl+F guides: [Windows](../../Forensics/windows.md) · [Linux](../../Forensics/linux.md) · [Windows Server](../../Forensics/windows-server.md); or the [cross-platform evidence workflows](../../Forensics/README.md#repeatable-investigation-procedures).
 3. Establish working administrative and VM recovery access, and record the initial scoring report.
 4. Start the **platform-specific priority guide** below. Use its inspection commands before modifications.
 5. After every change, verify both the security setting and required application/service behavior.
@@ -74,7 +74,7 @@ These categories are **prioritization aids inferred from educational checklists*
 ## Advanced Investigations, Recovery and Sources
 
 - **Searchable forensics and decryption:** [Windows](../../Forensics/windows.md) · [Linux](../../Forensics/linux.md) · [Windows Server/AD](../../Forensics/windows-server.md). Each guide has a Ctrl+F index, website options and local commands.
-- [Forensics investigation procedures](forensics-questions.md#repeatable-investigation-procedures)
+- [Forensics investigation procedures](../../Forensics/README.md#repeatable-investigation-procedures)
 - [Windows effective policy, events, persistence and recovery](../../Windows/windows-10-11.md#21-advanced-windows-investigations--included-in-this-checklist)
 - [Windows Server role-aware investigation](../../Windows/windows-server.md#12-role-aware-manual-procedures-and-recovery)
 - [Debian complete service hardening](../../Linux/debian.md#16-critical-services-complete-manual-procedures)
@@ -82,7 +82,7 @@ These categories are **prioritization aids inferred from educational checklists*
 - [Cisco Packet Tracer detailed CLI references](../../Cisco/packet-tracer.md#21-expanded-original-configuration-reference)
 - [Sources, attribution and maintenance](sources-and-attribution.md)
 
-**Forensics guides are documentation, not executable tools.** Separate optional platform scripts are linked from the [repository home](../../README.md); the [historical tool reference](../../Misc%20Softwares/using-the-scripts.md) remains available.
+**Forensics guides are documentation, not executable tools.** Separate optional platform scripts are linked from the [repository home](../../README.md); the [current script index and historical external-tool notes](../../Scripts/README.md) are available.
 
 ---
 

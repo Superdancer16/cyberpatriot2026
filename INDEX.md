@@ -1,7 +1,7 @@
 # 🗂️ CyberPatriot 2026–2027 — Complete File Index
 
 > [!IMPORTANT]
-> **Preservation policy:** This cleanup does not move, rename, replace with placeholders, or delete any existing file. All original file locations remain usable. This index is an added navigation layer.
+> **Current organization:** Original platform handbooks, scripts, workflows, and printable checklists remain in place. Superseded general-forensics and historical script-reference files were merged into the current hubs and removed; Git history retains their prior versions.
 
 **Start:** [Repository home](README.md) · [General basics](General/All/README.md) · [Forensics hub](Forensics/README.md) · [Script hub](Scripts/README.md) · [Printable checklists](Printable%20Checklists/README.md)
 
@@ -28,7 +28,6 @@
 - [What is CyberPatriot?](General/All/what-is-cyberpatriot.md)
 - [Reading the image README](General/All/reading-the-readme.md)
 - [Round game plan](General/All/round-game-plan.md)
-- [General forensics questions](General/All/forensics-questions.md)
 - [Things that lose points](General/All/things-that-lose-points.md)
 - [Glossary](General/All/glossary.md)
 - [Mentors and teachers](General/All/for-mentors-and-teachers.md)
@@ -82,13 +81,15 @@
 - **Debian:** [PDF](Printable%20Checklists/debian-checklist.pdf) · [Markdown](Printable%20Checklists/debian-checklist.md)
 - **Cisco:** [PDF](Printable%20Checklists/cisco-packet-tracer-checklist.pdf) · [Markdown](Printable%20Checklists/cisco-packet-tracer-checklist.md)
 
-## 🗃️ Supplemental software and repository maintenance
+## 🗃️ Command-line basics and repository maintenance
 
-- [Misc Softwares/README.md](Misc%20Softwares/README.md)
-- [Misc Softwares/using-the-scripts.md — upstream history and safe use](Misc%20Softwares/using-the-scripts.md)
+- [Windows PowerShell fundamentals](Windows/windows-10-11.md#20-complete-powershell-basics--included-in-this-windows-checklist)
+- [Linux terminal fundamentals](Linux/debian.md#20-complete-linux-terminal-basics-embedded)
+- [Cisco Packet Tracer](Cisco/packet-tracer.md)
+- [Script safety and historical upstream references](Scripts/README.md#review-external-or-historical-tools-before-running)
 - [Debian script syntax GitHub workflow](.github/workflows/debian-script-syntax.yml)
 - [Windows Server script GitHub workflow](.github/workflows/windows-server-script.yml)
 
 ---
 
-**Navigation only:** Original filenames, full instructions, executable scripts, printable PDFs, and CI workflows remain at their existing paths. Always follow the active image README and permitted competition resources before changing a system.
+**Maintenance:** Detailed platform manuals, current scripts, printable PDFs, and CI workflows retain their original paths; only three superseded legacy Markdown pages were consolidated into the current hubs. Always follow the active image README and permitted competition resources before changing a system.
