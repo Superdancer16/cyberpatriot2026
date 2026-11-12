@@ -121,7 +121,7 @@ function New-Config {
             ChangeDefaultPasswordPolicy=$false
             DefaultPasswordPolicy=[ordered]@{}
         }
-        Firewall = [ordered]@{EnableProfiles=$true;DisableRules=@()}
+        Firewall = [ordered]@{EnableProfiles=$false;DisableRules=@()}
         Defender = [ordered]@{Enable=$true;UpdateSignatures=$true;QuickScan=$false;RemovePathExclusions=@();RemoveProcessExclusions=@();RemoveExtensionExclusions=@()}
         SMB = [ordered]@{RequireServerSigning=$false;RequireClientSigning=$false;DisableSMB1=$false}
         Security = [ordered]@{
@@ -557,13 +557,13 @@ function Check-DomainWrites {
     Import-Module ActiveDirectory -ErrorAction Stop
     return $true
 }
-function ProtectedADUser($User) {
+function ProtectedADUser($User,[switch]$AllowAuthorized) {
     if (-not $User) { return $true }
     if ($User.SamAccountName -in @('krbtgt','Administrator')) { return $true }
     if ($User.SID.Value -match '-(500|501|502)$') { return $true }
     if ($User.adminCount -eq 1) { return $true }
     if ($null -ne $User.ServicePrincipalName -and @($User.ServicePrincipalName).Count -gt 0) { return $true }
-    if (Listed $User.SamAccountName $script:RequiredAccounts) { return $true }
+    if (-not $AllowAuthorized -and (Listed $User.SamAccountName $script:RequiredAccounts)) { return $true }
     return $false
 }
 function Check-ADGroup([string]$Name) {
@@ -619,7 +619,7 @@ function Invoke-ADAccounts {
         }
         try {
             $user = Get-ADUser -Identity $name -Properties adminCount,ServicePrincipalName -ErrorAction Stop
-            if (ProtectedADUser $user) { Record 'SKIPPED' "Protected service/privileged AD account cannot be changed: $name"; continue }
+            if (ProtectedADUser $user -AllowAuthorized) { Record 'SKIPPED' "Protected service/privileged AD account cannot be changed: $name"; continue }
             Change "Require AD password change at next logon: $name" $true {
                 Set-ADUser -Identity $user -ChangePasswordAtLogon $true -ErrorAction Stop
             }
@@ -629,7 +629,7 @@ function Invoke-ADAccounts {
         if (-not (Listed $name (Value $script:Cfg 'AuthorizedDomainUsers'))) { Record 'SKIPPED' "AD reset user not in authorized ordinary-user list: $name"; continue }
         try {
             $user = Get-ADUser -Identity $name -Properties adminCount,ServicePrincipalName -ErrorAction Stop
-            if (ProtectedADUser $user) { Record 'SKIPPED' "Cannot reset protected AD account $name"; continue }
+            if (ProtectedADUser $user -AllowAuthorized) { Record 'SKIPPED' "Cannot reset protected AD account $name"; continue }
             if ($Yes) { Record 'REVIEW' "Reset AD password for $name interactively; unattended secret storage disabled."; continue }
             if ($Mode -eq 'Audit') { Record 'WOULD' "Reset password for AD user $name"; continue }
             $pw = Read-Host "New AD password for $name" -AsSecureString
@@ -1258,7 +1258,7 @@ function Invoke-LegacyTls {
                 Save-Registry $base
                 $done = $true
             }
-            New-Item -Path $key -ItemType Directory -Force | Out-Null
+            New-Item -Path $key -Force | Out-Null
             New-ItemProperty -Path $key -Name Enabled -PropertyType DWord -Value 0 -Force | Out-Null
             New-ItemProperty -Path $key -Name DisabledByDefault -PropertyType DWord -Value 1 -Force | Out-Null
         }
