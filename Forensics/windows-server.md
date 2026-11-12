@@ -14,6 +14,8 @@ The script, if used, should be run **after** this evidence pass. [Server hardeni
 |---|---|---|
 | **[CyberChef — GCHQ](https://gchq.github.io/CyberChef/)** | **Best overall:** Base64, hex, ROT13, reverse text, XOR, binary, hashes, URL, compression, multiple layers | Paste safe sample text into **Input** (top right), search an operation on the **left**, drag it to **Recipe** (middle), inspect **Output** (bottom right). Stack operations **in order**; hover for help, and use **Magic** only as a clue |
 | **[Cryptii](https://cryptii.com/)** | Simpler visual **Base64 → ROT13 → Reverse** chains, ASCII, Morse, Vigenère | Create conversion/cipher steps, choose **Decode**, put in the given text and compare each intermediate result |
+| **[dCode Cipher Identifier](https://www.dcode.fr/cipher-identifier)** | Unknown cipher or encoded message; hints such as Rail Fence, Bacon, Polybius, pigpen | Paste **permitted practice text** → **Analyze** → use the clues/keywords and compare likely cipher families; no automatic result is guaranteed |
+| **[Wireshark User Guide](https://www.wireshark.org/docs/wsug_html_chunked/)** | Exact PCAP display filters and Follow Stream help | Read **Filtering Packets** / **Following Protocol Streams**; open captures in the installed Wireshark, not in a public upload site |
 | **[dCode Affine](https://www.dcode.fr/affine-cipher)** | Affine cipher with `a`/`b` values | Paste ciphertext under **Affine Decoder**, enter exact `A` and `B`, click **Decrypt** |
 | **[dCode Vigenère](https://www.dcode.fr/vigenere-cipher)** | Vigenère keyword puzzles | Paste ciphertext, select **Knowing the Key/Password**, enter key, click **Decrypt** |
 | **[DenCode Cipher](https://dencode.com/en/cipher)** | Caesar, ROT13, Atbash, affine, Vigenère comparisons | Paste **practice or permitted** ciphertext and inspect the appropriate **Decoded** result |
@@ -38,6 +40,7 @@ For **XOR**, CyberChef can accept a supplied key; set **key encoding (hex, Base6
 | encoded, cipher, ciphertext, decrypt, Base64, ROT13 | [Decoding decision tree](#decoding-decision-tree) |
 | Base64, `=`, `==`, ASCII from Base64 | [Base64](#base64-and-multiple-layers) |
 | hex, binary, first bytes, magic number, ELF, ASCII | [Hex and binary](#hex-ascii-binary-decimal-and-file-signatures) |
+| ROT47, Rail Fence, Bacon, Polybius, Pigpen, A1Z26, QWERTY/keyboard, JWT, columnar transposition | [Less common cipher types](#less-common-puzzle-types-rot47-rail-fence-bacon-polybius-pigpen-a1z26-keyboard-shift) |
 | ROT13, reverse, Caesar, affine, Atbash, Vigenere | [Classical ciphers](#rot13-reverse-caesar-atbash-affine-and-vigenere) |
 | XOR, OTP, one-time pad, supplied key | [XOR](#xor-and-one-time-pad-puzzles) |
 | AES, RSA, PGP, CMS, DPAPI, encrypted file, secret | [Real encryption](#real-encryption-cms-dpapi-aes-and-keys) |
@@ -303,6 +306,25 @@ try {
 ```
 
 Otherwise use an already-approved offline RIPEMD160 tool; never silently substitute SHA-1. Hash only the exact requested **original file** and verify by recomputing.
+
+## Less common puzzle types — ROT47, Rail Fence, Bacon, Polybius, Pigpen, A1Z26, keyboard shift
+
+When Ctrl+F finds a **rare cipher name**, start with the clue, not a guessed key. [dCode Cipher Identifier](https://www.dcode.fr/cipher-identifier) can suggest likely cipher families for a **permitted, non-sensitive** ciphertext; use its **Clues/Keywords** box if you know a hint. [DenCode Cipher](https://dencode.com/en/cipher) has ROT47, Rail Fence, Bacon and other classical options; [CyberChef](https://gchq.github.io/CyberChef/) has ROT47, To/From Character Code, Morse and related operations. Results from an automatic identifier are **hypotheses**, not guaranteed plaintext.
+
+| Ctrl+F keywords | How to recognize it | First investigation |
+|---|---|---|
+| **ROT47**, `!`, `?`, symbols | Text uses many visible ASCII punctuation symbols | [DenCode](https://dencode.com/en/cipher) → **Decoded → ROT47**; compare readable output |
+| **Rail Fence**, **zigzag**, **rails**, **transposition** | Same letters, order scrambled in alternating rows | Try the given **rail count** in [DenCode](https://dencode.com/en/cipher), then check all text was preserved |
+| **Columnar transposition**, **route cipher** | Letters appear permuted according to a keyword/grid | Look for the **column number, key order or grid shape**; try [Cipher Identifier](https://www.dcode.fr/cipher-identifier) for the right solver |
+| **Bacon**, **Baconian**, `AABBA` | Runs of A/B or two different fonts/styles | Group into **five-symbol** units; [DenCode](https://dencode.com/en/cipher) → Baconian; verify I/J/U/V variant |
+| **Polybius square**, **tap code**, `11 23 45` | Digits 1–5 in **pairs** | Convert pairs via a **5×5 square**; check whether I/J share a cell and whether key reshuffles alphabet |
+| **A1Z26**, `1-26`, number-letter | Integers from 1 through 26 | Map `1=A ... 26=Z`, preserving separators; don't treat as decimal ASCII without a reason |
+| **Pigpen**, **symbol cipher**, geometric shapes | Grids, X shapes and dots instead of ordinary letters | Search the cipher name in [dCode Identifier](https://www.dcode.fr/cipher-identifier); compare the supplied symbol chart |
+| **Keyboard shift**, **QWERTY**, **left/right key** | Nonsense produced by neighboring keyboard keys | Check **keyboard layout and direction**; distinguish a QWERTY shift from Caesar alphabet shift |
+| **Morse**, **dot dash**, `... --- ...` | Dots/dashes, spaces and `/` word separators | Use [CyberChef](https://gchq.github.io/CyberChef/) → **From Morse Code**, preserving word breaks |
+| **JWT**, `eyJ...`, three dot-separated sections | `header.payload.signature` is usually Base64URL | Decode **header/payload** for readable JSON; do **not** mistake decoding for signature verification or claim token authenticity |
+
+**Unknown cipher in the middle of a layered puzzle:** save the exact intermediate result, then use CyberChef **Magic** or dCode Identifier only to narrow down candidate transforms. Do not try unrelated ciphers on a SHA-256 hash or genuine AES ciphertext; without a key, an automatic "decoder" may confidently return nonsense.
 
 ## Active Directory, accounts and Group Policy
 
