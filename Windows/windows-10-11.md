@@ -71,7 +71,7 @@ Read the image README, preserve answers to forensic questions, confirm the initi
 #### 0.1 Read the README
 - [ ] **🎯 DO THIS — 0.1 Read the README**
 
-Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../Misc/General/reading-the-readme.md).
+Write down the admins, users, critical services, required software and prohibited items. See [Reading the README](../General/reading-the-readme.md).
 
 #### 0.2 Take a VMware snapshot
 - [ ] **🎯 DO THIS — 0.2 Take a VMware snapshot**
@@ -136,7 +136,7 @@ More: [Windows forensics guide](forensics.md).
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc/Scripts/README.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../General/script-safety.md) for the limits of external tools.
 
 ---
 

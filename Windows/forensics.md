@@ -628,6 +628,6 @@ This guide was built from the supplied **CyberPatriot Forensics Question Researc
 - [Microsoft Learn — Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent).
 - [Microsoft Learn — Get-SmbShare](https://learn.microsoft.com/en-us/powershell/module/smbshare/get-smbshare).
 - [CyberChef open-source project](https://github.com/gchq/CyberChef) for approved/offline multi-stage encoding practice.
-- [General forensic overview](../Misc/Forensics/README.md) · [Windows remediation handbook](windows-10-11.md).
+- [General forensic overview](../General/forensics-workflows.md) · [Windows remediation handbook](windows-10-11.md).
 
 Do not expect any document to cover **every possible future question**. This guide supplies starting workflows for broad question families; confirm the particular image's evidence before answering.

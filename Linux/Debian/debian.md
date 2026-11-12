@@ -82,7 +82,7 @@ Read README, secure your administrative recovery, answer forensics before removi
 #### 0.1 Read the README, record initial state and preserve recovery
 - [ ] **🎯 DO THIS — 0.1 Read the README, record initial state and preserve recovery**
 
-See [Reading the README](../../Misc/General/reading-the-readme.md). In VMware: **VM → Snapshot → Take Snapshot**.
+See [Reading the README](../../General/reading-the-readme.md). In VMware: **VM → Snapshot → Take Snapshot**.
 
 #### 0.2 Open a terminal
 - [ ] **🎯 DO THIS — 0.2 Open a terminal**
@@ -186,7 +186,7 @@ Without `sudo` (or root), `journalctl` shows only **your own** messages, so a lo
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../../Misc/Scripts/README.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../../General/script-safety.md) for the limits of external tools.
 
 ---
 
