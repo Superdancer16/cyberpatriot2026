@@ -422,6 +422,7 @@ function Initialize-ReadmeConfig {
         ResetPasswords = @()
         Groups = [ordered]@{}
         RemoveGroupMembers = [ordered]@{}
+        RemoveUserRights = [ordered]@{}
         DisableServices = @('RemoteRegistry','simptcp')
         DisableFeatures = @()
         RemoveShares = @()
@@ -734,6 +735,75 @@ function Invoke-AutoPasswordPolicy {
         Write-Result 'CHANGED' ('Requested password policy applied; confirm in secpol.msc: ' + ($wanted -join ', '))
     } catch { Write-Result 'FAILED' ('Password policy: ' + $_.Exception.Message) }
 }
+
+function Invoke-AutoUserRights {
+    if ($script:domainJoined) { Write-Result 'REVIEW' 'User-rights policy may be managed by domain GPO; skipped.'; return }
+    $desired = Get-Value $script:Cfg 'RemoveUserRights'
+    if (-not $desired) { return }
+    $allowed = @('SeSecurityPrivilege','SeTakeOwnershipPrivilege')
+    $currentPolicy = Join-Path $script:BackupDir 'user-rights-before.inf'
+    & secedit.exe /export /cfg $currentPolicy /areas USER_RIGHTS | Out-Null
+    if ($LASTEXITCODE -ne 0) { Write-Result 'FAILED' 'User rights export failed; no changes made.'; return }
+    foreach ($entry in $desired.PSObject.Properties) {
+        $rightName = [string]$entry.Name
+        if ($rightName -notin $allowed) {
+            Write-Result 'REVIEW' "Unsupported user right $rightName; use secpol.msc."
+            continue
+        }
+        foreach ($name in (Names $entry.Value)) {
+            if ($name -ieq $env:USERNAME -or (Is-Listed $name $script:Authorized)) {
+                Write-Result 'SKIPPED' "Refusing to remove rights from current or authorized user $name"
+                continue
+            }
+            $sid = $null
+            try {
+                $sid = (New-Object System.Security.Principal.NTAccount($name)).Translate(
+                    [System.Security.Principal.SecurityIdentifier]).Value
+            } catch {
+                Write-Result 'REVIEW' "Cannot resolve user-rights principal: $name"
+                continue
+            }
+            if ($sid -match '^S-1-5-32-' -or $sid -match '-(500|501|503|504)$') {
+                Write-Result 'SKIPPED' "Refusing built-in user or group right change: $name"
+                continue
+            }
+            $current = Join-Path $script:BackupDir 'user-rights-current.inf'
+            & secedit.exe /export /cfg $current /areas USER_RIGHTS | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Result 'FAILED' 'Cannot inspect effective user rights.'
+                continue
+            }
+            $body = Get-Content -LiteralPath $current -Raw
+            $pattern = '(?m)^\s*' + [regex]::Escape($rightName) + '\s*=\s*(.*)$'
+            $match = [regex]::Match($body,$pattern)
+            if (-not $match.Success) {
+                Write-Result 'REVIEW' "User-rights entry not found: $rightName"
+                continue
+            }
+            $members = @($match.Groups[1].Value -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+            $remaining = @($members | Where-Object {
+                $_ -ne ('*' + $sid) -and $_ -ne $sid -and $_ -ine $name -and $_ -notlike ('*\' + $name)
+            })
+            if ($remaining.Count -eq $members.Count) { Write-Result 'OK' "User $name does not have right $rightName"; continue }
+            if (-not $remaining.Count) {
+                Write-Result 'SKIPPED' "Refusing to leave $rightName with no principals."
+                continue
+            }
+            $inf = Join-Path $script:BackupDir ('rights-' + [Guid]::NewGuid().ToString('N') + '.inf')
+            $db = Join-Path $script:BackupDir ('rights-' + [Guid]::NewGuid().ToString('N') + '.sdb')
+            @('[Unicode]','Unicode=yes','','[Privilege Rights]',($rightName + ' = ' + ($remaining -join ',')),
+                '','[Version]','signature="$CHICAGO$"','Revision=1') |
+                Set-Content -LiteralPath $inf -Encoding Unicode
+            & secedit.exe /configure /db $db /cfg $inf /areas USER_RIGHTS /quiet | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Result 'FAILED' "Could not remove $name from $rightName. See exported backup."
+            } else {
+                Write-Result 'CHANGED' "Removed $name from $rightName; verify in secpol.msc."
+            }
+        }
+    }
+}
+
 function Invoke-AutoSecurity {
     $sec = $script:Sec
     if ([bool](Get-Value $sec 'RestrictBlankPasswordNetwork' $false)) {
@@ -1076,6 +1146,7 @@ function Run-Automation {
     $modules = @(
         @{ Name='accounts';  Fn='Invoke-AutoAccounts' },
         @{ Name='passwords'; Fn='Invoke-AutoPasswordPolicy' },
+        @{ Name='rights';    Fn='Invoke-AutoUserRights' },
         @{ Name='security';  Fn='Invoke-AutoSecurity' },
         @{ Name='defender';  Fn='Invoke-AutoDefender' },
         @{ Name='firewall';  Fn='Invoke-AutoFirewall' },
