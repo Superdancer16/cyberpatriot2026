@@ -42,7 +42,7 @@
 - [ ] **🎯 DO THIS —** Understand read-only Get commands versus modifying Set, Remove and Disable commands.
 - [ ] **🎯 DO THIS —** Keep authorized administrator access and a record of every original setting.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
+**🔁 ALTERNATE — PowerShell OS inspection (GUI first: Settings → System → About or Win + R → winver):**
 
 ~~~powershell
 Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber
@@ -296,41 +296,37 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > [!NOTE]
 > **ℹ️ Example:** If the README specifies group `SpiderVerse` and members `esther;wyatt;turner;tina`, **create** that group and then **add** those four members as separate checked tasks. Names and memberships always come from the active README.
 
+- [ ] **🎯 Check password expiration for authorized users:** **Win + R → `lusrmgr.msc` → Users → double-click the required account → Properties → General → uncheck "Password never expires" → Apply → OK.** Reopen to verify the account's password expires; preserve required service identities and undo only the changed property if mistaken.
+
 ### 3. Account policies (passwords and lockout)
 
 #### 3.1 Password Policy
-- [ ] **🎯 DO THIS — 3.1 Password Policy**
+- [ ] **🎯 Configure the image-required password-policy settings (local workstation)**
 
-| Setting | Set to |
+**⭐ EASIEST WAY — GUI:** **Win + R → \`secpol.msc\` → Account Policies → Password Policy**. Double-click each applicable field, set the exact image-required value and select **Apply → OK**.
+
+| Check | What to do in the GUI |
 |---|---|
-| Enforce password history | **Image-required count** (e.g. 5; 24 is one general benchmark) |
-| Maximum password age | **90** days (or what the README says) |
-| Minimum password age | **1** day |
-| Minimum password length | **12** characters |
-| Password must meet complexity requirements | **Enabled** |
-| Store passwords using reversible encryption | **Disabled** |
+| [ ] **Minimum password length** | Set the requested number of characters (12 is one example, not a universal score value) |
+| [ ] **Password must meet complexity requirements** | **Enabled** if required |
+| [ ] **Store passwords using reversible encryption** | **Disabled** unless the image explicitly documents a critical dependency |
+| [ ] **Enforce password history** | The image-required count (e.g. 5), not automatically 24 |
+| [ ] **Minimum / maximum password age** | Set only the exact required numbers |
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
-```powershell
-net accounts  # inspect current policy; use secpol.msc for the exact README-required values
-```
+**✅ VERIFY:** Reopen each property and inspect the new value. Confirm required user login still works. A greyed-out or reverting setting can be managed by domain Group Policy.
 
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
-```powershell
-secedit /export /cfg $env:TEMP\secpol.inf /areas SECURITYPOLICY
-(Get-Content $env:TEMP\secpol.inf) -replace 'PasswordComplexity = 0', 'PasswordComplexity = 1' -replace 'ClearTextPassword = 1', 'ClearTextPassword = 0' | Set-Content $env:TEMP\secpol.inf -Encoding Unicode
-secedit /configure /db $env:TEMP\secpol.sdb /cfg $env:TEMP\secpol.inf /areas SECURITYPOLICY
-secedit /export /cfg $env:TEMP\check.inf /areas SECURITYPOLICY; Select-String 'PasswordComplexity|ClearTextPassword' $env:TEMP\check.inf
-```
+**↩️ UNDO:** Restore the previously recorded original value; do not alter a domain-wide GPO to fix a workstation.
 
-**✅ Check it worked:** `net accounts` shows the numbers, and the last line above shows `PasswordComplexity = 1` and `ClearTextPassword = 0`.
-
-- **Check related policy fields together:** `secpol.msc` → **Account Policies → Password Policy** → **Enforce password history** and **Password must meet complexity requirements**. Use scenario-required settings, then reopen the policies; domain Group Policy can override local values.
-
-- [ ] **🎯 Password history:** **Win + R → `secpol.msc` → Account Policies → Password Policy → Enforce password history** → use the **image-required** number → Apply → OK.
-- [ ] **🎯 Password complexity:** In the same Password Policy screen, open **Password must meet complexity requirements → Enabled → Apply → OK**, if required.
-  - **✅ Verify:** Reopen both fields and confirm their *effective* policy. **ℹ️ Example:** A scenario may call for **5 remembered passwords**, even if this guide lists a stronger general baseline. The README/scoring requirement overrides generic sample numbers.
-
+> [!NOTE]
+> **🔁 ALTERNATE — optional PowerShell/CMD inspection, not another fix:**
+>
+> \`\`\`powershell
+> net accounts
+> secedit /export /cfg "$env:TEMP\cp-password-policy.inf" /areas SECURITYPOLICY
+> Select-String 'MinimumPasswordLength|PasswordComplexity|ClearTextPassword|PasswordHistorySize' "$env:TEMP\cp-password-policy.inf"
+> \`\`\`
+>
+> Prefer the GUI over importing a generic \`secedit\` template. Check every actual scoring requirement against the README.
 
 #### 3.2 Account Lockout Policy
 - [ ] **🎯 DO THIS — 3.2 Account Lockout Policy**
@@ -626,6 +622,9 @@ Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0 | Format-List
 - [ ] **🎯 Hide last signed-in account:** In Security Options → **Interactive logon: Don't display last signed-in → Enabled → Apply → OK**.
   - **✅ Verify:** Both policy entries show the requested values; confirm legitimate interactive login still works.
 
+
+- [ ] **🎯 Require SMB client signing when requested:** **Win + R → `secpol.msc` → Local Policies → Security Options → Microsoft network client: Digitally sign communications (always)** → **Enabled → Apply → OK**.
+  - **✅ VERIFY:** Reopen the policy and test any README-required file share. **↩️ UNDO:** Restore the recorded original value if an approved legacy client becomes incompatible.
 
 #### 4.4 PowerShell logging
 - [ ] **🎯 DO THIS — 4.4 PowerShell logging**
@@ -996,6 +995,14 @@ Look for:
   - **✅ Verify:** Each *targeted* package is absent from the installed-apps list; required apps still run. **⚠️** These product names are examples, not universally unauthorized software.
 
 
+#### 12.1a Specific unwanted application examples
+- [ ] **🎯 Burp Suite:** **Settings → Apps → Installed apps** → search **Burp Suite** → **Uninstall** only if explicitly prohibited.
+- [ ] **🎯 Jellyfin Media Player:** Same screen → **Jellyfin Media Player → Uninstall** only if prohibited.
+- [ ] **🎯 Nmap:** Same screen → **Nmap → Uninstall** only if prohibited; inspect optional companion packages separately.
+- **✅ VERIFY:** Each targeted application is absent from Installed apps; required software still launches. **↩️ UNDO:** Reinstall only the specific required app from a verified vendor source if mistakenly removed.
+> [!CAUTION]
+> Installed tools are not inherently malicious. Always check the active README and preserve software it explicitly requires.
+
 #### 12.2 Store apps and games
 - [ ] **🎯 DO THIS — 12.2 Store apps and games**
 
@@ -1045,6 +1052,11 @@ Get-ChildItem C:\Users -Recurse -Force -Include *password*,*creditcard*,*.pcap,*
 ```
 
 ---
+
+#### 13.4 Prohibited password-cracker archives
+- [ ] **🎯 Find prohibited archives:** **File Explorer → This PC → search `Brutus` or `*.zip`**, particularly in user and Public Downloads folders. Inspect archive contents **without running executables** and confirm the README prohibition.
+- [ ] **🎯 Remove only the confirmed prohibited archive** and any separately verified prohibited extracted files after preserving any necessary evidence.
+- **✅ VERIFY:** Repeat the File Explorer search; the targeted archive is gone without deleting permitted files. **↩️ UNDO:** Restore an accidental deletion from an approved backup.
 
 ### 14. Backdoors and malware
 
@@ -1152,10 +1164,13 @@ Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess, @{n
 
 Then **≡ → Help → About Firefox** to update. Also check **Add-ons and themes** for extensions you don't recognise.
 
-#### 16.3 Chrome (if installed)
-- [ ] **🎯 DO THIS — 16.3 Chrome (if installed)**
+> [!TIP]
+> **Application updates:** Use each application's own **About / Check for Updates** GUI when supported. Avoid moving browser or editor installation folders; recheck installed version and ability to launch.
 
-**⋮ → Settings → Privacy and security → Security → Standard (or Enhanced) protection**. **Site settings → Pop-ups and redirects → Don't allow**. **Autofill and passwords → Google Password Manager → Settings → Offer to save passwords: Off**. Update via **Help → About Google Chrome**.
+#### 16.3 Google Chrome — browser update and settings
+- [ ] **🎯 Update required Chrome:** **Open Chrome → ⋮ → Help → About Google Chrome** → allow automatic update check → **Relaunch** if prompted. Preserve its installed/default path.
+- [ ] **🎯 Check Safe Browsing and pop-up settings:** **⋮ → Settings → Privacy and security → Security** → select appropriate Safe Browsing protection; **Site settings → Pop-ups and redirects → Don't allow sites to send pop-ups or use redirects** unless the README requires an exception.
+- **✅ VERIFY:** Open **About Google Chrome** again and confirm an updated version and working required sites. **↩️ UNDO:** Restore only the affected approved browser policy if a required workflow breaks.
 
 ---
 
@@ -1356,19 +1371,19 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
   - **✅ Verify:** Effective SmartScreen settings **warn/block** as required; confirm compatible Windows Security reputation settings.
 
 
-#### 15.6 WDigest off (no plain-text passwords in memory)
-- [ ] **🎯 DO THIS — 15.6 WDigest off (no plain-text passwords in memory)**
+#### 15.6 WDigest off (avoid plaintext password caching)
+- [ ] **🎯 Inspect \`UseLogonCredential\` when applicable**
+
+**⭐ EASIEST WAY — GUI:** **Win + R → \`regedit\` → \`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest\`** → inspect \`UseLogonCredential\`. If the DWORD exists and equals **1**, export the key before editing, then change **Value data to 0**. On a patched system with the key/value absent, check the effective OS default; do not blindly create it.
+
+**✅ VERIFY:** A configured value of **0** disables WDigest plaintext caching; keep authorized login working. **↩️ UNDO:** Restore the recorded previous state only if mistaken; never re-enable plaintext caching without explicit necessity.
 
 > [!NOTE]
-> **💡 Why it matters:** With WDigest on, Windows keeps logged-in users' passwords in memory as plain text, and tools like mimikatz can read them.
-
-**⭐ EASIEST WAY — PowerShell/command line (run only applicable commands):**
-```powershell
-$k = 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest'
-if (-not (Test-Path $k)) { New-Item -Path $k | Out-Null }
-Set-ItemProperty $k -Name UseLogonCredential -Value 0 -Type DWord
-Get-ItemProperty $k | Select-Object UseLogonCredential   # must be 0
-```
+> **🔁 ALTERNATE — PowerShell read-only verification:**
+>
+> \`\`\`powershell
+> Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' -Name UseLogonCredential -ErrorAction SilentlyContinue
+> \`\`\`
 
 #### 15.7 NetBIOS over TCP/IP off
 - [ ] **🎯 DO THIS — 15.7 NetBIOS over TCP/IP off**
