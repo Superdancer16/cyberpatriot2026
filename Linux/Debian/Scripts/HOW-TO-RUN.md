@@ -8,7 +8,7 @@ Use [debian.sh](debian.sh) with the [Debian handbook](../debian.md). Like the Wi
 2. Inside the VM, open Firefox ESR, Chromium or another installed browser.
 3. Go to **https://github.com/login**, sign in if necessary and complete any verification. The repository is public, so a GitHub login is optional.
 4. Open **https://github.com/Superdancer16/cyberpatriot2026** and choose branch **main**.
-5. Open **Linux Scripts**, select **debian.sh**, and click **Raw**.
+5. Open **Linux → Debian → Scripts**, select **debian.sh**, and click **Raw**.
 6. Save the raw text to **Downloads → debian.sh** in the VM. If the browser displays the text, use **Ctrl+S** and select a plain file, not a complete webpage. Confirm the file is not named `.html` or `.txt`.
 7. Sign out of GitHub and decline to save personal credentials inside the VM. Do not download or run it on your host computer.
 

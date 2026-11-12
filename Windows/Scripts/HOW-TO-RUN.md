@@ -8,7 +8,7 @@ The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings b
 2. On the VM desktop, open **Microsoft Edge** or the installed browser.
 3. In the address bar, go to **https://github.com/login**. Sign in to your GitHub account and complete any requested verification. The repository is **public**, so signing in is optional; you can open it without an account if permitted.
 4. Open **https://github.com/Superdancer16/cyberpatriot2026**. Check that the repository name is correct and the branch selector says **main**.
-5. Click **Windows Scripts**, then **windows-10-11.ps1**.
+5. Click **Windows → Scripts → windows-10-11.ps1**.
 6. Click **Raw** above the file. If it opens as text, press **Ctrl+S**. If it downloads automatically, open the browser's **Downloads** panel.
 7. In the VM's **Save As** dialog, choose **Downloads**, set **Save as type: All files** if necessary, and name it **windows-10-11.ps1**. Do not save the GitHub preview as an HTML page.
 8. Open **File Explorer → Downloads**. In Windows 11 choose **View → Show → File name extensions**; in Windows 10 choose **View → File name extensions**. Make sure the file is **windows-10-11.ps1**, not **windows-10-11.ps1.txt**.
