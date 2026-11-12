@@ -13,6 +13,7 @@ Every major guide follows the same study and competition workflow:
 | Category | Full Guides |
 |---|---|
 | **[General / All](General/All/README.md)** | README, forensics, round strategy, glossary and source references |
+| **Forensics — Ctrl+F quick lookup** | [Windows 10/11](Forensics/windows.md) · [Linux (Debian/Mint/Ubuntu)](Forensics/linux.md) · [Windows Server / AD](Forensics/windows-server.md); step-by-step cipher/decoding, evidence searches and websites |
 | **[Windows](Windows/README.md)** | Windows 10/11 and Windows Server, including PowerShell and domain-aware guidance |
 | **[Linux](Linux/README.md)** | Complete Debian, Mint and Ubuntu guides; FreeBSD reference |
 | **[Cisco](Cisco/README.md)** | Packet Tracer step-by-step handbook and 385-question networking Q&A |
