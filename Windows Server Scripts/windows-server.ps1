@@ -221,3 +221,182 @@ function Save-Summary {
     Write-Host "Backups: $backups"
     Write-Host 'Review the Scoring Report and test all required server roles before rebooting.'
 }
+
+function Invoke-Audit {
+    $section = @()
+    $section += "Windows Server audit — $(Get-Date -Format s)"
+    $section += "Hostname: $env:COMPUTERNAME"
+    $section += "Detected role: $script:ActualRole"
+    $section += "Domain: $script:DomainName"
+    $section += "Windows PowerShell: $($PSVersionTable.PSVersion)"
+    $section | Set-Content -LiteralPath $report -Encoding UTF8
+    Save-Review 'operating-system' {
+        Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,ProductType,InstallDate,LastBootUpTime
+    }
+    Save-Review 'computer-domain' {
+        Get-CimInstance Win32_ComputerSystem | Select-Object Name,Domain,PartOfDomain,DomainRole
+    }
+    Save-Review 'installed-server-roles' {
+        if (Get-Command Get-WindowsFeature -ErrorAction SilentlyContinue) {
+            Get-WindowsFeature | Where-Object Installed | Select-Object Name,DisplayName,FeatureType
+        }
+    }
+    Save-Review 'services' {
+        Get-CimInstance Win32_Service | Select-Object Name,DisplayName,State,StartMode,StartName,PathName
+    }
+    Save-Review 'listeners' {
+        foreach ($item in @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue)) {
+            $process = Get-Process -Id $item.OwningProcess -ErrorAction SilentlyContinue
+            [pscustomobject]@{Address=$item.LocalAddress;Port=$item.LocalPort;PID=$item.OwningProcess;Process=$process.ProcessName}
+        }
+    }
+    Save-Review 'firewall-profiles' {
+        Get-NetFirewallProfile | Select-Object Name,Enabled,DefaultInboundAction,DefaultOutboundAction
+    }
+    Save-Review 'firewall-inbound-allow' {
+        Get-NetFirewallRule -Direction Inbound -Enabled True -Action Allow -ErrorAction SilentlyContinue |
+            Select-Object Name,DisplayName,DisplayGroup,Profile,PolicyStoreSource,Enabled
+    }
+    Save-Review 'local-password-policy' {
+        $data = & net.exe accounts 2>&1 | Out-String
+        [pscustomobject]@{Output=$data.Trim()}
+    }
+    Save-Review 'audit-policy' {
+        [pscustomobject]@{Text=((& auditpol.exe /get /category:* 2>&1) | Out-String).Trim()}
+    }
+    Save-Review 'shares' {
+        Get-SmbShare -ErrorAction SilentlyContinue | Select-Object Name,Path,Special,Description
+    }
+    Save-Review 'share-permissions' {
+        foreach ($share in @(Get-SmbShare -ErrorAction SilentlyContinue)) {
+            foreach ($entry in @(Get-SmbShareAccess -Name $share.Name -ErrorAction SilentlyContinue)) {
+                [pscustomobject]@{Share=$share.Name;Path=$share.Path;Account=$entry.AccountName;Right=$entry.AccessRight;Type=$entry.AccessControlType}
+            }
+        }
+    }
+    Save-Review 'defender' {
+        if (Get-Command Get-MpComputerStatus -ErrorAction SilentlyContinue) {
+            Get-MpComputerStatus | Select-Object AMServiceEnabled,AntivirusEnabled,RealTimeProtectionEnabled,AntivirusSignatureAge,IsTamperProtected
+        }
+    }
+    Save-Review 'defender-exclusions' {
+        if (Get-Command Get-MpPreference -ErrorAction SilentlyContinue) {
+            Get-MpPreference | Select-Object ExclusionPath,ExclusionExtension,ExclusionProcess,PUAProtection
+        }
+    }
+    Save-Review 'startup' {
+        Get-CimInstance Win32_StartupCommand | Select-Object Name,Command,Location,User
+    }
+    Save-Review 'tasks' {
+        Get-ScheduledTask -ErrorAction SilentlyContinue |
+            Where-Object TaskPath -NotLike '\Microsoft\*' |
+            Select-Object -First 200 TaskPath,TaskName,State
+    }
+    Save-Review 'installed-apps' {
+        Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue |
+            Where-Object DisplayName |
+            Select-Object DisplayName,DisplayVersion,Publisher,InstallLocation
+    }
+    Save-Review 'ifeo-debuggers' {
+        $base = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
+        foreach ($key in @(Get-ChildItem $base -ErrorAction SilentlyContinue)) {
+            $debugger = (Get-ItemProperty -Path $key.PSPath -Name Debugger -ErrorAction SilentlyContinue).Debugger
+            if ($debugger) { [pscustomobject]@{Executable=$key.PSChildName;Debugger=$debugger;Registry=$key.Name} }
+        }
+    }
+    Save-Review 'hosts' {
+        $hosts = Join-Path $env:WINDIR 'System32\drivers\etc\hosts'
+        $n = 0
+        foreach ($row in @(Get-Content -LiteralPath $hosts -ErrorAction SilentlyContinue)) {
+            $n++
+            if ($row.Trim() -and -not $row.Trim().StartsWith('#')) { [pscustomobject]@{Line=$n;Entry=$row.Trim()} }
+        }
+    }
+    Save-Review 'recent-service-installations' {
+        Get-WinEvent -FilterHashtable @{LogName='System';Id=7045} -MaxEvents 50 -ErrorAction Stop |
+            Select-Object TimeCreated,Id,ProviderName,Message
+    }
+    Save-Review 'recent-security-events' {
+        Get-WinEvent -FilterHashtable @{LogName='Security';Id=4625,4720,4726,4732,1102} -MaxEvents 80 -ErrorAction Stop |
+            Select-Object TimeCreated,Id,ProviderName,Message
+    }
+    if ($script:IsDC) {
+        Save-Review 'domain-users' {
+            Import-Module ActiveDirectory -ErrorAction Stop
+            Get-ADUser -Filter * -Properties Enabled,PasswordNeverExpires,LastLogonDate |
+                Select-Object SamAccountName,Enabled,PasswordNeverExpires,LastLogonDate,DistinguishedName
+        }
+        Save-Review 'domain-privileged-groups' {
+            Import-Module ActiveDirectory -ErrorAction Stop
+            foreach ($name in @('Domain Admins','Enterprise Admins','Schema Admins','Administrators','Account Operators','Backup Operators','Server Operators','DnsAdmins','Group Policy Creator Owners')) {
+                try {
+                    Get-ADGroupMember -Identity $name -Recursive -ErrorAction Stop |
+                        ForEach-Object { [pscustomobject]@{Group=$name;Member=$_.SamAccountName;Class=$_.ObjectClass} }
+                } catch { Record 'REVIEW' "Cannot list group $name: $($_.Exception.Message)" }
+            }
+        }
+        Save-Review 'domain-password-policies' {
+            Import-Module ActiveDirectory -ErrorAction Stop
+            Get-ADDefaultDomainPasswordPolicy | Select-Object *
+        }
+        Save-Review 'domain-fine-grained-policies' {
+            Import-Module ActiveDirectory -ErrorAction Stop
+            Get-ADFineGrainedPasswordPolicy -Filter * | Select-Object Name,Precedence,MinPasswordLength,ComplexityEnabled
+        }
+        Save-Review 'domain-replication-status' {
+            [pscustomobject]@{Text=((& repadmin.exe /replsummary 2>&1) | Out-String).Trim()}
+        }
+        Save-Review 'domain-controller-status' {
+            [pscustomobject]@{Text=((& dcdiag.exe /test:Advertising /test:Services /test:NetLogons 2>&1) | Out-String).Trim()}
+        }
+        Save-Review 'gpo-inventory' {
+            if (Get-Module -ListAvailable GroupPolicy) {
+                Import-Module GroupPolicy -ErrorAction Stop
+                Get-GPO -All | Select-Object DisplayName,Id,GpoStatus,ModificationTime
+            }
+        }
+    } elseif ($script:ActualRole -ne 'DomainController') {
+        Save-Review 'local-users' {
+            if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {
+                Get-LocalUser | Select-Object Name,Enabled,SID,PasswordExpires,PasswordRequired
+            } else {
+                [pscustomobject]@{Output=((& net.exe user) | Out-String).Trim()}
+            }
+        }
+        Save-Review 'local-administrators' {
+            if (Get-Command Get-LocalGroupMember -ErrorAction SilentlyContinue) {
+                Get-LocalGroupMember -SID 'S-1-5-32-544' | Select-Object Name,SID,ObjectClass,PrincipalSource
+            }
+        }
+    }
+    if (Get-Module -ListAvailable DnsServer) {
+        Save-Review 'dns-zones' {
+            Import-Module DnsServer -ErrorAction Stop
+            Get-DnsServerZone | Select-Object ZoneName,ZoneType,DynamicUpdate,IsDsIntegrated,SecureSecondaries
+        }
+    }
+    if (Get-Module -ListAvailable DhcpServer) {
+        Save-Review 'dhcp-scopes' {
+            Import-Module DhcpServer -ErrorAction Stop
+            Get-DhcpServerv4Scope | Select-Object ScopeId,Name,StartRange,EndRange,State
+        }
+        Save-Review 'dhcp-options' {
+            Get-DhcpServerv4OptionValue | Select-Object OptionId,Name,Value,VendorClass
+        }
+    }
+    if (Get-Module -ListAvailable WebAdministration) {
+        Save-Review 'iis-sites' {
+            Import-Module WebAdministration -ErrorAction Stop
+            Get-Website | Select-Object Name,State,PhysicalPath,Bindings
+        }
+        Save-Review 'iis-app-pools' {
+            Get-ChildItem 'IIS:\AppPools' | Select-Object Name,State,ManagedRuntimeVersion
+        }
+    }
+    if (Get-Command Get-WinEvent -ErrorAction SilentlyContinue) {
+        Record 'REVIEW' 'Use Event Viewer or the saved CSV reports for evidence; do not clear logs.'
+    }
+    Record 'INFO' "Audit records saved under $backups"
+}
+
