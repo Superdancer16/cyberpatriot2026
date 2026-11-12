@@ -4,7 +4,7 @@
 > **🧭 Quick orientation:** Use the links below to locate the right topic. Throughout the manuals, look for **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution**.
 
 > [!WARNING]
-> **Reference only:** This repository contains Markdown guidance, not executable hardening scripts. Review competition rules, source licenses and each script before considering external tools.
+> **Safety first:** This repository includes three optional platform scripts as well as documentation about *historical external tools*. Review the image README, competition rules, source licenses, and exact script content before using automation.
 
 ## 🧭 Quick links
 
@@ -13,7 +13,16 @@
 ---
 
 
-This repository is a **manual documentation handbook**. It does not contain the scripts, download pages, or configuration builder described in the original toolkit. Historical script names below identify external tools; they are not local files to run.
+This repository includes **three platform-specific scripts** in addition to its manual handbooks. The *historical upstream paths* in the table below still identify external tools and are **not** local filenames; the upstream configuration builder is not part of this repository.
+
+### Current scripts actually included
+
+- [Windows 10/11 PowerShell script and HOW-TO](../Windows%20Scripts/HOW-TO-RUN.md)
+- [Windows Server PowerShell script and HOW-TO](../Windows%20Server%20Scripts/HOW-TO-RUN.md)
+- [Debian Bash script and HOW-TO](../Linux%20Scripts/HOW-TO-RUN.md)
+- [Central script index with manual-task links](../Scripts/README.md)
+
+### Historical upstream script examples (reference only)
 
 | Upstream family | Historical path | Manual replacement |
 |---|---|---|

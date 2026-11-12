@@ -23,3 +23,9 @@ All three main Linux guides are now structured by learning stage and practical p
 **Debian 12/13 automation:** [debian.sh](../Linux%20Scripts/debian.sh) · [Beginner run instructions](../Linux%20Scripts/HOW-TO-RUN.md) · [Manual tasks after the script](../Linux%20Scripts/MANUAL-TASKS.md). Mint, Ubuntu and FreeBSD use their separate manual handbooks. The VM README takes priority.
 
 [All categories](../README.md)
+
+---
+
+## Related resources in one place
+
+[Linux forensic question finder](../Forensics/README.md) · [Debian printable checklist](../Printable%20Checklists/debian-checklist.pdf) · [Optional Debian script and manual tasks](../Scripts/README.md) · [Complete file index](../INDEX.md)

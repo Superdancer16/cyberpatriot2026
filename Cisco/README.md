@@ -12,3 +12,9 @@ Both Cisco guides follow **Basics / Information Needed → First Things to Do �
 **Study with the official [NetAcad CyberPatriot Content Course](https://www.netacad.com/courses/cyberpatriot-content)** and follow the actual round's assigned modules. This repository does **not** provide live competition answers or a promised scoring checklist. Use outside notes only when assessment rules allow them.
 
 [All categories](../README.md)
+
+---
+
+## Related resources
+
+[Printable Packet Tracer PDF](../Printable%20Checklists/cisco-packet-tracer-checklist.pdf) · [Editable Cisco checklist](../Printable%20Checklists/cisco-packet-tracer-checklist.md) · [Complete file index](../INDEX.md)
