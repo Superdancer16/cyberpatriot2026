@@ -94,6 +94,8 @@ If you need to add a local group, the relevant part of the generated JSON could 
 
 Use the actual usernames/group names in the current README. Passwords are requested securely during interactive runs and are **not stored in JSON**.
 
+**Firewall safety:** The Windows Server template deliberately starts with `Firewall.EnableProfiles=false`. Only set it to `true` after verifying required AD/DNS/DHCP/IIS/SMB and remote-management rules and ports. This differs from the workstation template.
+
 For a Domain Controller, `DomainChanges.Allowed` defaults to `false`, and the script also requires `-EnableDomainChanges` before it will attempt AD writes. Even with both enabled, protected AD accounts and privileged groups are intentionally left for manual review.
 
 ## 5. Run every configured section in one pass
