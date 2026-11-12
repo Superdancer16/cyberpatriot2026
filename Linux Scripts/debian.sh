@@ -236,6 +236,16 @@ do_users() {
         fi
     done < <(list NewUsers)
     while IFS= read -r name; do
+        if [[ "$name" == root ]]; then continue; fi
+        safe_user "$name" && user_present "$name" || { status REVIEW "Authorized admin missing/invalid: $name"; continue; }
+        if ! group_present sudo; then status REVIEW 'sudo group not found; inspect admin policy'; continue; fi
+        if id -nG "$name" | tr ' ' '\n' | grep -qxF sudo; then
+            status OK "Authorized administrator already in sudo: $name"
+        else
+            change "Give README-authorized admin sudo membership: $name" usermod -aG sudo "$name"
+        fi
+    done < <(list AuthorizedAdmins)
+    while IFS= read -r name; do
         safe_user "$name" && user_present "$name" || { status REVIEW "Password target not found/invalid: $name"; continue; }
         is_authorized "$name" || { status SKIPPED "Password target not authorized: $name"; continue; }
         if (( YES )); then status REVIEW "Set $name password interactively; unattended run stores no secrets"; continue; fi
