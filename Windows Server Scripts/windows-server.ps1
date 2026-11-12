@@ -400,3 +400,142 @@ function Invoke-Audit {
     Record 'INFO' "Audit records saved under $backups"
 }
 
+function Get-AdminGroup {
+    $item = Get-LocalGroup | Where-Object { $_.SID.Value -eq 'S-1-5-32-544' } | Select-Object -First 1
+    if (-not $item) { throw 'Could not identify local Administrators group by SID.' }
+    return $item
+}
+function LocalUserProtected([string]$Name) {
+    if (Listed $Name $script:RequiredAccounts) { return $true }
+    if ($Name -ieq $env:USERNAME) { return $true }
+    $user = Get-LocalUser -Name $Name -ErrorAction SilentlyContinue
+    if ($user -and $user.SID.Value -match '-(500|501|503|504)$') { return $true }
+    return $false
+}
+function Invoke-LocalAccounts {
+    if ($script:IsDC) { Record 'SKIPPED' 'Local SAM changes skipped on a Domain Controller; use AD-specific checks.'; return }
+    if (-not (Get-Command Get-LocalUser -ErrorAction SilentlyContinue)) {
+        Record 'REVIEW' 'LocalAccounts cmdlets unavailable; use Computer Management/local users GUI.'
+        return
+    }
+    $cfg = Value $script:Cfg 'LocalUsers'
+    $admin = Get-AdminGroup
+    $authorized = @(Values (Value $script:Cfg 'AuthorizedLocalUsers')) + @(Values (Value $script:Cfg 'AuthorizedLocalAdmins'))
+    foreach ($name in (Values (Value $cfg 'Create'))) {
+        if (-not (Listed $name $authorized)) { Record 'SKIPPED' "New user $name missing from README-authorized lists."; continue }
+        if ($name -notmatch '^[A-Za-z][A-Za-z0-9_.-]{0,19}$') { Record 'REVIEW' "Invalid requested local username $name"; continue }
+        if (Get-LocalUser -Name $name -ErrorAction SilentlyContinue) { Record 'OK' "Local user exists: $name"; continue }
+        if ($Yes) { Record 'REVIEW' "Create $name with an interactive password; unattended mode does not store secrets."; continue }
+        if ($Mode -eq 'Audit') { Record 'WOULD' "Create local user $name"; continue }
+        $password = Read-Host "New initial password for $name" -AsSecureString
+        Change "Create README-authorized local user $name" $true {
+            New-LocalUser -Name $name -Password $password -ErrorAction Stop | Out-Null
+            if (Listed $name (Value $script:Cfg 'AuthorizedLocalAdmins')) {
+                Add-LocalGroupMember -Group $admin.Name -Member $name -ErrorAction Stop
+            }
+            if (-not (Get-LocalUser -Name $name -ErrorAction SilentlyContinue)) { throw 'New user not found after creation' }
+        }
+    }
+    foreach ($name in (Values (Value $cfg 'ResetPasswords'))) {
+        if (-not (Listed $name $authorized)) { Record 'SKIPPED' "Password reset for unlisted user $name"; continue }
+        $user = Get-LocalUser -Name $name -ErrorAction SilentlyContinue
+        if (-not $user) { Record 'REVIEW' "Password user missing: $name"; continue }
+        if ($Yes) { Record 'REVIEW' "Reset $name password interactively (no secret stored in JSON)."; continue }
+        if ($Mode -eq 'Audit') { Record 'WOULD' "Reset password for $name"; continue }
+        $pw = Read-Host "New password for $name" -AsSecureString
+        Change "Reset authorized user password $name" $true {
+            Set-LocalUser -Name $name -Password $pw -ErrorAction Stop
+        }
+    }
+    foreach ($name in (Values (Value $cfg 'PasswordExpires'))) {
+        if (-not (Listed $name $authorized)) { Record 'SKIPPED' "User not authorized for password expiry change: $name"; continue }
+        $user = Get-LocalUser -Name $name -ErrorAction SilentlyContinue
+        if (-not $user) { Record 'REVIEW' "Password expiry user not found: $name"; continue }
+        Change "Require password expiry for $name" $true {
+            Set-LocalUser -Name $name -PasswordNeverExpires $false -ErrorAction Stop
+        }
+    }
+    foreach ($name in (Values (Value $cfg 'DemoteAdmins'))) {
+        if (LocalUserProtected $name) {
+            if (Listed $name (Value $script:Cfg 'AuthorizedLocalUsers')) {
+                # Authorized standard users can be removed from Administrators without deleting accounts.
+            } else { Record 'SKIPPED' "Cannot demote protected administrator $name"; continue }
+        }
+        $members = @(Get-LocalGroupMember -Group $admin.Name -ErrorAction SilentlyContinue)
+        $found = @($members | Where-Object { $_.Name -ieq $name -or $_.Name -like ("*\" + $name) })
+        if (-not $found.Count) { Record 'OK' "Not an administrator: $name"; continue }
+        if ($members.Count -le 1) { Record 'SKIPPED' "Refusing to remove the last local administrator: $name"; continue }
+        if (Listed $name (Value $script:Cfg 'AuthorizedLocalAdmins')) { Record 'SKIPPED' "README-authorized admin cannot be demoted: $name"; continue }
+        Change "Remove unauthorized administrator right from $name" $true {
+            Remove-LocalGroupMember -Group $admin.Name -Member $name -ErrorAction Stop
+        }
+    }
+    foreach ($name in (Values (Value $cfg 'Disable'))) {
+        $user = Get-LocalUser -Name $name -ErrorAction SilentlyContinue
+        if (-not $user) { Record 'OK' "Unauthorized account already missing: $name"; continue }
+        if (LocalUserProtected $name) { Record 'SKIPPED' "Protected account cannot be disabled: $name"; continue }
+        Change "Disable exact unauthorized local account $name" ([bool]$user.Enabled) {
+            $user | Select-Object Name,Enabled,SID | Export-Clixml (Join-Path $backups ("user-" + $name + "-before.xml"))
+            Disable-LocalUser -Name $name -ErrorAction Stop
+            if ((Get-LocalUser -Name $name).Enabled) { throw 'Account is still enabled' }
+        }
+    }
+    foreach ($name in (Values (Value $cfg 'Delete'))) {
+        if (-not $AllowRemovals -or -not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
+            Record 'REVIEW' "Deletion of $name needs -AllowRemovals and preserved forensic evidence."
+            continue
+        }
+        $user = Get-LocalUser -Name $name -ErrorAction SilentlyContinue
+        if (-not $user) { Record 'OK' "Unauthorized account already absent: $name"; continue }
+        if (LocalUserProtected $name) { Record 'SKIPPED' "Protected account cannot be deleted: $name"; continue }
+        $members = @(Get-LocalGroupMember -Group $admin.Name -ErrorAction SilentlyContinue)
+        if ($members.Count -le 1 -and @($members | Where-Object { $_.SID.Value -eq $user.SID.Value }).Count) {
+            Record 'SKIPPED' "Deleting $name would eliminate the last local admin."
+            continue
+        }
+        Change "Delete explicitly unauthorized local account $name (profile retained)" $true {
+            $user | Select-Object Name,SID,Enabled | Export-Clixml (Join-Path $backups ("deleted-user-" + $name + ".xml"))
+            Remove-LocalUser -Name $name -ErrorAction Stop
+        }
+    }
+}
+function Invoke-LocalGroups {
+    if ($script:IsDC) { Record 'SKIPPED' 'Local group changes skipped on Domain Controller.'; return }
+    if (-not (Get-Command Get-LocalGroup -ErrorAction SilentlyContinue)) { Record 'REVIEW' 'Local group cmdlets not installed.'; return }
+    $groups = Value $script:Cfg 'LocalGroups'
+    foreach ($name in (Values (Value $groups 'Create'))) {
+        if ($name -notmatch '^[A-Za-z][A-Za-z0-9 _.-]{0,63}$') { Record 'REVIEW' "Invalid group name $name"; continue }
+        if (Get-LocalGroup -Name $name -ErrorAction SilentlyContinue) { Record 'OK' "Local group exists: $name"; continue }
+        Change "Create specified local group $name" $true {
+            New-LocalGroup -Name $name -ErrorAction Stop | Out-Null
+        }
+    }
+    foreach ($entry in @((Value $groups 'Members').PSObject.Properties)) {
+        $group = [string]$entry.Name
+        if (-not (Get-LocalGroup -Name $group -ErrorAction SilentlyContinue)) { Record 'REVIEW' "Group missing: $group"; continue }
+        foreach ($name in (Values $entry.Value)) {
+            if (-not (Listed $name $script:RequiredAccounts)) { Record 'SKIPPED' "Group member not authorized: $name"; continue }
+            $exists = @(Get-LocalGroupMember -Group $group -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -ieq $name -or $_.Name -like ("*\" + $name) }).Count -gt 0
+            Change "Add $name to local group $group" (-not $exists) {
+                Add-LocalGroupMember -Group $group -Member $name -ErrorAction Stop
+            }
+        }
+    }
+    $admin = Get-AdminGroup
+    foreach ($entry in @((Value $groups 'RemoveMembers').PSObject.Properties)) {
+        $group = [string]$entry.Name
+        if (-not (Get-LocalGroup -Name $group -ErrorAction SilentlyContinue)) { Record 'OK' "Group absent: $group"; continue }
+        foreach ($name in (Values $entry.Value)) {
+            if (Listed $name (Value $script:Cfg 'AuthorizedLocalAdmins')) { Record 'SKIPPED' "Authorized admin membership protected: $name"; continue }
+            if ($name -ieq $env:USERNAME) { Record 'SKIPPED' 'Current administrator membership protected.'; continue }
+            $members = @(Get-LocalGroupMember -Group $group -ErrorAction SilentlyContinue)
+            $exists = @($members | Where-Object { $_.Name -ieq $name -or $_.Name -like ("*\" + $name) }).Count -gt 0
+            if ($group -ieq $admin.Name -and $members.Count -le 1) { Record 'SKIPPED' 'Cannot empty Administrators group.'; continue }
+            Change "Remove exact unauthorized member $name from $group" $exists {
+                Remove-LocalGroupMember -Group $group -Member $name -ErrorAction Stop
+            }
+        }
+    }
+}
+
