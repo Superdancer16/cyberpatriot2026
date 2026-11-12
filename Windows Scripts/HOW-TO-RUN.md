@@ -39,7 +39,7 @@ The JSON template is generated automatically and must be edited before Apply mod
 | `DisableServices`, `DisableFeatures`, `DisableScheduledTasks` | Only verified unnecessary components |
 | `RemoveShares`, `RemovePrograms`, `RemoveFiles` | Exact prohibited items |
 | `UpdatePrograms` | Exact installed `winget` IDs to update |
-| `Security` | Firewall, Defender, SMB, browser policies, RDP, audit, Windows Update |
+| `Security` | Firewall, Defender, SMB, browser policies, automatic Windows Update, RDP, audit, elevation policy |
 
 Example group object inside the generated JSON: ``"Groups": { "SpiderVerse": ["esther", "wyatt", "turner", "tina"] }`. This would create the specified group and add the four users automatically if they already exist. Replace these examples with names from the current README.
 
@@ -67,7 +67,7 @@ Without `-AllowRemovals`, permanent account/file/share/software removals are lis
 
 1. Account and group reconciliation: Guest, required local groups, members, specifically named unauthorized users/admin rights, password-expiry flags and authorized-user creation when a secure password can be entered.
 2. Configured local password and lockout policy, with an original policy export for recovery.
-3. Windows security options: SmartScreen, blank-password network restriction, AutoPlay, optional LLMNR, remote assistance, WDigest and screen lock controls.
+3. Windows security options: SmartScreen, blank-password network restriction, AutoPlay, optional LLMNR, remote assistance, WDigest, automatic-update policy, optional administrator enumeration restrictions, and screen lock controls.
 4. Defender protection/signature updates, firewall profiles, SMB signing/SMB1 and Credential Validation success auditing.
 5. Named unnecessary services and Windows features, selected scheduled tasks and custom SMB shares.
 6. Installed software inventory, exact `winget` application updates/removals, and exact prohibited files.
