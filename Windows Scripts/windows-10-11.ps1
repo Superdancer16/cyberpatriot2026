@@ -840,6 +840,105 @@ function Invoke-AutoAudit {
     } catch { Write-Result 'REVIEW' ('Credential Validation audit: ' + $_.Exception.Message) }
 }
 
+
+function Invoke-AutoServices {
+    $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','Appinfo','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time')
+    foreach ($name in (Names (Get-Value $script:Cfg 'DisableServices'))) {
+        if ($name -in $protected -or (Is-Listed $name $script:RequiredServices)) {
+            Write-Result 'SKIPPED' "Service $name protected or required by README."
+            continue
+        }
+        if ($name -in @('TermService','WinRM','W3SVC','FTPSVC','Spooler','sshd','RemoteAccess','SharedAccess')) {
+            Write-Result 'REVIEW' "High-impact service $name needs manual dependency/role verification; not stopped automatically."
+            continue
+        }
+        $svc = Get-Service -Name $name -ErrorAction SilentlyContinue
+        if (-not $svc) { Write-Result 'OK' "Service not installed: $name"; continue }
+        $dependents = @($svc.DependentServices | Where-Object { $_.Status -eq 'Running' })
+        if ($dependents.Count) {
+            Write-Result 'SKIPPED' ("Service $name has running dependencies: " + ($dependents.Name -join ', '))
+            continue
+        }
+        $unneeded = $svc.Status -ne 'Stopped' -or $svc.StartType -ne 'Disabled'
+        Decide "Stop and disable unneeded service $name" $unneeded {
+            $detail = Get-CimInstance Win32_Service -Filter ("Name='" + $name.Replace("'","''") + "'")
+            $detail | Select-Object Name,State,StartMode,StartName,PathName |
+                Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("service-" + $name + ".xml"))
+            if ($svc.Status -eq 'Running') { Stop-Service -Name $name -ErrorAction Stop }
+            Set-Service -Name $name -StartupType Disabled -ErrorAction Stop
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RequiredServices'))) {
+        $svc = Get-Service -Name $name -ErrorAction SilentlyContinue
+        if (-not $svc) { Write-Result 'REVIEW' "README-required service is absent: $name"; continue }
+        if ($svc.Status -ne 'Running') {
+            Write-Result 'REVIEW' "README-required service $name is $($svc.Status); check expected start mode/dependencies."
+        } else { Write-Result 'OK' "Required service running: $name" }
+    }
+}
+function Invoke-AutoFeatures {
+    $allowed = @('SMB1Protocol','MicrosoftWindowsPowerShellV2','TelnetClient','TFTP','SimpleTCP','SNMP','WindowsMediaPlayer')
+    foreach ($name in (Names (Get-Value $script:Cfg 'DisableFeatures'))) {
+        if ($name -notin $allowed) { Write-Result 'REVIEW' "Optional feature $name not on supported disable list."; continue }
+        if (Is-Listed $name $script:RequiredServices) { Write-Result 'SKIPPED' "Feature required: $name"; continue }
+        $item = Get-WindowsOptionalFeature -Online -FeatureName $name -ErrorAction SilentlyContinue
+        if (-not $item) { Write-Result 'OK' "Optional feature absent: $name"; continue }
+        Decide "Disable optional feature $name (restart may be needed)" ($item.State -eq 'Enabled') {
+            $item | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("feature-" + $name + ".xml"))
+            Disable-WindowsOptionalFeature -Online -FeatureName $name -NoRestart -ErrorAction Stop | Out-Null
+        }
+    }
+}
+function Invoke-AutoTasks {
+    foreach ($full in (Names (Get-Value $script:Cfg 'DisableScheduledTasks'))) {
+        if (-not $full.StartsWith('\')) {
+            Write-Result 'REVIEW' "Task path must begin with a backslash: $full"
+            continue
+        }
+        $index = $full.LastIndexOf('\')
+        if ($index -lt 0 -or $index -eq $full.Length - 1) {
+            Write-Result 'REVIEW' "Invalid task name: $full"
+            continue
+        }
+        $taskName = $full.Substring($index + 1)
+        $taskPath = $full.Substring(0, $index + 1)
+        if ($taskPath -like '\Microsoft\Windows\*') {
+            Write-Result 'SKIPPED' "Protected Microsoft scheduled task: $full"
+            continue
+        }
+        $task = Get-ScheduledTask -TaskPath $taskPath -TaskName $taskName -ErrorAction SilentlyContinue
+        if (-not $task) { Write-Result 'OK' "Scheduled task absent: $full"; continue }
+        Decide "Disable confirmed unauthorized scheduled task $full" ($task.State -ne 'Disabled') {
+            $xml = Export-ScheduledTask -TaskName $taskName -TaskPath $taskPath
+            $xml | Set-Content -LiteralPath (Join-Path $script:BackupDir ("task-" + [Guid]::NewGuid().ToString('N') + '.xml'))
+            Disable-ScheduledTask -TaskPath $taskPath -TaskName $taskName | Out-Null
+        }
+    }
+    $other = @(Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {
+        $_.TaskPath -notlike '\Microsoft\*' -and $_.State -ne 'Disabled'
+    } | Select-Object -First 50 TaskPath,TaskName,State)
+    $other | Export-Csv -Path (Join-Path $script:BackupDir 'task-inventory.csv') -NoTypeInformation
+    Write-Result 'REVIEW' "Review non-Microsoft scheduled tasks ($($other.Count) sampled) for unauthorized persistence."
+}
+function Invoke-AutoShares {
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveShares'))) {
+        if (-not $AllowRemovals) { Write-Result 'REVIEW' "Share removal needs -AllowRemovals: $name"; continue }
+        if (Is-Listed $name $script:RequiredShares) { Write-Result 'SKIPPED' "Required share: $name"; continue }
+        $share = Get-SmbShare -Name $name -ErrorAction SilentlyContinue
+        if (-not $share) { Write-Result 'OK' "Share already absent: $name"; continue }
+        if ($share.Special -or $name -in @('ADMIN$','C$','IPC$','print$')) {
+            Write-Result 'SKIPPED' "System/administrative share is protected: $name"
+            continue
+        }
+        Decide "Remove unauthorized custom share $name" $true {
+            $backup = Join-Path $script:BackupDir ("share-" + $name.Replace('$','_') + ".txt")
+            ($share | Format-List * | Out-String) | Set-Content -LiteralPath $backup
+            (Get-SmbShareAccess -Name $name | Format-Table -AutoSize | Out-String) | Add-Content -LiteralPath $backup
+            Remove-SmbShare -Name $name -Force -Confirm:$false
+        }
+    }
+}
+
 function Quick {
     Run-Task 'Baseline audit' { Audit }
     Run-Task 'Firewall' { Firewall }
