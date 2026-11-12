@@ -1087,6 +1087,159 @@ function Invoke-AutoAuditSubcategories {
     }
 }
 
+
+function Save-Discovery([string]$Name, [scriptblock]$Command) {
+    $file = Join-Path $script:BackupDir ("review-" + $Name + ".csv")
+    try {
+        $rows = @(& $Command)
+        if ($rows.Count) {
+            $rows | Export-Csv -LiteralPath $file -NoTypeInformation -Encoding UTF8
+        } else {
+            "No entries found for $Name" | Set-Content -LiteralPath $file -Encoding UTF8
+        }
+        Write-Result 'REVIEW' "Inspection saved: $file ($($rows.Count) entries)"
+    } catch {
+        Write-Result 'REVIEW' ("Inspection unavailable ($Name): " + $_.Exception.Message)
+    }
+}
+function Invoke-AutoDiscovery {
+    Save-Discovery 'startup-registry' {
+        foreach ($path in @(
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
+        )) {
+            if (-not (Test-Path -LiteralPath $path)) { continue }
+            $obj = Get-ItemProperty -LiteralPath $path
+            foreach ($prop in $obj.PSObject.Properties) {
+                if ($prop.Name -match '^PS(Path|ParentPath|ChildName|Drive|Provider)$') { continue }
+                [pscustomobject]@{Path=$path;Name=$prop.Name;Command=[string]$prop.Value}
+            }
+        }
+    }
+    Save-Discovery 'ifeo-debuggers' {
+        $base = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
+        foreach ($key in (Get-ChildItem $base -ErrorAction SilentlyContinue)) {
+            $debugger = (Get-ItemProperty -LiteralPath $key.PSPath -Name Debugger -ErrorAction SilentlyContinue).Debugger
+            if ($debugger) { [pscustomobject]@{Executable=$key.PSChildName;Debugger=$debugger;Key=$key.Name} }
+        }
+    }
+    Save-Discovery 'services-and-paths' {
+        Get-CimInstance Win32_Service | Select-Object Name,DisplayName,State,StartMode,StartName,PathName
+    }
+    Save-Discovery 'listening-processes' {
+        foreach ($conn in @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue)) {
+            $process = Get-Process -Id $conn.OwningProcess -ErrorAction SilentlyContinue
+            [pscustomobject]@{
+                Address=$conn.LocalAddress;Port=$conn.LocalPort;Pid=$conn.OwningProcess
+                Process=if($process){$process.ProcessName}else{''}
+                Executable=if($process){try{$process.Path}catch{''}}else{''}
+            }
+        }
+    }
+    Save-Discovery 'inbound-firewall-allow' {
+        Get-NetFirewallRule -Direction Inbound -Action Allow -Enabled True -ErrorAction SilentlyContinue |
+            Select-Object Name,DisplayName,DisplayGroup,Profile,Enabled
+    }
+    Save-Discovery 'installed-store-apps' {
+        Get-AppxPackage -AllUsers -ErrorAction Stop |
+            Select-Object Name,PackageFullName,Publisher,NonRemovable
+    }
+    Save-Discovery 'share-permissions' {
+        foreach ($share in (Get-SmbShare -ErrorAction SilentlyContinue)) {
+            foreach ($access in @(Get-SmbShareAccess -Name $share.Name -ErrorAction SilentlyContinue)) {
+                [pscustomobject]@{Share=$share.Name;Path=$share.Path;Account=$access.AccountName;Access=$access.AccessRight;Control=$access.AccessControlType}
+            }
+        }
+    }
+    Save-Discovery 'hosts-file' {
+        $hosts = Join-Path $env:WINDIR 'System32\drivers\etc\hosts'
+        $n = 0
+        foreach ($entry in (Get-Content -LiteralPath $hosts -ErrorAction Stop)) {
+            $n++
+            if ($entry.Trim() -and $entry.Trim() -notmatch '^#') {
+                [pscustomobject]@{Line=$n;Entry=$entry.Trim()}
+            }
+        }
+    }
+    Save-Discovery 'recent-security-events' {
+        Get-WinEvent -FilterHashtable @{LogName='Security';Id=4624,4625,4720,4732,1102} -MaxEvents 75 -ErrorAction Stop |
+            Select-Object TimeCreated,Id,ProviderName,LevelDisplayName,Message
+    }
+    Save-Discovery 'recent-service-installations' {
+        Get-WinEvent -FilterHashtable @{LogName='System';Id=7045} -MaxEvents 40 -ErrorAction Stop |
+            Select-Object TimeCreated,Id,ProviderName,Message
+    }
+    $roots = @(
+        (Join-Path $env:PUBLIC 'Downloads'),
+        (Join-Path $env:PUBLIC 'Desktop'),
+        (Join-Path $env:PUBLIC 'Documents'),
+        (Join-Path $env:USERPROFILE 'Downloads'),
+        (Join-Path $env:USERPROFILE 'Desktop'),
+        'C:\Temp'
+    ) + @(Names (Get-Value $script:Cfg 'ScanPaths'))
+    Save-Discovery 'suspicious-file-candidates' {
+        $extensions = @('.mp3','.mp4','.torrent','.zip','.7z','.rar','.pcap','.kdbx','.exe','.ps1','.bat')
+        $seen = @{}
+        foreach ($path in $roots) {
+            if (-not (Test-Path -LiteralPath $path -PathType Container)) { continue }
+            $folder = (Resolve-Path -LiteralPath $path).Path
+            if ($folder -match '(?i)\\Windows\\|\\Program Files') { continue }
+            if ($seen.ContainsKey($folder)) { continue }
+            $seen[$folder] = $true
+            Get-ChildItem -LiteralPath $folder -File -Recurse -Force -ErrorAction SilentlyContinue |
+                Where-Object { $_.Extension -in $extensions } |
+                Select-Object -First 250 FullName,Length,LastWriteTime,Extension
+        }
+    }
+    Write-Result 'REVIEW' 'Discovery findings are leads, not proof of malware. Confirm against the active image README.'
+}
+function Invoke-AutoStartupAndIFEO {
+    $allowed = @(
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+        'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce',
+        'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+        'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
+    )
+    foreach ($item in @(Get-Value $script:Cfg 'RemoveStartupValues' @())) {
+        $path = [string](Get-Value $item 'Path' '')
+        $name = [string](Get-Value $item 'Name' '')
+        if ($path -notin $allowed -or [string]::IsNullOrWhiteSpace($name)) {
+            Write-Result 'REVIEW' "Invalid startup entry; supply exact allowed Run/RunOnce path and value Name."
+            continue
+        }
+        if ($name -match '^(SecurityHealth|WindowsDefender|OneDrive)' -or $name.Contains('*')) {
+            Write-Result 'SKIPPED' "Protected or wildcard startup entry: $name"
+            continue
+        }
+        $value = Get-ItemProperty -Path $path -Name $name -ErrorAction SilentlyContinue
+        if (-not $value) { Write-Result 'OK' "Startup value absent: $path $name"; continue }
+        Decide "Remove confirmed unauthorized startup value $name" $true {
+            Save-RegKey $path
+            Remove-ItemProperty -Path $path -Name $name -ErrorAction Stop
+            if (Get-ItemProperty -Path $path -Name $name -ErrorAction SilentlyContinue) {
+                throw 'Startup entry still exists'
+            }
+        }
+    }
+    $base = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
+    $allowedExecutables = @('sethc.exe','utilman.exe','osk.exe','magnify.exe','narrator.exe')
+    foreach ($file in (Names (Get-Value $script:Cfg 'ClearIFEO'))) {
+        if ($file -notin $allowedExecutables) {
+            Write-Result 'REVIEW' "IFEO target $file not in the guarded accessibility-executable allowlist."
+            continue
+        }
+        $path = Join-Path $base $file
+        $debugger = (Get-ItemProperty -Path $path -Name Debugger -ErrorAction SilentlyContinue).Debugger
+        if (-not $debugger) { Write-Result 'OK' "No IFEO Debugger for $file"; continue }
+        Decide "Remove configured IFEO debugger from $file" $true {
+            Save-RegKey $path
+            Remove-ItemProperty -Path $path -Name Debugger -ErrorAction Stop
+        }
+    }
+}
+
 function Invoke-AutoServices {
     $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','Appinfo','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time')
     foreach ($name in (Names (Get-Value $script:Cfg 'DisableServices'))) {
@@ -1305,6 +1458,7 @@ function Run-Automation {
         if ($answer -cne 'APPLY') { Note 'Canceled before changing the system.'; return }
     }
     $modules = @(
+        @{ Name='discovery'; Fn='Invoke-AutoDiscovery' },
         @{ Name='accounts';  Fn='Invoke-AutoAccounts' },
         @{ Name='passwords'; Fn='Invoke-AutoPasswordPolicy' },
         @{ Name='rights';    Fn='Invoke-AutoUserRights' },
@@ -1318,6 +1472,7 @@ function Run-Automation {
         @{ Name='services';  Fn='Invoke-AutoServices' },
         @{ Name='features';  Fn='Invoke-AutoFeatures' },
         @{ Name='tasks';     Fn='Invoke-AutoTasks' },
+        @{ Name='startup';   Fn='Invoke-AutoStartupAndIFEO' },
         @{ Name='shares';    Fn='Invoke-AutoShares' },
         @{ Name='browsers';  Fn='Invoke-AutoBrowsers' },
         @{ Name='apps';      Fn='Invoke-AutoApps' },
