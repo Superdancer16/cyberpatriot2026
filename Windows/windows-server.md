@@ -2044,7 +2044,7 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 ##### WS.3.1 Password Policy (standalone/member-server reference)
 - [ ] **🎯 Configure only the required local password policy (not a Domain Controller's domain policy).**
 
-**⭐ EASIEST WAY — GUI (Desktop Experience):** **Win + R → \`secpol.msc\` → Account Policies → Password Policy** → double-click **Minimum password length**, **Password must meet complexity requirements**, **Store passwords using reversible encryption**, **Enforce password history** and any image-required password ages → enter the exact requested value → **Apply → OK**.
+**⭐ EASIEST WAY — GUI (Desktop Experience):** **Win + R → `secpol.msc` → Account Policies → Password Policy** → double-click **Minimum password length**, **Password must meet complexity requirements**, **Store passwords using reversible encryption**, **Enforce password history** and any image-required password ages → enter the exact requested value → **Apply → OK**.
 
 | Item | Intended action when applicable |
 |---|---|
@@ -2059,13 +2059,13 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > [!NOTE]
 > **🔁 ALTERNATE — read-only PowerShell/CMD, or Server Core where GUI is unavailable:**
 >
-> \`\`\`powershell
+> ```powershell
 > net accounts
 > secedit /export /cfg "$env:TEMP\cp-server-policy.inf" /areas SECURITYPOLICY
 > Select-String 'MinimumPasswordLength|PasswordComplexity|ClearTextPassword|PasswordHistorySize' "$env:TEMP\cp-server-policy.inf"
-> \`\`\`
+> ```
 >
-> **On a Domain Controller**, use **\`gpmc.msc\`** to edit the appropriate domain-root-linked password policy or use AD Administrative Center for fine-grained policy; local \`secpol.msc\` is not the correct control for domain users.
+> **On a Domain Controller**, use **`gpmc.msc`** to edit the appropriate domain-root-linked password policy or use AD Administrative Center for fine-grained policy; local `secpol.msc` is not the correct control for domain users.
 
 ##### WS.3.2 Account Lockout Policy
 - [ ] **🎯 DO THIS — WS.3.2 Account Lockout Policy**
@@ -2731,18 +2731,18 @@ Get-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient' | Sele
 > **Do not turn on BitLocker** on a practice image. Without the recovery key you can lock yourself out of the whole VM.
 
 ###### WS.15.6 WDigest off (avoid plaintext password caching)
-- [ ] **🎯 Inspect the \`UseLogonCredential\` policy if appropriate to the installed Server release.**
+- [ ] **🎯 Inspect the `UseLogonCredential` policy if appropriate to the installed Server release.**
 
-**⭐ EASIEST WAY — GUI (Desktop Experience):** **Win + R → \`regedit\` → \`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest\`**. If the DWORD **\`UseLogonCredential\`** exists and equals **1**, export the key and set it to **0**. If absent, verify default behavior before adding any value.
+**⭐ EASIEST WAY — GUI (Desktop Experience):** **Win + R → `regedit` → `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest`**. If the DWORD **`UseLogonCredential`** exists and equals **1**, export the key and set it to **0**. If absent, verify default behavior before adding any value.
 
 **✅ VERIFY:** Value is **0** if configured, and legitimate logon still works. **↩️ UNDO:** Restore only an accidental registry change from the saved key.
 
 > [!NOTE]
 > **🔁 ALTERNATE — PowerShell read-only check (Server Core):**
 >
-> \`\`\`powershell
+> ```powershell
 > Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' -Name UseLogonCredential -ErrorAction SilentlyContinue
-> \`\`\`
+> ```
 
 ##### WS.15.7 NetBIOS over TCP/IP off
 - [ ] **🎯 DO THIS — WS.15.7 NetBIOS over TCP/IP off**
