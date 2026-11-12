@@ -1,6 +1,6 @@
 # Printable CyberPatriot Checklists
 
-These are **separate, printable task checklists** based on the existing, comprehensive guides. **None of the original Windows, Debian, Windows Server or Cisco guides were modified.**
+These are **separate, printable task checklists** based on the comprehensive platform guides. Each PDF and matching Markdown tracker is stored under its platform's **Checklists/** directory.
 
 The PDFs are black-and-white-friendly, **US Letter (8.5 x 11 in), portrait**. Print at **100% / Actual Size**, then tick one square after each individual inspection, permitted fix or verification. Write **N/A** beside tasks that do not apply to your assigned image or Cisco activity.
 
@@ -28,7 +28,7 @@ Each PDF has a matching Markdown file with **exactly the same task IDs and order
 
 For team collaboration, each member can edit an assigned section on a feature branch/PR; avoid two people editing the same tracker simultaneously without coordination. If you prefer preserving an untouched checklist for each round, copy the Markdown tracker to a dated filename before marking it complete.
 
-## Original full guides (unchanged)
+## Detailed platform guides
 
 - [Windows 10 / 11](../Windows/windows-10-11.md)
 - [Windows Server](../Server/windows-server.md)
@@ -42,4 +42,4 @@ For team collaboration, each member can edit an assigned section on a feature br
 
 ## Return to the detailed instructions
 
-[Complete file index](../README.md) · [Forensics hub](forensics-workflows.md) · [Optional script instructions](script-safety.md). The original guides and all PDF/Markdown checklist pairs remain unchanged.
+[Complete file index](../README.md) · [Forensics hub](forensics-workflows.md) · [Optional script instructions](script-safety.md). The detailed platform guides and all PDF/Markdown checklist pairs remain available in their platform folders.

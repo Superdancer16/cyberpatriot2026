@@ -3,7 +3,7 @@
 > [!WARNING]
 > These scripts may change users, policies, services, software, network access, or files when configured to apply changes. **Read the competition rules and VM README, complete necessary forensics, inspect the code, and run Audit mode before any Apply mode.** Do not assume a script is permitted or safe for every image.
 
-The script source files **remain in their original directories**. This folder provides one shared navigation page only; no scripts have been moved, removed, renamed, or combined.
+The scripts live inside their respective platform folders: **[Windows/Scripts](../Windows/Scripts/HOW-TO-RUN.md)**, **[Server/Scripts](../Server/Scripts/HOW-TO-RUN.md)** and **[Linux/Debian/Scripts](../Linux/Debian/Scripts/HOW-TO-RUN.md)**. This is a shared safety reference, not an additional executable script.
 
 ## Select the matching operating system
 
