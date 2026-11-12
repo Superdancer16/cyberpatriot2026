@@ -1141,3 +1141,125 @@ function Invoke-ServerShares {
     }
 }
 
+function Invoke-IISSettings {
+    $cfg = Value $script:Cfg 'IIS'
+    $targets = Values (Value $cfg 'DisableDirectoryBrowsingOnSites')
+    if (-not $targets.Count) { return }
+    if (-not (Get-Module -ListAvailable WebAdministration)) {
+        Record 'REVIEW' 'IIS WebAdministration is unavailable; inspect IIS Manager/Server Manager.'
+        return
+    }
+    if (-not (Listed 'IIS' $script:RequiredRoles) -and -not (Listed 'Web-Server' $script:RequiredRoles)) {
+        Record 'REVIEW' 'IIS site changes require adding required IIS role to RequiredRoles after README review.'
+        return
+    }
+    Import-Module WebAdministration -ErrorAction Stop
+    $appcmd = Join-Path $env:WINDIR 'System32\inetsrv\appcmd.exe'
+    if (-not (Test-Path -LiteralPath $appcmd)) { Record 'REVIEW' 'appcmd.exe unavailable, cannot back up IIS before changing sites.'; return }
+    $name = 'cp-before-' + $stamp
+    if ($Mode -eq 'Apply') {
+        & $appcmd add backup $name | Out-Null
+        if ($LASTEXITCODE -ne 0) { Record 'FAILED' 'IIS backup failed; no site changes.'; return }
+        Record 'INFO' "IIS configuration backed up as $name"
+    }
+    foreach ($siteName in $targets) {
+        if ($siteName -match '[*?]' -or -not $siteName.Trim()) { Record 'REVIEW' "IIS site must be an exact name: $siteName"; continue }
+        $site = Get-Website -Name $siteName -ErrorAction SilentlyContinue
+        if (-not $site) { Record 'REVIEW' "IIS site not found: $siteName"; continue }
+        try {
+            $existing = Get-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Location $siteName -Filter 'system.webServer/directoryBrowse' -Name 'enabled' -ErrorAction Stop
+            Change "Disable IIS directory browsing for exact site $siteName" ([bool]$existing.Value) {
+                Set-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Location $siteName -Filter 'system.webServer/directoryBrowse' -Name 'enabled' -Value $false -ErrorAction Stop
+                $after = Get-WebConfigurationProperty -PSPath 'MACHINE/WEBROOT/APPHOST' -Location $siteName -Filter 'system.webServer/directoryBrowse' -Name 'enabled'
+                if ($after.Value) { throw 'Directory browsing still enabled' }
+            }
+            Record 'REVIEW' "Test required IIS site routes, HTTP status, authentication, application pool and bindings for $siteName."
+        } catch { Record 'REVIEW' "IIS site $siteName: $($_.Exception.Message)" }
+    }
+}
+function Invoke-DNSSettings {
+    $cfg = Value $script:Cfg 'DNS'
+    $secure = Values (Value $cfg 'SecureDynamicUpdateZones')
+    $transfers = Values (Value $cfg 'DisableZoneTransfers')
+    if (-not $secure.Count -and -not $transfers.Count) { return }
+    if (-not (Get-Module -ListAvailable DnsServer)) { Record 'REVIEW' 'DNS module unavailable; use DNS Manager.'; return }
+    if (-not (Listed 'DNS' $script:RequiredRoles) -and -not (Listed 'DNS' $script:RequiredServices)) {
+        Record 'REVIEW' 'DNS configuration requested but DNS not declared a required role/service.'
+        return
+    }
+    Import-Module DnsServer -ErrorAction Stop
+    foreach ($zoneName in $secure) {
+        if ($zoneName -match '[*?]' -or -not $zoneName.Trim()) { Record 'REVIEW' "Invalid DNS zone $zoneName"; continue }
+        $zone = Get-DnsServerZone -Name $zoneName -ErrorAction SilentlyContinue
+        if (-not $zone -or $zone.ZoneType -ne 'Primary' -or -not $zone.IsDsIntegrated) {
+            Record 'REVIEW' "Zone $zoneName is absent or not AD-integrated primary; do not force secure dynamic updates."
+            continue
+        }
+        Change "Require secure dynamic DNS updates on zone $zoneName" ($zone.DynamicUpdate -ne 'Secure') {
+            $zone | Export-Clixml -LiteralPath (Join-Path $backups ("dns-zone-" + [guid]::NewGuid().ToString('N') + ".xml"))
+            Set-DnsServerPrimaryZone -Name $zoneName -DynamicUpdate Secure -ErrorAction Stop
+        }
+        Record 'REVIEW' "Verify authorized zone registrations and required SRV/DNS records in zone $zoneName."
+    }
+    foreach ($zoneName in $transfers) {
+        if (-not $AllowCompatibilityChanges) { Record 'REVIEW' "Disabling zone transfers for $zoneName needs -AllowCompatibilityChanges and known secondary servers."; continue }
+        if (@(Values (Value $cfg 'RequiredSecondaryServers')).Count) {
+            Record 'SKIPPED' "At least one required DNS secondary exists; configure restricted transfer targets manually for $zoneName."
+            continue
+        }
+        $zone = Get-DnsServerZone -Name $zoneName -ErrorAction SilentlyContinue
+        if (-not $zone -or $zone.ZoneType -ne 'Primary') { Record 'REVIEW' "Primary DNS zone missing: $zoneName"; continue }
+        Change "Disable unspecified DNS zone transfers: $zoneName" ($zone.SecureSecondaries -ne 'NoTransfer') {
+            $zone | Export-Clixml -LiteralPath (Join-Path $backups ("dns-transfer-" + [guid]::NewGuid().ToString('N') + ".xml"))
+            Set-DnsServerPrimaryZone -Name $zoneName -SecureSecondaries NoTransfer -ErrorAction Stop
+        }
+        Record 'REVIEW' "Verify required DNS clients and authorized secondary zone-transfer behavior for $zoneName."
+    }
+}
+function Invoke-DHCPSettings {
+    $cfg = Value $script:Cfg 'DHCP'
+    if (-not [bool](Value $cfg 'EnableAuditLogging' $false)) { return }
+    if (-not (Get-Module -ListAvailable DhcpServer)) { Record 'REVIEW' 'DHCP cmdlets not installed.'; return }
+    if (-not (Listed 'DHCP' $script:RequiredRoles) -and -not (Listed 'DHCPServer' $script:RequiredServices)) {
+        Record 'REVIEW' 'DHCP audit logging requested but DHCP is not declared a required role/service.'
+        return
+    }
+    Import-Module DhcpServer -ErrorAction Stop
+    try {
+        $old = Get-DhcpServerAuditLog -ErrorAction Stop
+        Change 'Enable DHCP server audit logging' (-not [bool]$old.Enable) {
+            $old | Export-Clixml -LiteralPath (Join-Path $backups 'dhcp-audit-before.xml')
+            Set-DhcpServerAuditLog -Enable $true -ErrorAction Stop
+        }
+        Record 'REVIEW' 'Check DHCP authorization, scope options 003/006, reservations and a real client lease.'
+    } catch { Record 'REVIEW' "DHCP auditing: $($_.Exception.Message)" }
+}
+function Invoke-LegacyTls {
+    $cfg = Value $script:Cfg 'TLS'
+    $targets = Values (Value $cfg 'DisableServerProtocols')
+    if (-not $targets.Count) { return }
+    if (-not $AllowCompatibilityChanges -or -not [bool](Value $cfg 'CompatibilityConfirmed' $false)) {
+        Record 'REVIEW' 'Legacy TLS hardening requires compatibility confirmation and -AllowCompatibilityChanges.'
+        return
+    }
+    $allowed = @('SSL 2.0','SSL 3.0','TLS 1.0','TLS 1.1')
+    $base = 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols'
+    $done = $false
+    foreach ($protocol in $targets) {
+        if ($protocol -notin $allowed) { Record 'REVIEW' "Unsupported legacy TLS protocol: $protocol"; continue }
+        $key = Join-Path $base (Join-Path $protocol 'Server')
+        $current = $null
+        if (Test-Path $key) { $current=(Get-ItemProperty -Path $key -Name Enabled -ErrorAction SilentlyContinue).Enabled }
+        Change "Disable legacy server-side protocol $protocol" ($null -eq $current -or [int]$current -ne 0) {
+            if (-not $done) {
+                Save-Registry $base
+                $done = $true
+            }
+            New-Item -Path $key -ItemType Directory -Force | Out-Null
+            New-ItemProperty -Path $key -Name Enabled -PropertyType DWord -Value 0 -Force | Out-Null
+            New-ItemProperty -Path $key -Name DisabledByDefault -PropertyType DWord -Value 1 -Force | Out-Null
+        }
+    }
+    Record 'REVIEW' 'A controlled service/system restart may be required. Test required IIS, LDAPS, RDP, FTP, SQL and legacy clients.'
+}
+
