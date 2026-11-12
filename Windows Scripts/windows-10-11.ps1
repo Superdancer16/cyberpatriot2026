@@ -414,6 +414,15 @@ function Initialize-ReadmeConfig {
         RequiredServices = @()
         RequiredSoftware = @()
         RequiredShares = @()
+        RequiredPorts = @()
+        ForensicsComplete = $false
+        ScanPaths = @()
+        DisableFirewallRules = @()
+        RemoveAppxPackages = @()
+        RemoveStartupValues = @()
+        ClearIFEO = @()
+        RemoveShareAccess = @()
+        AuditSubcategories = [ordered]@{}
         DisableUsers = @()
         RemoveUsers = @()
         DemoteAdmins = @()
@@ -427,6 +436,8 @@ function Initialize-ReadmeConfig {
         DisableFeatures = @()
         RemoveShares = @()
         RemoveDefenderExclusions = @()
+        RemoveDefenderExclusionProcesses = @()
+        RemoveDefenderExclusionExtensions = @()
         DisableScheduledTasks = @()
         RemovePrograms = @()
         RemoveFiles = @()
@@ -438,6 +449,14 @@ function Initialize-ReadmeConfig {
             DefenderSignatures = $true
             DefenderQuickScan = $false
             SMBClientSigning = $false
+            SMBServerSigning = $false
+            RequireRdpNla = $false
+            EnableUAC = $false
+            RestrictAnonymous = $false
+            DisableLMHash = $false
+            RequireNTLMv2 = $false
+            ProtectPrintDrivers = $false
+            DisableNetBIOS = $false
             CredentialAuditSuccess = $true
             SmartScreen = $true
             DisableAutoPlay = $true
@@ -740,7 +759,7 @@ function Invoke-AutoUserRights {
     if ($script:domainJoined) { Write-Result 'REVIEW' 'User-rights policy may be managed by domain GPO; skipped.'; return }
     $desired = Get-Value $script:Cfg 'RemoveUserRights'
     if (-not $desired) { return }
-    $allowed = @('SeSecurityPrivilege','SeTakeOwnershipPrivilege')
+    $allowed = @('SeSecurityPrivilege','SeTakeOwnershipPrivilege','SeDebugPrivilege','SeBackupPrivilege','SeRestorePrivilege','SeLoadDriverPrivilege','SeRemoteInteractiveLogonRight')
     $currentPolicy = Join-Path $script:BackupDir 'user-rights-before.inf'
     & secedit.exe /export /cfg $currentPolicy /areas USER_RIGHTS | Out-Null
     if ($LASTEXITCODE -ne 0) { Write-Result 'FAILED' 'User rights export failed; no changes made.'; return }
@@ -845,6 +864,54 @@ function Invoke-AutoSecurity {
     if ([bool](Get-Value $sec 'PowerShellLogging' $false)) {
         Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' 'EnableScriptBlockLogging' 1
     }
+    if ([bool](Get-Value $sec 'EnableUAC' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'EnableLUA' 1
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'ConsentPromptBehaviorAdmin' 2
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'PromptOnSecureDesktop' 1
+        Write-Result 'REVIEW' 'UAC may require restarting Windows; test administrative elevation.'
+    }
+    if ([bool](Get-Value $sec 'RestrictAnonymous' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'RestrictAnonymousSAM' 1
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'RestrictAnonymous' 1
+    }
+    if ([bool](Get-Value $sec 'DisableLMHash' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'NoLMHash' 1
+    }
+    if ([bool](Get-Value $sec 'RequireNTLMv2' $false)) {
+        Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' 'LmCompatibilityLevel' 5
+        Write-Result 'REVIEW' 'NTLMv2-only may break legacy clients; test required file shares/authentication.'
+    }
+    if ([bool](Get-Value $sec 'ProtectPrintDrivers' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'RestrictDriverInstallationToAdministrators' 1
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'NoWarningNoElevationOnInstall' 0
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint' 'UpdatePromptSettings' 0
+        Write-Result 'REVIEW' 'Print-driver policy changed; verify required printers and driver installs.'
+    }
+    if ([bool](Get-Value $sec 'RequireRdpNla' $false)) {
+        if (Is-Listed 'TermService' $script:RequiredServices) {
+            Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' 'UserAuthentication' 1
+            Write-Result 'REVIEW' 'Verify authorized RDP clients still connect using NLA.'
+        } else {
+            Write-Result 'REVIEW' 'RDP NLA was requested, but TermService is not marked required in JSON.'
+        }
+    }
+    if ([bool](Get-Value $sec 'DisableNetBIOS' $false)) {
+        if ($script:RequiredShares.Count -gt 0 -or (Is-Listed 'LanmanServer' $script:RequiredServices)) {
+            Write-Result 'SKIPPED' 'NetBIOS change skipped because file sharing is listed as required.'
+        } else {
+            $adapters = @(Get-CimInstance Win32_NetworkAdapterConfiguration -Filter 'IPEnabled=True')
+            $adapters | Select-Object Description,Index,TcpipNetbiosOptions |
+                Export-Csv -LiteralPath (Join-Path $script:BackupDir 'netbios-before.csv') -NoTypeInformation
+            foreach ($adapter in $adapters) {
+                if ($adapter.TcpipNetbiosOptions -eq 2) { continue }
+                Decide "Disable NetBIOS on adapter $($adapter.Index)" $true {
+                    $result = Invoke-CimMethod -InputObject $adapter -MethodName SetTcpipNetbios -Arguments @{TcpipNetbiosOptions=2}
+                    if ($result.ReturnValue -notin @(0,1)) { throw "NetBIOS adapter result $($result.ReturnValue)" }
+                }
+            }
+            Write-Result 'REVIEW' 'Verify required connectivity after NetBIOS changes.'
+        }
+    }
     if ([bool](Get-Value $sec 'DisableRDP' $false)) {
         if ($env:SESSIONNAME -like 'RDP*' -or (Is-Listed 'TermService' $script:RequiredServices)) {
             Write-Result 'SKIPPED' 'Remote Desktop required or script running from RDP; cannot disable.'
@@ -903,6 +970,14 @@ function Invoke-AutoSMB {
             $old | Set-Content -LiteralPath (Join-Path $script:BackupDir 'smb-client-signing-before.txt')
             Set-SmbClientConfiguration -RequireSecuritySignature $true -Confirm:$false
         }
+    }
+    if ([bool](Get-Value $script:Sec 'SMBServerSigning' $false)) {
+        $current = (Get-SmbServerConfiguration).RequireSecuritySignature
+        Decide 'Require SMB server signing' (-not $current) {
+            $current | Set-Content -LiteralPath (Join-Path $script:BackupDir 'smb-server-signing-before.txt')
+            Set-SmbServerConfiguration -RequireSecuritySignature $true -Confirm:$false
+        }
+        Write-Result 'REVIEW' 'Verify authorized SMB clients and file shares after requiring server signing.'
     }
     if ([bool](Get-Value $script:Sec 'DisableSMB1' $false)) {
         $feature = Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -ErrorAction SilentlyContinue
