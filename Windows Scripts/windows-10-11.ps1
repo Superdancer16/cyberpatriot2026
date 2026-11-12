@@ -446,6 +446,8 @@ function Initialize-ReadmeConfig {
             DisableSMB1 = $false
             DisableWDigest = $true
             HideLastSignedIn = $false
+            DisableAdminEnumeration = $false
+            AutomaticWindowsUpdates = $true
             RestrictBlankPasswordNetwork = $true
             PowerShellLogging = $false
             LockScreenSeconds = $null
@@ -559,8 +561,12 @@ function Invoke-AutoAccounts {
     }
     $guest = Get-LocalUser | Where-Object { $_.SID.Value -match '-501$' } | Select-Object -First 1
     if ($guest) {
-        Decide ("Disable built-in Guest " + $guest.Name) ([bool]$guest.Enabled) {
-            Disable-LocalUser -Name $guest.Name
+        if (Is-Listed $guest.Name $script:Authorized) {
+            Write-Result 'SKIPPED' "Guest is listed as required in the configuration; do not disable automatically."
+        } else {
+            Decide ("Disable built-in Guest " + $guest.Name) ([bool]$guest.Enabled) {
+                Disable-LocalUser -Name $guest.Name
+            }
         }
     }
     $adminGroup = Get-LocalGroup | Where-Object { $_.SID.Value -eq 'S-1-5-32-544' } | Select-Object -First 1
@@ -744,6 +750,13 @@ function Invoke-AutoSecurity {
     }
     if ([bool](Get-Value $sec 'HideLastSignedIn' $false)) {
         Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' 'DontDisplayLastUserName' 1
+    }
+    if ([bool](Get-Value $sec 'DisableAdminEnumeration' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI' 'EnumerateAdministrators' 0
+    }
+    if ([bool](Get-Value $sec 'AutomaticWindowsUpdates' $false)) {
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' 'NoAutoUpdate' 0
+        Put-RegDword 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' 'AUOptions' 4
     }
     if ([bool](Get-Value $sec 'DisableWDigest' $false)) {
         Put-RegDword 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest' 'UseLogonCredential' 0
