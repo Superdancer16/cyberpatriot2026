@@ -227,7 +227,7 @@ function Save-Summary {
 
 function Invoke-Audit {
     $section = @()
-    $section += "Windows Server audit — $(Get-Date -Format s)"
+    $section += "Windows Server audit - $(Get-Date -Format s)"
     $section += "Hostname: $env:COMPUTERNAME"
     $section += "Detected role: $script:ActualRole"
     $section += "Domain: $script:DomainName"
@@ -1523,7 +1523,7 @@ function Run-ServerAudit {
 function Menu {
     while ($true) {
         Write-Host ''
-        Write-Host ("Windows Server hardening — " + $script:ActualRole)
+        Write-Host ("Windows Server hardening - " + $script:ActualRole)
         Write-Host '1) Audit only'
         Write-Host '2) Apply all configured sections'
         Write-Host '3) List section names'
