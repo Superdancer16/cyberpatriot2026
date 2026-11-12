@@ -307,6 +307,7 @@ try {
 
 Otherwise use an already-approved offline RIPEMD160 tool; never silently substitute SHA-1. Hash only the exact requested **original file** and verify by recomputing.
 
+<a id="less-common-puzzle-types-rot47-rail-fence-bacon-polybius-pigpen-a1z26-keyboard-shift"></a>
 ## Less common puzzle types — ROT47, Rail Fence, Bacon, Polybius, Pigpen, A1Z26, keyboard shift
 
 When Ctrl+F finds a **rare cipher name**, start with the clue, not a guessed key. [dCode Cipher Identifier](https://www.dcode.fr/cipher-identifier) can suggest likely cipher families for a **permitted, non-sensitive** ciphertext; use its **Clues/Keywords** box if you know a hint. [DenCode Cipher](https://dencode.com/en/cipher) has ROT47, Rail Fence, Bacon and other classical options; [CyberChef](https://gchq.github.io/CyberChef/) has ROT47, To/From Character Code, Morse and related operations. Results from an automatic identifier are **hypotheses**, not guaranteed plaintext.

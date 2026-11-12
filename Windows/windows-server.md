@@ -212,6 +212,7 @@ Prioritize authorized users, domain/local privilege, passwords, Defender/firewal
 
 ### 2. Users and groups
 
+<a id="21-standalone-member-server-fully-documented-local-accounts"></a>
 #### 2.1 Standalone / member server — fully documented local accounts
 
 - [ ] **🎯 DO THIS — 2.1 Standalone / member server — fully documented local accounts**
@@ -282,6 +283,7 @@ Set-LocalUser -Name 'exampleuser' -Password (Read-Host -AsSecureString 'New loca
 > [!CAUTION]
 > **⚠️** Never delete Administrator, Guest, DefaultAccount, or other built-in identities. Disable the Guest account unless the actual README requires it; built-in Administrator may be needed for recovery and should not be disabled blindly. Do not remove domain service accounts or domain groups based on local-only naming assumptions. Account deletion is irreversible without suitable backups.
 
+<a id="22-domain-controller-domain-users-and-authorized-accounts"></a>
 #### 2.2 Domain Controller — domain users and authorized accounts
 
 - [ ] **🎯 DO THIS — 2.2 Domain Controller — domain users and authorized accounts**
@@ -396,6 +398,7 @@ Set-ADAccountPassword -Identity bob -Reset -NewPassword (Read-Host -AsSecureStri
 
 ### 3. Password and lockout policy
 
+<a id="31-standalone-or-member-server-local-password-and-lockout-policies"></a>
 #### 3.1 Standalone or member server — local password and lockout policies
 
 - [ ] **🎯 DO THIS — 3.1 Standalone or member server — local password and lockout policies**
@@ -441,6 +444,7 @@ Complexity and reversible encryption are **not set by net accounts**. Use **secp
 > [!WARNING]
 > **↩️ Undo:** Restore the individual documented starting policy values using secpol.msc/net accounts. A configured threshold of 0 disables lockout; a lockout duration of 0 means administrative unlock is required on many systems—do not choose them accidentally. Domain account rules belong in the actual domain policy section below.
 
+<a id="32-domain-controller-domain-default-policy-and-fine-grained-policies"></a>
 #### 3.2 Domain Controller — domain default policy and fine-grained policies
 
 - [ ] **🎯 DO THIS — 3.2 Domain Controller — domain default policy and fine-grained policies**
@@ -529,6 +533,7 @@ The above changes server features and may require a reboot; do **not** run solel
 
 **Vendor reference:** [Microsoft Defender Antivirus on Windows Server](https://learn.microsoft.com/en-us/defender-endpoint/microsoft-defender-antivirus-windows-server-configure).
 
+<a id="52-windows-server-firewall-role-aware-standalone-procedure"></a>
 #### 5.2 Windows Server Firewall — role-aware, standalone procedure
 
 - [ ] **🎯 DO THIS — 5.2 Windows Server Firewall — role-aware, standalone procedure**
@@ -614,6 +619,7 @@ Never run a blanket disable command for all role-specific rules. For a specific 
 
 ### 4. Audit policy, user rights and security options
 
+<a id="41-standalonemember-server-audit-policy-user-rights-and-security-options"></a>
 #### 4.1 Standalone/member server — audit policy, user rights and security options
 
 - [ ] **🎯 DO THIS — 4.1 Standalone/member server — audit policy, user rights and security options**
@@ -1246,6 +1252,7 @@ This is only an example if Telnet Client is **installed and prohibited**. Do not
 
 ### 8. Remote access
 
+<a id="81-remote-desktop-and-remote-assistance-server-specific-procedure"></a>
 #### 8.1 Remote Desktop and Remote Assistance — Server-specific procedure
 
 - [ ] **🎯 DO THIS — 8.1 Remote Desktop and Remote Assistance — Server-specific procedure**
@@ -2967,6 +2974,7 @@ History prevents immediate reuse, maximum age requires periodic changes, minimum
 > [!CAUTION]
 > **⚠️ Warnings:** The tables are workstation starting points, not universal server baselines. Preserve service SIDs and required operators. Mandatory signing, NTLM restrictions, cached-logon settings and anonymous-access restrictions require client compatibility checks. Do not add your own admin account to a deny right.
 
+<a id="194-audit-selectively-and-investigate-windows-events"></a>
 ##### WS.19.4 Audit selectively and investigate Windows events
 
 - [ ] **🎯 DO THIS — WS.19.4 Audit selectively and investigate Windows events**
@@ -3418,6 +3426,7 @@ Expected: `original value`. This file restore does not model account/password re
 
 ---
 
+<a id="ws21-advanced-windows-server-investigations-included-in-this-handbook"></a>
 #### WS.21. Advanced Windows Server investigations — included in this handbook
 
 > **Use after:** Server roles and required services are identified in Parts 1–4. These are **manual Windows Server procedures inside this document**, not a script. Read the README, preserve forensic evidence, and retain a working admin/management path first.

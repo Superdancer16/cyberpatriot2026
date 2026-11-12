@@ -83,3 +83,9 @@ These categories are **prioritization aids inferred from educational checklists*
 - [Sources, attribution and maintenance](sources-and-attribution.md)
 
 **Forensics guides are documentation, not executable tools.** Separate optional platform scripts are linked from the [repository home](../../README.md); the [historical tool reference](../../Misc%20Softwares/using-the-scripts.md) remains available.
+
+---
+
+## More ways to browse without moving files
+
+[Complete file index](../../INDEX.md) · [Forensics hub](../../Forensics/README.md) · [Optional script hub](../../Scripts/README.md) · [Printable checklists](../../Printable%20Checklists/README.md)

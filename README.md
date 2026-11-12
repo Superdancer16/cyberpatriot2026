@@ -22,3 +22,17 @@ Every major guide follows the same study and competition workflow:
 **Non-negotiable:** Read the competition image README and preserve forensic evidence before deleting users/files or disabling services. Retain administrative access, verify every required function and keep rollback notes.
 
 **One-run scripts:** [Windows 10/11 PowerShell](Windows%20Scripts/HOW-TO-RUN.md) · [Windows Server PowerShell](Windows%20Server%20Scripts/HOW-TO-RUN.md) · [Debian 12/13 Bash](Linux%20Scripts/HOW-TO-RUN.md). Linux Mint, Ubuntu and other handbooks remain manual references. The image README and current competition rules take priority. See [sources and attribution](General/All/sources-and-attribution.md); original documentation reuse permission is noted there.
+
+---
+
+## 🚦 Browse by task — original files kept in place
+
+| I need to… | Open this first | Next step |
+|---|---|---|
+| Find any file quickly | **[Complete repository index](INDEX.md)** | Browse every original guide, script, PDF, and workflow |
+| Answer a forensics question | **[Forensics hub](Forensics/README.md)** | Choose Windows, Windows Server, or Linux and use Ctrl+F |
+| Work with a script | **[Script hub](Scripts/README.md)** | Start with Audit and the matching HOW-TO; respect round rules |
+| Print/check off tasks | **[Printable checklists](Printable%20Checklists/README.md)** | Choose PDF for paper or Markdown for tracking |
+| Start a scoring image safely | **[Reading the image README](General/All/reading-the-readme.md)** | Then follow the [round game plan](General/All/round-game-plan.md) |
+
+**Preservation:** This is a navigation cleanup, not a file migration. Existing paths remain unchanged, including all manuals, automation scripts, PDFs, and GitHub workflows.

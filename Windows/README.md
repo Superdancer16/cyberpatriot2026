@@ -18,3 +18,9 @@ Choose one self-contained guide. Each starts with **Basics / Info**, then **Firs
 **Top priorities:** Read [the image README](../General/All/reading-the-readme.md), preserve [forensic evidence](../General/All/forensics-questions.md), keep admin access, and verify services before any changes. A score increase is never guaranteed by any particular generic setting.
 
 [All categories](../README.md)
+
+---
+
+## Related resources in one place
+
+[Windows-specific forensics](../Forensics/windows.md) · [Windows Server / AD forensics](../Forensics/windows-server.md) · [Windows 10/11 printable checklist](../Printable%20Checklists/windows-10-11-checklist.pdf) · [Windows Server printable checklist](../Printable%20Checklists/windows-server-checklist.pdf) · [All optional script instructions](../Scripts/README.md) · [Complete file index](../INDEX.md)

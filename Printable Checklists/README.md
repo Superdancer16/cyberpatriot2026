@@ -37,3 +37,9 @@ For team collaboration, each member can edit an assigned section on a feature br
 
 > [!IMPORTANT]
 > **The image README or Packet Tracer activity is authoritative.** These are practice checklists and cannot predict individual secret scoring items. Do not blindly apply a change merely to complete a checkbox. All PDFs are provided solely for printing; the Markdown trackers are the editable GitHub progress records.
+
+---
+
+## Return to the detailed instructions
+
+[Complete file index](../INDEX.md) · [Forensics hub](../Forensics/README.md) · [Optional script instructions](../Scripts/README.md). The original guides and all PDF/Markdown checklist pairs remain unchanged.
