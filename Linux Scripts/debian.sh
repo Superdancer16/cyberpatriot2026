@@ -776,3 +776,188 @@ do_browsers() {
     status REVIEW 'Check Firefox ESR/Chromium browser versions, extensions, required default browser and pop-up settings in their GUIs.'
 }
 
+service_reload() {
+    local name="$1"
+    if systemctl is-active --quiet "$name"; then systemctl reload-or-restart "$name"; fi
+}
+apache_harden() {
+    local file=/etc/apache2/conf-available/security.conf
+    backup "$file"
+    set_file_value "$file" ServerTokens Prod space
+    set_file_value "$file" ServerSignature Off space
+    set_file_value "$file" TraceEnable Off space
+    if ! apache2ctl configtest; then cp -a "$BACKUPS/originals$file" "$file"; return 1; fi
+    if ! service_reload apache2; then cp -a "$BACKUPS/originals$file" "$file"; service_reload apache2 || true; return 1; fi
+}
+nginx_harden() {
+    local file=/etc/nginx/conf.d/90-cp-security.conf
+    backup "$file"
+    printf 'server_tokens off;\n' > "$file"
+    if ! nginx -t; then
+        if [[ -f "$BACKUPS/originals$file" ]]; then cp -a "$BACKUPS/originals$file" "$file"; else rm -f "$file"; fi
+        return 1
+    fi
+    service_reload nginx
+}
+vsftpd_harden() {
+    local file=/etc/vsftpd.conf
+    backup "$file"
+    set_file_value "$file" anonymous_enable NO equals
+    if systemctl is-active --quiet vsftpd; then systemctl restart vsftpd; fi
+}
+samba_harden() {
+    local file=/etc/samba/smb.conf
+    backup "$file"
+    python3 - "$file" <<'PY'
+import re,sys
+p=sys.argv[1];ls=open(p,encoding="utf-8").readlines();out=[];inside=False;found=False
+for line in ls:
+    if re.match(r'^\s*\[[^\]]+\]',line):
+        if inside and not found: out.append('server min protocol = SMB2\n');found=True
+        inside=(line.strip().lower()=='[global]')
+    if inside and re.match(r'^\s*server min protocol\s*=',line,re.I):
+        if not found: out.append('server min protocol = SMB2\n');found=True
+        continue
+    out.append(line)
+if inside and not found: out.append('server min protocol = SMB2\n')
+open(p,'w',encoding='utf-8').writelines(out)
+PY
+    if ! testparm -s >/dev/null 2>&1; then cp -a "$BACKUPS/originals$file" "$file"; return 1; fi
+    service_reload smbd
+}
+postfix_harden() {
+    local file=/etc/postfix/main.cf
+    backup "$file"
+    postconf -e 'disable_vrfy_command = yes'
+    if ! postfix check; then cp -a "$BACKUPS/originals$file" "$file"; return 1; fi
+    service_reload postfix
+}
+do_serverapps() {
+    if [[ "$(scalar ServiceHardening.Apache)" == true ]]; then
+        if [[ -f /etc/apache2/conf-available/security.conf ]] && is_required_service apache2; then
+            change 'Harden required Apache headers/version/TRACE' apache_harden
+            status REVIEW 'Test required Apache virtual hosts, paths and authentication.'
+        else status REVIEW 'Apache hardening skipped: required service/config not confirmed'; fi
+    fi
+    if [[ "$(scalar ServiceHardening.Nginx)" == true ]]; then
+        if [[ -f /etc/nginx/nginx.conf ]] && is_required_service nginx && command -v nginx >/dev/null; then
+            change 'Hide Nginx version header' nginx_harden
+            status REVIEW 'Test required Nginx sites, proxies and certificates.'
+        else status REVIEW 'Nginx hardening skipped: required service/config not confirmed'; fi
+    fi
+    if [[ "$(scalar ServiceHardening.VsftpdNoAnonymous)" == true ]]; then
+        if [[ -f /etc/vsftpd.conf ]] && is_required_service vsftpd; then
+            change 'Disable anonymous FTP for required vsftpd' vsftpd_harden
+            status REVIEW 'Test approved FTP authentication, passive ports, transfers and TLS clients.'
+        else status REVIEW 'FTP hardening skipped: required service/config not confirmed'; fi
+    fi
+    if [[ "$(scalar ServiceHardening.SambaNoSMB1)" == true ]]; then
+        if [[ -f /etc/samba/smb.conf ]] && is_required_service smbd; then
+            change 'Require SMB2 or later for Samba server' samba_harden
+            status REVIEW 'Test authorized Windows SMB clients, shares and permissions.'
+        else status REVIEW 'Samba hardening skipped: required smbd/config not confirmed'; fi
+    fi
+    if [[ "$(scalar ServiceHardening.PostfixNoVRFY)" == true ]]; then
+        if [[ -f /etc/postfix/main.cf ]] && is_required_service postfix; then
+            change 'Disable SMTP VRFY in required Postfix service' postfix_harden
+            status REVIEW 'Test approved SMTP submission and mail relay behavior.'
+        else status REVIEW 'Postfix hardening skipped: required service/config not confirmed'; fi
+    fi
+    status REVIEW 'MySQL/MariaDB, PostgreSQL, PHP, DNS, DHCP and custom app configuration require role-specific client tests and manual validation.'
+}
+do_verify() {
+    capture 'running-required-services' systemctl --failed --no-pager
+    capture 'listener-after' ss -lntup
+    capture 'shadow-after' stat -c '%a %U:%G %n' /etc/shadow /etc/gshadow
+    capture 'uid0-after' awk -F: '$3==0{print}' /etc/passwd
+    capture 'sudo-after' getent group sudo
+    capture 'package-updates-after' bash -c 'apt list --upgradable 2>/dev/null | head -100'
+    if command -v ufw >/dev/null 2>&1; then capture 'ufw-after' ufw status verbose; fi
+    if [[ -x /usr/sbin/sshd ]]; then capture 'sshd-after' /usr/sbin/sshd -T; fi
+    status REVIEW 'Open the Scoring Report and verify authorized logins, required browsers, SSH, FTP, web sites, database, network and desktop access.'
+}
+summary() {
+    echo
+    echo 'Debian security run — summary'
+    for name in CHANGED OK WOULD REVIEW SKIPPED FAILED; do
+        printf '%-8s %s\n' "$name" "$(awk -F '\t' -v s="$name" 'NR>1&&$2==s{n++}END{print n+0}' "$SUMMARY")"
+    done
+    printf 'Results:  %s\nLog:      %s\nBackups:  %s\nAudit:    %s\n' "$SUMMARY" "$LOG" "$BACKUPS" "$REPORT"
+    echo 'Next: review the VM Scoring Report, then MANUAL-TASKS.md.'
+}
+run_all() {
+    local selected=() item known ok
+    if [[ -n "$ONLY" ]]; then
+        IFS=',' read -r -a selected <<< "$ONLY"
+        for item in "${selected[@]}"; do
+            ok=0
+            for known in "${SECTIONS[@]}"; do [[ "$known" == "$item" ]] && ok=1; done
+            ((ok)) || { echo "Unknown --only section: $item" >&2; exit 2; }
+        done
+    fi
+    if [[ "$MODE" == apply ]]; then
+        validate_config
+        if (( ! YES )); then
+            echo 'This modifies the Debian VM using the image-config.json you reviewed.'
+            echo 'Read the README; preserve forensic evidence; keep a working admin console.'
+            read -r -p 'Type APPLY to continue: ' answer
+            [[ "$answer" == APPLY ]] || { status SKIPPED 'Cancelled before applying any change'; return; }
+        fi
+    fi
+    audit
+    for item in "${SECTIONS[@]}"; do
+        if ((${#selected[@]}>0)) && ! member "$item" "${selected[@]}"; then continue; fi
+        printf '\n-- %s --\n' "${item^^}"
+        case "$item" in
+            discovery) do_discovery ;;
+            users) do_users ;;
+            groups) do_groups ;;
+            passwords) do_passwords ;;
+            pam) do_pam ;;
+            firewall) do_firewall ;;
+            updates) do_updates ;;
+            services) do_services ;;
+            ssh) do_ssh ;;
+            kernel) do_kernel ;;
+            permissions) do_permissions ;;
+            software) do_software ;;
+            files) do_files ;;
+            persistence) do_persistence ;;
+            hosts) do_hosts ;;
+            desktop) do_desktop ;;
+            browsers) do_browsers ;;
+            apparmor) do_apparmor ;;
+            logging) do_logging ;;
+            serverapps) do_serverapps ;;
+            verify) do_verify ;;
+        esac
+    done
+    if [[ "$MODE" == apply ]]; then
+        cp -a "$REPORT" "$BACKUPS/audit-before.txt"
+        audit
+        cp -a "$REPORT" "$BACKUPS/audit-after.txt"
+    fi
+    summary
+}
+menu() {
+    printf '%s\n' 'Debian security helper' '  1  Audit only' '  2  Apply all configured sections' '  3  List sections' '  4  Quit'
+    local choice
+    read -r -p 'Choose: ' choice
+    case "$choice" in
+        1) MODE=audit; run_all ;;
+        2) MODE=apply; run_all ;;
+        3) printf '%s\n' "${SECTIONS[@]}" ;;
+        4) exit 0 ;;
+        *) echo 'Unknown selection.' ;;
+    esac
+}
+if ((INIT)); then
+    init_config
+    exit 0
+fi
+case "$MODE" in
+    audit) audit; do_discovery; summary ;;
+    apply) run_all ;;
+    menu) menu ;;
+esac
+
