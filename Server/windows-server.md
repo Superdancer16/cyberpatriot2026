@@ -1886,7 +1886,7 @@ Get-ChildItem C:\Users -Recurse -Force -Filter *secret* -ErrorAction SilentlyCon
 Get-ChildItem C:\Users -Recurse -File -Force -Include *.txt,*.csv,*.log,*.ps1,*.bat -ErrorAction SilentlyContinue | Select-String -Pattern "password"   # find text inside files
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aGVsbG8='))   # decode base64
 ```
-More: [Forensics questions guide](../General/All/forensics-questions.md).
+More: [Windows Server forensics guide](../Forensics/windows-server.md).
 
 ##### WS.1.2 Manual security baseline (no hardening script)
 - [ ] **🎯 DO THIS — WS.1.2 Manual security baseline (no hardening script)**
@@ -1916,7 +1916,7 @@ More: [Forensics questions guide](../General/All/forensics-questions.md).
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
 
 ---
 

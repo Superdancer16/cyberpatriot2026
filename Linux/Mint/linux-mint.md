@@ -118,7 +118,7 @@ sha256sum /path/to/file                            # hash of a file
 echo 'aGVsbG8=' | base64 -d                        # decode base64
 sudo grep -E 'Accepted|Failed' /var/log/auth.log   # who logged in / failed to
 ```
-More techniques: [Forensics questions guide](../General/All/forensics-questions.md).
+More techniques: [Linux forensics guide](../Forensics/linux.md).
 
 > [!WARNING]
 > Answers must be **exact**: right spelling, capitals, and full paths when asked. Don't delete the "ANSWER:" line.
@@ -151,7 +151,7 @@ More techniques: [Forensics questions guide](../General/All/forensics-questions.
 > **↩️ Undo:** Reverse the most recent change using the recorded value or the procedure's backup. A VM snapshot rollback can discard later fixes; use it only within the rules and verify the resulting score again.
 
 > [!CAUTION]
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
 
 ---
 

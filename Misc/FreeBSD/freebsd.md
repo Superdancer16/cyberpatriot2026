@@ -58,7 +58,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 - [ ] **🎯 DO THIS —** Read the README; write down admins, users, critical services.
 - [ ] **🎯 DO THIS —** Take a VMware snapshot.
 - [ ] **🎯 DO THIS —** Become root: `su -` (or `sudo -i` / `doas -s` if those are installed), then type `sh` (see the box above).
-- [ ] **🎯 DO THIS —** Answer the forensics questions ([guide](../General/All/forensics-questions.md)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
+- [ ] **🎯 DO THIS —** Answer the forensics questions ([FreeBSD forensic quick reference](../Forensics/README.md#freebsd-quick-reference)). `sha256 file` hashes a file on FreeBSD (`sha256sum` may not exist).
 
 ### 0.1 Fast path: run the hardening script
 - [ ] **🎯 DO THIS — 0.1 Fast path: run the hardening script**
@@ -93,7 +93,7 @@ FreeBSD may appear in the **Semifinals** (depending on tier). It's a Unix like L
 
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
-> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Misc%20Softwares/using-the-scripts.md) for the limits of external tools.
+> **⚠️ Warnings:** Never use a guessed list of authorized users or bulk-delete files. See [Using the scripts safely](../Scripts/README.md) for the limits of external tools.
 
 ---
 
@@ -834,3 +834,9 @@ For an unauthorized cron entry, back up the user's crontab and use `crontab -u b
 > [!CAUTION]
 > **ℹ️ EXTRA INFO — explanation, safety or rollback; not a separate required task**
 > **⚠️ Warnings:** Securelevel can prevent repairs until reboot; leave optional hardening until core functionality is verified. Never clear logs, remove every privileged binary, or delete package-owned system files based on names alone.
+
+---
+
+## FreeBSD forensic-question command reference
+
+The former cross-platform forensics overview has been consolidated into the [Forensics hub's FreeBSD quick reference](../Forensics/README.md#freebsd-quick-reference), which covers hashes, file metadata, account IDs, sockets/processes, audit logs, and preservation. Follow that alongside this FreeBSD-specific handbook. Do not substitute Linux-only commands for BSD utilities.

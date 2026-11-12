@@ -17,7 +17,6 @@ Every major guide follows the same study and competition workflow:
 | **[Windows](Windows/README.md)** | Windows 10/11 and Windows Server, including PowerShell and domain-aware guidance |
 | **[Linux](Linux/README.md)** | Complete Debian, Mint and Ubuntu guides; FreeBSD reference |
 | **[Cisco](Cisco/README.md)** | Packet Tracer step-by-step handbook and 385-question networking Q&A |
-| **[Misc Softwares](Misc%20Softwares/README.md)** | Supplemental software/tool references only |
 
 **Non-negotiable:** Read the competition image README and preserve forensic evidence before deleting users/files or disabling services. Retain administrative access, verify every required function and keep rollback notes.
 
@@ -35,4 +34,4 @@ Every major guide follows the same study and competition workflow:
 | Print/check off tasks | **[Printable checklists](Printable%20Checklists/README.md)** | Choose PDF for paper or Markdown for tracking |
 | Start a scoring image safely | **[Reading the image README](General/All/reading-the-readme.md)** | Then follow the [round game plan](General/All/round-game-plan.md) |
 
-**Preservation:** This is a navigation cleanup, not a file migration. Existing paths remain unchanged, including all manuals, automation scripts, PDFs, and GitHub workflows.
+**Consolidation:** Full operating-system manuals, automation scripts, PDFs, and GitHub workflows retain their paths. Three superseded general-forensics and historical-script Markdown pages were merged into the [forensics](Forensics/README.md) and [script](Scripts/README.md) hubs; previous versions remain in Git history.

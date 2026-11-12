@@ -1,140 +1,60 @@
-# 🔎 Forensics questions
+# 🔎 Forensics — Searchable Question Finder
 
 > [!TIP]
-> **🧭 Reading guide:** Use the quick links to jump between sections. **🔎 Check · 🛠️ Fix · ✅ Verify · ↩️ Undo · ⚠️ Caution** are used consistently across the repository.
+> Start here when a forensics prompt looks unfamiliar. Open the correct operating-system guide, then use **Ctrl+F** for the terms from the question. These are investigative guides, not a collection of live competition answers.
 
-> [!CAUTION]
-> **Preserve evidence first.** Record relevant artifacts and answers before changing accounts, logs, binaries, services, or files.
+## Choose the guide for your image
 
-**New detailed Ctrl+F guides:** [Windows 10/11](../../Forensics/windows.md) · [Linux — Debian/Mint/Ubuntu](../../Forensics/linux.md) · [Windows Server / Active Directory](../../Forensics/windows-server.md). Use these for step-by-step decoding (Base64, ROT13, reverse, hex, XOR, AES/keys), file searches, events, and optional CyberChef/cryptography websites. This page remains a shorter cross-platform introduction.
-
-## 🧭 Quick links
-
-[How to answer](#topic-1) · [The common question types](#topic-2) · [Don't lose the evidence](#topic-3) · [Repeatable investigation procedures](#topic-4)
-
----
-
-
-Forensics questions are text files on the desktop (`Forensics Question 1.txt`, …). Each one asks something about the computer, and you type the answer into the file. They're often worth **more than any single fix**, so do them **first**, before anything you change destroys the evidence.
-
----
-
-<a id="topic-1"></a>
-## How to answer
-1. Open the file. Read the **whole** question, including the example answer format.
-2. Find the answer.
-3. Type it after `ANSWER:` **exactly** in the format asked: same capitals, full path if asked, no extra spaces.
-4. **Save** the file (Ctrl+S). Check the Scoring Report: a correct answer shows up within a minute or two.
-
-> [!TIP]
-> If there's a question you can't answer in 10 minutes, move on and come back later. A question often becomes obvious once you've explored the system.
-
----
-
-
-<a id="topic-2"></a>
-## The common question types
-
-### "What is the hash of file X?"
-
-| | Linux | Windows (PowerShell) | FreeBSD |
-|---|---|---|---|
-| SHA-256 | `sha256sum file` | `Get-FileHash file -Algorithm SHA256` | `sha256 file` |
-| SHA-1 | `sha1sum file` | `Get-FileHash file -Algorithm SHA1` | `sha1 file` |
-| MD5 | `md5sum file` | `Get-FileHash file -Algorithm MD5` | `md5 file` |
-
-Copy only the long string of letters and numbers. Windows prints it in **upper case**. If the question shows a lower-case example, type it in lower case.
-
-### "Decode this message"
-Look at the text and guess the encoding:
-
-| Looks like | Probably | Decode with |
+| Image | Searchable handbook | Useful Ctrl+F terms |
 |---|---|---|
-| Letters, numbers, `+` `/`, often ends with `=` or `==` | **Base64** | Linux: `echo 'aGVsbG8=' \| base64 -d` · Windows: `[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aGVsbG8='))` |
-| Only `0-9` and `a-f`, even length | **Hex** | `echo '68656c6c6f' \| xxd -r -p` |
-| Only `0` and `1` in groups of 8 | **Binary** | `echo '01101000 01101001' \| perl -lape '$_=pack"(B8)*",@F'` |
-| Normal letters but scrambled words | **ROT13 / Caesar** | `echo 'uryyb' \| tr 'A-Za-z' 'N-ZA-Mn-za-m'` |
-| `%20`, `%3A` | **URL encoding** | `python3 -c "import urllib.parse,sys;print(urllib.parse.unquote(sys.argv[1]))" 'hi%20there'` |
+| Windows 10 / Windows 11 | [Windows forensics](windows.md) | Base64, ROT13, Caesar, XOR, encryption, BitLocker, file signature, alternate data stream, event log, registry, port, hash |
+| Windows Server / Active Directory | [Server forensics](windows-server.md) | domain user, SID, group, Group Policy, DNS, DHCP, IIS, SMB, certificate, CMS, DPAPI, AES, event log |
+| Debian / Mint / Ubuntu | [Linux forensics](linux.md) | GPG, OpenSSL, ROT13, Base64, hex, ELF, UID, GID, chmod, sudo, SSH, cron, journalctl, PCAP |
 
-Several layers are common (e.g. base64 of hex). Decode one layer at a time. **CyberChef** (gchq.github.io/CyberChef) does all of these in a browser, and its "Magic" operation guesses the encoding for you.
+## If your question does not match a chapter
 
-### "Find the file that…" / "What is the name of the hidden file…"
+1. **Identify the artifact:** Is it a message, file, archive, user account, service, network capture, or log entry?
+2. **Copy exact wording:** Search the right guide using a distinctive noun, extension, cipher name, port, or tool.
+3. **Check layers:** A suspicious string might be encoded more than once; encoding is not the same as encryption, and genuine encryption requires the correct key or authorized recovery method.
+4. **Preserve evidence first:** Record paths, timestamps and copies when appropriate. Do not delete suspicious files just because the question mentions them.
+5. **Verify the result:** Check that decoded text, a username, hash, or event timestamp actually answers the question.
 
-| | Linux | Windows |
-|---|---|---|
-| By name | `sudo find / -iname '*secret*' 2>/dev/null` | `Get-ChildItem C:\ -Recurse -Force -Filter *secret* -ErrorAction SilentlyContinue` |
-| Containing text | `sudo grep -rIl 'needle' /home /etc /opt 2>/dev/null` | `Get-ChildItem C:\Users -Recurse -File -Force -ErrorAction SilentlyContinue \| Select-String 'needle' -List \| Select Path` |
-| Changed recently | `sudo find / -xdev -mmin -120 -type f 2>/dev/null` (last 2 hours) | `Get-ChildItem C:\Users -Recurse -File -Force -EA 0 \| Where LastWriteTime -gt (Get-Date).AddDays(-2)` |
-| Hidden files | names start with `.`: `ls -la` | `Get-ChildItem -Force`, or Explorer → View → Hidden items |
+**Start:** Read [the image README](../General/All/reading-the-readme.md) and finish forensic question files before hardening. The platform guides above cover the detailed question types; the preserved cross-platform investigation procedures below cover safe collection, decoding, process correlation, and log verification.
 
-### "Which user…" / "What is the UID / group of…"
-```bash
-id bob                         # Linux: UID, groups
-getent passwd bob              # Linux: home folder, shell
-getent group sudo
-```
-```powershell
-Get-LocalUser bob | Format-List *          # Windows: description, last logon, SID
-Get-LocalGroupMember Administrators
-Get-ADUser bob -Properties *               # Domain Controller
-```
+[Complete file index](../INDEX.md) · [Repository home](../README.md)
 
-### "What port / program is the backdoor using?"
-```bash
-sudo ss -tulpn                 # Linux: port + program name + PID
-ls -l /proc/<PID>/exe          # which file the program is
-```
-```powershell
-Get-NetTCPConnection -State Listen | Select LocalPort, OwningProcess
-Get-Process -Id <PID> | Select Name, Path
-```
+---
 
-### "Who logged in / what did the attacker do?" (logs)
-| Where | Look at |
+## Quick question-answer workflow (all images)
+
+1. Read every desktop forensic-question file and note the **exact requested format** (value, name, full path, capitalization, encoding, or timestamp).
+2. Preserve the original clue and record the system time/timezone. Avoid deleting or restarting anything mentioned in a question.
+3. Use the platform guide above to investigate, or the cross-platform workflows below when you need a repeatable evidence-handling procedure.
+4. Type the final answer **after `ANSWER:` in the existing question file**, save it with **Ctrl+S**, reopen to confirm, and verify the Scoring Report after its normal update interval. Do not alter the question wording.
+5. If a question takes too long, record what you checked and return after other independent tasks. Do not brute-force guesses or destroy evidence.
+
+Forensics commands described as read-only still cause incidental shell history, timestamps, or log entries. Copies and exports write new files; preserve evidence with permission. Do not upload private files, credentials, or VM artifacts to public websites.
+
+<a id="freebsd-quick-reference"></a>
+## FreeBSD forensic quick reference (BSD, not Linux)
+
+The [FreeBSD handbook](../Linux/freebsd.md) is a **separate** BSD-specific reference. Do **not** assume GNU `stat`, Linux `/proc`, `ss`, `systemctl`, or `sha256sum` are present. Use FreeBSD's native tools when the exercise involves FreeBSD.
+
+| Question type | FreeBSD read-only starting point |
 |---|---|
-| Linux (Mint/Ubuntu) | `/var/log/auth.log` (logins, sudo), `/var/log/syslog`, `last`, `lastb` (failed) |
-| Debian 12 | `journalctl _COMM=sshd`, `journalctl _COMM=sudo`, `last` |
-| Shell history | `/home/*/.bash_history`, `/root/.bash_history` |
-| Windows | **Event Viewer** (`eventvwr.msc`) → Windows Logs → **Security**. Event **4624** = logon, **4625** = failed logon, **4720** = user created, **4732** = added to group |
-| Windows PowerShell history | `C:\Users\<user>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt` |
-| Web server | `/var/log/apache2/access.log`, `C:\inetpub\logs\LogFiles\` |
+| SHA-256 file hash | `sha256 /path/to/file` |
+| SHA-1 / MD5 file hash | `sha1 /path/to/file` / `md5 /path/to/file` |
+| Owner, mode, size, timestamp | `stat -x /path/to/file` |
+| User accounts and groups | `id username`, `pw usershow username`, `pw groupshow wheel` |
+| Listening ports and owning process | `sockstat -4 -6 -l` |
+| Inspect a process | `ps -p 4242 -o pid,ppid,user,command`, `procstat -b 4242` |
+| Logs and security events | Review configured `/var/log/` syslog files; if auditing is enabled, consult `praudit` and the exercise's audit configuration |
+| Scheduled tasks and startup | Review `crontab -l`, `/etc/crontab`, `/etc/rc.conf`, and relevant `/usr/local/etc/rc.d/` scripts |
 
-```powershell
-Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720} | Format-List TimeCreated, Message   # who was created
-```
-
-### "What's in this picture / document?"
-- Hidden text in a file: `strings file | less`
-- Picture details (camera, GPS, author): `exiftool photo.jpg` (Linux: `sudo apt install libimage-exiftool-perl`), or on Windows right-click → **Properties → Details**
-- Office documents are ZIP files: copy, rename to `.zip`, and look inside.
-
-### "What is the password / key for…"
-Often in a text file, browser saved passwords, a script, or shell history:
-```bash
-sudo grep -rIi 'password' /home /opt /var/www 2>/dev/null | head
-cat /home/*/.bash_history
-```
-
-### "Which package / program installed…"
-```bash
-dpkg -S /usr/bin/somefile       # which package owns a file
-grep ' install ' /var/log/dpkg.log     # what was installed and when
-```
-Windows: **Settings → Apps** sorted by **Install date**, or **Event Viewer → Application** log (source **MsiInstaller**).
+Replace paths, usernames, and PIDs with values from the current question; record the time and never change logs just to make the answer appear.
 
 ---
 
-
-<a id="topic-3"></a>
-## Don't lose the evidence
-
-- Don't delete a user, file or program until you've checked whether a question mentions it.
-- If you must change something, **copy it first** (`cp file ~/evidence/`).
-- Don't empty the Recycle Bin / Trash until forensics is finished.
-
----
-
-<a id="topic-4"></a>
 ## Repeatable investigation procedures
 
 These are practice examples, not active competition answers. Use the question's exact path, hash algorithm, date range and answer format. **Read-only** below means the command is intended not to modify the target deliberately; live inspection still creates shell history/events and can update access times. A live machine is not a forensic disk image. Exports/copies write new files. Scans, quarantine, password resets, package installation, service restarts and deletion can alter evidence.
