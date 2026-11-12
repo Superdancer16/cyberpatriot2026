@@ -1432,3 +1432,134 @@ function Invoke-ServerUpdates {
     } catch { Record 'REVIEW' "Windows Update COM scan/install incomplete: $($_.Exception.Message)" }
 }
 
+function Invoke-ServerVerify {
+    foreach ($name in $script:RequiredServices) {
+        $service = Get-Service -Name $name -ErrorAction SilentlyContinue
+        if (-not $service) { Record 'REVIEW' "Critical service missing: $name"; continue }
+        if ($service.Status -eq 'Running') { Record 'OK' "Critical service active: $name" }
+        else { Record 'REVIEW' "Critical service $name is $($service.Status); test role behavior before starting it." }
+    }
+    if ($script:IsDC) {
+        Record 'REVIEW' 'Verify domain login, SYSVOL/NETLOGON, secure DNS records, replication, time and AD policy from another client.'
+    }
+    if (Listed 'DNS' $script:RequiredRoles) { Record 'REVIEW' 'Verify DNS A/AAAA and SRV records using a permitted client.' }
+    if (Listed 'DHCP' $script:RequiredRoles) { Record 'REVIEW' 'Verify authorized client DHCP lease, gateway and DNS options.' }
+    if (Listed 'IIS' $script:RequiredRoles) { Record 'REVIEW' 'Verify required IIS sites, app pools, TLS and authentication from a client browser.' }
+    if (@($script:RequiredShares).Count) { Record 'REVIEW' 'Verify required SMB shares and both share/NTFS permissions from an authorized client.' }
+    Record 'REVIEW' 'Review Scoring Report, saved forensic answers, authorized logons, remote management, printing and required roles. No automatic restart.'
+}
+$sections = @(
+    @{Name='localusers';Fn='Invoke-LocalAccounts'},
+    @{Name='localgroups';Fn='Invoke-LocalGroups'},
+    @{Name='adusers';Fn='Invoke-ADAccounts'},
+    @{Name='adgroups';Fn='Invoke-ADGroups'},
+    @{Name='localpasswords';Fn='Invoke-LocalPasswordPolicy'},
+    @{Name='domainpasswords';Fn='Invoke-DomainPasswordPolicy'},
+    @{Name='rights';Fn='Invoke-UserRights'},
+    @{Name='auditpolicy';Fn='Invoke-AdvancedAuditing'},
+    @{Name='security';Fn='Invoke-ServerSecurity'},
+    @{Name='defender';Fn='Invoke-ServerDefender'},
+    @{Name='firewall';Fn='Invoke-ServerFirewall'},
+    @{Name='smb';Fn='Invoke-ServerSMB'},
+    @{Name='services';Fn='Invoke-ServerServices'},
+    @{Name='features';Fn='Invoke-ServerFeatures'},
+    @{Name='shares';Fn='Invoke-ServerShares'},
+    @{Name='iis';Fn='Invoke-IISSettings'},
+    @{Name='dns';Fn='Invoke-DNSSettings'},
+    @{Name='dhcp';Fn='Invoke-DHCPSettings'},
+    @{Name='tls';Fn='Invoke-LegacyTls'},
+    @{Name='persistence';Fn='Invoke-ServerPersistence'},
+    @{Name='files';Fn='Invoke-ServerFiles'},
+    @{Name='software';Fn='Invoke-ServerSoftware'},
+    @{Name='updates';Fn='Invoke-ServerUpdates'},
+    @{Name='verify';Fn='Invoke-ServerVerify'}
+)
+function Run-ServerApply {
+    Check-Admin
+    Read-Config
+    $requested = @()
+    if ($Only) { $requested = @(($Only -join ',') -split '[,\s]+' | Where-Object { $_ }) }
+    $valid = @($sections | ForEach-Object { $_.Name })
+    $unknown = @($requested | Where-Object { $_ -notin $valid })
+    if ($unknown.Count) { throw "Unknown -Only sections: $($unknown -join ', '). Available: $($valid -join ', ')" }
+    if ($script:IsDC -and (-not $EnableDomainChanges)) {
+        Record 'INFO' 'Domain Controller detected. AD mutations are off; directory health is audited.'
+    }
+    if (-not $Yes) {
+        Write-Host ''
+        Write-Host 'This will apply the exact JSON choices to the server VM, not every sample from the handbook.'
+        Write-Host "Role: $script:ActualRole  Domain: $script:DomainName"
+        Write-Host 'Keep console/recovery access, save forensic evidence, and check critical roles.'
+        $response = Read-Host 'Type APPLY to continue'
+        if ($response -cne 'APPLY') { Record 'SKIPPED' 'Run cancelled before changing settings.'; return }
+    }
+    $script:Phase = 'before'
+    try {
+        Invoke-Audit
+        Copy-Item -LiteralPath $report -Destination (Join-Path $backups 'audit-before.txt') -Force
+    } catch { Record 'REVIEW' "Initial server audit partially unavailable: $($_.Exception.Message)" }
+    foreach ($item in $sections) {
+        if ($requested.Count -and $item.Name -notin $requested) { continue }
+        Write-Host ''
+        Write-Host ("--- " + $item.Name.ToUpper() + " ---")
+        try { & $item.Fn } catch { Record 'FAILED' ("Module " + $item.Name + ": " + $_.Exception.Message) }
+    }
+    $script:Phase = 'after'
+    try {
+        Invoke-Audit
+        Copy-Item -LiteralPath $report -Destination (Join-Path $backups 'audit-after.txt') -Force
+    } catch { Record 'REVIEW' "Final server audit partially unavailable: $($_.Exception.Message)" }
+    Save-Summary
+}
+function Run-ServerAudit {
+    $script:Phase = 'audit'
+    try { Invoke-Audit }
+    catch { Record 'REVIEW' "Audit partly unavailable: $($_.Exception.Message)" }
+    Save-Summary
+}
+function Menu {
+    while ($true) {
+        Write-Host ''
+        Write-Host ("Windows Server hardening — " + $script:ActualRole)
+        Write-Host '1) Audit only'
+        Write-Host '2) Apply all configured sections'
+        Write-Host '3) List section names'
+        Write-Host '4) Exit'
+        $choice = Read-Host 'Choose'
+        switch ($choice) {
+            '1' { Run-ServerAudit }
+            '2' {
+                $script:Mode = 'Apply'
+                try { Run-ServerApply } catch { Record 'FAILED' $_.Exception.Message }
+            }
+            '3' { $sections | ForEach-Object { Write-Host $_.Name } }
+            '4' { return }
+            default { Write-Host 'Choose 1, 2, 3, or 4.' }
+        }
+    }
+}
+if ($List) {
+    $sections | ForEach-Object { Write-Host $_.Name }
+    return
+}
+if ($InitConfig) {
+    New-Config
+    return
+}
+try {
+    Init-Workspace
+    Detect-Server
+    switch ($Mode) {
+        'Audit' { Run-ServerAudit }
+        'Apply' { Run-ServerApply }
+        default { Menu }
+    }
+} catch {
+    if (Test-Path -LiteralPath $root) {
+        Record 'FAILED' $_.Exception.Message
+    } else {
+        Write-Error $_
+    }
+    exit 1
+}
+
