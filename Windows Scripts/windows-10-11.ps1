@@ -757,7 +757,7 @@ function Invoke-AutoUserRights {
             }
             $sid = $null
             try {
-                $sid = (New-Object System.Security.Principal.NTAccount($name)).Translate(
+                $sid = (New-Object System.Security.Principal.NTAccount -ArgumentList $name).Translate(
                     [System.Security.Principal.SecurityIdentifier]).Value
             } catch {
                 Write-Result 'REVIEW' "Cannot resolve user-rights principal: $name"
