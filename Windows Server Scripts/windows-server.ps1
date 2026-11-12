@@ -19,6 +19,7 @@ $log = Join-Path $root ("changes-" + $stamp + ".txt")
 $summary = Join-Path $root ("summary-" + $stamp + ".csv")
 $report = Join-Path $root ("audit-" + $stamp + ".txt")
 $script:Results = New-Object System.Collections.ArrayList
+$script:Phase = 'initial'
 $script:Cfg = $null
 $script:IsDC = $false
 $script:IsDomainJoined = $false
@@ -69,7 +70,7 @@ function Change([string]$Name, [bool]$Required, [scriptblock]$Action) {
     } catch { Record 'FAILED' ($Name + ': ' + $_.Exception.Message) }
 }
 function Check-Admin {
-    $p = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $p = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
     if (-not $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         throw 'Run PowerShell as Administrator within the Windows Server VM.'
     }
@@ -107,6 +108,7 @@ function New-Config {
         LocalUsers = [ordered]@{Create=@();Disable=@();Delete=@();DemoteAdmins=@();PasswordExpires=@();ResetPasswords=@()}
         LocalGroups = [ordered]@{Create=@();Members=[ordered]@{};RemoveMembers=[ordered]@{}}
         LocalPasswordPolicy = [ordered]@{}
+        RemoveUserRights = [ordered]@{}
         DomainChanges = [ordered]@{
             Allowed=$false
             DisableUsers=@()
@@ -135,6 +137,7 @@ function New-Config {
         UninstallWindowsFeatures = @()
         DisableScheduledTasks = @()
         RemoveStartupValues = @()
+        RemoveHostsEntries = @()
         ClearAccessibilityDebuggers = @()
         RemoveShares = @()
         RemoveShareAccess = @()
@@ -143,7 +146,7 @@ function New-Config {
         UninstallPrograms = @()
         WindowsUpdate = 'Scan'
         IIS = [ordered]@{DisableDirectoryBrowsingOnSites=@()}
-        DNS = [ordered]@{SecureDynamicUpdateZones=@();DisableZoneTransfers=@()}
+        DNS = [ordered]@{SecureDynamicUpdateZones=@();DisableZoneTransfers=@();RequiredSecondaryServers=@()}
         DHCP = [ordered]@{EnableAuditLogging=$false}
         TLS = [ordered]@{DisableServerProtocols=@();CompatibilityConfirmed=$false}
         DiscoveryPaths = @('C:\Users\Public','C:\Temp')
@@ -201,7 +204,7 @@ function Set-Dword([string]$Key,[string]$Name,[int]$Wanted) {
     }
 }
 function Save-Review([string]$Name,[scriptblock]$Query) {
-    $dest = Join-Path $backups ("review-" + $Name + ".csv")
+    $dest = Join-Path $backups ("review-" + [string]$script:Phase + "-" + $Name + ".csv")
     try {
         $rows = @(& $Query)
         if ($rows.Count -gt 0) { $rows | Export-Csv -LiteralPath $dest -NoTypeInformation -Encoding UTF8 }
@@ -559,7 +562,7 @@ function ProtectedADUser($User) {
     if ($User.SamAccountName -in @('krbtgt','Administrator')) { return $true }
     if ($User.SID.Value -match '-(500|501|502)$') { return $true }
     if ($User.adminCount -eq 1) { return $true }
-    if (@($User.ServicePrincipalName).Count) { return $true }
+    if ($null -ne $User.ServicePrincipalName -and @($User.ServicePrincipalName).Count -gt 0) { return $true }
     if (Listed $User.SamAccountName $script:RequiredAccounts) { return $true }
     return $false
 }
