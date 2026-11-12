@@ -514,3 +514,182 @@ Get-ChildItem Cert:\LocalMachine\My |
 **Thumbprint** is a certificate identifier (usually SHA-1 hex), not the same as SHA-256 hashing a file. If the prompt wants both **Subject and Thumbprint**, provide both exactly as displayed. Remove copy/paste whitespace only if the answer format requires it. **Do not export a private key** to answer a metadata question.
 
 If a cert file is supplied, `certutil -dump "C:\path\cert.cer"` can inspect metadata without installing it. For CMS encrypted to a certificate, see [real encryption](#real-encryption-cms-dpapi-aes-and-keys).
+
+## Network, event logs, persistence and file evidence
+
+### Ports, PIDs and network connection questions
+
+A question may ask **"What other port is listening under PID N?"**. The **local port** is after `:` in the local address; **PID** is the process ID, not the port. One process can own multiple listening sockets.
+
+**GUI:** Task Manager → Details → enable PID column; Resource Monitor → Network → Listening Ports.
+
+```cmd
+netstat -abno
+netstat -ano | findstr LISTENING
+```
+
+For an exact PID from the current image:
+
+```powershell
+Get-NetTCPConnection -State Listen |
+  Sort-Object OwningProcess,LocalPort |
+  Select-Object LocalAddress,LocalPort,OwningProcess
+Get-Process -Id 1234 -ErrorAction SilentlyContinue |
+  Select-Object Id,ProcessName,Path
+```
+
+For IIS/DNS/DHCP and DC roles, many legitimate ports are present (e.g. RPC, DNS, Kerberos, LDAP, SMB, HTTPS, RDP). A listening port is **not proof** of malware. Correlate PID → binary path → service/role → README.
+
+### Packet captures and Wireshark
+
+If the image provides a `.pcap`/`.pcapng` and Wireshark is already installed:
+
+1. Open a copy of the file via **File → Open**; do not start a live capture to answer an offline PCAP question.
+2. Use display filters `ip`, `tcp`, `udp`, `dns`, `http`, `tcp.port == 445`, `ip.addr == 192.0.2.10`, `kerberos`, `ldap`, `smb2`.
+3. Select a packet, expand Internet Protocol/TCP/DNS/Kerberos/SMB fields and read **Source/Destination**, timestamps and ports.
+4. **Right-click → Follow TCP Stream** for a conversation. Use **Statistics → Endpoints/Conversations** to count peers.
+5. Check **source versus destination** and whether the question asks for **client IP** or **server IP**.
+6. If an approved `tshark` already exists:
+
+```cmd
+tshark -r "C:\path\capture.pcap" -T fields -e frame.number -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport
+```
+
+Encrypted TLS or SMB encryption is not readable without the authorized session keys. Often the evidence requested is network metadata, not decrypted application payload.
+
+### Event Viewer, Windows logs and timestamps
+
+GUI: **Win+R → `eventvwr.msc` → Windows Logs → Security/System → Filter Current Log**. For server roles, inspect **Applications and Services Logs** and their role-specific channels (DNS Server, Directory Service, DHCP-Server, DFS Replication, etc.) when installed.
+
+| Event ID / log | Meaning to investigate |
+|---|---|
+| Security 4624 / 4625 | successful / failed logon |
+| Security 4648 | explicit credentials used |
+| Security 4688 | process created, if enabled |
+| Security 4720 / 4726 | account created / deleted |
+| Security 4724 | password reset attempt |
+| Security 4728 / 4732 | member added to global / local security group |
+| Security 4729 / 4733 | member removed from global / local security group |
+| Security 4740 | account lockout |
+| Security 4768 / 4769 | Kerberos TGT / service ticket request |
+| Security 4771 | Kerberos preauthentication failed |
+| Security 4776 | NTLM credential validation |
+| Security 4662 | directory object access, only if audited |
+| Security 5136 | directory object modified, if AD change auditing enabled |
+| Security 1102 | audit log cleared |
+| System 7045 | service installed |
+| Security 4698 | scheduled task created, if audited |
+
+Example query with a time window:
+
+```powershell
+Get-WinEvent -FilterHashtable @{
+  LogName='Security'
+  Id=4624,4625,4720,4726,4728,4732,4740,4768,4769,4771,4776
+  StartTime=(Get-Date).AddDays(-7)
+} -ErrorAction SilentlyContinue |
+  Select-Object -First 150 TimeCreated,Id,Message
+```
+
+Specific service installation:
+
+```powershell
+Get-WinEvent -FilterHashtable @{LogName='System';Id=7045} -ErrorAction SilentlyContinue |
+  Select-Object -First 40 TimeCreated,Message
+```
+
+**Timestamp questions:** check time zone/UTC, log retention, channel, event ID, user and machine. `Get-WinEvent` may omit entries if audit settings were disabled. An empty search does not prove an event never occurred. Do not clear logs as part of a forensic pass.
+
+### Services, scheduled tasks and startup persistence
+
+**GUI:** `services.msc`, `taskschd.msc` → Task Scheduler Library, Task Manager → Startup apps, `regedit`.
+
+```powershell
+Get-CimInstance Win32_Service |
+  Select-Object Name,State,StartMode,StartName,PathName
+Get-ScheduledTask | Select-Object TaskPath,TaskName,State,Actions
+Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run'
+Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce'
+Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
+```
+
+Accessibility debugger override (read-only):
+
+```powershell
+Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sethc.exe' -ErrorAction SilentlyContinue
+```
+
+A suspicious task launching `powershell.exe`, `cmd.exe`, `wscript.exe`, `mshta.exe`, or a binary under a writable Temp folder is a **lead**, not automatic proof. Record **task name, action/arguments, user, trigger, file path, PID, hash and time** before altering it.
+
+Domain Controllers may legitimately run many scheduled maintenance tasks and protected services; don't disable system AD/Netlogon/DFSR entries because their names look unfamiliar.
+
+### Files, metadata, ownership and version
+
+GUI: File Explorer → View → Hidden items + File name extensions; file right-click **Properties → Details/Security**. A named server file may reside in `C:\inetpub`, `C:\Windows\SYSVOL`, a custom share root, Desktop or Documents.
+
+```powershell
+Get-Item -LiteralPath 'C:\path\file.exe' |
+  Select-Object FullName,Length,Attributes,CreationTime,LastWriteTime
+(Get-Item -LiteralPath 'C:\path\file.exe').VersionInfo |
+  Format-List FileVersion,ProductVersion,CompanyName,OriginalFilename
+Get-Acl -LiteralPath 'C:\path\file.exe' |
+  Format-List Owner,AccessToString
+```
+
+Search narrow before whole drive:
+
+```powershell
+Get-ChildItem 'C:\Users','C:\inetpub' -File -Recurse -Force -ErrorAction SilentlyContinue |
+  Where-Object { $_.Name -like '*keyword*' -or $_.Extension -in '.zip','.txt','.pcap' } |
+  Select-Object FullName,Length,LastWriteTime
+```
+
+**Time nuance:** Created/modified/access times may change after copy or access. Do not infer activity from a single property; use logs and object metadata as corroboration.
+
+### Alternate data streams and file contents
+
+```powershell
+Get-Item -LiteralPath 'C:\path\file.txt' -Stream * -ErrorAction SilentlyContinue
+Get-Content -LiteralPath 'C:\path\file.txt' -Stream Zone.Identifier -ErrorAction SilentlyContinue
+```
+
+NTFS alternate data streams can carry metadata like `Zone.Identifier` or additional content. Do not automatically delete streams or unblock evidence. If a file's extension is misleading, inspect its **magic bytes**, not its name alone.
+
+### Image, audio, PDF and steganography
+
+If a question supplies an image, PDF, audio or archive rather than a log:
+
+1. Preserve original file and compute exact SHA-256.
+2. Inspect visible contents, filename, extension, Properties → Details, comments, author, version, certificate or embedded QR code.
+3. Inspect first bytes to confirm actual format; a PDF/ZIP/Office file can be renamed.
+4. For steganography: look for provided tool/method hints, image layers, LSB, embedded files, spectrum/spectrogram or encoded metadata. Use only approved offline tools when available.
+5. For encrypted PDF/ZIP: identify the required password/recipient key; do not upload private evidence to online unlock sites.
+
+Distinguish **metadata extraction** from **decryption**. A certificate thumbprint or PDF author can be answered without any secret key.
+
+## If Ctrl+F does not find the question
+
+1. Underline the requested **answer type**: file path, user, group, GPO, domain controller, DNS CNAME, DHCP reservation, IIS path, share, port, timestamp, certificate, plaintext, hash.
+2. Identify the **role**: DC, member, standalone; then the installed server role (AD, DNS, DHCP, IIS/FTP, SMB, CA, Hyper-V, SQL, printing).
+3. Find the **authoritative store**: `dsa.msc`, `gpmc.msc`, `dnsmgmt.msc`, `dhcpmgmt.msc`, `inetmgr`, `fsmgmt.msc`, `certlm.msc`, Event Viewer or a named evidence file.
+4. Run one narrow, read-only query for the exact user, group, zone, site, event ID, file or port. Don't run a domain-wide change command just to get information.
+5. If missing, check another DC/role host, AD OU, nested group, DNS zone, compressed/archived log, UTC offset, record alias/target, file extensions or the relevant policy precedence.
+6. If ciphertext fails to decode, write down each intermediate value and distinguish **hex/Base64 bytes**, **ROT/reversal**, **XOR byte key**, **real encryption with key**, and **one-way hashes**.
+7. Re-read the prompt's nouns: **alias versus target**, **certificate subject versus thumbprint**, **share name versus absolute path**, **domain versus local user**, **direct versus nested member**, **source versus destination IP**.
+8. If an application is unavailable, use authorized RSAT/PowerShell or the corresponding original server handbook, not a random installer or borrowed account.
+9. Record the evidence and move to another question if needed; return once you have a more specific clue.
+
+Personal scratch template: `exact question | role | artifact/zone/user | read-only command/GUI | observed value | answer format | verified`. Type **only the requested answer** in the scored question document.
+
+## Sources and scope
+
+Built from the supplied **CyberPatriot Forensics Question Research Report**, **CP19 Windows 11 Training Round 2 Answer Key**, and **CP19 Round 1 category summary**, plus general Microsoft Server investigation methods. Historical Server 2019/2022 examples in the research report are school/team records, **not proof of every past official question**.
+
+- [Windows Server role-aware handbook](../Windows/windows-server.md).
+- [Microsoft Learn — Get-WinEvent](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent).
+- [Microsoft Learn — Get-DnsServerResourceRecord](https://learn.microsoft.com/en-us/powershell/module/dnsserver/get-dnsserverresourcerecord).
+- [Microsoft Learn — Get-SmbShare](https://learn.microsoft.com/en-us/powershell/module/smbshare/get-smbshare).
+- [Microsoft Learn — Get-FileHash](https://learn.microsoft.com/en-us/powershell/module/Microsoft.PowerShell.Utility/Get-FileHash).
+- [CyberChef open-source project](https://github.com/gchq/CyberChef) for approved offline decoding.
+
+No guide can guarantee an instant answer to **every unforeseen forensic puzzle**. These sections provide a concrete, searchable investigation for the main types of evidence plus a role-aware fallback.
