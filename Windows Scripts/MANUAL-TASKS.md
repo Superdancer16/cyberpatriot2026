@@ -16,7 +16,7 @@ The [one-run PowerShell script](windows-10-11.ps1) processes all configured sect
 | Confirm exact authorized users and administrator membership | Account names and service-account exceptions come from the active image README, not an inventory alone | [Account review](../Windows/windows-10-11.md#2-users-and-groups) |
 | Confirm required group membership | Script creates only the `Groups` entries in JSON; verify every member visually | [Create group](../Windows/windows-10-11.md#29-create-a-required-custom-local-group) · [Add members](../Windows/windows-10-11.md#210-add-the-specified-users-to-the-required-group) |
 | Verify password/lockout values and effective GPO | An imported local value may be overridden by domain policy; numeric requirements vary by image | [Password Policy](../Windows/windows-10-11.md#31-password-policy) · [Account Lockout](../Windows/windows-10-11.md#32-account-lockout-policy) |
-| User-rights assignment and granular audit policy | Removing the wrong privilege can break service accounts; the script only handles Credential Validation success auditing automatically | [User Rights](../Windows/windows-10-11.md#42-user-rights-assignment) · [Audit Policy](../Windows/windows-10-11.md#41-audit-policy-record-security-events) |
+| User-rights assignment and granular audit policy | The script can remove **specified** `SeSecurityPrivilege` and `SeTakeOwnershipPrivilege` principals and enable Credential Validation success auditing. Other rights and domain-managed policy need GUI review | [User Rights](../Windows/windows-10-11.md#42-user-rights-assignment) · [Audit Policy](../Windows/windows-10-11.md#41-audit-policy-record-security-events) |
 
 ## Applications, services and threats
 
