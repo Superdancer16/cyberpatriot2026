@@ -1,6 +1,13 @@
 #requires -Version 5.1
 [CmdletBinding()]
-param([ValidateSet('Menu','Audit','Quick')][string]$Mode = 'Menu')
+param(
+    [ValidateSet('Menu','Audit','Quick','Apply')][string]$Mode = 'Menu',
+    [string]$Config,
+    [switch]$InitConfig,
+    [switch]$Yes,
+    [switch]$AllowRemovals,
+    [string[]]$Only
+)
 
 $ErrorActionPreference = 'Stop'
 $root = Join-Path $env:USERPROFILE 'Documents\WindowsSecurityWork'
@@ -375,6 +382,173 @@ function ScriptLogging {
     Note 'Script Block Logging enabled; verify applicable GPO and Event Viewer. Review log retention and privacy.'
 }
 
+
+function Get-Value($Object, [string]$Key, $Fallback = $null) {
+    if ($null -eq $Object) { return $Fallback }
+    $property = $Object.PSObject.Properties[$Key]
+    if ($null -ne $property) { return $property.Value }
+    return $Fallback
+}
+function Names($Value) {
+    if ($null -eq $Value) { return @() }
+    return @($Value | ForEach-Object { [string]$_ } | Where-Object { $_.Trim() } | Select-Object -Unique)
+}
+function Is-Listed([string]$Name, $List) {
+    foreach ($entry in (Names $List)) {
+        if ($entry -ieq $Name -or $entry -ieq ($Name -split '\\')[-1]) { return $true }
+    }
+    return $false
+}
+function Write-Result([string]$State, [string]$Message) {
+    if ($null -eq $script:Results) { $script:Results = New-Object System.Collections.ArrayList }
+    [void]$script:Results.Add([pscustomobject]@{ State=$State; Message=$Message })
+    Note "[$State] $Message"
+}
+function Initialize-ReadmeConfig {
+    $dest = if ($Config) { $Config } else { Join-Path $PSScriptRoot 'image-config.json' }
+    if (Test-Path -LiteralPath $dest) { throw "File already exists: $dest. It will not be overwritten." }
+    $sample = [ordered]@{
+        ConfirmedReadme = $false
+        AuthorizedUsers = @()
+        AuthorizedAdmins = @()
+        RequiredServices = @()
+        RequiredSoftware = @()
+        RequiredShares = @()
+        DisableUsers = @()
+        RemoveUsers = @()
+        DemoteAdmins = @()
+        PasswordExpiresUsers = @()
+        NewUsers = @()
+        ResetPasswords = @()
+        Groups = [ordered]@{}
+        RemoveGroupMembers = [ordered]@{}
+        DisableServices = @('RemoteRegistry','simptcp')
+        DisableFeatures = @()
+        RemoveShares = @()
+        RemoveDefenderExclusions = @()
+        DisableScheduledTasks = @()
+        RemovePrograms = @()
+        RemoveFiles = @()
+        UpdatePrograms = @()
+        PasswordPolicy = [ordered]@{}
+        Security = [ordered]@{
+            Firewall = $true
+            Defender = $true
+            DefenderSignatures = $true
+            DefenderQuickScan = $false
+            SMBClientSigning = $false
+            CredentialAuditSuccess = $true
+            SmartScreen = $true
+            DisableAutoPlay = $true
+            DisableLLMNR = $false
+            DisableRemoteAssistance = $true
+            DisableRDP = $false
+            DisableSMB1 = $false
+            DisableWDigest = $true
+            HideLastSignedIn = $false
+            RestrictBlankPasswordNetwork = $true
+            PowerShellLogging = $false
+            LockScreenSeconds = $null
+            WindowsUpdate = 'Scan'
+        }
+    }
+    $sample | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $dest -Encoding UTF8
+    Write-Host "Created $dest" -ForegroundColor Green
+    Write-Host 'Edit it using the image README. Set ConfirmedReadme to true after checking all lists.'
+}
+function Load-ReadmeConfig {
+    if (-not $Config) { throw 'Apply mode requires -Config with an image-specific JSON file. Run -InitConfig first.' }
+    if (-not (Test-Path -LiteralPath $Config -PathType Leaf)) { throw "Configuration file not found: $Config" }
+    $script:Cfg = Get-Content -LiteralPath $Config -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+    if (-not [bool](Get-Value $script:Cfg 'ConfirmedReadme' $false)) {
+        throw 'Set ConfirmedReadme=true only after reading the actual image README and checking authorized accounts/services.'
+    }
+    $script:Authorized = @(Names (Get-Value $script:Cfg 'AuthorizedUsers')) + @(Names (Get-Value $script:Cfg 'AuthorizedAdmins'))
+    $script:RequiredServices = @(Names (Get-Value $script:Cfg 'RequiredServices'))
+    $script:RequiredSoftware = @(Names (Get-Value $script:Cfg 'RequiredSoftware'))
+    $script:RequiredShares = @(Names (Get-Value $script:Cfg 'RequiredShares'))
+    $script:Sec = Get-Value $script:Cfg 'Security'
+    if ($null -eq $script:Sec) { throw 'Configuration requires a Security object.' }
+    $conflicts = New-Object System.Collections.ArrayList
+    foreach ($user in (Names (Get-Value $script:Cfg 'RemoveUsers'))) {
+        if ((Is-Listed $user $script:Authorized) -or $user -ieq $env:USERNAME) {
+            [void]$conflicts.Add("RemoveUsers includes an authorized/current user: $user")
+        }
+    }
+    foreach ($service in (Names (Get-Value $script:Cfg 'DisableServices'))) {
+        if (Is-Listed $service $script:RequiredServices) {
+            [void]$conflicts.Add("DisableServices includes a required service: $service")
+        }
+    }
+    foreach ($share in (Names (Get-Value $script:Cfg 'RemoveShares'))) {
+        if (Is-Listed $share $script:RequiredShares) {
+            [void]$conflicts.Add("RemoveShares includes a required share: $share")
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemovePrograms'))) {
+        if (Is-Listed $name $script:RequiredSoftware) {
+            [void]$conflicts.Add("RemovePrograms includes required software: $name")
+        }
+    }
+    if ($conflicts.Count) { throw ($conflicts -join '; ') }
+}
+function Check-Workstation {
+    Need-Admin
+    $os = Get-CimInstance Win32_OperatingSystem
+    if ($os.ProductType -ne 1) { throw 'This script is for Windows 10/11 workstations, not Windows Server or a Domain Controller.' }
+    if ($script:domainJoined) { Write-Result 'REVIEW' 'Domain-joined: account policy and local-group edits may be governed by domain policy.' }
+}
+function Decide([string]$Name, [bool]$NeedsChange, [scriptblock]$Fix) {
+    if (-not $NeedsChange) { Write-Result 'OK' $Name; return }
+    if ($Mode -eq 'Audit') { Write-Result 'WOULD' $Name; return }
+    try {
+        & $Fix
+        Write-Result 'CHANGED' $Name
+    } catch {
+        Write-Result 'FAILED' ($Name + ': ' + $_.Exception.Message)
+    }
+}
+function Exec-Native([string]$Name, [scriptblock]$Call) {
+    & $Call | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "$Name failed (exit $LASTEXITCODE)" }
+}
+function Save-RegKey([string]$Path) {
+    $reg = $Path -replace '^HKLM:\\','HKEY_LOCAL_MACHINE\' -replace '^HKCU:\\','HKEY_CURRENT_USER\'
+    if (-not (Test-Path -Path $Path)) { return }
+    $filename = 'registry-' + [Guid]::NewGuid().ToString('N') + '.reg'
+    $destination = Join-Path $script:BackupDir $filename
+    & reg.exe export $reg $destination /y | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Could not back up registry key $Path" }
+    Note "Registry backup: $Path -> $destination"
+}
+function Put-RegDword([string]$Path, [string]$Key, [int]$Wanted) {
+    $current = $null
+    if (Test-Path -Path $Path) {
+        $current = (Get-ItemProperty -Path $Path -Name $Key -ErrorAction SilentlyContinue).$Key
+    }
+    Decide ("Registry " + $Path + "\" + $Key + " -> " + $Wanted) ($null -eq $current -or [int]$current -ne $Wanted) {
+        Save-RegKey $Path
+        if (-not (Test-Path -Path $Path)) { New-Item -Path $Path -Force | Out-Null }
+        New-ItemProperty -Path $Path -Name $Key -Value $Wanted -PropertyType DWord -Force | Out-Null
+        $actual = (Get-ItemProperty -Path $Path -Name $Key).$Key
+        if ([int]$actual -ne $Wanted) { throw 'Value did not persist; check effective Group Policy.' }
+    }
+}
+function Show-AutomationSummary {
+    Write-Host ''
+    Write-Host 'Windows hardening summary' -ForegroundColor Cyan
+    foreach ($state in @('CHANGED','OK','WOULD','SKIPPED','REVIEW','FAILED')) {
+        $n = @($script:Results | Where-Object { $_.State -eq $state }).Count
+        Write-Host "$state : $n"
+    }
+    $file = Join-Path $root "summary-$stamp.csv"
+    $script:Results | Export-Csv -LiteralPath $file -NoTypeInformation -Encoding UTF8
+    Write-Host "Summary: $file"
+    Write-Host "Audit: $report"
+    Write-Host "Changes: $log"
+    Write-Host "Backups: $script:BackupDir"
+}
+
 function Quick {
     Run-Task 'Baseline audit' { Audit }
     Run-Task 'Firewall' { Firewall }
@@ -445,7 +619,8 @@ Note "Started: $env:COMPUTERNAME, mode=$Mode, domainJoined=$script:domainJoined"
 switch ($Mode) {
     'Audit' { Audit }
     'Quick' { Quick }
-    default { Menu }
+    'Apply' { Run-Automation }
+    default { if ($InitConfig) { Initialize-ReadmeConfig } else { Menu } }
 }
 Write-Host "Change log: $log" -ForegroundColor Green
 
