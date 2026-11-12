@@ -7,6 +7,8 @@
 > [!CAUTION]
 > **Read the image README before changing accounts, services, authentication, or network access.** Preserve forensic evidence and a recovery path; do not apply every example automatically.
 
+**Forensics first — searchable question solver:** [Windows 10/11 forensic guide](../Forensics/windows.md) — Ctrl+F question index, Base64/ROT13, hex/XOR/decryption, evidence commands, and optional CyberChef/decoder websites.
+
 **Version note (November 2026):** Windows 10 mainstream support ended October 14, 2025; use only the specific security-update/ESU support arrangements available to your image, and never substitute an OS upgrade for an authorized CyberPatriot task. Windows 11 editions, policy behavior, features and installed roles can differ; check `winver` and the actual README.
 
 **How to use this page**
