@@ -24,7 +24,9 @@ jobs:
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors) | Out-Null
           if ($errors.Count -gt 0) {
-            $errors | Format-List | Out-String | Write-Host
+            foreach ($e in $errors) {
+              Write-Host ("Line {0}, column {1}: {2} -- {3}" -f $e.Extent.StartLineNumber,$e.Extent.StartColumnNumber,$e.Message,$e.Extent.Text)
+            }
             exit 1
           }
       - name: Check list and configuration template
