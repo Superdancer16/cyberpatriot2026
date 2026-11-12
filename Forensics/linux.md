@@ -315,3 +315,307 @@ openssl dgst -ripemd160 /path/file  # when supported by installed OpenSSL provid
 ```
 
 SHA-256 = 64 hex digits; MD5 = 32; SHA-1 and RIPEMD160 often = 40. Length alone cannot prove the algorithm. Recompute the same digest twice and check for changed bytes/paths. Hashes are for comparison/integrity, **not decryption**.
+
+## Finding files, owners and hidden evidence
+
+### Search files and parent directories
+
+GUI: Home folder → search name or extension; **Ctrl+H** shows hidden dotfiles in many Linux file managers.
+
+Find MP3s (live `find` is safer than relying on a stale `locate` database):
+
+```bash
+sudo find /home -type f \( -iname '*.mp3' -o -iname '*.wav' -o -iname '*.mp4' -o -iname '*.mkv' \) -print 2>/dev/null
+```
+
+If asked for the **directory containing** a media file, submit the **parent directory**, not just a filename:
+
+```bash
+dirname -- '/home/example/Music/song.mp3'
+readlink -f -- '/home/example/Music'
+```
+
+If no result in the expected home directory, expand to:
+
+```bash
+sudo find /srv /opt /tmp /var/tmp -type f -iname '*keyword*' -print 2>/dev/null
+sudo find / -type f -iname '*keyword*' -print 2>/dev/null
+```
+
+Avoid `sudo updatedb` solely to solve a path question when a live `find` works. If using `locate`, remember its index may not reflect recent files.
+
+### UID, GID and orphaned file owners
+
+Common prompt: "Which file is owned by UID **1951** even though no account has that UID?"
+
+```bash
+id username
+id -u username
+getent passwd 1951
+sudo find / -xdev -uid 1951 -ls 2>/dev/null
+sudo find / -xdev -nouser -ls 2>/dev/null
+```
+
+If `-xdev` does not find it, try other mounted filesystems or omit `-xdev` after checking what is mounted.
+
+Verify the actual numeric owner:
+
+```bash
+stat -c 'file=%n UID=%u GID=%g owner=%U group=%G mode=%a' /path/to/file
+ls -ln -- /path/to/file
+getent passwd 1951
+```
+
+An orphaned numeric UID can remain on a file even after the user account was deleted. This is a documented **Debian practice question pattern**. Do not automatically change ownership before answering.
+
+### Users, groups and UID zero
+
+```bash
+getent passwd
+getent group
+getent group sudo
+id username
+awk -F: '$3==0 {print $1,$3,$6,$7}' /etc/passwd
+getent passwd | awk -F: '$3==0'
+```
+
+Normally root has UID 0. Additional UID-0 accounts warrant investigation. Distinguish a **human user** from a legitimate service account, and distinguish sudo-group membership from a user-specific `sudoers` permission.
+
+### Permissions, SUID, capabilities and ACLs
+
+```bash
+stat -c '%A %a %U:%G %u:%g %n' /path/to/file
+namei -l /path/to/file
+sudo find /usr /bin /sbin -xdev -type f -perm /4000 -print 2>/dev/null
+getcap -r /usr /opt 2>/dev/null
+getfacl /path/to/file                    # if available
+```
+
+A question may request numeric permission mode (`640`), owner, group, `setuid`, a Linux capability, or an extended ACL. These are different properties. Do not use `chmod`, `chown`, `setcap` or SUID removal to **answer** a question.
+
+### Unsafe C functions and source code
+
+If the question mentions a `.c` source file or "unsafe standard library function", read the source **without executing it**:
+
+```bash
+nl -ba "$HOME/Desktop/example.c" | less
+grep -nE '(^|[^[:alnum:]_])(gets|strcpy|strcat|sprintf|scanf|system|tmpnam|mktemp)[[:space:]]*\(' "$HOME/Desktop/example.c"
+```
+
+`gets`, unchecked `strcpy`/`strcat` and unbounded `sprintf` are common clues, but **a name appearing does not by itself prove the call is vulnerable**. Check the call's parameters, buffer sizes, and the prompt. Search through includes/macros and comments if the apparent answer is missing.
+
+The supplied research contains a Debian-specific example involving an insecure function in a C source file. Use the *method* above; do not guess the answer from the exercise filename.
+
+### Hidden files and misleading extensions
+
+```bash
+find "$HOME" -type f -name '.*' -print
+sudo find /home /tmp /var/tmp /dev/shm -type f -mtime -2 -print 2>/dev/null
+file -- /path/suspicious.dat
+od -An -tx1 -N16 /path/suspicious.dat
+strings -a -n 5 /path/suspicious.dat | head -60
+```
+
+`strings` finds possible hints, not proof of malicious content. A `.txt` file may actually be ELF/ZIP/PDF/PNG. Inspect bytes rather than believing the extension.
+
+### Metadata and timestamp questions
+
+```bash
+stat /path/file
+stat -c 'mode=%a owner=%U:%G UID=%u GID=%g size=%s mtime=%y ctime=%z birth=%w name=%n' /path/file
+sudo find /home /tmp /var/tmp -type f -mmin -1440 -printf '%TY-%Tm-%Td %TH:%TM:%TS %u %p\n' 2>/dev/null
+```
+
+**mtime** = content modification; **ctime** = inode metadata change (not creation); **atime** = last access, often suppressed; **birth** may be unavailable. A time sequence needs corroboration from shell/log/package events. A file's creation time after copying may reflect the **copy**, not the original.
+
+### Image, audio and steganography
+
+Search `steganography`, `hidden text`, `LSB`, `metadata`, `EXIF`, `QR`, `waveform`, `spectrogram`, `embedded ZIP`.
+
+1. Look at the visible image/audio first, including rotation, contrast, subtitles and QR codes.
+2. Read `file`, `stat`, `sha256sum`, and first-byte hex before interpreting content.
+3. If installed and permitted, `exiftool /path/image.jpg` or `identify -verbose /path/image.png` can show metadata without editing the file.
+4. Look for appended archive data or suspicious size (use a **copy** for extraction).
+5. If sound is involved, listen with an approved player or inspect a spectrogram in an already installed audio editor.
+6. For LSB steganography, use an approved offline tool only when the prompt provides a reason; a failed stego guess is not proof there is no hidden data.
+
+## Linux accounts, logs, services and network questions
+
+### Bash history and command evidence
+
+```bash
+history                         # only the current shell's known history
+sudo find /home /root -name '.bash_history' -type f -print 2>/dev/null
+sudo grep -RniE 'curl|wget|nc |netcat|sudo|useradd|passwd|cron|systemctl' /home --include='.bash_history' 2>/dev/null
+sudo grep -HniE 'curl|wget|nc |netcat|sudo|useradd|passwd|cron|systemctl' /root/.bash_history 2>/dev/null
+```
+
+**Limit:** history may not be written until logout; it can be disabled, deleted, modified or incomplete. Cross-check with the journal and files, not assumptions.
+
+### Authentication logs and SSH logins
+
+On Debian/Ubuntu/Mint systems where rsyslog auth logs exist:
+
+```bash
+sudo grep -Ei 'Accepted|Failed|Invalid user|sudo|session opened|useradd' /var/log/auth.log 2>/dev/null
+sudo zgrep -Ei 'Accepted|Failed|sudo' /var/log/auth.log*.gz 2>/dev/null
+```
+
+If there is no `/var/log/auth.log`, use journal:
+
+```bash
+sudo journalctl -u ssh --no-pager | grep -Ei 'Accepted|Failed|Invalid'
+sudo journalctl -t sshd --no-pager | tail -100
+sudo journalctl -g 'Failed password|Accepted password|sudo|useradd' --no-pager
+```
+
+Cross-check account, time, source IP, password/public-key method and **success versus failure**. Optional:
+
+```bash
+last -a | head -35
+sudo lastb | head -35      # may be unavailable on this image
+who
+```
+
+### journalctl and time windows
+
+```bash
+sudo journalctl --since '2026-11-01 00:00:00' --until '2026-11-02 00:00:00' --no-pager
+sudo journalctl -u ssh --since '1 day ago' --no-pager
+sudo journalctl -p warning -n 100 --no-pager
+journalctl --list-boots
+timedatectl
+```
+
+If results are missing, check timezone, unit name (`ssh` or `sshd`), log permissions, retention, boot ID and whether persistent journaling is enabled. Don't assume logs survived reboot.
+
+### Cron and systemd persistence
+
+```bash
+sudo crontab -l
+sudo cat /etc/crontab
+sudo ls -la /etc/cron.d /etc/cron.daily /var/spool/cron/crontabs 2>/dev/null
+systemctl list-timers --all
+systemctl list-unit-files --type=service
+systemctl --user list-timers --all
+```
+
+All user crontabs, if authorized:
+
+```bash
+while IFS=: read -r username ignored; do
+  printf '\n===== %s =====\n' "$username"
+  sudo crontab -u "$username" -l 2>/dev/null
+done < /etc/passwd
+```
+
+Inspect a suspicious installed unit **without executing it**:
+
+```bash
+systemctl cat NAME.service
+systemctl show NAME.service -p ExecStart -p User -p FragmentPath
+sudo find /etc/systemd/system -maxdepth 3 -type f -print
+```
+
+A cron entry containing `nc` or `netcat` could be malicious or a legitimate tool. Record **full command, user, file, network port and current PID**; do not stop/delete a process before answering a question about it.
+
+### APT, dpkg, Snap and Flatpak history
+
+```bash
+sudo grep -Ei 'Install:|Upgrade:|Remove:|Purge:' /var/log/apt/history.log 2>/dev/null
+sudo grep -Ei ' install | upgrade | remove | purge ' /var/log/dpkg.log 2>/dev/null
+sudo zgrep -Ei ' install | upgrade | remove | purge ' /var/log/dpkg.log*.gz 2>/dev/null
+dpkg-query -W -f='${Package}\t${Version}\t${Status}\n' PACKAGE
+apt-mark showhold
+```
+
+Ubuntu images may have `snap list`, `snap changes`; Mint and other desktops may have `flatpak list` and `flatpak history` where supported. **Don't install or purge a package to answer a version/history question.**
+
+### Processes and open ports
+
+```bash
+ps auxf
+ps -eo pid,ppid,user,etime,cmd --sort=pid | less
+sudo ss -lntup
+sudo ss -tunp
+sudo lsof -nP -iTCP -sTCP:LISTEN        # if installed
+readlink -f /proc/1234/exe             # replace PID from this VM
+tr '\0' ' ' < /proc/1234/cmdline
+```
+
+A **PID** is not a port. In `ss`, `:PORT` is in the local address field; `pid=...` is a process identifier shown when permitted. A process can own multiple sockets.
+
+```bash
+ip -br address
+ip route
+resolvectl status 2>/dev/null
+```
+
+### PCAP and Wireshark
+
+With a supplied `.pcap` or `.pcapng` and an approved installed Wireshark:
+
+1. File → Open the **copy** of the capture.
+2. Use display filters: `ip`, `tcp`, `udp`, `dns`, `http`, `tcp.port == 22`, `ip.src == 192.0.2.10`.
+3. Inspect **Source**, **Destination**, timestamps, packet fields and **Follow → TCP Stream** when relevant.
+4. Use **Statistics → Endpoints/Conversations** for counts, not guesses from the most visible packet.
+
+If `tshark` exists:
+
+```bash
+tshark -r /path/traffic.pcap -T fields -e frame.number -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport
+```
+
+If `tcpdump` exists:
+
+```bash
+tcpdump -nn -r /path/traffic.pcap | head -60
+```
+
+HTTPS/TLS traffic is encrypted without authorized session keys. The prompt may only require IP/port/DNS/packet metadata, not decrypted application content.
+
+### Samba, NFS shares and mounts
+
+```bash
+findmnt
+mount | head -50
+grep -v '^\s*#' /etc/fstab
+testparm -s                         # if Samba installed
+grep -nE '^\[|path\s*=|valid users|guest ok' /etc/samba/smb.conf 2>/dev/null
+sudo exportfs -v                    # if NFS tools installed
+```
+
+Distinguish **share name**, filesystem path, allowed users, NFS export target and actual Linux file permissions. Do not remove a share before answering a question about its location.
+
+### Certificates, signatures and keys
+
+```bash
+openssl x509 -in /path/cert.pem -noout -subject -issuer -dates -serial -fingerprint -sha256
+openssl x509 -in /path/cert.pem -noout -text | head -80
+```
+
+For DER certificates add `-inform DER`. A `BEGIN CERTIFICATE` public certificate differs from a `BEGIN PRIVATE KEY` secret key. Do not paste or export unrelated private-key material. A certificate fingerprint is not the same as a file SHA-256 digest.
+
+## If Ctrl+F did not find your question
+
+1. Identify the **answer type** (filename/path, username/UID/GID, byte sequence, plaintext, hash, PID/port, timestamp, package, certificate).
+2. Identify the **artifact** (Desktop file, code, binary, archive, account database, auth logs, cron, systemd, PCAP, share, certificate, browser).
+3. Choose the closest topic here and use **one narrow read-only command**. Replace sample names/paths with the actual prompt's values.
+4. If nothing is found, **expand scope** (single home → `/home` → `/srv` and `/opt` → `/`; `-xdev` versus cross-mounted) and inspect dotfiles, compressed logs, stale indexes, alternate users and paths.
+5. For decoding, save intermediate outputs; check **hex versus Base64**, **bytes versus UTF-8**, **ROT direction**, **reverse order**, **key text versus key bytes** and required file headers.
+6. For "command not found", use an installed equivalent: `od` instead of `xxd`; `journalctl` instead of `auth.log`; Python 3 stdlib instead of a web decoder. Do not automatically install a tool.
+7. Read the question again: **full directory** differs from filename, **UID** from username, **mtime** from `ctime`, and **local port** from remote port.
+8. Record current evidence, move on to another question, and return with a more precise search term.
+
+Notes template: `question wording | requested answer type | file/user/PID | commands | exact output | verification`. Submit only the requested answer after `ANSWER:` in the actual question file.
+
+## Sources and scope
+
+Created from the supplied **CyberPatriot Forensics Question Research Report**, **CP19 Debian 12 Training Round 2 Answer Key**, and **CP19 Round 1 categories**. Examples show methods rather than publishing a complete current-season answer key. The presence of a technique here does **not** establish that it appeared in an official past round.
+
+- [Debian handbook](../Linux/debian.md) · [Mint handbook](../Linux/linux-mint.md) · [Ubuntu handbook](../Linux/ubuntu.md).
+- [systemd journalctl documentation](https://www.freedesktop.org/software/systemd/man/latest/journalctl.html).
+- [Debian dpkg-query manual](https://manpages.debian.org/dpkg-query).
+- [CyberChef open-source project](https://github.com/gchq/CyberChef) for approved offline layered decoding.
+
+No document can predict **every future forensic question**. This is intended as a searchable starting procedure with clear fallback steps rather than a promise of guaranteed answers.
