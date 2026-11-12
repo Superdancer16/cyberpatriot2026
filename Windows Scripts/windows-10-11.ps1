@@ -1045,6 +1045,62 @@ function Invoke-AutoWindowsUpdate {
     }
 }
 
+
+function Run-Automation {
+    Load-ReadmeConfig
+    Check-Workstation
+    $script:Results = New-Object System.Collections.ArrayList
+    $script:BackupDir = Join-Path $root "backups-$stamp"
+    New-Item -ItemType Directory -Path $script:BackupDir -Force | Out-Null
+
+    if (-not $Yes) {
+        Write-Host 'This performs all applicable steps from image-config.json in one run.' -ForegroundColor Yellow
+        Write-Host 'Read the README and preserve forensics before changing anything.'
+        Write-Host 'Account, file, share and program deletion also requires -AllowRemovals.'
+        $answer = Read-Host 'Type APPLY to start, or anything else to cancel'
+        if ($answer -cne 'APPLY') { Note 'Canceled before changing the system.'; return }
+    }
+    $modules = @(
+        @{ Name='accounts';  Fn='Invoke-AutoAccounts' },
+        @{ Name='passwords'; Fn='Invoke-AutoPasswordPolicy' },
+        @{ Name='security';  Fn='Invoke-AutoSecurity' },
+        @{ Name='defender';  Fn='Invoke-AutoDefender' },
+        @{ Name='firewall';  Fn='Invoke-AutoFirewall' },
+        @{ Name='smb';       Fn='Invoke-AutoSMB' },
+        @{ Name='audit';     Fn='Invoke-AutoAudit' },
+        @{ Name='services';  Fn='Invoke-AutoServices' },
+        @{ Name='features';  Fn='Invoke-AutoFeatures' },
+        @{ Name='tasks';     Fn='Invoke-AutoTasks' },
+        @{ Name='shares';    Fn='Invoke-AutoShares' },
+        @{ Name='browsers';  Fn='Invoke-AutoBrowsers' },
+        @{ Name='apps';      Fn='Invoke-AutoApps' },
+        @{ Name='files';     Fn='Invoke-AutoFiles' },
+        @{ Name='updates';   Fn='Invoke-AutoWindowsUpdate' }
+    )
+    Write-Host ''
+    Write-Host ("Starting full run: " + $env:COMPUTERNAME) -ForegroundColor Cyan
+    Write-Host ("Selected sections: " + $(if ($Only) { $Only -join ', ' } else { 'all' }))
+    Write-Host ("Authorized admins: " + (($script:Cfg.AuthorizedAdmins) -join ', '))
+    Write-Host ("Required services: " + (($script:RequiredServices) -join ', '))
+    Write-Host ''
+    try {
+        Audit
+        Copy-Item -LiteralPath $report -Destination (Join-Path $script:BackupDir 'audit-before.txt') -Force
+    } catch { Write-Result 'REVIEW' ('Initial audit unavailable: ' + $_.Exception.Message) }
+    foreach ($entry in $modules) {
+        if ($Only -and $entry.Name -notin $Only) { continue }
+        Write-Host ("---- " + $entry.Name.ToUpper() + " ----") -ForegroundColor Cyan
+        try { & $entry.Fn }
+        catch { Write-Result 'FAILED' ($entry.Name + ' section failed: ' + $_.Exception.Message) }
+    }
+    try {
+        Audit
+        Copy-Item -LiteralPath $report -Destination (Join-Path $script:BackupDir 'audit-after.txt') -Force
+    } catch { Write-Result 'REVIEW' ('Final audit unavailable: ' + $_.Exception.Message) }
+    Write-Result 'REVIEW' 'Check Scoring Report, forensic answers, working admin login, required apps and remote access.'
+    Show-AutomationSummary
+}
+
 function Quick {
     Run-Task 'Baseline audit' { Audit }
     Run-Task 'Firewall' { Firewall }
@@ -1112,11 +1168,15 @@ function Menu {
 }
 
 Note "Started: $env:COMPUTERNAME, mode=$Mode, domainJoined=$script:domainJoined"
-switch ($Mode) {
-    'Audit' { Audit }
-    'Quick' { Quick }
-    'Apply' { Run-Automation }
-    default { if ($InitConfig) { Initialize-ReadmeConfig } else { Menu } }
+if ($InitConfig) {
+    Initialize-ReadmeConfig
+} else {
+    switch ($Mode) {
+        'Audit' { Audit }
+        'Quick' { Quick }
+        'Apply' { Run-Automation }
+        default { Menu }
+    }
 }
 Write-Host "Change log: $log" -ForegroundColor Green
 
