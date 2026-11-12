@@ -1240,6 +1240,63 @@ function Invoke-AutoStartupAndIFEO {
     }
 }
 
+
+function Invoke-AutoAppx {
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveAppxPackages'))) {
+        if (-not $AllowRemovals) {
+            Write-Result 'REVIEW' "Store app removal requires -AllowRemovals: $name"
+            continue
+        }
+        if ($name.Contains('*') -or $name.Contains('?') -or $name -match '^Microsoft\.(Windows|VCLibs|NET|UI|DesktopAppInstaller)') {
+            Write-Result 'SKIPPED' "Protected or wildcard Store app: $name"
+            continue
+        }
+        if (Is-Listed $name $script:RequiredSoftware) {
+            Write-Result 'SKIPPED' "Required Store app: $name"
+            continue
+        }
+        $packages = @(Get-AppxPackage -AllUsers -Name $name -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -ieq $name })
+        if (-not $packages.Count) { Write-Result 'OK' "Store app absent: $name"; continue }
+        foreach ($package in $packages) {
+            if ($package.NonRemovable) { Write-Result 'SKIPPED' "Non-removable Store app: $name"; continue }
+            Decide "Remove explicitly prohibited Store app $($package.PackageFullName)" $true {
+                $package | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("appx-" + [Guid]::NewGuid().ToString('N') + ".xml"))
+                Remove-AppxPackage -AllUsers -Package $package.PackageFullName -ErrorAction Stop
+            }
+        }
+        Write-Result 'REVIEW' "Check provisioned versions and per-user registration of $name separately."
+    }
+}
+function Invoke-AutoShareAccess {
+    foreach ($item in @(Get-Value $script:Cfg 'RemoveShareAccess' @())) {
+        $shareName = [string](Get-Value $item 'Share' '')
+        $account = [string](Get-Value $item 'Account' '')
+        if ([string]::IsNullOrWhiteSpace($shareName) -or [string]::IsNullOrWhiteSpace($account)) {
+            Write-Result 'REVIEW' 'RemoveShareAccess needs exact Share and Account properties.'
+            continue
+        }
+        if ($shareName -in @('ADMIN$','C$','IPC$','print$') -or $account -match '^(SYSTEM|Administrators)$') {
+            Write-Result 'SKIPPED' "Protected share or principal: $shareName / $account"
+            continue
+        }
+        if (-not $AllowRemovals) {
+            Write-Result 'REVIEW' "Share permission removal needs -AllowRemovals: $shareName / $account"
+            continue
+        }
+        $share = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
+        if (-not $share -or $share.Special) { Write-Result 'SKIPPED' "Share missing/protected: $shareName"; continue }
+        $acl = @(Get-SmbShareAccess -Name $shareName -ErrorAction Stop)
+        $target = @($acl | Where-Object { $_.AccountName -ieq $account })
+        if (-not $target.Count) { Write-Result 'OK' "No share permission found: $account on $shareName"; continue }
+        Decide "Revoke exact share permission $shareName / $account" $true {
+            $acl | Export-Clixml -LiteralPath (Join-Path $script:BackupDir ("share-acl-" + [Guid]::NewGuid().ToString('N') + ".xml"))
+            Revoke-SmbShareAccess -Name $shareName -AccountName $account -Force -Confirm:$false -ErrorAction Stop | Out-Null
+        }
+        Write-Result 'REVIEW' "Verify required users can still access share $shareName, and inspect NTFS ACL separately."
+    }
+}
+
 function Invoke-AutoServices {
     $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','Appinfo','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time')
     foreach ($name in (Names (Get-Value $script:Cfg 'DisableServices'))) {
@@ -1474,8 +1531,10 @@ function Run-Automation {
         @{ Name='tasks';     Fn='Invoke-AutoTasks' },
         @{ Name='startup';   Fn='Invoke-AutoStartupAndIFEO' },
         @{ Name='shares';    Fn='Invoke-AutoShares' },
+        @{ Name='shareaccess'; Fn='Invoke-AutoShareAccess' },
         @{ Name='browsers';  Fn='Invoke-AutoBrowsers' },
         @{ Name='apps';      Fn='Invoke-AutoApps' },
+        @{ Name='storeapps'; Fn='Invoke-AutoAppx' },
         @{ Name='files';     Fn='Invoke-AutoFiles' },
         @{ Name='updates';   Fn='Invoke-AutoWindowsUpdate' }
     )
