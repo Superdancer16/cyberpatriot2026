@@ -9,6 +9,8 @@ Choose one self-contained guide. Each starts with **Basics / Info**, then **Firs
 - [Windows 10 / 11 — Complete Workstation Handbook](windows-10-11.md) — PowerShell basics, forensics, authorized users, password policies, Defender, firewall, updates, services, remote access, startup persistence, audit/event evidence and recovery.
 - [Windows Server — Complete Role-Aware Handbook](windows-server.md) — Domain Controller versus member server, Active Directory, DNS/DHCP, IIS, SMB/NTFS, domain policy, server-only security, and full embedded workstation procedures.
 
+**Automated Windows 10/11 review:** [One-run PowerShell script](../Windows%20Scripts/windows-10-11.ps1) · [Beginner setup and run guide](../Windows%20Scripts/HOW-TO-RUN.md) · [Remaining manual tasks](../Windows%20Scripts/MANUAL-TASKS.md). The standalone Windows Server guide does not use this script.
+
 **Top priorities:** Read [the image README](../General/All/reading-the-readme.md), preserve [forensic evidence](../General/All/forensics-questions.md), keep admin access, and verify services before any changes. A score increase is never guaranteed by any particular generic setting.
 
 [All categories](../README.md)
