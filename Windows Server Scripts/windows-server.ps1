@@ -1030,3 +1030,114 @@ function Invoke-ServerSMB {
     Record 'REVIEW' 'Test required SMB clients, SYSVOL/NETLOGON and authorized file shares.'
 }
 
+function Invoke-ServerServices {
+    $protected = @('RpcSs','DcomLaunch','EventLog','BFE','mpssvc','WinDefend','Winmgmt','Schedule','ProfSvc','CryptSvc','PlugPlay','LanmanWorkstation','LanmanServer','SamSs','LSM','gpsvc','W32Time','Netlogon','NTDS','Kdc','DFSR','ADWS','DNS','DHCPServer','ClusSvc','W3SVC','FTPSVC','WinRM','TermService','sshd','RemoteAccess','SharedAccess','Spooler')
+    foreach ($name in (Values (Value $script:Cfg 'DisableServices'))) {
+        if ($name -match '[*?]' -or $name -notmatch '^[A-Za-z0-9_.-]+$') { Record 'REVIEW' "Service must have an exact safe Name: $name"; continue }
+        if ($name -in $protected -or Listed $name $script:RequiredServices) {
+            Record 'SKIPPED' "Core/role-sensitive/README-required service $name requires manual role verification."
+            continue
+        }
+        if ($script:IsDC -and $name -notin @('RemoteRegistry','simptcp','SNMP','SNMPTRAP','upnphost','SSDPSRV')) {
+            Record 'SKIPPED' "Unlisted DC service $name requires manual inspection."; continue
+        }
+        $svc = Get-Service -Name $name -ErrorAction SilentlyContinue
+        if (-not $svc) { Record 'OK' "Unneeded service absent: $name"; continue }
+        $dependents = @($svc.DependentServices | Where-Object { $_.Status -eq 'Running' })
+        if ($dependents.Count) { Record 'SKIPPED' "Service $name has running dependents: $($dependents.Name -join ', ')"; continue }
+        Change "Stop and disable explicitly unneeded service $name" ($svc.Status -ne 'Stopped' -or $svc.StartType -ne 'Disabled') {
+            Get-CimInstance Win32_Service -Filter ("Name='" + $name + "'") |
+                Select-Object Name,State,StartMode,StartName,PathName |
+                Export-Clixml -LiteralPath (Join-Path $backups ("service-" + $name + "-before.xml"))
+            if ($svc.Status -eq 'Running') { Stop-Service -Name $name -ErrorAction Stop }
+            Set-Service -Name $name -StartupType Disabled -ErrorAction Stop
+        }
+    }
+    foreach ($name in $script:RequiredServices) {
+        $svc = Get-Service -Name $name -ErrorAction SilentlyContinue
+        if (-not $svc) { Record 'REVIEW' "Critical service not installed: $name"; continue }
+        if ($svc.Status -ne 'Running' -and $svc.StartType -eq 'Disabled') {
+            Record 'REVIEW' "Required service $name is disabled; restore its correct documented startup type manually."
+        } elseif ($svc.Status -ne 'Running') {
+            Record 'REVIEW' "Required service $name is $($svc.Status). Check role behavior before forcing a start."
+        } else { Record 'OK' "Required service running: $name" }
+    }
+}
+function Invoke-ServerFeatures {
+    if (-not (Get-Command Get-WindowsFeature -ErrorAction SilentlyContinue)) {
+        Record 'REVIEW' 'ServerManager Windows feature cmdlets unavailable.'; return
+    }
+    $protected = @('AD-Domain-Services','DNS','DHCP','Web-Server','Web-Ftp-Server','FS-FileServer','FS-DFS-Replication','RSAT-AD-Tools','AD-Certificate','Hyper-V','Failover-Clustering','Print-Server')
+    $safeOptional = @('FS-SMB1','Telnet-Client','PowerShell-V2','SNMP-Service','TFTP-Client','XPS-Viewer')
+    foreach ($name in (Values (Value $script:Cfg 'DisableFeatures'))) {
+        if ($name -notin @('SMB1Protocol','MicrosoftWindowsPowerShellV2','TelnetClient','SimpleTCP','SNMP','TFTP')) {
+            Record 'REVIEW' "Unknown optional Windows feature $name"; continue
+        }
+        if ($name -eq 'SMB1Protocol' -and ($script:IsDC -or $script:RequiredShares.Count) -and -not $AllowCompatibilityChanges) {
+            Record 'REVIEW' 'SMB1 removal on DC/file server needs a documented client compatibility check.'; continue
+        }
+        $item = Get-WindowsOptionalFeature -Online -FeatureName $name -ErrorAction SilentlyContinue
+        if (-not $item) { Record 'OK' "Windows optional feature $name not installed"; continue }
+        Change "Disable specifically unwanted Windows feature $name" ($item.State -eq 'Enabled') {
+            $item | Export-Clixml -LiteralPath (Join-Path $backups ("optional-feature-" + $name + ".xml"))
+            Disable-WindowsOptionalFeature -Online -FeatureName $name -NoRestart -ErrorAction Stop | Out-Null
+        }
+    }
+    foreach ($name in (Values (Value $script:Cfg 'UninstallWindowsFeatures'))) {
+        if ($name -notin $safeOptional -or $name -in $protected -or Listed $name $script:RequiredRoles) {
+            Record 'SKIPPED' "Role/feature not in supported safe-removal set: $name"; continue
+        }
+        if (-not $AllowRemovals -or -not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
+            Record 'REVIEW' "Feature removal $name requires -AllowRemovals and preserved evidence."; continue
+        }
+        $item = Get-WindowsFeature -Name $name -ErrorAction SilentlyContinue
+        if (-not $item -or -not $item.Installed) { Record 'OK' "Feature $name already absent"; continue }
+        Change "Uninstall explicit noncritical Windows feature $name without reboot" $true {
+            $item | Export-Clixml -LiteralPath (Join-Path $backups ("server-feature-" + $name + ".xml"))
+            $result = Uninstall-WindowsFeature -Name $name -Restart:$false -ErrorAction Stop
+            if (-not $result.Success) { throw 'Uninstall-WindowsFeature did not succeed' }
+            if ($result.RestartNeeded -ne 'No') { Record 'REVIEW' "Feature $name has a pending restart; confirm before rebooting." }
+        }
+    }
+}
+function Invoke-ServerShares {
+    foreach ($name in (Values (Value $script:Cfg 'RemoveShares'))) {
+        if (Listed $name $script:RequiredShares) { Record 'SKIPPED' "README-required share protected: $name"; continue }
+        $share = Get-SmbShare -Name $name -ErrorAction SilentlyContinue
+        if (-not $share) { Record 'OK' "Share already absent: $name"; continue }
+        if ($share.Special -or $name -in @('ADMIN$','IPC$','SYSVOL','NETLOGON','print$') -or $name -match '^[A-Za-z]\$$') {
+            Record 'SKIPPED' "System/domain/administrative share protected: $name"; continue
+        }
+        if (-not $AllowRemovals -or -not [bool](Value $script:Cfg 'ForensicsComplete' $false)) {
+            Record 'REVIEW' "Remove custom share $name only after forensics with -AllowRemovals."; continue
+        }
+        Change "Remove exact unauthorized custom SMB share $name" $true {
+            $share | Export-Clixml -LiteralPath (Join-Path $backups ("share-" + $name.Replace('$','_') + "-before.xml"))
+            Get-SmbShareAccess -Name $name -ErrorAction Stop |
+                Export-Clixml -LiteralPath (Join-Path $backups ("share-" + $name.Replace('$','_') + "-acl.xml"))
+            Remove-SmbShare -Name $name -Force -Confirm:$false -ErrorAction Stop
+        }
+    }
+    foreach ($item in @(Value $script:Cfg 'RemoveShareAccess' @())) {
+        $shareName = [string](Value $item 'Share' '')
+        $account = [string](Value $item 'Account' '')
+        if (-not $shareName -or -not $account) { Record 'REVIEW' 'RemoveShareAccess needs exact Share and Account'; continue }
+        if ($shareName -in @('ADMIN$','IPC$','SYSVOL','NETLOGON','print$') -or $shareName -match '^[A-Za-z]\$$' -or Listed $shareName $script:RequiredShares) {
+            Record 'SKIPPED' "System or required share ACL protected: $shareName"; continue
+        }
+        if (Listed $account $script:RequiredAccounts -or $account -match '^(SYSTEM|BUILTIN\\Administrators|NT AUTHORITY\\SYSTEM)$') {
+            Record 'SKIPPED' "Required/system share principal protected: $account"; continue
+        }
+        if (-not $AllowRemovals) { Record 'REVIEW' "Share ACL removal $shareName/$account needs -AllowRemovals."; continue }
+        $share = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
+        if (-not $share -or $share.Special) { Record 'REVIEW' "Custom share missing/protected: $shareName"; continue }
+        $rights = @(Get-SmbShareAccess -Name $shareName -ErrorAction SilentlyContinue)
+        $target = @($rights | Where-Object AccountName -EQ $account)
+        Change "Revoke exact unauthorized share permission $account on $shareName" ($target.Count -gt 0) {
+            $rights | Export-Clixml -LiteralPath (Join-Path $backups ("share-ace-" + [guid]::NewGuid().ToString('N') + ".xml"))
+            Revoke-SmbShareAccess -Name $shareName -AccountName $account -Force -Confirm:$false -ErrorAction Stop | Out-Null
+        }
+        Record 'REVIEW' "Re-test effective NTFS and share permissions for authorized clients on $shareName."
+    }
+}
+
