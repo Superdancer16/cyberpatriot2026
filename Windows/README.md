@@ -11,6 +11,8 @@ Choose one self-contained guide. Each starts with **Basics / Info**, then **Firs
 
 **Automated Windows 10/11 review:** [One-run PowerShell script](../Windows%20Scripts/windows-10-11.ps1) · [Beginner setup and run guide](../Windows%20Scripts/HOW-TO-RUN.md) · [Remaining manual tasks](../Windows%20Scripts/MANUAL-TASKS.md). The standalone Windows Server guide does not use this script.
 
+**Windows Server automation (separate script):** [One-run Server PowerShell](../Windows%20Server%20Scripts/windows-server.ps1) · [Beginner setup and role selection](../Windows%20Server%20Scripts/HOW-TO-RUN.md) · [AD/DNS/DHCP/IIS manual checks](../Windows%20Server%20Scripts/MANUAL-TASKS.md). Use only on Server 2016/2019/2022 and verify the standalone/member/DC role first.
+
 **Top priorities:** Read [the image README](../General/All/reading-the-readme.md), preserve [forensic evidence](../General/All/forensics-questions.md), keep admin access, and verify services before any changes. A score increase is never guaranteed by any particular generic setting.
 
 [All categories](../README.md)
