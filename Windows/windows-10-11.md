@@ -329,30 +329,20 @@ foreach ($g in 'Backup Operators','Power Users','Remote Desktop Users','Remote M
 > Prefer the GUI over importing a generic `secedit` template. Check every actual scoring requirement against the README.
 
 #### 3.2 Account Lockout Policy
-- [ ] **🎯 DO THIS — 3.2 Account Lockout Policy**
+- [ ] **🎯 Check account lockout only when the image requires it.**
 
-| Setting | Set to |
-|---|---|
-| Account lockout threshold | **5** invalid attempts (set this first) |
-| Account lockout duration | **30** minutes |
-| Reset account lockout counter after | **30** minutes |
-| Allow Administrator account lockout (only on updated systems; skip it if it isn't in the list) | **Enabled** |
+**⭐ EASIEST WAY — GUI:** **Win + R → `secpol.msc` → Account Policies → Account Lockout Policy** → open each applicable setting. Set the exact README-required **threshold**, **duration** and **counter-reset window** (for example 5 attempts / 30 minutes / 30 minutes) → **Apply → OK**. If **Allow Administrator account lockout** exists and is specified, configure it separately.
 
-```powershell
-net accounts /lockoutthreshold:5 /lockoutduration:30 /lockoutwindow:30
-net accounts                     # check everything
-```
+**✅ VERIFY:** Reopen all changed settings and inspect actual effective values; test a permitted admin login safely.
 
-> [!CAUTION]
-> Never set **Account lockout duration** to **0**: that means a locked account stays locked until an admin unlocks it. Don't set the threshold below 3 either: a few typos would lock real users out.
+**↩️ UNDO:** Restore individual recorded original policy values, not a generic template. **⚠️** Duration 0 can mean an account stays locked until an administrator unlocks it. Never intentionally lock out the only admin.
 
----
-
-- **Lockout check:** In `secpol.msc` → **Account Lockout Policy**, verify threshold, lockout duration, and reset-counter window together. Record previous values and preserve a working admin login.
-
-- [ ] **🎯 Lockout threshold:** **`secpol.msc` → Account Policies → Account Lockout Policy → Account lockout threshold** → enter the exact required number (for example, **5**) → OK. Review duration and counter reset.
-  - **✅ Verify:** Reopen the threshold and confirm the value. **⚠️** Keep an alternate admin login; never deliberately lock out the only administrator.
-
+> [!NOTE]
+> **🔁 ALTERNATE — read-only CMD/PowerShell verification (not a second fix):**
+>
+> ```powershell
+> net accounts
+> ```
 
 ### 5. Microsoft Defender antivirus
 
