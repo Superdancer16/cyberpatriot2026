@@ -487,6 +487,10 @@ function Load-ReadmeConfig {
     if (-not [bool](Get-Value $script:Cfg 'ConfirmedReadme' $false)) {
         throw 'Set ConfirmedReadme=true only after reading the actual image README and checking authorized accounts/services.'
     }
+    $adminNames = Names (Get-Value $script:Cfg 'AuthorizedAdmins')
+    if (-not $adminNames.Count) {
+        throw 'AuthorizedAdmins cannot be empty. List your actual authorized administrators from the image README.'
+    }
     $script:Authorized = @(Names (Get-Value $script:Cfg 'AuthorizedUsers')) + @(Names (Get-Value $script:Cfg 'AuthorizedAdmins'))
     $script:RequiredServices = @(Names (Get-Value $script:Cfg 'RequiredServices'))
     $script:RequiredSoftware = @(Names (Get-Value $script:Cfg 'RequiredSoftware'))
@@ -942,7 +946,27 @@ function Invoke-AutoDefender {
         } catch { Write-Result 'REVIEW' ('Defender signatures could not update: ' + $_.Exception.Message) }
     }
     if ([bool](Get-Value $script:Sec 'DefenderQuickScan' $false)) {
-        Write-Result 'REVIEW' 'Defender quick scan can quarantine evidence; execute separately after forensics are saved.'
+        if (-not [bool](Get-Value $script:Cfg 'ForensicsComplete' $false)) {
+            Write-Result 'REVIEW' 'Defender quick scan blocked: set ForensicsComplete=true only after saving required evidence.'
+        } else {
+            try {
+                Start-MpScan -ScanType QuickScan -ErrorAction Stop
+                Write-Result 'CHANGED' 'Defender quick scan completed; review threat history and quarantine.'
+            } catch {
+                Write-Result 'FAILED' ('Defender quick scan: ' + $_.Exception.Message)
+            }
+        }
+    }
+    $pref = Get-MpPreference
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusionProcesses'))) {
+        Decide "Remove Defender process exclusion $name" ($name -in @($pref.ExclusionProcess)) {
+            Remove-MpPreference -ExclusionProcess $name -ErrorAction Stop
+        }
+    }
+    foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusionExtensions'))) {
+        Decide "Remove Defender extension exclusion $name" ($name -in @($pref.ExclusionExtension)) {
+            Remove-MpPreference -ExclusionExtension $name -ErrorAction Stop
+        }
     }
     foreach ($name in (Names (Get-Value $script:Cfg 'RemoveDefenderExclusions'))) {
         $paths = @(Get-MpPreference).ExclusionPath
@@ -1075,10 +1099,11 @@ function Invoke-AutoAuditSubcategories {
             Write-Result 'REVIEW' "Audit $name value must be Success, Failure or SuccessAndFailure."
             continue
         }
-        $success = if ($value -in @('Success','SuccessAndFailure')) { 'enable' } else { 'disable' }
-        $failure = if ($value -in @('Failure','SuccessAndFailure')) { 'enable' } else { 'disable' }
+        $args = @('/set',("/subcategory:$name"))
+        if ($value -in @('Success','SuccessAndFailure')) { $args += '/success:enable' }
+        if ($value -in @('Failure','SuccessAndFailure')) { $args += '/failure:enable' }
         try {
-            & auditpol.exe /set "/subcategory:$name" "/success:$success" "/failure:$failure" | Out-Null
+            & auditpol.exe @args | Out-Null
             if ($LASTEXITCODE -ne 0) { throw 'auditpol returned error; check policy scope and localization' }
             Write-Result 'CHANGED' "Audit $name set to $value; verify effective policy."
         } catch {
@@ -1131,10 +1156,15 @@ function Invoke-AutoDiscovery {
     Save-Discovery 'listening-processes' {
         foreach ($conn in @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue)) {
             $process = Get-Process -Id $conn.OwningProcess -ErrorAction SilentlyContinue
+            $procName = ''
+            $procPath = ''
+            if ($process) {
+                $procName = [string]$process.ProcessName
+                try { $procPath = [string]$process.Path } catch { $procPath = '' }
+            }
             [pscustomobject]@{
                 Address=$conn.LocalAddress;Port=$conn.LocalPort;Pid=$conn.OwningProcess
-                Process=if($process){$process.ProcessName}else{''}
-                Executable=if($process){try{$process.Path}catch{''}}else{''}
+                Process=$procName;Executable=$procPath
             }
         }
     }
@@ -1185,6 +1215,7 @@ function Invoke-AutoDiscovery {
         foreach ($path in $roots) {
             if (-not (Test-Path -LiteralPath $path -PathType Container)) { continue }
             $folder = (Resolve-Path -LiteralPath $path).Path
+            if ($folder -eq [IO.Path]::GetPathRoot($folder)) { continue }
             if ($folder -match '(?i)\\Windows\\|\\Program Files') { continue }
             if ($seen.ContainsKey($folder)) { continue }
             $seen[$folder] = $true
