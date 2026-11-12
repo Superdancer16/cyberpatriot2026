@@ -173,3 +173,136 @@ audit() {
     } > "$REPORT"
     status OK "Audit saved: $REPORT"
 }
+
+is_authorized() {
+    local candidate="$1" item
+    while IFS= read -r item; do [[ "$candidate" == "$item" ]] && return 0; done < <(list AuthorizedAdmins)
+    while IFS= read -r item; do [[ "$candidate" == "$item" ]] && return 0; done < <(list AuthorizedUsers)
+    return 1
+}
+is_required_service() {
+    local candidate="$1" item
+    while IFS= read -r item; do [[ "$candidate" == "$item" ]] && return 0; done < <(list RequiredServices)
+    return 1
+}
+is_required_package() {
+    local candidate="$1" item
+    while IFS= read -r item; do [[ "$candidate" == "$item" ]] && return 0; done < <(list RequiredSoftware)
+    return 1
+}
+user_present() { getent passwd "$1" >/dev/null; }
+group_present() { getent group "$1" >/dev/null; }
+unit_present() { systemctl cat "$1" >/dev/null 2>&1; }
+do_discovery() {
+    capture 'root-cron' bash -c 'crontab -u root -l 2>/dev/null || true'
+    capture 'scheduled-timers' systemctl list-timers --all --no-pager
+    capture 'enabled-services' systemctl list-unit-files --state=enabled --no-pager
+    capture 'sockets' ss -lntup
+    capture 'shadow' stat -c '%a %U:%G %n' /etc/shadow /etc/gshadow
+    capture 'sudo-policies' bash -c 'grep -RnE "NOPASSWD|!authenticate" /etc/sudoers /etc/sudoers.d 2>/dev/null || true'
+    capture 'files-suid' bash -c 'find /usr /bin /sbin /opt -xdev -type f -perm /4000 -print 2>/dev/null | head -150'
+    capture 'files-world-writable' bash -c 'find /etc /usr/local -xdev -type f -perm /0002 -print 2>/dev/null | head -150'
+    capture 'systemd-overrides' systemctl list-unit-files --type=service --no-pager
+    capture 'hosts' cat /etc/hosts
+    capture 'installed-packages' bash -c 'dpkg-query -W -f="${binary:Package} ${Version}\n" 2>/dev/null || true'
+    capture 'sshd-policy' bash -c 'command -v sshd >/dev/null && sshd -T 2>/dev/null | head -80 || true'
+    capture 'apt-sources' bash -c 'grep -RHE "^(deb |URIs:|Suites:|Signed-By:|Trusted:)" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null || true'
+    capture 'crontab-directories' bash -c 'ls -la /etc/cron.d /etc/cron.daily /var/spool/cron/crontabs 2>/dev/null || true'
+    if [[ -n "$CONFIG" && -f "$CONFIG" ]]; then
+        local dir name
+        while IFS= read -r dir; do
+            [[ -d "$dir" && "$dir" == /* && "$dir" != / ]] || continue
+            case "$dir" in /etc|/usr|/lib|/var/lib) continue ;; esac
+            name=$(printf '%s' "$dir" | tr '/ ' '__')
+            local out="$BACKUPS/review-file-candidates-$name.txt"
+            find "$dir" -xdev -type f \( -iname '*.mp3' -o -iname '*.mp4' -o -iname '*.zip' -o -iname '*.pcap' -o -iname '*.torrent' -o -iname '*netcat*' \) -print 2>/dev/null | head -200 > "$out" || true
+            status REVIEW "Candidate files (review manually): $out"
+        done < <(list ScanPaths)
+    fi
+    status REVIEW 'Inspect nonstandard service binaries, startup scripts and user-level timers before making changes.'
+}
+do_users() {
+    local name owner id
+    while IFS= read -r name; do
+        safe_user "$name" || { status SKIPPED "Invalid requested user: $name"; continue; }
+        is_authorized "$name" || { status SKIPPED "New user $name not authorized in config"; continue; }
+        if user_present "$name"; then status OK "Authorized user already exists: $name"; continue; fi
+        if (( YES )); then status REVIEW "Create $name interactively: password is required and never saved in JSON"; continue; fi
+        if [[ "$MODE" == audit ]]; then status WOULD "Create authorized user $name"; continue; fi
+        if adduser --disabled-password --gecos '' "$name" && passwd "$name"; then
+            status CHANGED "Created authorized user and password: $name"
+        else
+            status FAILED "Could not fully create $name; check lock state before proceeding"
+        fi
+    done < <(list NewUsers)
+    while IFS= read -r name; do
+        safe_user "$name" && user_present "$name" || { status REVIEW "Password target not found/invalid: $name"; continue; }
+        is_authorized "$name" || { status SKIPPED "Password target not authorized: $name"; continue; }
+        if (( YES )); then status REVIEW "Set $name password interactively; unattended run stores no secrets"; continue; fi
+        change "Set password for $name" passwd "$name"
+    done < <(list SetPasswords)
+    while IFS= read -r name; do
+        safe_user "$name" && user_present "$name" || { status REVIEW "Cannot expire password: $name"; continue; }
+        is_authorized "$name" || { status SKIPPED "Password expiry not authorized: $name"; continue; }
+        change "Require password change at next login: $name" chage -d 0 "$name"
+    done < <(list ExpirePasswords)
+    while IFS= read -r name; do
+        safe_user "$name" && user_present "$name" || { status REVIEW "Cannot demote sudo account: $name"; continue; }
+        if is_authorized "$name" && ! grep -qxF "$name" <(list AuthorizedUsers); then
+            status SKIPPED "Only standard users listed in AuthorizedUsers can be demoted: $name"; continue
+        fi
+        if id -nG "$name" | tr ' ' '\n' | grep -qx sudo; then
+            change "Remove unauthorized sudo membership from $name" gpasswd -d "$name" sudo
+        else status OK "$name is not a sudo-group member"; fi
+    done < <(list DemoteSudo)
+    while IFS= read -r name; do
+        safe_user "$name" && user_present "$name" || { status REVIEW "Cannot disable account: $name"; continue; }
+        if is_authorized "$name" || [[ "$name" == "${SUDO_USER:-}" ]]; then
+            status SKIPPED "Required/current account cannot be disabled: $name"; continue
+        fi
+        if [[ "$MODE" == apply ]]; then chage -l "$name" > "$BACKUPS/user-before-$name.txt" || true; fi
+        change "Expire unauthorized account $name" usermod --expiredate 1970-01-02 "$name"
+    done < <(list DisableUsers)
+    while IFS= read -r name; do
+        safe_user "$name" && user_present "$name" || { status OK "User absent/invalid: $name"; continue; }
+        if is_authorized "$name" || [[ "$name" == "${SUDO_USER:-}" ]]; then
+            status SKIPPED "Cannot delete required/current account: $name"; continue
+        fi
+        guard_removal "Remove account $name" || continue
+        id=$(id -u "$name")
+        if (( id < 1000 )); then status SKIPPED "Service/low-UID account $name requires manual review"; continue; fi
+        if pgrep -u "$name" >/dev/null 2>&1; then status REVIEW "User $name has active processes; inspect and sign out first"; continue; fi
+        if [[ "$MODE" == apply ]]; then
+            getent passwd "$name" > "$BACKUPS/user-removed-$name.txt"
+            id "$name" >> "$BACKUPS/user-removed-$name.txt" || true
+        fi
+        change "Delete explicitly unauthorized user $name (home retained)" userdel "$name"
+    done < <(list RemoveUsers)
+}
+do_groups() {
+    local group name
+    while IFS= read -r group; do
+        safe_group "$group" || { status REVIEW "Invalid group name: $group"; continue; }
+        if group_present "$group"; then status OK "Group already exists: $group"; continue; fi
+        change "Create README-required group $group" addgroup "$group"
+    done < <(list NewGroups)
+    while IFS=$'\t' read -r group name; do
+        safe_group "$group" && safe_user "$name" || { status REVIEW "Invalid group/member: $group / $name"; continue; }
+        group_present "$group" && user_present "$name" || { status REVIEW "Group/member missing: $group / $name"; continue; }
+        is_authorized "$name" || { status SKIPPED "Cannot add unauthorized member $name to $group"; continue; }
+        if id -nG "$name" | tr ' ' '\n' | grep -qxF "$group"; then
+            status OK "$name is already in group $group"
+        else change "Add $name to group $group" adduser "$name" "$group"; fi
+    done < <(pairs GroupMembers)
+    while IFS=$'\t' read -r group name; do
+        safe_group "$group" && safe_user "$name" || { status REVIEW "Invalid group/member removal"; continue; }
+        if [[ "$group" == sudo ]] && is_authorized "$name"; then
+            status SKIPPED "Cannot remove sudo from authorized admin without human review"; continue
+        fi
+        group_present "$group" && user_present "$name" || { status OK "Group/member already absent: $group / $name"; continue; }
+        if id -nG "$name" | tr ' ' '\n' | grep -qxF "$group"; then
+            change "Remove unauthorized group membership $name from $group" gpasswd -d "$name" "$group"
+        else status OK "$name not in group $group"; fi
+    done < <(pairs RemoveGroupMembers)
+}
+
