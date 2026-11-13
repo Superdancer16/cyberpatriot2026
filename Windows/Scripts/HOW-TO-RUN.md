@@ -1,142 +1,226 @@
-# Windows 10/11 — download and run inside the VM
+# 🪟 Windows 10/11 script — beginner's step-by-step guide
 
-The [PowerShell script](windows-10-11.ps1) checks and changes Windows settings based on the [complete handbook](../windows-10-11.md). One Apply command runs all configured sections. The **image README determines which accounts, services, applications and files are authorized**.
+**Never used PowerShell before? Start here.** Follow the numbered steps in order. This guide is for the [Windows 10/11 workstation script](windows-10-11.ps1) and **not** the [Windows Server script](../../Server/Scripts/HOW-TO-RUN.md).
 
-## 1. Sign in to GitHub inside the virtual machine
+> [!IMPORTANT]
+> **Run everything INSIDE your Windows 10/11 virtual machine (VM), never on your own computer.** A VM is the practice/scoring Windows computer opened in VMware or similar software. The VM's desktop **README** and the current competition rules decide what is allowed. Do not run/download a script if the rules prohibit it.
+>
+> **Start with Audit.** `-Mode Audit` inspects settings and writes report files; it does not apply hardening fixes. **Apply changes the system** and requires carefully filling in a JSON configuration file. It is fine to stop after the audit and use the [manual checklist](MANUAL-TASKS.md).
 
-1. **Start the Windows 10/11 VM** in VMware or your competition VM software, and log into the assigned Windows account. Everything below happens **inside the VM**, not on your personal computer.
-2. On the VM desktop, open **Microsoft Edge** or the installed browser.
-3. In the address bar, go to **https://github.com/login**. Sign in to your GitHub account and complete any requested verification. The repository is **public**, so signing in is optional; you can open it without an account if permitted.
-4. Open **https://github.com/Superdancer16/cyberpatriot2026**. Check that the repository name is correct and the branch selector says **main**.
-5. Click **Windows → Scripts → windows-10-11.ps1**.
-6. Click **Raw** above the file. If it opens as text, press **Ctrl+S**. If it downloads automatically, open the browser's **Downloads** panel.
-7. In the VM's **Save As** dialog, choose **Downloads**, set **Save as type: All files** if necessary, and name it **windows-10-11.ps1**. Do not save the GitHub preview as an HTML page.
-8. Open **File Explorer → Downloads**. In Windows 11 choose **View → Show → File name extensions**; in Windows 10 choose **View → File name extensions**. Make sure the file is **windows-10-11.ps1**, not **windows-10-11.ps1.txt**.
-9. **Sign out of GitHub in the VM** afterward and decline any offer to save your GitHub password. Avoid leaving personal login credentials in a competition VM.
+## What the words mean
 
-If your competition rules prohibit web browsing or downloading outside resources, use a transfer method your coach has approved instead. You may also download [HOW-TO-RUN.md](HOW-TO-RUN.md) and [MANUAL-TASKS.md](MANUAL-TASKS.md) for offline reading.
-
-## 2. Open PowerShell as Administrator in the VM
-
-1. In the VM, open **Start**, search **Windows PowerShell**, then right-click and select **Run as administrator → Yes**.
-2. Enter:
-
-```powershell
-cd "$env:USERPROFILE\Downloads"
-Get-Item .\windows-10-11.ps1
-Get-Content .\windows-10-11.ps1 -TotalCount 4
-```
-
-Check that the file exists and starts with `#requires -Version 5.1`, rather than displaying HTML. The script is for **Windows 10/11 workstations**; do not apply it to Windows Server or a Domain Controller.
-
-## 3. Run the read-only audit first
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Audit
-```
-
-The audit produces a report under **Documents → WindowsSecurityWork**. Compare its findings with the image README, record the original score, and preserve any required forensic answers. Audit mode does not apply hardening fixes.
-
-## 4. Create the image-specific configuration
-
-Enter:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -InitConfig -Config ".\image-config.json"
-notepad .\image-config.json
-```
-
-The generated JSON is only a template. Before Apply mode, fill in:
-
-- `AuthorizedAdmins` with **every authorized administrator from this VM's README** (the script refuses an empty list), and `AuthorizedUsers` with authorized ordinary users.
-- `RequiredServices`, `RequiredSoftware`, `RequiredShares` and `RequiredPorts` to protect the VM's required functions.
-- Any exact accounts/groups/files/software requiring changes. Never copy names or numeric settings from a different scoring image.
-- `ForensicsComplete: true` **only after** the necessary forensic answers and evidence are saved.
-- Set `"ConfirmedReadme": true` only after reviewing the completed configuration against the README. Save with **Ctrl+S** and close Notepad.
-
-### Important JSON fields
-
-| Field | Meaning |
+| Word on this page | Plain-English meaning |
 |---|---|
-| `Groups` | Create required local groups and add the exact users |
-| `NewUsers`, `DemoteAdmins`, `PasswordExpiresUsers`, `ResetPasswords` | Named account changes; passwords require secure prompts |
-| `DisableUsers`, `RemoveUsers`, `RemoveGroupMembers`, `RemoveUserRights` | Specifically identified unauthorized accounts/privileges |
-| `PasswordPolicy` | Explicit password and lockout requirements; leave `{}` when unknown |
-| `DisableServices`, `DisableFeatures`, `DisableScheduledTasks` | Named unnecessary components only |
-| `DisableFirewallRules`, `RequiredPorts` | Turn off exact unwanted inbound firewall rules, checking required ports |
-| `AuditSubcategories` | Enable specified auditing categories without clearing unrelated audit settings |
-| `RemoveStartupValues`, `ClearIFEO` | Targeted registry startup values and accessibility debugger overrides |
-| `RemoveShares`, `RemoveShareAccess` | Exact custom shares and share permission entries |
-| `RemovePrograms`, `UpdatePrograms`, `RemoveAppxPackages`, `RemoveFiles` | Exact package IDs, Store app names or file paths |
-| `ScanPaths` | Extra folders for read-only file candidate discovery |
-| `RemoveDefenderExclusions`, `RemoveDefenderExclusionProcesses`, `RemoveDefenderExclusionExtensions` | Specific Defender exclusions |
-| `Security` | Defender, firewall, SMB, RDP/NLA, UAC, NTLM, print, Windows Update and other opt-in settings |
+| **VM** | The Windows computer inside your virtualization program, separate from your personal computer |
+| **PowerShell** | A window where you type commands to Windows |
+| **Script** | A saved file of commands; this one is named `windows-10-11.ps1` |
+| **Audit** | Look at current settings and save a report without applying hardening fixes |
+| **Apply** | Run actions that may change accounts, security settings, services, or software |
+| **JSON config** | A text file named `image-config.json` telling the script which *specific* changes and protections are intended |
+| **Administrator** | A Windows account/window allowed to manage system settings |
 
-For example, a required group can be entered in the existing `Groups` field:
+**How to type commands:** Copy **one command at a time** from the gray code blocks, paste into PowerShell, and press **Enter**. Do **not** type the word `powershell` or the `PS C:\...>` prompt you might see in the window.
 
-```json
-"Groups": {
-  "EXAMPLE_REQUIRED_GROUP": ["EXAMPLE_USER_A", "EXAMPLE_USER_B"]
-}
-```
+## ✅ Part A — First run: download, check, and AUDIT (no hardening changes)
 
-Use the names from your own image and keep the rest of the generated JSON intact. In JSON, registry paths need double backslashes—for example `"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"`.
+### Step 1 — Open the correct Windows computer
 
-If the image requires a 12-character password minimum and complexity enabled, an example is `"PasswordPolicy": {"MinimumPasswordLength": 12, "PasswordComplexity": 1}`. **Do not assume these example values apply to another image.** Options that may disrupt remote access, print drivers or old clients default to `false` unless you enable them deliberately.
+1. Open your Windows **10 or 11 VM** and sign into its assigned account.
+2. Confirm you are looking at the **VM desktop**, not your personal PC desktop.
+3. Read the **README file on the VM desktop**. Write down which users, programs, services, and remote-access functions must stay working.
+4. Read and answer any forensic questions **before modifying or removing evidence**. Note the starting score if the VM has a Scoring Report.
+5. Keep console/admin access available. Create a practice snapshot **only if the exercise rules permit it**.
 
-## 5. Run everything in one pass
+### Step 2 — Download the correct script inside the VM
 
-After completing the JSON:
+1. In the **VM**, open **Edge** or another installed browser. You do **not** need a GitHub account for this public repository.
+2. Open this exact page: [windows-10-11.ps1 on GitHub](https://github.com/Superdancer16/cyberpatriot2026/blob/main/Windows/Scripts/windows-10-11.ps1).
+3. Click **Raw** (above the code). You should see **plain text beginning with `#requires -Version 5.1`**, not a regular webpage.
+4. Save the raw file: press **Ctrl+S**, choose **Downloads**, and name it **`windows-10-11.ps1`**. If you see **Save as type**, select **All files**. Alternatively, right-click **Raw** and use **Save link as** if the browser offers it.
+5. In the VM, open **File Explorer → Downloads**. Turn on filename extensions:
+   - Windows 11: **View → Show → File name extensions**
+   - Windows 10: **View → File name extensions**
+6. Confirm the exact name is **`windows-10-11.ps1`** — not `windows-10-11.ps1.txt`, `.html`, or a webpage.
 
-```powershell
+> [!CAUTION]
+> **Do not rename an HTML page to `.ps1`.** If you downloaded a webpage, return to GitHub and save the **Raw** file instead. Never enter your personal GitHub password into a competition VM; because this repo is public, signing in isn't needed.
+
+### Step 3 — Open the correct PowerShell window
+
+1. Still **inside the VM**, click **Start**.
+2. Type **Windows PowerShell**. Select **Windows PowerShell** (the built-in Windows PowerShell 5.1), not an unrelated terminal or PowerShell 7 installation.
+3. Right-click it → **Run as administrator** → click **Yes** when Windows asks.
+4. A blue or dark command window should appear. It may begin with `PS C:\Windows\system32>`. That is normal.
+5. Make sure you are using the **same Windows user account** that downloaded the file. If you used a different administrator account, its Downloads folder may be different.
+
+### Step 4 — Point PowerShell at Downloads
+
+Type this **one line** and press Enter:
+
+~~~powershell
+cd "$env:USERPROFILE\Downloads"
+~~~
+
+Check where PowerShell is now:
+
+~~~powershell
+Get-Location
+~~~
+
+**Expected:** A path ending in `\Downloads`. Next, check whether the saved file exists:
+
+~~~powershell
+Get-Item .\windows-10-11.ps1
+~~~
+
+**Expected:** Information about `windows-10-11.ps1` (name, size, date). Verify it is script text:
+
+~~~powershell
+Get-Content .\windows-10-11.ps1 -TotalCount 1
+~~~
+
+**Expected first line:** `#requires -Version 5.1`. If you get **Cannot find path**, return to Step 2. If the first line looks like `<!DOCTYPE html>` or `<html>`, re-download the **Raw** file.
+
+### Step 5 — Run the FIRST and safest command: AUDIT
+
+Copy this **exact line** (you are still in Downloads):
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Audit
+~~~
+
+Press **Enter**. This launches the script in its **Audit** mode. It will inspect Windows settings and write audit/log files, but it **does not apply the configured hardening changes**. The command's execution-policy option applies to this child PowerShell process; it is **not** permission to trust an unreviewed script.
+
+**What success looks like:** You should see an audit/report path, typically under your Windows account's Documents folder. Some individual inspections may say **Unavailable** if a Windows feature is missing; that is a finding, not a reason to run Apply immediately.
+
+### Step 6 — Open your audit report
+
+In the same PowerShell window:
+
+~~~powershell
+explorer.exe "$env:USERPROFILE\Documents\WindowsSecurityWork"
+~~~
+
+File Explorer opens the report folder. Look for the newest **`audit-...txt`** file (the numbers are its date/time); double-click to read it.
+
+Record the issues you recognize, but **compare them with the VM README**. For example, an unfamiliar service might be required. Audit can also write a change log; a log existing **does not mean any security fixes were applied**.
+
+**🎉 You have successfully run the script's audit. You may stop here.** Open [MANUAL-TASKS.md](MANUAL-TASKS.md) or the [full Windows handbook](../windows-10-11.md) to inspect any findings manually.
+
+---
+
+## ⚠️ Part B — Only after Audit: configure and APPLY changes
+
+**Apply is not a beginner one-click fix.** It can disable services, change firewall/security settings, create or modify users, and affect required programs. Ask a coach or experienced teammate to review your planned changes if you do not know what the VM README requires.
+
+### Step 7 — Create the configuration file (once)
+
+In the **same Downloads PowerShell window**, run:
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -InitConfig -Config ".\image-config.json"
+~~~
+
+**Expected:** A message saying it created `image-config.json`. The script **refuses to overwrite** a file of that name; if it already exists, open the existing file instead of deleting your work.
+
+Open it in Notepad:
+
+~~~powershell
+notepad .\image-config.json
+~~~
+
+If Windows asks to create a missing file, click **No** and return to the previous command to find out why it did not generate the template.
+
+### Step 8 — Fill in the actual VM information
+
+The file has lines such as these (illustrations only; **edit the existing file**, do not paste a second copy of these keys):
+
+~~~json
+"ConfirmedReadme": false,
+"AuthorizedAdmins": [],
+"AuthorizedUsers": [],
+"RequiredServices": [],
+"ForensicsComplete": false
+~~~
+
+**What the symbols mean:** `[]` = list of names; `false` = off/not yet confirmed; `true` = on/confirmed. JSON needs **double quotes** around names and **commas** between list items. It must not contain comments.
+
+Use the **actual VM desktop README** to fill in:
+
+1. **`AuthorizedAdmins`:** every user the README authorizes as an administrator (required; cannot be empty).
+2. **`AuthorizedUsers`:** normal authorized users.
+3. **`RequiredServices`, `RequiredSoftware`, `RequiredShares`, `RequiredPorts`:** things that must keep working (especially remote access).
+4. **Other action lists:** only **exact, verified** users, programs, tasks, services, and files you intentionally want changed. Leave unknown removals empty.
+5. **`ForensicsComplete`:** change to `true` **only after** saving the required answers and evidence.
+6. **`ConfirmedReadme`:** change to `true` **last**, only after verifying the *whole file* against the README.
+
+> [!WARNING]
+> The generated workstation template already contains **some enabled security actions** and a short default `DisableServices` list. **It is not a no-op template.** Review **every** field, especially `Security` and `DisableServices`, before Apply. Do **not** just fill in an admin name and flip `ConfirmedReadme` to `true`. Do not copy example usernames, passwords, or settings from another image.
+
+In Notepad, press **Ctrl+S**, then close it.
+
+### Step 9 — Check JSON formatting without applying anything
+
+Paste into PowerShell:
+
+~~~powershell
+Get-Content .\image-config.json -Raw | ConvertFrom-Json | Out-Null
+~~~
+
+**Expected:** No output means PowerShell could parse the JSON. If you see a red error, reopen with `notepad .\image-config.json`, correct the formatting, and check again. **Valid JSON does not mean safe choices** — the README review still matters.
+
+### Step 10 — Apply ONLY your reviewed configuration
+
+**Do this only when the image rules permit scripts, your forensics are safe, and the JSON has been checked.** Keep console access open.
+
+~~~powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json"
-```
+~~~
 
-Type **APPLY** at the confirmation prompt. This runs the initial audit, all configured hardening sections and the final audit, without selecting every menu task.
+At the prompt, type **`APPLY`** in capitals and press **Enter**. If you have any doubt about the settings, **do not type APPLY**; you can cancel the run at that prompt.
 
-After you have reviewed the JSON, this command skips the one initial prompt:
+The script runs an initial audit, the selected/configured tasks, then a final audit. **It does not automatically reboot the VM.**
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json" -Yes
-```
+### Step 11 — Review the results and verify normal operation
 
-**Only if the image explicitly requires removal** of named accounts, custom shares, applications, Store apps or files, add `-AllowRemovals`:
+Open the same folder as Step 6:
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json" -Yes -AllowRemovals
-```
+~~~powershell
+explorer.exe "$env:USERPROFILE\Documents\WindowsSecurityWork"
+~~~
 
-`-AllowRemovals` permits only the **exact entries configured in JSON**; it does not delete files because a scan found a suspicious name.
+Look for the newest `summary-...csv`, `changes-...txt`, `audit-...txt` and `backups-...` folder. Here is how to read common results:
 
-For a selected rerun, use comma-separated section names:
+| Result | Meaning |
+|---|---|
+| `CHANGED` | The script reports a modification; **not proof of CyberPatriot points** |
+| `OK` | The inspected item was already acceptable to the script |
+| `REVIEW` / `SKIPPED` | You need to decide manually or the script intentionally skipped it |
+| `FAILED` | The action did not complete as intended; read the error |
+| `WOULD` | Proposed action, not evidence it was applied |
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-10-11.ps1" -Mode Apply -Config ".\image-config.json" -Only accounts,passwords,firewall
-```
+Compare your **Scoring Report** to the score before Apply. Check that authorized users can sign in and required services, networking, shares, RDP, printers, and applications still function. Use the [remaining manual checks](MANUAL-TASKS.md). If you break something, **stop and restore the specific change** from your recorded before-state/backup; some deletions are irreversible.
 
-Available names: `discovery`, `accounts`, `passwords`, `rights`, `security`, `defender`, `firewall`, `firewallrules`, `smb`, `audit`, `auditdetails`, `services`, `features`, `tasks`, `startup`, `shares`, `shareaccess`, `browsers`, `apps`, `storeapps`, `files`, `updates`.
+## Optional advanced commands (do not start with these)
 
-`-Yes` does **not** enter passwords. New users and password resets needing secret passwords are marked **REVIEW**. Rerun without `-Yes` for the secure prompts or follow the manual account section.
+- **Run just selected sections** after reviewing the JSON: `-Only accounts,passwords,firewall` appended to the Apply command.
+- **Skip the initial APPLY confirmation:** `-Yes`. This also skips interactive password prompts; **not recommended for a beginner**.
+- **Allow configured removals:** `-AllowRemovals`. This may remove data or accounts; use only for exact authorized targets after preserving evidence.
+- **Manual menu:** launching the script without `-Mode Audit` can open a menu that includes change-making actions. **Use the explicit Audit command above instead.**
 
-## 6. Check your results
+## Troubleshooting — if a step does not work
 
-Open **File Explorer → Documents → WindowsSecurityWork**. Inspect the latest:
+| What you see | What to do |
+|---|---|
+| `Cannot find path` / script not recognized | Verify you are inside the VM, run `cd "$env:USERPROFILE\Downloads"`, check the actual filename, then run `Get-Item .\windows-10-11.ps1` |
+| First line shows HTML or filename ends in `.txt` | Download **Raw** again as **All files**; do not rename HTML |
+| Windows asks for Administrator permission | Close the window; reopen **Windows PowerShell → Run as administrator** in the VM |
+| Execution is blocked | Check file provenance and the competition rules; this command already uses process-scoped `-ExecutionPolicy Bypass`. Do not disable system-wide protections |
+| `image-config.json` already exists | The script is preventing accidental overwrite; edit your existing file |
+| `ConvertFrom-Json` reports an error | Look for extra/missing commas, quotes, or brackets in Notepad |
+| Apply refuses to start | Check `ConfirmedReadme`, `AuthorizedAdmins`, protected services, and the *actual* README; never bypass validation |
+| A required service fails or score drops | **Stop**, review logs/backups, and undo only the affected action; ask a mentor before rebooting or deleting anything |
 
-- `audit-...txt`: general system audit.
-- `changes-...txt`: results and failures.
-- `summary-...csv`: status per attempted item.
-- `backups-...`: exported original settings plus `review-...csv` reports for startup entries, firewall rules, services, processes, Store apps, hosts entries, file candidates and events.
+**Reference:** [Complete Windows 10/11 handbook](../windows-10-11.md) · [Manual tasks](MANUAL-TASKS.md) · [General script safety and rollback](../../General/script-safety.md).
 
-`CHANGED` means the command reported a change, **not** that CyberPatriot awarded points. Review every `REVIEW` and `FAILED` result and compare the Scoring Report to your original score. Confirm authorized administrative login, required apps, RDP/SSH, printers, shares and networking still work.
-
-Some settings need a restart, but **the script does not reboot the VM**. If a necessary service fails or the score drops, restore only the changed setting using the original value or exported backup; deleted users/files may not be recoverable. Use [MANUAL-TASKS.md](MANUAL-TASKS.md) and the [handbook recovery steps](../windows-10-11.md#19-manual-verification-recovery-and-missing-investigation-steps).
-
-## Troubleshooting
-
-- **PowerShell can't find the script:** Check the actual file name and path in File Explorer and rerun `Get-Item .\windows-10-11.ps1`.
-- **It downloaded as HTML or `.txt`:** Go back to GitHub, click **Raw**, then save with **All files** selected.
-- **Execution blocked by Windows:** Inspect the trusted source before using `Unblock-File .\windows-10-11.ps1`. The run command already uses a process-scoped execution policy.
-- **Apply refuses to start:** Check `ConfirmedReadme`, `AuthorizedAdmins`, the JSON syntax and the current VM's README.
-- **A setting fails or reverts:** See the detailed result and check whether Group Policy, protection settings, missing software or service dependencies are responsible.
-
-**Testing status:** The code has not been executed inside a Windows VM in this session. Test on an authorized disposable practice VM first and follow the current competition rules for downloaded scripts and outside resources.
+*Documentation has been checked against the script's command options, but this update does not claim an end-to-end test on a Windows VM.*
