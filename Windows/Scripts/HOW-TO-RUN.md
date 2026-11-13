@@ -37,7 +37,7 @@
 2. Open this exact page: [windows-10-11.ps1 on GitHub](https://github.com/Superdancer16/cyberpatriot2026/blob/main/Windows/Scripts/windows-10-11.ps1).
 3. Click **Raw** (above the code). You should see **plain text beginning with `#requires -Version 5.1`**, not a regular webpage.
 4. Save the raw file: press **Ctrl+S**, choose **Downloads**, and name it **`windows-10-11.ps1`**. If you see **Save as type**, select **All files**. Alternatively, right-click **Raw** and use **Save link as** if the browser offers it.
-5. In the VM, open **File Explorer → Downloads**. Turn on filename extensions:
+5. If you cannot find the download, press **Ctrl+J** in your browser to open its Downloads list, then use **Show in folder**. In the VM, open **File Explorer → Downloads**. Turn on filename extensions:
    - Windows 11: **View → Show → File name extensions**
    - Windows 10: **View → File name extensions**
 6. Confirm the exact name is **`windows-10-11.ps1`** — not `windows-10-11.ps1.txt`, `.html`, or a webpage.

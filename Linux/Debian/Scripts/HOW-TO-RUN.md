@@ -38,7 +38,7 @@
 2. Go straight to [debian.sh on GitHub](https://github.com/Superdancer16/cyberpatriot2026/blob/main/Linux/Debian/Scripts/debian.sh). The repository is **public**; no GitHub sign-in is required.
 3. Click **Raw** above the code. You should see plain text beginning with **`#!/usr/bin/env bash`**.
 4. Press **Ctrl+S**, choose the **Downloads** folder, and save it as **`debian.sh`**. If you see a file-type option, use plain text or **All files**. In some browsers you can also right-click **Raw → Save link as**.
-5. Open the file manager and look inside **Downloads**. The file should be named **`debian.sh`**, **not** `debian.sh.txt`, `debian.sh.html` or `debian.sh.sh`.
+5. Open the file manager and look inside **Downloads**. If you cannot find the download, press **Ctrl+J** in your browser and use **Show in folder**. The file should be named **`debian.sh`**, **not** `debian.sh.txt`, `debian.sh.html` or `debian.sh.sh`.
 6. Do not save personal GitHub credentials in the VM. If the competition disallows outside downloads, stop and ask your coach for an approved transfer method.
 
 > [!CAUTION]

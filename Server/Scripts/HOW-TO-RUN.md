@@ -36,7 +36,7 @@
 2. Open [windows-server.ps1 on GitHub](https://github.com/Superdancer16/cyberpatriot2026/blob/main/Server/Scripts/windows-server.ps1).
 3. Click **Raw** above the code. It should display plain text, starting with `#requires -Version 5.1`.
 4. Press **Ctrl+S** to save that raw text. Choose **Downloads**, set **Save as type → All files** if shown, and save as **`windows-server.ps1`**. Some browsers also support right-clicking **Raw → Save link as**.
-5. Open **File Explorer → Downloads**, enable **View → Show → File name extensions**, and check the filename is exactly **`windows-server.ps1`** (not `.ps1.txt` or `.html`).
+5. If you cannot find the file, press **Ctrl+J** in the browser and choose **Show in folder**. In **File Explorer → Downloads**, turn on file extensions: on Server 2022 use **View → Show → File name extensions**; on older Server desktops use the **View** ribbon's **File name extensions** checkbox. Check the name is exactly **`windows-server.ps1`** (not `.ps1.txt` or `.html`).
 6. Sign out of GitHub if you signed in; do not save your personal credentials inside a competition VM.
 
 > [!CAUTION]
