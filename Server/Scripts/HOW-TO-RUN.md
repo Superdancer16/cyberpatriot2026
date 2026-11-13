@@ -1,158 +1,251 @@
-# Windows Server — download and run inside the VM
+# 🖥️ Windows Server script — beginner's step-by-step guide
 
-Use [windows-server.ps1](windows-server.ps1) with the [Windows Server handbook](../windows-server.md). The script works with Windows Server 2016, 2019 and 2022 roles described in the handbook. It does not assume a Domain Controller is the same as a standalone server.
+**New to Windows Server or PowerShell? Follow Part A first.** This guide walks through downloading, inspecting, and running the [Windows Server script](windows-server.ps1) in an authorized **Windows Server 2016 / 2019 / 2022 virtual machine (VM)**. For a normal Windows 10/11 computer, use the [Windows workstation guide](../../Windows/Scripts/HOW-TO-RUN.md) instead.
 
-Read the image README and save necessary forensic answers before making changes. The script executes only the configuration you approve, not every example in the handbook.
+> [!IMPORTANT]
+> **Only work INSIDE the assigned VM, not on your personal computer.** Follow its desktop README, authorized accounts/required services, and current competition rules. If downloads or automated changes are prohibited, do **not** run this tool.
+>
+> **Part A (Audit) checks and records settings without applying hardening fixes. Part B (Apply) can change the server.** On a Domain Controller, careless changes can break logins, DNS, DHCP, Group Policy, and other machines. **Do not proceed with Apply if you are unsure of the server role or required services.**
 
-## 1. Download from GitHub inside the server VM
+## Five terms to know
 
-For a Windows Server **Desktop Experience** image:
-
-1. Start the Windows Server VM and sign in using the assigned Windows administrator account.
-2. **Inside the VM**, open an installed browser such as Microsoft Edge or Chrome. Do not run the script on your personal host computer.
-3. Go to **https://github.com/login** and sign in if you want to use your GitHub account. Because the repo is public, signing in is optional. Never save a personal GitHub password inside a competition VM.
-4. Open **https://github.com/Superdancer16/cyberpatriot2026**, verify the branch is **main**, and open **Server → Scripts → windows-server.ps1**.
-5. Click **Raw** above the code, then **Ctrl+S** if raw text opens in the browser.
-6. Save as **Downloads\windows-server.ps1**. In the Save dialog select **All files**, not Text Documents. Verify in File Explorer that the filename is not `windows-server.ps1.txt` or `.html`.
-7. Sign out of GitHub in the VM after downloading, and decline browser offers to remember credentials.
-
-**Server Core has no local browser or GUI.** In that case, transfer the reviewed script to the server using a method permitted by the image/competition administrator. Do not install a browser, disable Internet Explorer Enhanced Security Configuration, or enable remote management solely to download this file.
-
-If internet access or outside resources are disallowed during a scored round, do not use an unapproved download method; follow your coach's guidance.
-
-## 2. Start an Administrator PowerShell window
-
-On Desktop Experience, open **Start → Windows PowerShell → Run as administrator → Yes**. On Server Core, use the authorized console's administrator PowerShell session.
-
-```powershell
-cd "$env:USERPROFILE\Downloads"
-Get-Item .\windows-server.ps1
-Get-Content .\windows-server.ps1 -TotalCount 4
-```
-
-Confirm the file is PowerShell source starting with `#requires -Version 5.1`, not HTML. If it is blocked by Windows, verify the origin before using `Unblock-File .\windows-server.ps1`.
-
-To list supported modules without changing settings:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -List
-```
-
-## 3. Run the read-only audit first
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -Mode Audit
-```
-
-The audit records installed roles, OS/domain role, accounts, firewall, shares, services, recent events and, on Domain Controllers, Active Directory, password policies and replication health. It saves reports under **C:\ProgramData\ServerSecurityWork** (or the VM's corresponding `ProgramData` path).
-
-Open **Server Manager → Local Server**, check whether this is a **StandaloneServer**, **MemberServer** or **DomainController**, and record the original Scoring Report. Do not confuse a domain user's password policy with a member server's local policy.
-
-## 4. Generate the exact image configuration
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -InitConfig -Config ".\server-config.json"
-notepad .\server-config.json
-```
-
-Notepad may not be present on Server Core; use an approved PowerShell editor or edit the JSON on another authorized management machine and transfer it securely.
-
-**Before Apply can run:**
-
-- Set `ExpectedRole` to the actual detected role (`StandaloneServer`, `MemberServer`, or `DomainController`).
-- On a DC set `DomainName` to the exact current AD domain, and populate `AuthorizedDomainAdmins`.
-- On a standalone/member server populate `AuthorizedLocalAdmins`; add ordinary authorized users in the appropriate array.
-- Fill all relevant `RequiredRoles`, `RequiredServices`, `RequiredShares`, `RequiredApplications`, `RequiredPorts`, and `RequiredServiceAccounts` from the VM README.
-- Enter **only exact targets** and values you have confirmed from the README. Avoid general templates, wildcard names, and values copied from another image.
-- Once the whole configuration matches the image, set `ConfirmedReadme` and `ConfirmedServerRole` to `true`. Do not set `ForensicsComplete=true` until evidence and questions are saved.
-
-### Config areas and what they do
-
-| JSON section | Supported operations |
+| Term | Meaning |
 |---|---|
-| `LocalUsers` and `LocalGroups` | Create named users/groups, manage exact membership, disable/demote/delete confirmed unauthorized local accounts |
-| `DomainChanges` | Optional AD user/group changes and domain default password policy, **disabled by default** |
-| `LocalPasswordPolicy`, `RemoveUserRights`, `AuditSubcategories` | Exact local account policy, selected rights and configured audit subcategories |
-| `Firewall`, `Defender`, `SMB`, `Security` | Security baseline and explicitly chosen Windows Server protections |
-| `DisableServices`, `DisableFeatures`, `UninstallWindowsFeatures` | Exact installed targets, with server-critical dependencies protected |
-| `RemoveShares`, `RemoveShareAccess`, `RemoveStartupValues`, `ClearAccessibilityDebuggers` | Exact custom share/ACL and persistence changes |
-| `IIS`, `DNS`, `DHCP`, `TLS` | Narrow server-role settings with prerequisite checks and backups |
-| `RemoveFiles`, `UpdatePrograms`, `UninstallPrograms`, `WindowsUpdate` | Exact files, application IDs, and approved Windows Update actions |
-| `DiscoveryPaths` | Limited folders to inspect for suspicious files, without deleting discoveries |
+| **VM** | The virtual Windows Server computer inside VMware or other VM software |
+| **PowerShell** | A Windows command window where you paste and run commands |
+| **`windows-server.ps1`** | The PowerShell script file you will download |
+| **Audit** | Inspect the server and save a report; do not apply configured fixes |
+| **Apply / config** | Run changes chosen in a separate JSON text file (`server-config.json`) |
+| **Server role** | What the machine does: `StandaloneServer`, `MemberServer`, or `DomainController` |
 
-If you need to add a local group, the relevant part of the generated JSON could look like this:
+**How to use commands:** Copy one line from each code block, paste it into **Windows PowerShell**, and press **Enter**. Do not type the `PS C:\...>` prompt that the terminal displays.
 
-```json
-"LocalGroups": {
-  "Create": ["EXAMPLE_REQUIRED_GROUP"],
-  "Members": {
-    "EXAMPLE_REQUIRED_GROUP": ["EXAMPLE_USER_A", "EXAMPLE_USER_B"]
-  },
-  "RemoveMembers": {}
-}
-```
+## ✅ Part A — Safe first run: download → check → AUDIT
 
-Use the actual usernames/group names in the current README. Passwords are requested securely during interactive runs and are **not stored in JSON**.
+### Step 1 — Make sure you are using the server VM
 
-**Firewall safety:** The Windows Server template deliberately starts with `Firewall.EnableProfiles=false`. Only set it to `true` after verifying required AD/DNS/DHCP/IIS/SMB and remote-management rules and ports. This differs from the workstation template.
+1. Open your assigned **Windows Server VM**. Sign in using its authorized administrator account.
+2. Read its **desktop README**. Make a list of services and roles that must work: for example, **Active Directory (AD), DNS, DHCP, IIS, file sharing, and remote login**. Only include those actually required by *this* image.
+3. Save/answer required forensic questions before changing accounts, logs, files, or services; note your starting Scoring Report.
+4. Keep console access available. Only use a snapshot or other recovery method if the exercise rules allow it.
+5. **If you are on Server Core** (no ordinary desktop or local browser), skip the browser steps below: use a **coach-approved method** to transfer the reviewed script into that VM, then use its authorized PowerShell console. Do not install a browser, open remote-management ports, or weaken security just to fetch the file.
 
-For a Domain Controller, `DomainChanges.Allowed` defaults to `false`, and the script also requires `-EnableDomainChanges` before it will attempt AD writes. Even with both enabled, protected AD accounts and privileged groups are intentionally left for manual review.
+### Step 2 — Download the script (Desktop Experience only)
 
-## 5. Run every configured section in one pass
+1. **Inside the Server VM**, open an installed browser (Edge, Chrome, etc.). This public repository does **not** require you to sign into GitHub.
+2. Open [windows-server.ps1 on GitHub](https://github.com/Superdancer16/cyberpatriot2026/blob/main/Server/Scripts/windows-server.ps1).
+3. Click **Raw** above the code. It should display plain text, starting with `#requires -Version 5.1`.
+4. Press **Ctrl+S** to save that raw text. Choose **Downloads**, set **Save as type → All files** if shown, and save as **`windows-server.ps1`**. Some browsers also support right-clicking **Raw → Save link as**.
+5. Open **File Explorer → Downloads**, enable **View → Show → File name extensions**, and check the filename is exactly **`windows-server.ps1`** (not `.ps1.txt` or `.html`).
+6. Sign out of GitHub if you signed in; do not save your personal credentials inside a competition VM.
 
-After reviewing the JSON and completing the initial audit:
+> [!CAUTION]
+> A GitHub webpage saved as `.html` is **not** a PowerShell script. Do not rename HTML to `.ps1`; repeat the Raw download. Use an approved transfer method when external browsing is not allowed.
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -Mode Apply -Config ".\server-config.json"
-```
+### Step 3 — Open PowerShell as Administrator
 
-Type **APPLY** at the initial confirmation prompt. After fully reviewing the configuration, you can skip that single confirmation:
+1. **On the Server VM**, click **Start** and search for **Windows PowerShell**.
+2. Right-click **Windows PowerShell** → **Run as administrator** → **Yes**.
+3. A command window appears. It may start with `PS C:\Windows\system32>`; that is normal. Use the built-in **Windows PowerShell 5.1**.
+4. If using **Server Core**, use its existing authorized administrator PowerShell session. Have an experienced teammate help with file transfer or editing if necessary; you can stop after Audit.
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -Mode Apply -Config ".\server-config.json" -Yes
-```
+### Step 4 — Find the downloaded file
 
-**Important options**—use only when applicable and specifically authorized:
+If you saved the file in **Downloads**, run:
 
-- `-AllowRemovals`: enables only exact, configured local-user/file/software/share/feature removals, after forensic evidence is preserved.
-- `-EnableDomainChanges`: together with `DomainChanges.Allowed=true` and the matching domain, permits supported, explicit AD edits.
-- `-AllowCompatibilityChanges`: permits opted-in changes that can disrupt legacy clients, such as NTLM-only policy, SMB1 or older TLS protocols and DNS transfers.
-- `-Only localusers,defender,firewall`: reruns only those sections.
+~~~powershell
+cd "$env:USERPROFILE\Downloads"
+~~~
 
-Example limited rerun:
+Verify your current folder:
 
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -Mode Apply -Config ".\server-config.json" -Only defender,firewall,updates
-```
+~~~powershell
+Get-Location
+~~~
 
-The complete section names are available with `-List`: `localusers`, `localgroups`, `adusers`, `adgroups`, `localpasswords`, `domainpasswords`, `rights`, `auditpolicy`, `security`, `defender`, `firewall`, `smb`, `services`, `features`, `shares`, `iis`, `dns`, `dhcp`, `tls`, `persistence`, `files`, `software`, `updates`, `verify`.
+**Expected:** A folder ending in `\Downloads`. Now check the file:
 
-The script skips secret password prompts in `-Yes` mode, refuses blanket account/file removal, and never automatically restarts the server.
+~~~powershell
+Get-Item .\windows-server.ps1
+~~~
 
-## 6. Check results before trying another fix
+**Expected:** Information about the script's name, length and date. Show the first line:
 
-In File Explorer or an elevated PowerShell session, open:
+~~~powershell
+Get-Content .\windows-server.ps1 -TotalCount 1
+~~~
 
-```powershell
+**Expected:** `#requires -Version 5.1`. If PowerShell says **Cannot find path**, use File Explorer to find the actual download location and correct filename. If the first line contains HTML, repeat Step 2.
+
+If Server Core or your approved transfer placed the script **somewhere else**, use the actual folder containing it instead of the Downloads command above. All later commands assume your PowerShell window is in that folder.
+
+### Step 5 — Run the read-only AUDIT
+
+Copy this line exactly:
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -Mode Audit
+~~~
+
+Press **Enter**. The script identifies whether the VM is a **StandaloneServer**, **MemberServer**, or **DomainController**, and inspects installed roles, users, networking, security policies, and services.
+
+**Expected:** The terminal shows audit information and report results, not a request to apply all hardening. It may mention missing features when a role isn't installed; that is not a reason to install it. Audit creates report/log files but **does not apply hardening changes**.
+
+### Step 6 — Open and read the audit results
+
+On a Server VM **with a desktop**, paste:
+
+~~~powershell
 explorer.exe "$env:ProgramData\ServerSecurityWork"
-```
+~~~
 
-On Server Core, use `Get-ChildItem "$env:ProgramData\ServerSecurityWork"` instead.
+On **Server Core** (or when Explorer is unavailable), list the files instead:
 
-- `summary-...csv` — changes reported as `CHANGED`, `OK`, `REVIEW`, `SKIPPED`, `WOULD`, or `FAILED`.
-- `changes-...txt` — detailed action log.
-- `audit-...txt`, `backups-...\audit-before.txt`, `audit-after.txt` — audit status.
-- `backups-...\review-before-*.csv` and `review-after-*.csv` — role-specific findings and diagnostics.
-- `backups-...` — exports of original service, registry, account, firewall, security policy, IIS, DNS, DHCP and SMB settings where applicable.
+~~~powershell
+Get-ChildItem "$env:ProgramData\ServerSecurityWork"
+~~~
 
-**`CHANGED` does not mean points were awarded.** Check the Scoring Report, address failures, then follow [MANUAL-TASKS.md](MANUAL-TASKS.md). Test required domain login, DNS, DHCP, IIS, FTP, SMB, RDP/WinRM, required databases and server roles with real clients.
+Look for the newest `audit-...txt`, `summary-...csv`, and `changes-...txt` files. In Desktop Experience, double-click a text report to inspect it. On Server Core, an administrator can use `Get-Content` with the exact file path listed.
 
-### Troubleshooting
+**Check the detected server role** in the report and compare its findings with your VM README. Do not assume a role should be removed just because it looks unusual.
 
-- **Wrong image:** The script refuses Windows workstation systems. Fix `ExpectedRole`/`DomainName` only after checking the actual VM.
-- **Script downloaded as HTML or TXT:** Return to the file's **Raw** GitHub view and save with **All files** selected.
-- **Cannot change Active Directory:** Domain changes require the DC role, exact domain, `DomainChanges.Allowed=true` and `-EnableDomainChanges`.
-- **Domain/local policy not applying:** A GPO or fine-grained policy may override local settings. Inspect the effective source in the Windows Server handbook.
-- **Required service broke:** Use the stored original values and follow role-specific recovery procedures. Never remove AD DS, DNS, DHCP or a required server role to chase generic hardening points.
+**🎉 Audit completed. It is completely fine to stop here.** Use the [manual tasks](MANUAL-TASKS.md) and the [full Server handbook](../windows-server.md) to review findings one at a time.
 
-No execution on a real competition Server image was performed while authoring this file. Review results and test the code on an authorized disposable server VM before scored use.
+---
+
+## ⚠️ Part B — Only with a reviewed configuration: APPLY
+
+**This part can change your VM.** Stop if you cannot identify the server's role, its required services, its users, or its current recovery/console path. On a Domain Controller, ask someone familiar with Active Directory to review the configuration.
+
+### Step 7 — Find out what kind of server you have
+
+The script reports the detected role during Audit. You can also use **Server Manager → Local Server** when a desktop is available. To view computer/domain details in PowerShell:
+
+~~~powershell
+Get-CimInstance Win32_ComputerSystem | Select-Object Domain,PartOfDomain,DomainRole
+~~~
+
+- **StandaloneServer**: Server not joined to a domain and not a Domain Controller.
+- **MemberServer**: Server joined to a domain but **not** a Domain Controller.
+- **DomainController**: Runs AD DS and manages a domain; needs extra care.
+
+**Not sure which one you have? Do not run Apply.** Ask a coach or mentor to confirm the role and the domain name.
+
+### Step 8 — Create the JSON configuration file (once)
+
+Back in the same PowerShell folder containing `windows-server.ps1`:
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -InitConfig -Config ".\server-config.json"
+~~~
+
+**Expected:** A new file named `server-config.json` appears. The script will **not overwrite** a file that already exists.
+
+On Desktop Experience, open it:
+
+~~~powershell
+notepad .\server-config.json
+~~~
+
+**Server Core note:** Notepad may not be installed. Use an approved text editor or have an experienced teammate edit the JSON on an authorized management computer and transfer it securely. Do **not** install extra software on the VM just for this step.
+
+### Step 9 — Fill out the important JSON fields
+
+In Notepad, look for the existing fields below; **edit their values in the generated file** rather than pasting these fragments in again.
+
+~~~json
+"ConfirmedReadme": false,
+"ConfirmedServerRole": false,
+"ForensicsComplete": false,
+"ExpectedRole": "StandaloneServer",
+"DomainName": "",
+"AuthorizedLocalAdmins": [],
+"AuthorizedDomainAdmins": []
+~~~
+
+What these mean:
+
+1. **`ExpectedRole`:** Set to the **exact role detected in the audit**: `StandaloneServer`, `MemberServer`, or `DomainController`.
+2. **`DomainName`:** On a Domain Controller, fill in the exact domain name found by the script (do not guess it).
+3. **`AuthorizedLocalAdmins`:** List actual authorized local administrators on standalone/member servers. This list **cannot be empty** for those roles.
+4. **`AuthorizedDomainAdmins`:** List actual authorized domain administrators on a Domain Controller. This list **cannot be empty** on a DC.
+5. **`AuthorizedLocalUsers` and `AuthorizedDomainUsers`:** Use only the appropriate lists of authorized non-admin users for your VM.
+6. **`RequiredRoles`, `RequiredServices`, `RequiredShares`, `RequiredApplications`, `RequiredPorts` and `RequiredServiceAccounts`:** Identify what **must not be broken**.
+7. **`ForensicsComplete`:** Set to `true` only after necessary evidence and answers are saved.
+8. **`ConfirmedReadme` and `ConfirmedServerRole`:** Set to `true` **last**, only after the entire configuration has been checked against the VM README and actual detected role.
+
+**JSON basics:** `[]` is a list (e.g., `["USER_A", "USER_B"]`); quotes around names are required; commas separate entries; `true`/`false` are lowercase and **not quoted**. The example names in this explanation are placeholders, **never real accounts to create or remove**. Don't put passwords in the file.
+
+> [!WARNING]
+> The generated template has **some enabled defaults**, including Defender-related options. **Firewall.EnableProfiles is false initially** because enabling a server firewall without checking role-specific ports could lock you out. Review **every section** (Firewall, Defender, SMB, Security, LocalUsers, DomainChanges, services, shares, roles, etc.), not only the fields above. Do not enable or remove a feature just to seek points.
+>
+> On Domain Controllers, `DomainChanges.Allowed` defaults to `false` and AD modifications also require a separate command option. Leave these protections in place unless an experienced, authorized teammate has reviewed the exact changes.
+
+Save the file with **Ctrl+S** and close Notepad.
+
+### Step 10 — Check JSON syntax (this does NOT apply changes)
+
+~~~powershell
+Get-Content .\server-config.json -Raw | ConvertFrom-Json | Out-Null
+~~~
+
+**Expected:** No error. If you see red text, reopen `server-config.json` and fix missing commas, quotes, or brackets. Passing this check only means the file is formatted correctly—it does **not** prove the server changes are safe.
+
+### Step 11 — Apply only when you are ready
+
+**Do this only with an authorized, reviewed config and working console access:**
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -Mode Apply -Config ".\server-config.json"
+~~~
+
+At the confirmation prompt, type **`APPLY`** exactly and press **Enter** to continue. If unsure, **do not type APPLY**. The script checks its configuration and detected server role, performs its configured tasks, and records before/after audit results.
+
+**It does not reboot the server for you.** Some Windows changes may need a later restart, which you should schedule only if authorized and after testing role dependencies.
+
+### Step 12 — Check results before making another change
+
+On Desktop Experience:
+
+~~~powershell
+explorer.exe "$env:ProgramData\ServerSecurityWork"
+~~~
+
+Look at the latest `summary-...csv` and `changes-...txt`, plus `backups-...` and audit files. On Server Core, use `Get-ChildItem "$env:ProgramData\ServerSecurityWork"` to locate them.
+
+| Status | Simple meaning |
+|---|---|
+| `CHANGED` | Action was reported as changed; **not a guarantee of points** |
+| `OK` | The check did not need a change |
+| `REVIEW` / `SKIPPED` | You or a teammate must inspect it manually |
+| `FAILED` | The attempted action failed; read the details |
+| `WOULD` | A proposed change; not confirmation that it was made |
+
+**Verify real functionality:** authorized domain/local logins, DNS resolution, DHCP leases, IIS sites, FTP, shares, RDP/WinRM, and required databases **when those features are required by this image**. Compare the Scoring Report to your baseline. If a role or login stops working, **stop and restore the exact affected setting** using its recorded original value; do not indiscriminately undo/re-run the whole script. Some deletions cannot be fully undone.
+
+## Advanced controls — read only if supervised
+
+- **List section names (no fixes):** `powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\windows-server.ps1" -List`.
+- **Run only specific sections:** append `-Only defender,firewall,updates` to the Apply command after reviewing the config.
+- **Skip the initial confirmation:** `-Yes`. Not recommended for beginners; secure password prompts may be skipped.
+- **Remove exact configured items:** `-AllowRemovals`. Potentially destructive; requires confirmed targets and forensic preservation.
+- **Change AD objects on a DC:** requires both `DomainChanges.Allowed=true` in JSON **and** `-EnableDomainChanges`, with exact role/domain checks.
+- **Allow compatibility-impacting security changes:** `-AllowCompatibilityChanges`. Can disrupt older clients, protocols, shares, and remote management. Use only after compatibility testing.
+
+## Troubleshooting
+
+| Problem | Exact next step |
+|---|---|
+| Script file missing | Confirm you are in the script's actual download/transfer folder. Run `Get-Item .\windows-server.ps1` |
+| Download saved as HTML or TXT | Return to **Raw** and download the real `.ps1` script |
+| Not an Administrator | Reopen **Windows PowerShell → Run as administrator** inside the VM |
+| Wrong server type / `ExpectedRole` error | Re-read the role in the Audit output and confirm it with a coach; **do not change the JSON just to silence an error** |
+| `DomainName` mismatch | Check the domain shown by the server, including exact spelling; do not guess |
+| Config already exists | Edit the existing `server-config.json` instead of deleting it |
+| JSON formatting error | Run `Get-Content .\server-config.json -Raw | ConvertFrom-Json | Out-Null` and correct Notepad errors |
+| AD edit skipped | This is deliberate until authorized domain-change safeguards are met; never bypass them casually |
+| Lost DNS/DHCP/IIS/remote access | **Stop applying changes**, inspect backups and the [role-specific recovery guide](../windows-server.md) before touching other settings |
+
+**More help:** [Server manual tasks](MANUAL-TASKS.md) · [Complete Windows Server handbook](../windows-server.md) · [General script safety and rollback](../../General/script-safety.md).
+
+*These instructions match the script's documented CLI options; an end-to-end run on a Windows Server VM was not performed as part of this documentation update.*
