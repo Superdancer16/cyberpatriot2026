@@ -1,0 +1,99 @@
+{
+  "ConfirmedReadme": false,
+  "ForensicsComplete": false,
+  "AuthorizedAdmins": [
+    "labadmin"
+  ],
+  "AuthorizedUsers": [
+    "labstudent"
+  ],
+  "RequiredServices": [
+    "ssh",
+    "apache2"
+  ],
+  "RequiredSoftware": [
+    "openssh-server",
+    "apache2"
+  ],
+  "RequiredPorts": [
+    "22/tcp",
+    "80/tcp"
+  ],
+  "NewUsers": [],
+  "DisableUsers": [],
+  "RemoveUsers": [],
+  "DemoteSudo": [],
+  "SetPasswords": [],
+  "ExpirePasswords": [],
+  "NewGroups": [
+    "labreaders"
+  ],
+  "GroupMembers": {
+    "labreaders": [
+      "labstudent"
+    ]
+  },
+  "RemoveGroupMembers": {},
+  "PasswordAging": {
+    "PASS_MAX_DAYS": 90,
+    "PASS_MIN_DAYS": 7,
+    "PASS_WARN_AGE": 14
+  },
+  "UserAging": {
+    "labstudent": {
+      "max": 90,
+      "min": 7,
+      "warn": 14
+    }
+  },
+  "PasswordQuality": {
+    "minlen": 12,
+    "difok": 4
+  },
+  "RemovePAMNullok": false,
+  "EnableUFW": false,
+  "InstallUFW": false,
+  "FirewallAllowPorts": [],
+  "UpdatePackageLists": false,
+  "UpgradePackages": false,
+  "UpdatePackages": [],
+  "EnableDailyUpdateRefresh": false,
+  "DisableServices": [],
+  "EnableRequiredServices": false,
+  "SSH": {
+    "DisableRootLogin": false,
+    "DisableEmptyPasswords": false
+  },
+  "Sysctl": {
+    "net.ipv4.tcp_syncookies": 1
+  },
+  "FixShadowPermissions": false,
+  "RemovePackages": [],
+  "RemoveFiles": [],
+  "RemoveCronLines": [],
+  "RemoveHostsLines": [],
+  "DisableUnits": [],
+  "Desktop": {
+    "DisableGdmAutologin": false
+  },
+  "Browsers": {
+    "ChromiumBlockPopups": false
+  },
+  "AppArmorProfiles": [],
+  "Logging": {
+    "EnableAuditd": false,
+    "EnableRsyslog": false
+  },
+  "ServiceHardening": {
+    "Apache": false,
+    "Nginx": false,
+    "VsftpdNoAnonymous": false,
+    "SambaNoSMB1": false,
+    "PostfixNoVRFY": false
+  },
+  "ScanPaths": [
+    "/home",
+    "/tmp",
+    "/var/tmp"
+  ]
+}
