@@ -159,6 +159,232 @@ Use the **actual VM desktop README** to fill in:
 
 In Notepad, press **Ctrl+S**, then close it.
 
+
+#### Step 8A — Find exact Windows names (read-only checks)
+
+The **VM desktop README**, not a generic checklist, determines which accounts and services are authorized. Use these commands in the VM's elevated PowerShell window to verify exact names. Run them one at a time:
+
+~~~powershell
+whoami
+Get-LocalUser | Select-Object Name,Enabled
+Get-LocalGroupMember -Group Administrators
+Get-Service | Select-Object Name,DisplayName,Status | Sort-Object Name
+Get-SmbShare | Select-Object Name,Path
+Get-NetTCPConnection -State Listen | Select-Object LocalPort,OwningProcess
+~~~
+
+- `Name` in `Get-Service` (for example `Spooler` or `TermService`) is a **service name**; `DisplayName` (e.g. **Print Spooler**) is *not* the right value for `RequiredServices` or `DisableServices`.
+- `Get-LocalUser` lists accounts, but **does not tell you who the README authorizes**. Compare every username to the desktop README.
+- `Get-SmbShare` shows local share **names**, not just folder paths; do not remove system shares.
+- A listening port is **not automatically approved or required**. Record only what the README and required applications demand.
+- Installed software can be checked in **Settings → Apps → Installed apps** or **Control Panel → Programs and Features**. `UpdatePrograms` and `RemovePrograms` require **exact winget package IDs**, not friendly titles.
+
+#### Step 8B — Full top-level JSON field reference
+
+**JSON types:** `["alice", "bob"]` is a string list; `{}` is an object; `true`/`false` are switches. Every array listed below should be `[]` until you have a specific, approved target. Do **not** put commands, passwords, or explanations inside JSON.
+
+| Field | What to enter — common exact structure |
+|---|---|
+| `ConfirmedReadme` | `false` until every intended change has been compared against the **current VM README**; set `true` last. |
+| `ForensicsComplete` | `false` until required questions and evidence are safely preserved; set `true` only afterward. |
+| `AuthorizedAdmins` | **Exact authorized admin account names**, e.g. `["labadmin"]`. Required and may not be empty when applying. |
+| `AuthorizedUsers` | **Exact authorized ordinary usernames**, e.g. `["labstudent", "labviewer"]`. Do not use display names or add an unapproved user. |
+| `RequiredServices` | Exact service names, e.g. `["Spooler", "TermService"]` **only when printing/RDP are required**. Protects them from configured service disabling. |
+| `RequiredSoftware` | Names of *required installed applications*, e.g. `["Mozilla Firefox"]`. Compare the installed-app display name. If you later use a winget remove ID, separately verify it is not required and list/protect the exact ID as appropriate. |
+| `RequiredShares` | Exact required SMB share names, e.g. `["LabShare"]`, not paths like `C:\Share`. |
+| `RequiredPorts` | **Port numbers as strings**, e.g. `["3389", "80"]` when RDP/web access is actually required. Here the script compares them to firewall-rule port filters; **this field does not open ports or prove connectivity**. |
+| `ScanPaths` | Extra folders for **candidate-file discovery** only, e.g. `["C:\\Users\\Public"]`. Use double backslashes inside JSON Windows paths. |
+| `NewUsers` | Missing, expressly authorized local user names to create, e.g. `["labnewuser"]`. Must also appear in an authorized list; passwords are entered interactively. |
+| `DisableUsers` | Verified unauthorized existing account names to **disable**, e.g. `["unapproveduser"]`; do not include current/authorized/built-in users. |
+| `RemoveUsers` | Exact unauthorized local accounts to **delete**. Destructive and requires `-AllowRemovals`; home/profile contents are not automatically restored. |
+| `DemoteAdmins` | Exact users who must remain accounts but **no longer be administrators**. Validate against the authorized-admin list. |
+| `PasswordExpiresUsers` | Existing users whose `PasswordNeverExpires` flag needs clearing, e.g. `["labstudent"]`. This does **not** force a next-logon password reset. |
+| `ResetPasswords` | Existing authorized users for an interactive password reset. The password **never goes into JSON**; `-Yes` skips password prompts. |
+| `Groups` | An object of **group name → array of authorized usernames**, e.g. `{"LabReaders": ["labstudent"]}`. Creates missing group and adds existing users. |
+| `RemoveGroupMembers` | Object of **existing group → users to remove**, e.g. `{"LabReaders": ["unapproveduser"]}`. Never blindly remove privileged or service-required members. |
+| `PasswordPolicy` | Object of supported **numeric** settings, e.g. `{"MinimumPasswordLength": 12, "PasswordHistorySize": 5, "PasswordComplexity": 1}` only if the README requires them. Other supported keys: `MinimumPasswordAge`, `MaximumPasswordAge`, `ClearTextPassword`, `LockoutBadCount`, `LockoutDuration`, `ResetLockoutCount`. Values `PasswordComplexity` and `ClearTextPassword` must be **0 or 1**. |
+| `RemoveUserRights` | Object of **security-right identifier → array of exact principals to remove**, e.g. `{"SeDebugPrivilege": ["unapproveduser"]}`. Supported: `SeSecurityPrivilege`, `SeTakeOwnershipPrivilege`, `SeDebugPrivilege`, `SeBackupPrivilege`, `SeRestorePrivilege`, `SeLoadDriverPrivilege`, `SeRemoteInteractiveLogonRight`. High-impact; leave `{}` unless inspected in `secpol.msc`. |
+| `DisableServices` | Array of exact service **Names** to stop/disable. The generated script template includes `["RemoteRegistry","simptcp"]` by default: **review and change this**, not just the admin lists. In the teaching example this is deliberately `[]`. |
+| `DisableFeatures` | Exact installed Windows optional-feature names (not a friendly label), e.g. `["SMB1Protocol"]` only after verifying it isn't required. May affect compatibility/restarts. |
+| `DisableScheduledTasks` | Array of fully qualified task paths, e.g. `["\\LabTasks\\UnwantedTask"]` only for a confirmed unauthorized *non-Microsoft* task. |
+| `DisableFirewallRules` | Exact internal **`Get-NetFirewallRule -Name`** value for an unnecessary inbound Allow rule. Do **not** use a display name, wildcard, or required port. |
+| `AuditSubcategories` | Object of an exact `auditpol` subcategory → one of `"Success"`, `"Failure"`, `"SuccessAndFailure"`, e.g. `{"Logon": "SuccessAndFailure"}`, subject to OS language and effective GPO. |
+| `RemoveStartupValues` | Array of objects with `Path` and `Name`: `[{"Path":"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run","Name":"UnwantedEntry"}]`. Exact Run/RunOnce registry value; script restricts allowed paths. |
+| `ClearIFEO` | Array of supported accessibility executable names, e.g. `["sethc.exe"]` only when an unwanted debugger override is verified. The script also accepts `utilman.exe`, `osk.exe`, `magnify.exe`, `narrator.exe`. |
+| `RemoveShares` | Exact non-system SMB share names to remove. Destructive and requires `-AllowRemovals`; don't include required shares. |
+| `RemoveShareAccess` | Array of `{"Share":"LabShare","Account":"unapproveduser"}` objects to remove a **specific SMB share permission**, not a file's NTFS permissions. Requires `-AllowRemovals`. |
+| `RemoveDefenderExclusions` | Array of exact unwanted **path** exclusions shown by `Get-MpPreference`, e.g. a suspicious folder path; do not guess. |
+| `RemoveDefenderExclusionProcesses` | Array of exact process-name/path exclusions to remove after checking their legitimate purpose. |
+| `RemoveDefenderExclusionExtensions` | Array of exact Defender extension exclusions to remove, e.g. a verified unwanted `".exe"` exclusion. |
+| `RemoveAppxPackages` | Exact installed **Microsoft Store package Names** (not friendly app titles or globs). Removals require `-AllowRemovals`; core packages are protected. |
+| `RemovePrograms` | Array of exact installed **winget IDs** for expressly prohibited software, not the app's display name. Requires `-AllowRemovals`. |
+| `UpdatePrograms` | Array of exact **winget IDs** to upgrade, e.g. `["Mozilla.Firefox"]` **only if winget lists that ID and the update is permitted**. |
+| `RemoveFiles` | Array of exact full paths to confirmed prohibited **files**, e.g. `["C:\\Users\\Public\\Downloads\\unapproved.exe"]`. No folders/globs. Deletion may be irreversible and requires `-AllowRemovals`. |
+| `Security` | A nested object of security switches and values, explained **one by one below**; the script requires this object. |
+
+**Common shape examples (these are fragments, not complete JSON files):**
+
+~~~json
+"Groups": {"LabReaders": ["labstudent"]},
+"RemoveStartupValues": [
+  {"Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", "Name": "UnwantedEntry"}
+],
+"RemoveShareAccess": [
+  {"Share": "LabShare", "Account": "unapproveduser"}
+],
+"AuditSubcategories": {"Logon": "SuccessAndFailure"}
+~~~
+
+These latter three actions can modify the system. **Do not paste them just because the keys appear here.** Leave their arrays/objects empty unless the current README and your inspection require the exact change.
+
+#### Step 8C — Every setting inside `Security`
+
+All switches below live **inside `"Security": { ... }`**. Unless noted, values are **`true` or `false`**, and `true` requests the described action. Treat a setting as an **opt-in** after inspecting required functions; "common" does not mean universally safe.
+
+| `Security` subkey | What `true` does / how to choose it |
+|---|---|
+| `Firewall` | Enable Windows Firewall profiles. Check actual required inbound rules and remote access. |
+| `Defender` | Request Defender real-time/PUA protection. Confirm it is the required/active antivirus. |
+| `DefenderSignatures` | Request Defender security-intelligence update; may need allowed network access. |
+| `DefenderQuickScan` | Start a malware quick scan (may quarantine evidence); wait until forensics is preserved. |
+| `SMBClientSigning` | Require SMB signing when acting as an SMB client; test required shares/legacy clients. |
+| `SMBServerSigning` | Require SMB signing for hosted shares; test clients. |
+| `RequireRdpNla` | Require Network Level Authentication for RDP; confirm RDP remains usable. |
+| `EnableUAC` | Enable User Account Control prompts; may require restarting and testing admin elevation. |
+| `RestrictAnonymous` | Restrict anonymous account/share enumeration; verify dependencies. |
+| `DisableLMHash` | Disable storage of legacy LM password hashes. |
+| `RequireNTLMv2` | Restrict legacy NTLM behavior; can break older clients/SMB authentication. |
+| `ProtectPrintDrivers` | Require admin rights for Point-and-Print driver installs; verify printing. |
+| `DisableNetBIOS` | Disable NetBIOS-over-TCP/IP on adapters; check legacy name resolution. |
+| `CredentialAuditSuccess` | Enable successful Credential Validation auditing; logs more events. |
+| `SmartScreen` | Request SmartScreen protection. |
+| `DisableAutoPlay` | Disable automatic actions from removable-media autoplay. |
+| `DisableLLMNR` | Disable Link-Local Multicast Name Resolution; check local network dependencies. |
+| `DisableRemoteAssistance` | Disable **Remote Assistance** (not the same thing as Remote Desktop). |
+| `DisableRDP` | Disable inbound Remote Desktop; **never enable this option if RDP is required**. |
+| `DisableSMB1` | Disable legacy SMBv1 optional feature; test required old file-sharing clients. |
+| `DisableWDigest` | Disable WDigest plaintext-credential caching. |
+| `HideLastSignedIn` | Hide last signed-in username on the sign-in screen. |
+| `DisableAdminEnumeration` | Stop Windows credential UI from enumerating admin accounts. |
+| `AutomaticWindowsUpdates` | Configure Windows automatic-update policy; distinct from the `WindowsUpdate` action. |
+| `RestrictBlankPasswordNetwork` | Block use of local blank-password accounts over the network. |
+| `PowerShellLogging` | Enable PowerShell Script Block Logging; logs may include sensitive command text. |
+| `LockScreenSeconds` | **Integer 60–86400 or `null`**, e.g. `900` for 15 minutes; don't enter `"15 minutes"`. |
+| `WindowsUpdate` | Exactly `"None"`, `"Scan"`, or `"Install"`. `"Install"` downloads/installs updates and may create reboot requirements; `"Scan"` searches without installing. |
+| `ChromeBlockPopups` | Set Chrome managed popup-blocking policy; verify required sites. |
+| `EdgeBlockPopups` | Set Edge managed popup-blocking policy; verify required sites. |
+
+**Critical difference:** `RequiredPorts` **does not enable** a firewall rule. It is used to avoid disabling a rule that appears necessary. Firewall and application access must still be tested manually.
+
+#### Step 8D — Complete JSON reference (fictional Windows practice VM)
+
+The [complete reference JSON](EXAMPLE-CONFIG-DO-NOT-APPLY.json) includes **all fields** the script generates and demonstrates multiple value types. It describes a **fictional** lab with `labadmin`, `labstudent`, a required printer/RDP service, and a made-up share.
+
+> [!WARNING]
+> **Never run Apply directly with the example file.** `ConfirmedReadme` is intentionally `false`. There is no universal Windows CyberPatriot config: the sample password length, group, required ports, and enabled security settings are **not instructions** for your VM. Use the script-generated `image-config.json`, transfer only relevant values after verification, and set `ConfirmedReadme` to `true` **last**.
+
+~~~json
+{
+  "ConfirmedReadme": false,
+  "AuthorizedUsers": [
+    "labstudent",
+    "labviewer"
+  ],
+  "AuthorizedAdmins": [
+    "labadmin"
+  ],
+  "RequiredServices": [
+    "Spooler",
+    "TermService"
+  ],
+  "RequiredSoftware": [
+    "Mozilla Firefox"
+  ],
+  "RequiredShares": [
+    "LabShare"
+  ],
+  "RequiredPorts": [
+    "3389"
+  ],
+  "ForensicsComplete": false,
+  "ScanPaths": [
+    "C:\\Users\\Public"
+  ],
+  "DisableFirewallRules": [],
+  "RemoveAppxPackages": [],
+  "RemoveStartupValues": [],
+  "ClearIFEO": [],
+  "RemoveShareAccess": [],
+  "AuditSubcategories": {},
+  "DisableUsers": [],
+  "RemoveUsers": [],
+  "DemoteAdmins": [],
+  "PasswordExpiresUsers": [
+    "labstudent"
+  ],
+  "NewUsers": [],
+  "ResetPasswords": [],
+  "Groups": {
+    "LabReaders": [
+      "labstudent"
+    ]
+  },
+  "RemoveGroupMembers": {},
+  "RemoveUserRights": {},
+  "DisableServices": [],
+  "DisableFeatures": [],
+  "RemoveShares": [],
+  "RemoveDefenderExclusions": [],
+  "RemoveDefenderExclusionProcesses": [],
+  "RemoveDefenderExclusionExtensions": [],
+  "DisableScheduledTasks": [],
+  "RemovePrograms": [],
+  "RemoveFiles": [],
+  "UpdatePrograms": [],
+  "PasswordPolicy": {
+    "MinimumPasswordLength": 12,
+    "PasswordHistorySize": 5,
+    "PasswordComplexity": 1
+  },
+  "Security": {
+    "Firewall": true,
+    "Defender": true,
+    "DefenderSignatures": true,
+    "DefenderQuickScan": false,
+    "SMBClientSigning": false,
+    "SMBServerSigning": false,
+    "RequireRdpNla": false,
+    "EnableUAC": false,
+    "RestrictAnonymous": false,
+    "DisableLMHash": false,
+    "RequireNTLMv2": false,
+    "ProtectPrintDrivers": false,
+    "DisableNetBIOS": false,
+    "CredentialAuditSuccess": true,
+    "SmartScreen": true,
+    "DisableAutoPlay": true,
+    "DisableLLMNR": false,
+    "DisableRemoteAssistance": false,
+    "DisableRDP": false,
+    "DisableSMB1": false,
+    "DisableWDigest": true,
+    "HideLastSignedIn": false,
+    "DisableAdminEnumeration": false,
+    "AutomaticWindowsUpdates": false,
+    "RestrictBlankPasswordNetwork": true,
+    "PowerShellLogging": false,
+    "LockScreenSeconds": null,
+    "WindowsUpdate": "None",
+    "ChromeBlockPopups": false,
+    "EdgeBlockPopups": false
+  }
+}
+~~~
+
+**How to adjust:** If RDP is not required, do not list `TermService` or `3389`. If printing is not required, remove `Spooler`. If no local group should be created, use `"Groups": {}`. If your README has no stated password policy, use `"PasswordPolicy": {}`. If a security change could break a required app, leave its option `false` and review it manually. Keep account-removal and file-removal fields empty until the exact need is verified.
+
+Save the edited **generated file** in Notepad. Continue to **Step 9** to check JSON syntax; that test does not check whether the choices are authorized.
+
 ### Step 9 — Check JSON formatting without applying anything
 
 Paste into PowerShell:
