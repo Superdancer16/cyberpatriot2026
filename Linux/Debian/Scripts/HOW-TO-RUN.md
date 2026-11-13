@@ -185,6 +185,212 @@ Fill in these key fields **using the actual VM desktop README**:
 
 **Do not fill in fake usernames, remove users at random, or enable everything.** In particular, review `EnableUFW`, `InstallUFW`, `SSH`, `PasswordAging`, `RemoveUsers`, `RemovePackages`, `RemoveFiles`, and `ServiceHardening`. Enabling a firewall without required port rules or changing PAM/SSH can lock you out.
 
+
+#### Step 9A — Collect the real names before editing
+
+**First identify what is already on the VM.** The exercise README is the source of truth; these commands only help you identify exact Linux names. Run each separately in Terminal (they inspect the machine, but some may create normal shell/log activity).
+
+~~~bash
+whoami
+id
+getent passwd
+getent group sudo
+systemctl list-units --type=service --state=running --no-pager
+ss -lntup
+~~~
+
+- `whoami` is your **current username**. The name after `uid=` in `id` is also useful. It is not automatically the only authorized administrator.
+- `getent passwd` lists many **system accounts** too. Use the README, not this output alone, to decide who is authorized.
+- A service's name is the **systemd unit** such as `ssh`, `apache2`, `smbd`, `vsftpd`, or `nginx`; it is **not** the description displayed in a GUI.
+- `ss -lntup` shows listening ports. A displayed port is not automatically a port you should expose with UFW.
+- Read the README first for required SSH, web, FTP, database, printing, or custom application functionality. The service must really exist on the VM before you configure it.
+
+#### Step 9B — Exact field-by-field reference
+
+**Value types:** `["item1", "item2"]` is a list of strings; `{"key": ["item"]}` is an object mapping names to lists; `{"option": true}` is an object with switches. A blank `[]` or `{}` means you are **not requesting that action**. Names/paths are case-sensitive on Linux.
+
+**1. Identity, permissions, and requirements**
+
+| JSON key | Exactly what belongs there; representative examples |
+|---|---|
+| `ConfirmedReadme` | `false` until you have checked **every** setting against the current VM README. Set `true` only at the very end. This is an approval switch, not a security fix. |
+| `ForensicsComplete` | `false` until forensic questions and relevant evidence have been saved; then `true`. Does **not** answer the questions for you. |
+| `AuthorizedAdmins` | Array of **actual usernames** that the README explicitly authorizes for sudo, e.g. `["labadmin"]`. **Important:** the script may add these existing accounts to the `sudo` group during Apply. Never put every user here. |
+| `AuthorizedUsers` | Array of ordinary authorized usernames, e.g. `["labstudent", "labviewer"]`, **not** account display names. A person listed here isn't automatically an admin. |
+| `RequiredServices` | Array of *actual systemd service names* needed by the image: examples `["ssh", "apache2"]` or `["smbd"]`, **only when the VM needs them**. Protects these services from automated disabling; enables service-specific hardening when selected. |
+| `RequiredSoftware` | Exact Debian **APT package names** needed by the VM, e.g. `["openssh-server", "apache2"]`, not friendly application titles. Helps protect packages from removal. |
+| `RequiredPorts` | Array of required listening ports with protocols, e.g. `["22/tcp", "80/tcp"]` for an SSH/web lab; `"53/udp"` for DNS if required. When `EnableUFW` is true, the script will issue `ufw allow` for these ports. **Never open every familiar port.** |
+| `ScanPaths` | Existing **absolute directories** for file discovery, e.g. `["/home", "/tmp", "/var/tmp"]`. These are *inspection locations*, not deletion targets. Avoid scanning the full filesystem unnecessarily. |
+
+**2. Users, groups, and passwords**
+
+| JSON key | Exactly what belongs there; common use |
+|---|---|
+| `NewUsers` | List of **missing, README-required** usernames, e.g. `["labnewuser"]`. Each must also be in `AuthorizedUsers` or `AuthorizedAdmins`; the script prompts for its password. |
+| `SetPasswords` | Existing authorized usernames whose passwords you intentionally need to reset, e.g. `["labstudent"]`. **Do not put passwords in JSON**; the script prompts interactively. |
+| `ExpirePasswords` | Existing authorized users who must change password at next login, e.g. `["labstudent"]`. This calls `chage -d 0`; it can interrupt account usage. |
+| `DemoteSudo` | Existing usernames that should no longer belong to the `sudo` group. Ordinary authorized users must also appear in `AuthorizedUsers`. Check access first. |
+| `DisableUsers` | **Exact unauthorized usernames** to expire/disable, e.g. `["unauthorizedlab"]`. The script uses account expiration; it does not delete their home folders. Verify against README. |
+| `RemoveUsers` | **Exact unauthorized usernames** to remove. Destructive; requires `--allow-removals` and a forensic-review guard. Prefer manual review first. |
+| `NewGroups` | Array of missing *Linux group names* required by the README, e.g. `["labreaders"]`. Group creation alone does not add users. |
+| `GroupMembers` | Object mapping **group name to array of authorized usernames**, e.g. `{"labreaders": ["labstudent"]}`. Adds existing users to existing groups (or groups created by `NewGroups`). |
+| `RemoveGroupMembers` | Object mapping group to exact names whose membership should be removed, e.g. `{"labreaders": ["unapproveduser"]}`. Avoid removing required sudo/group access. |
+| `PasswordAging` | Object with numbers for **new-account defaults** in `/etc/login.defs`: `{"PASS_MAX_DAYS": 90, "PASS_MIN_DAYS": 7, "PASS_WARN_AGE": 14}`. These numbers are examples, **not universal scoring values**. |
+| `UserAging` | Object for **existing** authorized users: `{"labstudent": {"max": 90, "min": 7, "warn": 14}}`. These map to `chage` maximum days, minimum days, and warning days. |
+| `PasswordQuality` | Object of integer options for `/etc/security/pwquality.conf`. Examples: `{"minlen": 12, "difok": 4}`. The script also accepts `maxrepeat`, `ucredit`, `lcredit`, `dcredit`, `ocredit`, `dictcheck` and `usercheck`; it requires `pam_pwquality.so` in the active PAM configuration. Don't invent missing modules or reorder PAM automatically. |
+| `RemovePAMNullok` | `true` removes `nullok` from an active `pam_unix.so` line in `/etc/pam.d/common-auth`. Leave `false` until PAM is inspected and you have a console recovery path. Wrong PAM settings can lock out users. |
+
+**3. Firewall, services, SSH, packages, and kernel**
+
+| JSON key | Exactly what belongs there; common use |
+|---|---|
+| `EnableUFW` | `true` means **enable the UFW firewall** after adding required port rules. Leave `false` unless UFW is the intended firewall owner; check for existing nftables and current remote access. |
+| `InstallUFW` | `true` permits installing the `ufw` package **if missing** when UFW enablement is selected; requires allowed APT/network access. |
+| `FirewallAllowPorts` | Additional exact UFW port strings, e.g. `["443/tcp"]` if explicitly required. `RequiredPorts` are also added when UFW is enabled. |
+| `SSH.DisableRootLogin` | `true` edits SSH server config to set `PermitRootLogin no`, when the SSH server exists and that is allowed by the README. |
+| `SSH.DisableEmptyPasswords` | `true` sets `PermitEmptyPasswords no` for SSH. Test effective config and a second authorized SSH connection. |
+| `DisableServices` | Array of exact **unneeded service names** to stop and disable, e.g. `["example-daemon"]` when confirmed unwanted. Never list required services, networking, or logging units. |
+| `EnableRequiredServices` | `true` tries to start services in `RequiredServices` if they are down; database/DNS services receive extra manual-review safeguards. |
+| `UpdatePackageLists` | `true` runs an APT package-index refresh; it doesn't itself install all upgrades. |
+| `UpgradePackages` | `true` requests an APT-wide upgrade of currently installed packages. Review expected removals, dependencies, required services, and network access before enabling. |
+| `UpdatePackages` | List of exact installed APT package names to upgrade individually, e.g. `["openssl", "curl"]` only when these packages are installed and updates are authorized. |
+| `EnableDailyUpdateRefresh` | `true` enables a daily APT package-list refresh setting (not a guarantee every package is upgraded). |
+| `Sysctl` | Object of **specific allowed kernel options → numeric values**, e.g. `{"net.ipv4.tcp_syncookies": 1}`. Supported choices include `net.ipv4.ip_forward`, `kernel.randomize_va_space`, and the permitted redirect/source-route keys in the script. **Do not blindly set forwarding to 0** on a router/VPN VM. |
+| `FixShadowPermissions` | `true` removes group-write/world access from `/etc/shadow` and `/etc/gshadow` when necessary. Does not blindly reset all ownership/modes. |
+| `AppArmorProfiles` | Array of **existing absolute profile paths** in `/etc/apparmor.d/`, e.g. `["/etc/apparmor.d/usr.sbin.some-daemon"]` *only after verifying the file exists*. Requests enforce mode; can break required apps. |
+
+**4. Files, persistence, desktop, applications, and logs**
+
+| JSON key | Exactly what belongs there; common use |
+|---|---|
+| `RemovePackages` | Exact unwanted Debian **package names** to purge, e.g. an explicitly prohibited game/torrent package. The script simulates dependencies first and requires removal approval. Do not remove a package the README requires. |
+| `RemoveFiles` | Exact **absolute file paths**, not glob patterns or whole folders, e.g. `["/home/labstudent/Downloads/prohibited-file.mp3"]` **only if explicitly prohibited and evidence is saved**. Deletion is not automatically reversible. |
+| `RemoveCronLines` | List of objects `{"User": "labstudent", "Line": "* * * * * /home/labstudent/unsafe-job.sh"}`. The line must **exactly match** a user's existing crontab entry; only use after proving it is unauthorized. |
+| `RemoveHostsLines` | Array of **exact complete lines** from `/etc/hosts` that must be removed, e.g. `["198.51.100.8 example.test"]` only if the entry is unauthorized. Keep localhost/required mappings. |
+| `DisableUnits` | Exact unneeded `systemd` service unit names such as `"example-daemon.service"`. Verify they are not required; stopping them affects running services. |
+| `Desktop.DisableGdmAutologin` | `true` disables auto-login in **GDM3 only**. Debian images using LightDM or another login manager need manual guidance. |
+| `Browsers.ChromiumBlockPopups` | `true` sets a Chromium-managed policy that blocks normal popups; only relevant when Chromium is installed. Verify required sites still work. |
+| `Logging.EnableAuditd` | `true` starts/enables installed `auditd`; does not install it if missing. |
+| `Logging.EnableRsyslog` | `true` starts/enables installed `rsyslog`; doesn't mean every log source becomes available. |
+| `ServiceHardening.Apache` | `true` hardens a **README-required** `apache2` service, including security headers/TRACE settings. Test the website afterward. |
+| `ServiceHardening.Nginx` | `true` hides version details for a **required** `nginx` service; verify proxy/sites. |
+| `ServiceHardening.VsftpdNoAnonymous` | `true` disables anonymous logins for required `vsftpd`; verify authorized FTP access. |
+| `ServiceHardening.SambaNoSMB1` | `true` enforces SMB2 or later for required `smbd`; check all authorized Windows clients. |
+| `ServiceHardening.PostfixNoVRFY` | `true` disables SMTP `VRFY` for required `postfix`; verify mail flow. |
+
+#### Step 9C — Complete example JSON (fictional practice VM)
+
+**Open the [full example JSON file](EXAMPLE-CONFIG-DO-NOT-APPLY.json)** if you want a single copyable reference. It contains **every key in the generated script template**, with realistic *shapes* and some nonempty fictional values.
+
+> [!CAUTION]
+> **This is a reference, not a ready-to-run solution.** All `lab...` users and required services are invented. The values `90`, `7`, `14`, and `12` are teaching examples, not assumed CyberPatriot scoring requirements. The file deliberately keeps `ConfirmedReadme: false` and `ForensicsComplete: false` to prevent casual Apply. Replace the example with the **generated JSON** and review every field before ever setting confirmation flags.
+
+~~~json
+{
+  "ConfirmedReadme": false,
+  "ForensicsComplete": false,
+  "AuthorizedAdmins": [
+    "labadmin"
+  ],
+  "AuthorizedUsers": [
+    "labstudent"
+  ],
+  "RequiredServices": [
+    "ssh",
+    "apache2"
+  ],
+  "RequiredSoftware": [
+    "openssh-server",
+    "apache2"
+  ],
+  "RequiredPorts": [
+    "22/tcp",
+    "80/tcp"
+  ],
+  "NewUsers": [],
+  "DisableUsers": [],
+  "RemoveUsers": [],
+  "DemoteSudo": [],
+  "SetPasswords": [],
+  "ExpirePasswords": [],
+  "NewGroups": [
+    "labreaders"
+  ],
+  "GroupMembers": {
+    "labreaders": [
+      "labstudent"
+    ]
+  },
+  "RemoveGroupMembers": {},
+  "PasswordAging": {
+    "PASS_MAX_DAYS": 90,
+    "PASS_MIN_DAYS": 7,
+    "PASS_WARN_AGE": 14
+  },
+  "UserAging": {
+    "labstudent": {
+      "max": 90,
+      "min": 7,
+      "warn": 14
+    }
+  },
+  "PasswordQuality": {
+    "minlen": 12,
+    "difok": 4
+  },
+  "RemovePAMNullok": false,
+  "EnableUFW": false,
+  "InstallUFW": false,
+  "FirewallAllowPorts": [],
+  "UpdatePackageLists": false,
+  "UpgradePackages": false,
+  "UpdatePackages": [],
+  "EnableDailyUpdateRefresh": false,
+  "DisableServices": [],
+  "EnableRequiredServices": false,
+  "SSH": {
+    "DisableRootLogin": false,
+    "DisableEmptyPasswords": false
+  },
+  "Sysctl": {
+    "net.ipv4.tcp_syncookies": 1
+  },
+  "FixShadowPermissions": false,
+  "RemovePackages": [],
+  "RemoveFiles": [],
+  "RemoveCronLines": [],
+  "RemoveHostsLines": [],
+  "DisableUnits": [],
+  "Desktop": {
+    "DisableGdmAutologin": false
+  },
+  "Browsers": {
+    "ChromiumBlockPopups": false
+  },
+  "AppArmorProfiles": [],
+  "Logging": {
+    "EnableAuditd": false,
+    "EnableRsyslog": false
+  },
+  "ServiceHardening": {
+    "Apache": false,
+    "Nginx": false,
+    "VsftpdNoAnonymous": false,
+    "SambaNoSMB1": false,
+    "PostfixNoVRFY": false
+  },
+  "ScanPaths": [
+    "/home",
+    "/tmp",
+    "/var/tmp"
+  ]
+}
+~~~
+
+**How to adapt it:** If your VM has no required Apache, remove `"apache2"` from `RequiredServices` and `RequiredSoftware`. If SSH is not required, do not open `22/tcp`. If you have no required new groups, set `NewGroups` to `[]` and `GroupMembers` to `{}`. If the README gives no password-aging values, make `PasswordAging` and `UserAging` empty objects. Leave uncertain actions switched off; never turn every `false` to `true`.
+
+**Before saving in nano:** Double-check that each string has quotes, arrays use square brackets, nested settings use curly braces, and there is no trailing comma after the last field. Continue with **Step 10** below to save and validate the JSON.
+
 ### Step 10 — Save the file in nano
 
 1. Press **Ctrl+O** (the letter O, not zero): nano says **File Name to Write**.

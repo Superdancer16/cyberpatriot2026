@@ -183,6 +183,302 @@ What these mean:
 
 Save the file with **Ctrl+S** and close Notepad.
 
+
+#### Step 9A — Identify server role and real names first
+
+**Never guess Domain Controller versus member server.** The [Server handbook](../windows-server.md) explains the differences. Use the VM README and the audit report, then run these *inspection commands* in elevated Windows PowerShell:
+
+~~~powershell
+Get-CimInstance Win32_ComputerSystem | Select-Object Name,Domain,PartOfDomain,DomainRole
+Get-WindowsFeature | Where-Object Installed | Select-Object Name,DisplayName
+Get-Service | Select-Object Name,DisplayName,Status | Sort-Object Name
+Get-SmbShare | Select-Object Name,Path
+Get-NetTCPConnection -State Listen | Select-Object LocalPort,OwningProcess
+~~~
+
+- **Role:** The script detects `StandaloneServer`, `MemberServer`, or `DomainController` during Audit; enter that **exact string** in `ExpectedRole`. `DomainRole` codes from Windows are clues, but use the script's actual detected role.
+- **`RequiredRoles`:** Prefer the exact installed Windows role/feature `Name` (e.g. `Web-Server`, `AD-Domain-Services`, `DNS`, `DHCP`). The script also recognizes `IIS` in its IIS-specific checks. Don't assume a role is required just because it is installed.
+- **`RequiredServices`:** Use actual service `Name` strings (e.g. `W3SVC` for IIS, `DNS`, `DHCPServer`, `TermService` for RDP), not `DisplayName`.
+- **`RequiredPorts`:** Enter ports used by services that **must stay accessible**, for example `"80/tcp"` for a required HTTP site or `"3389/tcp"` for required RDP. A port being open is not enough evidence that it is needed.
+- **Domain Controller:** An AD domain is **not the same** as a local Windows user database. Never put an invented domain or OU into a real configuration.
+
+#### Step 9B — Every top-level JSON field
+
+**Type guide:** `[]` = array; `{}` = object of settings; `true`/`false` = Boolean. Fields ending in a plural name usually hold arrays of **exact names**, not instructions or PowerShell commands. Leave unknown actions empty or false.
+
+**1. Confirmations, accounts, and protected roles**
+
+| Field | Exactly what belongs there |
+|---|---|
+| `ConfirmedReadme` | `false` until the VM README and all required accounts/services have been reviewed. Then `true` **last**. |
+| `ConfirmedServerRole` | `false` until you have verified the script-detected role. Set `true` only after matching `ExpectedRole`. |
+| `ForensicsComplete` | `false` until all necessary forensic answers and evidence are preserved. Then `true`. |
+| `ExpectedRole` | Exactly one string: `"StandaloneServer"`, `"MemberServer"`, or `"DomainController"`, matching Audit. |
+| `DomainName` | On a DC, the current **DNS domain name** exactly as reported, e.g. fictional `"lab.example.test"`; blank `""` for standalone. Do not guess. |
+| `AuthorizedLocalAdmins` | Exact authorized **local** admin usernames, e.g. `["labadmin"]`, required for standalone/member servers. |
+| `AuthorizedLocalUsers` | Exact authorized non-admin local usernames, e.g. `["labstudent"]`. |
+| `AuthorizedDomainAdmins` | Exact authorized AD/domain administrator usernames, required on a DC. |
+| `AuthorizedDomainUsers` | Exact authorized ordinary AD user names; only meaningful when using a domain. |
+| `RequiredServiceAccounts` | Service identity names required to keep a job running; do not disable/reset or group-change them without checking dependencies. |
+| `RequiredServices` | Service **Names** needed by the VM, e.g. `["W3SVC", "TermService"]` for required IIS and RDP; examples for other roles include `DNS`, `DHCPServer`, `NTDS`. |
+| `RequiredRoles` | Required installed roles/features, e.g. `["Web-Server"]` for IIS, or `["AD-Domain-Services", "DNS"]` on a DC. These protect server-role functionality. |
+| `RequiredShares` | Exact required SMB share names, not disk folder paths, e.g. `["LabShare"]`. |
+| `RequiredApplications` | Required installed application display names, e.g. `["Mozilla Firefox"]` **if the image says it must remain installed**. Cross-check exact winget IDs before any uninstall. |
+| `RequiredPorts` | Array of string ports, optionally with protocol, e.g. `["80/tcp","3389/tcp"]`. These help the script avoid disabling relevant firewall rules. **Listing a port does not itself open or test it.** |
+| `DiscoveryPaths` | Array of exact folders used only for finding suspicious file candidates, e.g. `["C:\\Users\\Public", "C:\\Temp"]`. The script limits supported scan roots; do not enter full drives indiscriminately. |
+
+**2. Accounts, groups, password policy, and auditing**
+
+| Field | Exactly what belongs there; shape example |
+|---|---|
+| `LocalUsers.Create` | List of **missing authorized local usernames** to create, e.g. `["labstudent"]`, also named in authorized lists. Password supplied interactively. |
+| `LocalUsers.Disable` | List of exact unauthorized local usernames to disable; verify the current account/critical service is not dependent on them. |
+| `LocalUsers.Delete` | List of exact unauthorized local usernames to delete; requires `-AllowRemovals` and saved forensics. Destructive. |
+| `LocalUsers.DemoteAdmins` | Existing local users who must lose local Administrators membership but keep their account. |
+| `LocalUsers.PasswordExpires` | Authorized local users whose `PasswordNeverExpires` should become false; it does **not** mean force password change immediately. |
+| `LocalUsers.ResetPasswords` | Authorized local accounts whose passwords need interactive reset; never store passwords in JSON. |
+| `LocalGroups.Create` | Array of exact local group names to create, e.g. `["LabReaders"]`. |
+| `LocalGroups.Members` | Object mapping **group → authorized members**, e.g. `{"LabReaders": ["labstudent"]}`. |
+| `LocalGroups.RemoveMembers` | Object mapping **group → exact users to remove**, e.g. `{"LabReaders": ["unapproveduser"]}`. |
+| `LocalPasswordPolicy` | Object of **numbers**, e.g. `{"MinimumPasswordLength":12,"PasswordComplexity":1}`. Supported names: `MinimumPasswordLength`, `PasswordHistorySize`, `MinimumPasswordAge`, `MaximumPasswordAge`, `PasswordComplexity`, `ClearTextPassword`, `LockoutBadCount`, `LockoutDuration`, `ResetLockoutCount`. Binary options need 0/1; domain policy may override local settings. |
+| `RemoveUserRights` | Object `{"SeDebugPrivilege": ["unapproveduser"]}` for specifically unauthorized privileges; supported rights include `SeSecurityPrivilege`, `SeTakeOwnershipPrivilege`, `SeDebugPrivilege`, `SeBackupPrivilege`, and `SeRestorePrivilege`. **Never remove required admin/service privileges indiscriminately.** |
+| `AuditSubcategories` | Object `{"Logon": "SuccessAndFailure"}`. Values must be `"Success"`, `"Failure"`, or `"SuccessAndFailure"` and use the exact audit subcategory name on the VM. |
+| `DomainChanges` | **A nested AD object, not a flat list.** Exact field reference in Step 9C. Leave `Allowed:false` for normal beginner use. |
+
+**3. Firewall, antivirus, file sharing, services, and installations**
+
+| Field | Exactly what belongs there |
+|---|---|
+| `Firewall.EnableProfiles` | `true` enables Domain/Private/Public Windows Firewall profiles. **Default is false** in Server template to prevent lockouts; verify all required role ports and RDP first. |
+| `Firewall.DisableRules` | Exact **internal rule names** returned by `Get-NetFirewallRule -Name`, *not* descriptions; only for known unwanted inbound Allow rules. |
+| `Defender.Enable` | `true` requests Defender realtime and PUA protections if installed/appropriate. |
+| `Defender.UpdateSignatures` | `true` requests Defender signature refresh, subject to approved network access. |
+| `Defender.QuickScan` | `true` requests a quick scan; wait until forensic evidence is preserved. |
+| `Defender.RemovePathExclusions` | Exact path exclusions verified unnecessary via `Get-MpPreference`. |
+| `Defender.RemoveProcessExclusions` | Exact process exclusions verified unnecessary. |
+| `Defender.RemoveExtensionExclusions` | Exact file extension exclusions verified unnecessary. |
+| `SMB.RequireServerSigning` | `true` requires signing on server-hosted SMB shares; may disrupt old clients. |
+| `SMB.RequireClientSigning` | `true` requires signing when this server accesses other SMB shares. |
+| `SMB.DisableSMB1` | `true` disables legacy SMB1, with extra DC/compatibility checks; test required SMB clients. |
+| `DisableServices` | Exact service **Names** to stop/disable, e.g. a confirmed unnecessary third-party service; don't include `DNS`, `NTDS`, `W3SVC`, or required units. |
+| `DisableFeatures` | Exact names of Windows **optional features** to disable only if unnecessary. |
+| `UninstallWindowsFeatures` | Exact installed Server role/feature names to **remove**; may break dependencies. Requires removal permission and forensics. |
+| `DisableScheduledTasks` | Full names of unauthorized non-Microsoft scheduled tasks, e.g. `["\\LabTasks\\UnwantedTask"]`. |
+| `RemoveStartupValues` | Array of objects `[{"Path":"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run","Name":"UnwantedEntry"}]` for an exact Run/RunOnce registry value. |
+| `RemoveHostsEntries` | Array of exact **full lines** from `hosts` to remove, e.g. an explicitly malicious mapping; requires `-AllowRemovals` and is guarded on DCs. |
+| `ClearAccessibilityDebuggers` | Exact allowlisted executable names (e.g. `"sethc.exe"`, `"utilman.exe"`, `"osk.exe"`, `"magnify.exe"`, `"narrator.exe"`) *only* when an unwanted debugger hijack is verified. |
+| `RemoveShares` | Exact non-system share names to remove after verification; destructive and requires `-AllowRemovals`. |
+| `RemoveShareAccess` | Array `[{"Share":"LabShare","Account":"unapproveduser"}]` to revoke an exact SMB share grant, **not** its NTFS ACL. |
+| `RemoveFiles` | Exact full paths to **files** that must be removed, e.g. `["C:\\Users\\Public\\unapproved.exe"]` only with preserved evidence and removal approval. No bulk deletions. |
+| `UpdatePrograms` | Exact winget package IDs to update, e.g. `["Mozilla.Firefox"]` only if installed and approved. |
+| `UninstallPrograms` | Exact winget IDs to remove, **not** friendly display titles; requires `-AllowRemovals`. |
+| `WindowsUpdate` | Exactly `"None"`, `"Scan"`, or `"Install"`; `"Install"` attempts updates but does not automatically reboot. |
+| `IIS`, `DNS`, `DHCP`, `TLS` | Server role-specific nested objects explained in Step 9D. |
+| `Security` | Nested Windows Server security settings explained in Step 9E. |
+
+#### Step 9C — Domain Controller `DomainChanges` fields
+
+Only configure this object if the VM is **really a Domain Controller** and your team has explicitly approved AD writes. On a standalone/member server, leave the example's defaults (all empty and `Allowed:false`).
+
+| DomainChanges key | Expected value |
+|---|---|
+| `Allowed` | `false` by default. When `true`, AD writes still require the separate `-EnableDomainChanges` command option, a matching domain, and authorization. |
+| `DisableUsers` | Array of exact **unauthorized AD `SamAccountName`** strings; protected/service/privileged users are skipped. |
+| `NewUsers` | Array of **objects**, e.g. `[{"SamAccountName":"labstudent","Name":"Lab Student","OU":"OU=Students,DC=lab,DC=example,DC=test"}]`. The OU must exist under the actual domain and the username must appear in authorized domain lists; password is interactive. |
+| `ExpirePasswords` | Exact authorized non-service AD usernames that must change password at next logon. |
+| `ResetPasswords` | Authorized ordinary AD usernames needing an interactive reset; do not reset privileged/service identities blindly. |
+| `NewGroups` | Array of **objects** like `[{"Name":"LabReaders","OU":"OU=Groups,DC=lab,DC=example,DC=test","Scope":"Global"}]`. Supported scopes: `Global`, `DomainLocal`, `Universal`. |
+| `AddGroupMembers` | Object `{"LabReaders":["labstudent"]}` for verified, authorized domain-group membership. Does not grant Domain Admin privileges indiscriminately; privileged groups require human review. |
+| `RemoveGroupMembers` | Object `{"LabReaders":["unapproveduser"]}` for an explicitly unauthorized member, after checking app dependencies. |
+| `ChangeDefaultPasswordPolicy` | `true` requests changing the default **domain** password policy (different from `LocalPasswordPolicy`); also requires AD-write safeguards. |
+| `DefaultPasswordPolicy` | Object with **numbers or booleans**, using these exact keys: `MinPasswordLength`, `PasswordHistoryCount`, `ComplexityEnabled`, `ReversibleEncryptionEnabled`, `LockoutThreshold`, `LockoutDurationMinutes`, `LockoutObservationWindowMinutes`, `MinPasswordAgeDays`, `MaxPasswordAgeDays`. Example `{"MinPasswordLength":12,"ComplexityEnabled":true}` **only if explicitly specified**; check effective domain and fine-grained policies first. |
+
+**Important:** On a DC, `ExpectedRole` must equal `"DomainController"`, `DomainName` must match the server's **real** AD DNS domain, and `AuthorizedDomainAdmins` must list real authorized administrators. The complete example below illustrates a **standalone server**, not a DC. **Don't simply change the role string to make a config pass validation.**
+
+#### Step 9D — Server-role-specific settings
+
+| Nested field | Exact structure and when relevant |
+|---|---|
+| `IIS.DisableDirectoryBrowsingOnSites` | Array of exact IIS website names, e.g. `["Default Web Site"]`, if IIS is required and directory browsing should be disabled. `RequiredRoles` must contain `"Web-Server"` or `"IIS"`. Test the website afterward. |
+| `DNS.SecureDynamicUpdateZones` | Array of exact AD-integrated **primary zone names**, e.g. `["lab.example.test"]`, only when that zone is owned by the VM and secure updates are required. |
+| `DNS.DisableZoneTransfers` | Exact primary DNS zone names where transfers should be disabled; **requires `-AllowCompatibilityChanges`**, and can break legitimate secondaries. |
+| `DNS.RequiredSecondaryServers` | Array of names/addresses of legitimate secondary DNS servers. A non-empty list makes the script skip broad no-transfer changes for safety; configure restricted transfers manually. |
+| `DHCP.EnableAuditLogging` | `true` requests DHCP audit logging **only if DHCP is installed and declared required**. Does not configure scopes/leases for you. |
+| `TLS.DisableServerProtocols` | List of exact legacy protocol names from `"SSL 2.0"`, `"SSL 3.0"`, `"TLS 1.0"`, `"TLS 1.1"`; can disrupt required clients. |
+| `TLS.CompatibilityConfirmed` | `true` means the necessary protocol/client testing was performed. The script also requires `-AllowCompatibilityChanges` for TLS protocol changes. |
+
+#### Step 9E — Each `Security` setting
+
+All values below are **`true`/`false`** inside the `Security` object. `true` requests that action when its dependencies allow it. **None is automatically guaranteed safe on a domain controller.**
+
+| Security subkey | What it requests |
+|---|---|
+| `SmartScreen` | Enable Microsoft SmartScreen policy, where applicable. |
+| `RestrictBlankPasswords` | Restrict network access for blank-password local accounts. |
+| `EnableUAC` | Turn on User Account Control and admin elevation prompts (may need restart). |
+| `HideLastSignedIn` | Hide last signed-in username at logon. |
+| `DisableAutoplay` | Disable automatic actions from removable media. |
+| `DisableLLMNR` | Disable multicast name resolution; may affect networks that rely on it. |
+| `PowerShellLogging` | Enable PowerShell script-block logging; collected events may contain sensitive details. |
+| `RequireNTLMv2` | Require stronger NTLM behavior; **also needs `-AllowCompatibilityChanges`**. |
+| `RestrictAnonymous` | Restrict anonymous access. On DC, compatibility preflight/flag required. |
+| `PrintDriverAdminOnly` | Restrict Point-and-Print driver installation to admins; test printing. |
+| `RequireRdpNLA` | Require RDP Network Level Authentication; verify `TermService` is declared required and connection still works. |
+| `DisableRemoteAssistance` | Disable Remote Assistance (different from Remote Desktop). |
+| `DisableUnencryptedWinRM` | Turn off unencrypted WinRM traffic, after verifying required remote management. |
+| `DisableBasicWinRM` | Turn off WinRM Basic authentication; test your authorized remoting method. |
+
+#### Step 9F — Complete example JSON (fictional standalone server)
+
+Use the [complete standalone-server example JSON](EXAMPLE-CONFIG-DO-NOT-APPLY.json) as a reference for **every generated field**. The example pretends the lab needs a web server, a named file share, and RDP, but these are **not assumed requirements for your actual image**.
+
+> [!WARNING]
+> **Never Apply this example as-is.** The demo uses fictional `lab...` accounts and an assumed IIS website; both confirmation fields are `false` so the script will reject unreviewed Apply. The example password length and IIS settings are for illustrating correct JSON types, **not a recommended universal configuration**.
+
+~~~json
+{
+  "ConfirmedReadme": false,
+  "ConfirmedServerRole": false,
+  "ForensicsComplete": false,
+  "ExpectedRole": "StandaloneServer",
+  "DomainName": "",
+  "AuthorizedLocalUsers": [
+    "labstudent"
+  ],
+  "AuthorizedLocalAdmins": [
+    "labadmin"
+  ],
+  "AuthorizedDomainUsers": [],
+  "AuthorizedDomainAdmins": [],
+  "RequiredServiceAccounts": [],
+  "RequiredServices": [
+    "W3SVC",
+    "TermService"
+  ],
+  "RequiredRoles": [
+    "Web-Server"
+  ],
+  "RequiredShares": [
+    "LabShare"
+  ],
+  "RequiredApplications": [
+    "Mozilla Firefox"
+  ],
+  "RequiredPorts": [
+    "80/tcp",
+    "3389/tcp"
+  ],
+  "LocalUsers": {
+    "Create": [],
+    "Disable": [],
+    "Delete": [],
+    "DemoteAdmins": [],
+    "PasswordExpires": [],
+    "ResetPasswords": []
+  },
+  "LocalGroups": {
+    "Create": [
+      "LabReaders"
+    ],
+    "Members": {
+      "LabReaders": [
+        "labstudent"
+      ]
+    },
+    "RemoveMembers": {}
+  },
+  "LocalPasswordPolicy": {
+    "MinimumPasswordLength": 12,
+    "PasswordComplexity": 1
+  },
+  "RemoveUserRights": {},
+  "DomainChanges": {
+    "Allowed": false,
+    "DisableUsers": [],
+    "NewUsers": [],
+    "ExpirePasswords": [],
+    "ResetPasswords": [],
+    "NewGroups": [],
+    "AddGroupMembers": {},
+    "RemoveGroupMembers": {},
+    "ChangeDefaultPasswordPolicy": false,
+    "DefaultPasswordPolicy": {}
+  },
+  "Firewall": {
+    "EnableProfiles": false,
+    "DisableRules": []
+  },
+  "Defender": {
+    "Enable": true,
+    "UpdateSignatures": false,
+    "QuickScan": false,
+    "RemovePathExclusions": [],
+    "RemoveProcessExclusions": [],
+    "RemoveExtensionExclusions": []
+  },
+  "SMB": {
+    "RequireServerSigning": false,
+    "RequireClientSigning": false,
+    "DisableSMB1": false
+  },
+  "Security": {
+    "SmartScreen": false,
+    "RestrictBlankPasswords": false,
+    "EnableUAC": false,
+    "HideLastSignedIn": false,
+    "DisableAutoplay": false,
+    "DisableLLMNR": false,
+    "PowerShellLogging": false,
+    "RequireNTLMv2": false,
+    "RestrictAnonymous": false,
+    "PrintDriverAdminOnly": false,
+    "RequireRdpNLA": false,
+    "DisableRemoteAssistance": false,
+    "DisableUnencryptedWinRM": false,
+    "DisableBasicWinRM": false
+  },
+  "AuditSubcategories": {},
+  "DisableServices": [],
+  "DisableFeatures": [],
+  "UninstallWindowsFeatures": [],
+  "DisableScheduledTasks": [],
+  "RemoveStartupValues": [],
+  "RemoveHostsEntries": [],
+  "ClearAccessibilityDebuggers": [],
+  "RemoveShares": [],
+  "RemoveShareAccess": [],
+  "RemoveFiles": [],
+  "UpdatePrograms": [],
+  "UninstallPrograms": [],
+  "WindowsUpdate": "None",
+  "IIS": {
+    "DisableDirectoryBrowsingOnSites": [
+      "Default Web Site"
+    ]
+  },
+  "DNS": {
+    "SecureDynamicUpdateZones": [],
+    "DisableZoneTransfers": [],
+    "RequiredSecondaryServers": []
+  },
+  "DHCP": {
+    "EnableAuditLogging": false
+  },
+  "TLS": {
+    "DisableServerProtocols": [],
+    "CompatibilityConfirmed": false
+  },
+  "DiscoveryPaths": [
+    "C:\\Users\\Public",
+    "C:\\Temp"
+  ]
+}
+~~~
+
+**To change this example for a real VM:** Choose your detected `ExpectedRole`, replace all fictional names, copy only actually required services/roles/ports from the README, and leave every unknown action list empty. For a DC, follow Step 9C and keep AD writes disabled unless explicitly authorized. For a server without IIS, remove `"Web-Server"` from `RequiredRoles` and set `"IIS": {"DisableDirectoryBrowsingOnSites": []}`. **Verify firewall/remote connectivity before changing networking settings.**
+
+Now save your edited **generated file**, not the teaching example. Continue with Step 10 to check the JSON format and Step 11 only when your configuration has been reviewed.
+
 ### Step 10 — Check JSON syntax (this does NOT apply changes)
 
 ~~~powershell

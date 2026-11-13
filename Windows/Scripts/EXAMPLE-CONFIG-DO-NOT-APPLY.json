@@ -1,0 +1,95 @@
+{
+  "ConfirmedReadme": false,
+  "AuthorizedUsers": [
+    "labstudent",
+    "labviewer"
+  ],
+  "AuthorizedAdmins": [
+    "labadmin"
+  ],
+  "RequiredServices": [
+    "Spooler",
+    "TermService"
+  ],
+  "RequiredSoftware": [
+    "Mozilla Firefox"
+  ],
+  "RequiredShares": [
+    "LabShare"
+  ],
+  "RequiredPorts": [
+    "3389"
+  ],
+  "ForensicsComplete": false,
+  "ScanPaths": [
+    "C:\\Users\\Public"
+  ],
+  "DisableFirewallRules": [],
+  "RemoveAppxPackages": [],
+  "RemoveStartupValues": [],
+  "ClearIFEO": [],
+  "RemoveShareAccess": [],
+  "AuditSubcategories": {},
+  "DisableUsers": [],
+  "RemoveUsers": [],
+  "DemoteAdmins": [],
+  "PasswordExpiresUsers": [
+    "labstudent"
+  ],
+  "NewUsers": [],
+  "ResetPasswords": [],
+  "Groups": {
+    "LabReaders": [
+      "labstudent"
+    ]
+  },
+  "RemoveGroupMembers": {},
+  "RemoveUserRights": {},
+  "DisableServices": [],
+  "DisableFeatures": [],
+  "RemoveShares": [],
+  "RemoveDefenderExclusions": [],
+  "RemoveDefenderExclusionProcesses": [],
+  "RemoveDefenderExclusionExtensions": [],
+  "DisableScheduledTasks": [],
+  "RemovePrograms": [],
+  "RemoveFiles": [],
+  "UpdatePrograms": [],
+  "PasswordPolicy": {
+    "MinimumPasswordLength": 12,
+    "PasswordHistorySize": 5,
+    "PasswordComplexity": 1
+  },
+  "Security": {
+    "Firewall": true,
+    "Defender": true,
+    "DefenderSignatures": true,
+    "DefenderQuickScan": false,
+    "SMBClientSigning": false,
+    "SMBServerSigning": false,
+    "RequireRdpNla": false,
+    "EnableUAC": false,
+    "RestrictAnonymous": false,
+    "DisableLMHash": false,
+    "RequireNTLMv2": false,
+    "ProtectPrintDrivers": false,
+    "DisableNetBIOS": false,
+    "CredentialAuditSuccess": true,
+    "SmartScreen": true,
+    "DisableAutoPlay": true,
+    "DisableLLMNR": false,
+    "DisableRemoteAssistance": false,
+    "DisableRDP": false,
+    "DisableSMB1": false,
+    "DisableWDigest": true,
+    "HideLastSignedIn": false,
+    "DisableAdminEnumeration": false,
+    "AutomaticWindowsUpdates": false,
+    "RestrictBlankPasswordNetwork": true,
+    "PowerShellLogging": false,
+    "LockScreenSeconds": null,
+    "WindowsUpdate": "None",
+    "ChromeBlockPopups": false,
+    "EdgeBlockPopups": false
+  }
+}

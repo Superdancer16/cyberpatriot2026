@@ -1,0 +1,137 @@
+{
+  "ConfirmedReadme": false,
+  "ConfirmedServerRole": false,
+  "ForensicsComplete": false,
+  "ExpectedRole": "StandaloneServer",
+  "DomainName": "",
+  "AuthorizedLocalUsers": [
+    "labstudent"
+  ],
+  "AuthorizedLocalAdmins": [
+    "labadmin"
+  ],
+  "AuthorizedDomainUsers": [],
+  "AuthorizedDomainAdmins": [],
+  "RequiredServiceAccounts": [],
+  "RequiredServices": [
+    "W3SVC",
+    "TermService"
+  ],
+  "RequiredRoles": [
+    "Web-Server"
+  ],
+  "RequiredShares": [
+    "LabShare"
+  ],
+  "RequiredApplications": [
+    "Mozilla Firefox"
+  ],
+  "RequiredPorts": [
+    "80/tcp",
+    "3389/tcp"
+  ],
+  "LocalUsers": {
+    "Create": [],
+    "Disable": [],
+    "Delete": [],
+    "DemoteAdmins": [],
+    "PasswordExpires": [],
+    "ResetPasswords": []
+  },
+  "LocalGroups": {
+    "Create": [
+      "LabReaders"
+    ],
+    "Members": {
+      "LabReaders": [
+        "labstudent"
+      ]
+    },
+    "RemoveMembers": {}
+  },
+  "LocalPasswordPolicy": {
+    "MinimumPasswordLength": 12,
+    "PasswordComplexity": 1
+  },
+  "RemoveUserRights": {},
+  "DomainChanges": {
+    "Allowed": false,
+    "DisableUsers": [],
+    "NewUsers": [],
+    "ExpirePasswords": [],
+    "ResetPasswords": [],
+    "NewGroups": [],
+    "AddGroupMembers": {},
+    "RemoveGroupMembers": {},
+    "ChangeDefaultPasswordPolicy": false,
+    "DefaultPasswordPolicy": {}
+  },
+  "Firewall": {
+    "EnableProfiles": false,
+    "DisableRules": []
+  },
+  "Defender": {
+    "Enable": true,
+    "UpdateSignatures": false,
+    "QuickScan": false,
+    "RemovePathExclusions": [],
+    "RemoveProcessExclusions": [],
+    "RemoveExtensionExclusions": []
+  },
+  "SMB": {
+    "RequireServerSigning": false,
+    "RequireClientSigning": false,
+    "DisableSMB1": false
+  },
+  "Security": {
+    "SmartScreen": false,
+    "RestrictBlankPasswords": false,
+    "EnableUAC": false,
+    "HideLastSignedIn": false,
+    "DisableAutoplay": false,
+    "DisableLLMNR": false,
+    "PowerShellLogging": false,
+    "RequireNTLMv2": false,
+    "RestrictAnonymous": false,
+    "PrintDriverAdminOnly": false,
+    "RequireRdpNLA": false,
+    "DisableRemoteAssistance": false,
+    "DisableUnencryptedWinRM": false,
+    "DisableBasicWinRM": false
+  },
+  "AuditSubcategories": {},
+  "DisableServices": [],
+  "DisableFeatures": [],
+  "UninstallWindowsFeatures": [],
+  "DisableScheduledTasks": [],
+  "RemoveStartupValues": [],
+  "RemoveHostsEntries": [],
+  "ClearAccessibilityDebuggers": [],
+  "RemoveShares": [],
+  "RemoveShareAccess": [],
+  "RemoveFiles": [],
+  "UpdatePrograms": [],
+  "UninstallPrograms": [],
+  "WindowsUpdate": "None",
+  "IIS": {
+    "DisableDirectoryBrowsingOnSites": [
+      "Default Web Site"
+    ]
+  },
+  "DNS": {
+    "SecureDynamicUpdateZones": [],
+    "DisableZoneTransfers": [],
+    "RequiredSecondaryServers": []
+  },
+  "DHCP": {
+    "EnableAuditLogging": false
+  },
+  "TLS": {
+    "DisableServerProtocols": [],
+    "CompatibilityConfirmed": false
+  },
+  "DiscoveryPaths": [
+    "C:\\Users\\Public",
+    "C:\\Temp"
+  ]
+}
