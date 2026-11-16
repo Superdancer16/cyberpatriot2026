@@ -13,8 +13,8 @@
 | 🖥️ **Windows Server / AD** | [Standalone Server guide](Server/windows-server.md) | [Server forensics](Server/forensics.md) | [Checklist PDF](Server/Checklists/windows-server-checklist.pdf) |
 | 🌐 **Cisco Packet Tracer / quiz** | [Packet Tracer](Cisco/packet-tracer.md) · [Networking quiz](Cisco/cisco-quiz.md) | Use activity tasks / topology first | [Cisco checklist PDF](Cisco/Checklists/cisco-packet-tracer-checklist.pdf) |
 | 🐧 **Debian 12/13** | [Debian handbook](Linux/Debian/debian.md) | [Linux forensics](Linux/forensics.md) | [Checklist PDF](Linux/Debian/Checklists/debian-checklist.pdf) |
-| 🌿 **Linux Mint** | [Linux Mint handbook](Linux/Mint/linux-mint.md) | [Linux forensics](Linux/forensics.md) | [Linux Mint handbook](Linux/Mint/linux-mint.md) |
-| 🟠 **Ubuntu** | [Ubuntu handbook](Linux/Ubuntu/ubuntu.md) | [Linux forensics](Linux/forensics.md) | [Ubuntu handbook](Linux/Ubuntu/ubuntu.md) |
+| 🌿 **Linux Mint** | [Linux Mint handbook](Linux/Mint/linux-mint.md) | [Linux forensics](Linux/forensics.md) | Manual reference only |
+| 🟠 **Ubuntu** | [Ubuntu handbook](Linux/Ubuntu/ubuntu.md) | [Linux forensics](Linux/forensics.md) | Manual reference only |
 | 🐡 **FreeBSD** | [FreeBSD handbook](Misc/FreeBSD/freebsd.md) | [BSD-specific forensic quick reference](General/forensics-workflows.md#freebsd-quick-reference) | FreeBSD commands differ from Linux |
 
 ## 🗂️ Repository layout
